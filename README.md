@@ -98,20 +98,6 @@ The home page is composed top to bottom in `app/page.tsx`.
 
 ---
 
-## The interactive wordmark
-
-`components/effects/interactive-mark.tsx` is the cursor-driven wordmark panel that sits on the right side of the hero. It works like this.
-
-- A `useMousePosition` hook tracks normalized 0..1 coordinates inside the panel.
-- A `requestAnimationFrame` loop lerps the inner mark's transform toward the cursor target. The smoothing factor is 0.12.
-- On pointer leave, the target resets to center and the mark eases back to rest.
-- `prefers-reduced-motion: reduce` short-circuits the rAF loop and falls back to the global `animate-float` keyframe.
-- The panel itself uses a CRT-style scanline overlay and corner brackets for character.
-
-It is a single `'use client'` component with no external state. Drop it anywhere you want a cursor-reactive element.
-
----
-
 ## Legal pages
 
 Three policies. Privacy, Terms of Service, and Acceptable Use. Each lives as:
