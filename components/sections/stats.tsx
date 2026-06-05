@@ -1,20 +1,6 @@
 import { cn } from '@/lib/utils'
-import { CountUp } from '@/components/count-up'
-
-interface Stat {
-  prefix?: string
-  value: number
-  suffix?: string
-  label: string
-  decimals?: number
-}
-
-const stats: Stat[] = [
-  { value: 99.9, suffix: '%', label: 'Uptime SLA', decimals: 1 },
-  { value: 1,   prefix: '< ', suffix: ' hr', label: 'Avg. Support Response' },
-  { value: 100, suffix: '%', label: 'Private & Application Only' },
-  { value: 100, suffix: '%', label: 'USA-based, Missouri' },
-]
+import { CountUp } from '@/components/effects/count-up'
+import { stats } from '@/data/stats'
 
 export function Stats() {
   return (

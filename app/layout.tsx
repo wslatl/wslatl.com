@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
-import { AnimatedBackground } from '@/components/animated-background'
-import { ScrollProgress } from '@/components/scroll-progress'
+import { AnimatedBackground } from '@/components/brand/animated-background'
+import { ScrollProgress } from '@/components/brand/scroll-progress'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, Children, isValidElement, cloneElement } from 'react'
 import { cn } from '@/lib/utils'
+import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
 type RevealProps = {
   children: React.ReactNode
@@ -26,15 +27,12 @@ export function Reveal({
 }: RevealProps) {
   const ref = useRef<HTMLElement | null>(null)
   const [visible, setVisible] = useState(false)
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
-
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
+    if (reducedMotion) {
       setVisible(true)
       return
     }
@@ -54,7 +52,7 @@ export function Reveal({
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [amount, once])
+  }, [amount, once, reducedMotion])
 
   return (
     <Comp
@@ -100,15 +98,12 @@ export function RevealGroup({
 }: RevealGroupProps) {
   const ref = useRef<HTMLElement | null>(null)
   const [visible, setVisible] = useState(false)
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     const el = ref.current
     if (!el) return
-
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
+    if (reducedMotion) {
       setVisible(true)
       return
     }
@@ -128,7 +123,7 @@ export function RevealGroup({
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [amount, once])
+  }, [amount, once, reducedMotion])
 
   const wrapped = Children.map(children, (child, idx) => {
     if (!isValidElement(child)) return child

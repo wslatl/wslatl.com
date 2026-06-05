@@ -1,15 +1,10 @@
 import Image from 'next/image'
-import { Reveal } from '@/components/reveal'
+import { Reveal } from '@/components/effects/reveal'
+import { clients } from '@/data/clients'
 
-const clients = [
-  { name: 'Joes',             logo: '/clients/joes.png',        width: 6250, height: 6250, hClass: 'h-14' },
-  { name: 'West Bay Project', logo: '/clients/westbay.png',     width: 955,  height: 261,  hClass: 'h-8'  },
-  { name: 'VulnRadar',        logo: '/clients/vulnradar.png',   width: 378,  height: 156,  hClass: 'h-9'  },
-  { name: 'HASKINS',          logo: '/clients/haskins.png',     width: 509,  height: 490,  hClass: 'h-14' },
-  { name: 'WSLATL',           logo: '/clients/wslatl-main.png', width: 1563, height: 1563, hClass: 'h-12' },
-]
-
-const scrollItems = [...clients, ...clients, ...clients, ...clients]
+/** Repeats the client list 4x to create a seamless infinite-marquee track. */
+const SCROLL_REPEATS = 4
+const scrollItems = Array.from({ length: SCROLL_REPEATS }, () => clients).flat()
 
 export function Clients() {
   return (

@@ -1,14 +1,10 @@
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
-import { Header } from '@/components/header'
-import { Footer } from '@/components/footer'
-import { Reveal } from '@/components/reveal'
-
-const legalPages = [
-  { label: 'Privacy Policy', href: '/privacy' },
-  { label: 'Terms of Service', href: '/terms' },
-  { label: 'Acceptable Use', href: '/acceptable-use' },
-]
+import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
+import { Reveal } from '@/components/effects/reveal'
+import { legalPages } from '@/data/legal'
+import { siteConfig } from '@/config/site'
 
 interface LegalLayoutProps {
   title: string
@@ -73,8 +69,8 @@ export function LegalLayout({ title, description, effectiveDate, currentPath, ch
               <span className="text-foreground/60">Jurisdiction</span>
               <span className="text-foreground/90 font-medium">WSLATL LLC, Missouri, USA</span>
             </span>
-            <Link href="mailto:support@wslatl.com" className="hover:text-primary transition-colors">
-              support@wslatl.com
+            <Link href={`mailto:${siteConfig.email.support}`} className="hover:text-primary transition-colors">
+              {siteConfig.email.support}
             </Link>
           </div>
         </div>
@@ -99,13 +95,13 @@ export function LegalLayout({ title, description, effectiveDate, currentPath, ch
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <Link
-                href="mailto:support@wslatl.com"
+                href={`mailto:${siteConfig.email.support}`}
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-colors text-sm font-medium"
               >
-                support@wslatl.com
+                {siteConfig.email.support}
               </Link>
               <Link
-                href="https://discord.gg/3eKawhSbAF"
+                href={siteConfig.links.discord}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-border/70 text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors text-sm font-medium"

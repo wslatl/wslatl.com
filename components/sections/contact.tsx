@@ -1,41 +1,7 @@
 import Link from 'next/link'
-import { CreditCard, Mail, MapPin } from 'lucide-react'
-import { DiscordIcon } from '@/components/icons'
-import { siteConfig } from '@/config/site'
-import { Reveal, RevealGroup } from '@/components/reveal'
-
-const reachOptions = [
-  {
-    icon: CreditCard,
-    title: 'Billing Portal Ticket',
-    description: 'Log in to your billing portal and open a support ticket. Great for account or billing questions.',
-    cta: 'Open a Ticket',
-    href: siteConfig.links.billing,
-    ring: 'ring-blue-400/30',
-    bg: 'bg-blue-400/10',
-    text: 'text-blue-300',
-  },
-  {
-    icon: DiscordIcon,
-    title: 'Discord Server',
-    description: 'Join our Discord and open a ticket in the server. This is the fastest way to hear from us.',
-    cta: 'Join Discord',
-    href: siteConfig.links.discord,
-    ring: 'ring-[#5865F2]/40',
-    bg: 'bg-[#5865F2]/10',
-    text: 'text-[#7d87fa]',
-  },
-  {
-    icon: DiscordIcon,
-    title: 'Direct Message Us',
-    description: 'Prefer something more private? DM us directly on Discord and we will get back to you personally.',
-    cta: 'Find Us on Discord',
-    href: siteConfig.links.discord,
-    ring: 'ring-[#5865F2]/40',
-    bg: 'bg-[#5865F2]/10',
-    text: 'text-[#7d87fa]',
-  },
-]
+import { DiscordIcon } from '@/components/brand/icons'
+import { Reveal, RevealGroup } from '@/components/effects/reveal'
+import { reachOptions } from '@/data/reach-options'
 
 export function Contact() {
   return (
@@ -63,7 +29,7 @@ export function Contact() {
             return (
               <div
                 key={idx}
-                className={`group p-5 rounded-2xl border border-border/70 bg-card/30 hover:bg-card/60 transition-all duration-300 flex flex-col gap-3`}
+                className="group p-5 rounded-2xl border border-border/70 bg-card/30 hover:bg-card/60 transition-all duration-300 flex flex-col gap-3"
               >
                 <div
                   className={`w-11 h-11 rounded-full ring-1 ${option.ring} ${option.bg} flex items-center justify-center flex-shrink-0`}

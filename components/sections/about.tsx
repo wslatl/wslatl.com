@@ -1,6 +1,32 @@
 import Image from 'next/image'
-import { HeartGlyph, ShieldGlyph, NodesGlyph } from '@/components/glyphs'
-import { Reveal, RevealGroup } from '@/components/reveal'
+import type { ComponentType } from 'react'
+import { HeartGlyph, ShieldGlyph, NodesGlyph } from '@/components/brand/glyphs'
+import { Reveal, RevealGroup } from '@/components/effects/reveal'
+import { team } from '@/data/team'
+
+interface Pillar {
+  Glyph: ComponentType<{ className?: string }>
+  title: string
+  desc: string
+}
+
+const pillars: Pillar[] = [
+  {
+    Glyph: HeartGlyph,
+    title: 'Family First',
+    desc: "Every client gets our direct attention. We learn your setup, respond fast, and treat your server like it is our own.",
+  },
+  {
+    Glyph: ShieldGlyph,
+    title: 'Private by Design',
+    desc: "We accept clients personally. That is how we keep the quality of service high and make sure we are actually a good fit.",
+  },
+  {
+    Glyph: NodesGlyph,
+    title: 'Industry Veterans',
+    desc: "We have worked at hosting companies before. We know the shortcuts they take. We do not take them.",
+  },
+]
 
 export function About() {
   return (
@@ -37,23 +63,7 @@ export function About() {
           </Reveal>
 
           <RevealGroup as="div" className="space-y-3" step={120}>
-            {[
-              {
-                Glyph: HeartGlyph,
-                title: 'Family First',
-                desc: "Every client gets our direct attention. We learn your setup, respond fast, and treat your server like it is our own.",
-              },
-              {
-                Glyph: ShieldGlyph,
-                title: 'Private by Design',
-                desc: "We accept clients personally. That is how we keep the quality of service high and make sure we are actually a good fit.",
-              },
-              {
-                Glyph: NodesGlyph,
-                title: 'Industry Veterans',
-                desc: "We have worked at hosting companies before. We know the shortcuts they take. We do not take them.",
-              },
-            ].map((p, idx) => {
+            {pillars.map((p, idx) => {
               const Glyph = p.Glyph
               return (
                 <div
@@ -100,20 +110,7 @@ export function About() {
             </p>
           </Reveal>
           <RevealGroup as="div" className="flex flex-col sm:flex-row gap-5 justify-center max-w-2xl mx-auto" step={150}>
-            {[
-              {
-                name: 'Liam Henry',
-                role: 'Founder & CEO',
-                photo: '/owners/rejectmodders.jpg',
-                bio: 'Years in the hosting industry. Built WSLATL to give clients the direct attention they deserve.',
-              },
-              {
-                name: 'Tyler Woollis',
-                role: 'Co-Founder & Co-Owner',
-                photo: '/owners/tyler.png',
-                bio: 'Keeps the infrastructure solid. If something breaks, he already knows about it.',
-              },
-            ].map((member, idx) => (
+            {team.map((member, idx) => (
               <div
                 key={idx}
                 className="group flex-1 p-6 rounded-2xl border border-border/70 bg-card/30 text-center hover:bg-card/60 hover:border-primary/30 transition-all duration-300"

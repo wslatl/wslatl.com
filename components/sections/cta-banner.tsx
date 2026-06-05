@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { UserPlus, ChevronRight } from 'lucide-react'
-import { DiscordIcon } from '@/components/icons'
+import { DiscordIcon } from '@/components/brand/icons'
 import { siteConfig } from '@/config/site'
-import { Reveal } from '@/components/reveal'
+import { Reveal } from '@/components/effects/reveal'
 
 export function CtaBanner() {
   return (

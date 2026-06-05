@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { UserPlus, MessageSquare, Rocket } from 'lucide-react'
 import { siteConfig } from '@/config/site'
-import { Reveal, RevealGroup } from '@/components/reveal'
+import { Reveal, RevealGroup } from '@/components/effects/reveal'
 
 const steps = [
   {

@@ -1,81 +1,8 @@
 import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
 import { ChevronRight } from 'lucide-react'
-import {
-  ServerStackGlyph,
-  ControllerGlyph,
-  LayersGlyph,
-  GlobeGlyph,
-} from '@/components/glyphs'
-import { siteConfig } from '@/config/site'
-import { Reveal, RevealGroup } from '@/components/reveal'
-
-const services = [
-  {
-    Glyph: ServerStackGlyph,
-    title: 'Dedicated Servers',
-    badge: 'Most Popular',
-    description:
-      "Your own hardware and resources. Nobody sharing your CPU or RAM. Full root access, managed or unmanaged, and we are available if anything comes up.",
-    features: [
-      'Dedicated hardware with no shared resources',
-      'NVMe SSD storage',
-      'Unmetered bandwidth options',
-      'IPMI and KVM remote access',
-      'Managed or self managed',
-    ],
-    accent: 'group-hover:border-blue-400/40',
-    halo: 'from-blue-500/8 to-indigo-500/4',
-  },
-  {
-    Glyph: ControllerGlyph,
-    title: 'Game Hosting',
-    badge: 'Pterodactyl Panel',
-    description:
-      'Game servers with a clean control panel and zero headache. We keep it fast, we keep it online, and if something breaks we fix it.',
-    features: [
-      'Minecraft, Rust, CS2, ARK, Valheim and more',
-      'Pterodactyl panel included',
-      'DDoS protection built in',
-      'Mod and plugin support',
-      'Fast setup, usually same day',
-    ],
-    accent: 'group-hover:border-purple-400/40',
-    halo: 'from-purple-500/8 to-pink-500/4',
-  },
-  {
-    Glyph: LayersGlyph,
-    title: 'VPS Hosting',
-    badge: 'Scalable',
-    description:
-      'Isolated resources, full root access, and the flexibility to run whatever you need. A solid middle ground between shared and dedicated.',
-    features: [
-      'Full root and sudo access',
-      'Your choice of OS',
-      'Scalable CPU and RAM',
-      'SSD backed storage',
-      '99.9% uptime SLA',
-    ],
-    accent: 'group-hover:border-cyan-400/40',
-    halo: 'from-cyan-500/8 to-blue-500/4',
-  },
-  {
-    Glyph: GlobeGlyph,
-    title: 'Web Hosting',
-    badge: 'Managed',
-    description:
-      'Reliable hosting for websites and web apps, managed by us. Free SSL, daily backups, and someone to contact if things go sideways.',
-    features: [
-      'Free SSL certificates',
-      'Daily automated backups',
-      'Email hosting included',
-      'One click app installs',
-      'Personal support included',
-    ],
-    accent: 'group-hover:border-emerald-400/40',
-    halo: 'from-emerald-500/8 to-teal-500/4',
-  },
-]
+import { Badge } from '@/components/ui/badge'
+import { Reveal, RevealGroup } from '@/components/effects/reveal'
+import { services } from '@/data/services'
 
 export function Services() {
   return (
@@ -137,7 +64,7 @@ export function Services() {
                 </ul>
 
                 <Link
-                  href={siteConfig.links.register}
+                  href={service.ctaHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/70 font-semibold transition-colors mt-auto relative"

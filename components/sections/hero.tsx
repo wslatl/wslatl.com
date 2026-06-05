@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ChevronRight, UserPlus } from 'lucide-react'
-import { DiscordIcon } from '@/components/icons'
+import { DiscordIcon } from '@/components/brand/icons'
 import { siteConfig } from '@/config/site'
 
 export function Hero() {

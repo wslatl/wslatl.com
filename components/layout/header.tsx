@@ -2,10 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
-import {
-  Menu, X, ChevronDown, LogIn, UserPlus,
-  CreditCard, Gamepad2, Server, LayoutDashboard, HardDrive,
-} from 'lucide-react'
+import { Menu, X, ChevronDown, LogIn } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -14,31 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Wordmark } from '@/components/brand/wordmark'
+import { mainLinks, loginLinks } from '@/data/nav'
 import { siteConfig } from '@/config/site'
-import { Wordmark } from '@/components/wordmark'
 import { cn } from '@/lib/utils'
-
-type NavLink = { label: string; href: string; Icon: React.ElementType }
-type NavItem = NavLink | null
-
-const mainLinks = [
-  { label: 'Home',     href: '/',            external: false },
-  { label: 'Services', href: '#services',    external: false },
-  { label: 'About',    href: '#about',       external: false },
-  { label: 'Contact',  href: '#contact',     external: false },
-  { label: 'Status',   href: siteConfig.links.status,  external: true },
-  { label: 'Discord',  href: siteConfig.links.discord, external: true },
-]
-
-const loginLinks: NavItem[] = [
-  { label: 'Billing Portal',  href: siteConfig.links.billing,    Icon: CreditCard },
-  { label: 'Register',        href: siteConfig.links.register,   Icon: UserPlus },
-  null,
-  { label: 'Gaming Panel',    href: siteConfig.links.gamingPanel, Icon: Gamepad2 },
-  { label: 'VPS Panel',       href: siteConfig.links.vpsPanel,   Icon: Server },
-  { label: 'Dedicated Portal',href: siteConfig.links.dedicated,  Icon: HardDrive },
-  { label: 'cPanel',          href: siteConfig.links.cPanel,     Icon: LayoutDashboard },
-]
 
 function LoginDropdownItems() {
   return (
@@ -54,7 +30,7 @@ function LoginDropdownItems() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 cursor-pointer"
             >
-              <item.Icon className="w-4 h-4" />
+              <item.icon className="w-4 h-4" />
               {item.label}
             </Link>
           </DropdownMenuItem>
@@ -190,7 +166,7 @@ export function Header() {
                           rel="noopener noreferrer"
                           className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
                         >
-                          <item.Icon className="w-4 h-4 text-muted-foreground" />
+                          <item.icon className="w-4 h-4 text-muted-foreground" />
                           {item.label}
                         </Link>
                       )
