@@ -96,6 +96,15 @@ export function Footer() {
               <MissouriGlyph className="w-4 h-3 text-muted-foreground/70" />
               Hand-built in Missouri.
             </span>
+            <span aria-hidden className="opacity-40">·</span>
+            <Link
+              href={siteConfig.trustpilot.profileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-primary transition-colors"
+            >
+              Rate us on Trustpilot ↗
+            </Link>
           </p>
         </div>
       </div>

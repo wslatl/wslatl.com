@@ -32,6 +32,10 @@ export const siteConfig = {
     info:    'info@wslatl.com',
   },
 
+  trustpilot: {
+    profileUrl: 'https://www.trustpilot.com/review/wslatl.com',
+  },
+
   credits: {
     label: 'Made by RejectModders',
     href:  'https://rejectmodders.dev',
