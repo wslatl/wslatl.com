@@ -32,6 +32,7 @@ export const legalColumn: FooterColumn = {
     { label: 'Privacy Policy',   href: '/privacy' },
     { label: 'Terms of Service', href: '/terms' },
     { label: 'Acceptable Use',   href: '/acceptable-use' },
+    { label: 'Refund Policy',    href: '/refund' },
     { label: 'Contact Us',       href: '/#contact' },
   ],
 }

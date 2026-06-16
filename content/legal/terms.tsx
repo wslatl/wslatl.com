@@ -94,14 +94,14 @@ export default function TermsContent() {
         </LegalSubSection>
 
         <LegalSubSection title="4.4 Refund Policy">
-          <p>Our refund policy is as follows:</p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
-            <li>New clients may request a full refund within <span className="text-foreground font-medium">48 hours</span> of initial service activation, provided the service has not been materially used or resources have not been substantially consumed</li>
-            <li>Dedicated server setup fees and any custom provisioning fees are non-refundable</li>
-            <li>Services cancelled mid-billing-cycle are not eligible for pro-rated refunds unless otherwise agreed to in writing by WSLATL</li>
-            <li>No refunds will be issued for services terminated due to violations of these Terms or our Acceptable Use Policy</li>
-            <li>All refund requests must be submitted through our billing portal or by contacting us via Discord or email</li>
-          </ul>
+          <p>
+            Our refund policy is maintained as a separate document at{' '}
+            <a href={siteConfig.paths.refund} className="text-primary hover:underline">{siteConfig.siteUrl}{siteConfig.paths.refund.replace('/','')}</a>{' '}
+            and is incorporated into these Terms by reference. The Refund Policy is the
+            authoritative source for all questions about refund eligibility, windows, eligible
+            reasons, processing, and non-refundable items. The rules in the Refund Policy control
+            over any conflicting language elsewhere in these Terms.
+          </p>
         </LegalSubSection>
 
         <LegalSubSection title="4.5 Price Changes">

@@ -24,6 +24,7 @@ export const siteConfig = {
     privacy:        '/privacy',
     terms:          '/terms',
     acceptableUse:  '/acceptable-use',
+    refund:         '/refund',
     contact:        '/#contact',
   },
 
