@@ -70,9 +70,9 @@ export const pricingTabs: PricingTab[] = [
         description: 'Game servers on SATA SSD. We usually have you live the same day.',
         claim: { text: '10% under Sparked', icon: TrendingDown },
         plans: [
-          { name: 'GAME-1', specs: ['4GB RAM'],  price: 5.40  },
-          { name: 'GAME-2', specs: ['8GB RAM'],  price: 10.80, popular: true },
-          { name: 'GAME-3', specs: ['16GB RAM'], price: 21.60 },
+          { name: 'GAME-1', specs: ['4GB RAM', '2 vCores', '25GB SATA SSD'],   price: 3.60  },
+          { name: 'GAME-2', specs: ['8GB RAM', '2 vCores', '50GB SATA SSD'],   price: 7.20, popular: true },
+          { name: 'GAME-3', specs: ['16GB RAM', '3 vCores', '100GB SATA SSD'], price: 14.40 },
         ],
       },
       {
@@ -82,14 +82,11 @@ export const pricingTabs: PricingTab[] = [
         description: 'NVMe drives and Ryzen 9 cores for when the budget line is not enough.',
         claim: { text: '25% under Sparked', icon: TrendingDown },
         plans: [
-          { name: 'P-GAME-1', specs: ['4GB RAM'],  price: 12.00 },
-          { name: 'P-GAME-2', specs: ['8GB RAM'],  price: 24.00, popular: true },
-          { name: 'P-GAME-3', specs: ['16GB RAM'], price: 48.00 },
+          { name: 'P-GAME-1', specs: ['4GB RAM',  '3 vCores', '100GB NVMe'], price: 12.00 },
+          { name: 'P-GAME-2', specs: ['8GB RAM',  '3 vCores', '100GB NVMe'], price: 24.00, popular: true },
+          { name: 'P-GAME-3', specs: ['16GB RAM', '3 vCores', '100GB NVMe'], price: 48.00 },
         ],
       },
     ],
   },
 ]
-
-export const GAME_PLAN_FOOTER =
-  'Includes: Pterodactyl panel · DDoS protection · Mod & plugin support · Same-day setup'

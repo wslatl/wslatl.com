@@ -6,7 +6,7 @@ import { ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Reveal, RevealGroup } from '@/components/effects/reveal'
-import { pricingTabs, GAME_PLAN_FOOTER, type PricingPlan, type PricingTab } from '@/data/pricing'
+import { pricingTabs, type PricingPlan, type PricingTab } from '@/data/pricing'
 import { cn } from '@/lib/utils'
 
 const ORDER_HREF = 'https://billing.wslatl.com/register'
@@ -63,7 +63,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
   )
 }
 
-function GroupBlock({ group, isGame }: { group: PricingTab['groups'][number]; isGame: boolean }) {
+function GroupBlock({ group }: { group: PricingTab['groups'][number] }) {
   const claim = group.claim
   const ClaimIcon = claim?.icon
   return (
@@ -100,12 +100,6 @@ function GroupBlock({ group, isGame }: { group: PricingTab['groups'][number]; is
           <PricingCard key={plan.name} plan={plan} />
         ))}
       </RevealGroup>
-
-      {isGame && (
-        <p className="mt-6 text-xs text-muted-foreground text-center tracking-wide">
-          {GAME_PLAN_FOOTER}
-        </p>
-      )}
     </div>
   )
 }
@@ -142,15 +136,21 @@ export function Pricing() {
           </div>
         </div>
 
+        {activeTab.note && (
+          <p className="text-center text-sm text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-10">
+            {activeTab.note}
+          </p>
+        )}
+
         <div>
-          {activeTab.note && (
-            <p className="mb-10 text-base text-muted-foreground leading-relaxed max-w-2xl">
-              {activeTab.note}
+          {activeTab.groups.map((group) => (
+            <GroupBlock key={group.id} group={group} />
+          ))}
+          {isGame && (
+            <p className="mt-12 text-center text-xs text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+              Every game plan includes the Pterodactyl panel, DDoS protection, mod and plugin support, and same-day setup.
             </p>
           )}
-          {activeTab.groups.map((group) => (
-            <GroupBlock key={group.id} group={group} isGame={isGame} />
-          ))}
         </div>
       </div>
     </section>
