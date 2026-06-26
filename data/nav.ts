@@ -19,6 +19,7 @@ export interface LoginLink {
 export const mainLinks: MainLink[] = [
   { label: 'Home',     href: '/',         external: false },
   { label: 'Services', href: '#services', external: false },
+  { label: 'Pricing',  href: '/pricing',  external: false },
   { label: 'About',    href: '#about',    external: false },
   { label: 'Contact',  href: '#contact',  external: false },
   { label: 'Status',   href: siteConfig.links.status,  external: true  },
