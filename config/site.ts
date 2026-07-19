@@ -25,6 +25,11 @@ export const siteConfig = {
     terms:          '/terms',
     acceptableUse:  '/acceptable-use',
     refund:         '/refund',
+    sla:            '/sla',
+    dmca:           '/dmca',
+    accountCredit:  '/account-credit',
+    subprocessors:  '/subprocessors',
+    backups:        '/backups',
     contact:        '/#contact',
   },
 
@@ -42,13 +47,48 @@ export const siteConfig = {
     href:  'https://rejectmodders.dev',
   },
 
-  /** Shared by all three policy pages. */
   legal: {
-    effectiveDate: 'June 3, 2026',
     companyName:   'WSLATL LLC',
     mailingAddress: 'Missouri, United States',
     discordVanity:  'discord.gg/3eKawhSbAF',
+
+    /**
+     * Fallback effective date. Only used if a document has no entry in
+     * `effectiveDates` below. Prefer adding an entry there instead.
+     */
+    effectiveDate: 'June 3, 2026',
+
+    /**
+     * Per-document effective dates.
+     *
+     * Each legal document carries its own date so that revising one policy
+     * does not silently re-date the others. When you change the substance of
+     * a document, bump ONLY that document's entry to the date the revision
+     * actually takes effect.
+     */
+    effectiveDates: {
+      privacy:        'July 19, 2026',
+      terms:          'July 19, 2026',
+      acceptableUse:  'June 3, 2026',
+      refund:         'July 19, 2026',
+      sla:            'July 19, 2026',
+      dmca:           'July 19, 2026',
+      accountCredit:  'July 19, 2026',
+      subprocessors:  'July 19, 2026',
+      backups:        'July 19, 2026',
+    },
   },
 } as const
 
 export type SiteConfig = typeof siteConfig
+
+/** Keys of the per-document effective date map. */
+export type LegalDocumentKey = keyof typeof siteConfig.legal.effectiveDates
+
+/**
+ * Effective date for a single legal document, falling back to the shared date
+ * if the document has no entry of its own.
+ */
+export function legalEffectiveDate(doc: LegalDocumentKey): string {
+  return siteConfig.legal.effectiveDates[doc] ?? siteConfig.legal.effectiveDate
+}
