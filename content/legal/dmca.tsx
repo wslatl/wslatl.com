@@ -51,8 +51,8 @@ export default function DmcaContent() {
           <p className="font-semibold text-foreground">Designated Copyright Agent</p>
           <p><span className="text-foreground font-medium">Agent name:</span> [TO BE COMPLETED]</p>
           <p><span className="text-foreground font-medium">Company:</span> WSLATL LLC</p>
-          <p><span className="text-foreground font-medium">Mailing address:</span> [TO BE COMPLETED]</p>
-          <p><span className="text-foreground font-medium">Telephone:</span> [TO BE COMPLETED]</p>
+          <p><span className="text-foreground font-medium">Mailing address:</span> 2414 County Road 1310, Moberly, MO 65270, United States</p>
+          <p><span className="text-foreground font-medium">Telephone:</span> 1-660-998-8016</p>
           <p>
             <span className="text-foreground font-medium">Email:</span>{' '}
             <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
