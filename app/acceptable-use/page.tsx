@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { LegalLayout } from '@/components/layout/legal-layout'
 import AcceptableUseContent from '@/content/legal/acceptable-use'
-import { siteConfig } from '@/config/site'
+import { siteConfig, legalEffectiveDate } from '@/config/site'
 
 export const metadata: Metadata = {
   title: 'Acceptable Use Policy | WSLATL LLC',
@@ -13,7 +13,7 @@ export default function AcceptableUsePage() {
     <LegalLayout
       title="Acceptable Use Policy"
       description="Our infrastructure is shared between clients. One bad actor affects everyone. This policy defines what is and is not acceptable on WSLATL servers. Read it. Follow it. We enforce it."
-      effectiveDate={siteConfig.legal.effectiveDate}
+      effectiveDate={legalEffectiveDate('acceptableUse')}
       currentPath={siteConfig.paths.acceptableUse}
     >
       <AcceptableUseContent />

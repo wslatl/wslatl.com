@@ -17,6 +17,48 @@ export default function PrivacyContent() {
           and communications provided by WSLATL. By using any of our services, you agree to the practices
           described in this policy.
         </p>
+
+        <LegalSubSection title="1.1 Controller and Processor">
+          <p>
+            Hosting involves two different kinds of data, and our legal role is different for
+            each. The distinction matters, so it is worth stating plainly.
+          </p>
+          <ul className="list-disc pl-5 space-y-2 mt-2">
+            <li>
+              <span className="text-foreground font-medium">Your account data.</span> The
+              information you give us so we can open and run your account: your name, contact
+              details, billing records, support tickets, and the panel activity described in
+              Section 2. For this data, WSLATL is the{' '}
+              <span className="text-foreground font-medium">controller</span>. We decide what is
+              collected and why, and this Privacy Policy describes that decision.
+            </li>
+            <li>
+              <span className="text-foreground font-medium">Data you put on your own services.</span>{' '}
+              Whatever you or your users store on a server we host for you: databases, game server
+              data, uploaded files, website content, application logs. For this data, WSLATL is a{' '}
+              <span className="text-foreground font-medium">processor</span>, not the controller.
+              We store and transmit it so the service works, and we do not decide what you collect
+              or why you collect it.
+            </li>
+          </ul>
+          <p className="mt-3">
+            If you host other people&rsquo;s personal data on a WSLATL service, you are the
+            controller of it. The obligations that come with that role are yours: having a lawful
+            basis for the processing, giving notice to your own users, honoring their rights
+            requests, and keeping your own record of processing activities. This Privacy Policy
+            does not do any of that for you, and it is not a privacy policy your users can rely
+            on.
+          </p>
+          <p>
+            We act on your instructions in respect of that data, and we access it only where
+            necessary to provide, maintain, or secure the service, or where we are legally
+            required to. If you need a data processing agreement covering our role as processor,
+            contact us at{' '}
+            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+              {siteConfig.email.support}
+            </a>.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="2" title="Information We Collect">
@@ -28,10 +70,31 @@ export default function PrivacyContent() {
             <li>Full name</li>
             <li>Email address</li>
             <li>Billing address</li>
-            <li>Phone number (optional, may be required for account recovery)</li>
+            <li>Phone number (required at sign-up, and used for account recovery and to verify account ownership)</li>
+            <li>Date of birth (used to apply the age requirements in Section 9)</li>
+            <li>
+              Tax identification number, where you provide one so that we can invoice you as a
+              business or apply a tax exemption
+            </li>
             <li>Account username and password (stored as a secure hash, we never see your plaintext password)</li>
+            <li>
+              Discord account identity, where you choose to link your Discord account to your
+              WSLATL account. Linking gives us your Discord user ID, username, and avatar so that
+              we can associate you with support conversations and role access in our server.
+              Linking is optional and can be disconnected.
+            </li>
             <li>Any information you voluntarily provide during the application or onboarding process</li>
           </ul>
+          <p className="mt-3">
+            We also maintain an{' '}
+            <span className="text-foreground font-medium">account credit ledger</span> for your
+            account, recording every change to your credit balance including top-up purchases,
+            credits we issue, amounts applied to invoices, gifts sent or received, and the date,
+            amount, and reason for each entry. This ledger is retained as part of your billing
+            records. See our{' '}
+            <a href={siteConfig.paths.accountCredit} className="text-primary hover:underline">Account Credit Terms</a>{' '}
+            for how the balance itself works.
+          </p>
         </LegalSubSection>
 
         <LegalSubSection title="2.2 Billing & Payment Information">
@@ -116,8 +179,18 @@ export default function PrivacyContent() {
           <ul className="list-disc pl-5 space-y-1.5 mt-2">
             <li>Payment processors (to handle billing transactions)</li>
             <li>Data center and infrastructure partners (for physical server hosting)</li>
+            <li>Bot and abuse protection, content delivery, and DNS providers</li>
+            <li>Email delivery for transactional messages such as invoices and account notices</li>
+            <li>Address autocomplete and geocoding for address entry forms</li>
             <li>Status monitoring services (e.g., status.wslatl.com)</li>
           </ul>
+          <p className="mt-3">
+            We publish the individual providers, not just these categories. Each subprocessor is
+            named on our{' '}
+            <a href={siteConfig.paths.subprocessors} className="text-primary hover:underline">Subprocessors</a>{' '}
+            page, together with what it is used for, what data categories it receives, and where
+            it is located. That page is kept current as our infrastructure changes.
+          </p>
         </LegalSubSection>
 
         <LegalSubSection title="4.2 Legal Requirements">
@@ -147,9 +220,60 @@ export default function PrivacyContent() {
             active clients via email of any such change before it occurs.
           </p>
         </LegalSubSection>
+
+        <LegalSubSection title="4.5 International Transfers">
+          <p>
+            WSLATL LLC is established in the State of Missouri, United States, and our services
+            are operated from the United States. If you are located in the European Economic Area,
+            the United Kingdom, or Switzerland, using our services means your personal data is
+            transferred to the United States, and where a subprocessor operates a global network,
+            potentially to other countries.
+          </p>
+          <p>
+            The United States is not covered by a general adequacy decision applying to all
+            recipients. Where we transfer personal data out of the EEA or the UK, we rely on the
+            transfer being necessary to perform the contract you have asked us to perform, and on
+            the European Commission&rsquo;s Standard Contractual Clauses together with the UK
+            International Data Transfer Addendum where a subprocessor offers them.
+          </p>
+          <p>
+            The mechanisms that apply to each recipient, and further detail on our transfer
+            position, are set out on our{' '}
+            <a href={siteConfig.paths.subprocessors} className="text-primary hover:underline">Subprocessors</a>{' '}
+            page. If you need a data processing agreement or a copy of the clauses as we apply
+            them, contact us at{' '}
+            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+              {siteConfig.email.support}
+            </a>.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="5" title="Data Retention">
+        {/*
+          OWNER DECISION NEEDED: retention period must be reconciled across ToS 9.3, Privacy 5,
+          and config/accounts.php purge_grace_days.
+
+          The "Post-termination data" row below says data is deleted or anonymized within 90 days
+          of account closure. Two other places state a different number for the same thing:
+
+            - Terms of Service Section 9.3: "up to 14 days"
+            - Application config, config/accounts.php purge_grace_days: 7
+            - Refund Policy Section 8 restates the 14-day figure
+
+          Under GDPR Article 13(2)(a) and CCPA disclosure rules, the retention period stated here
+          is a representation to the data subject. It must match what the system actually does.
+
+          Decide the real number, then change ALL FOUR together: this table, ToS 9.3, Refund
+          Policy Section 8, and the config value in the billing panel.
+
+          Also decide whether "post-termination data" here is meant to cover the same thing as
+          the server data in ToS 9.3, or something broader such as account and profile records.
+          If they are different things they should be described as different things, with
+          different rows, rather than left looking like a contradiction.
+
+          Do not change the number below in isolation.
+        */}
         <p>We retain your data for the following periods:</p>
         <div className="overflow-x-auto mt-3">
           <table className="legal-table">
@@ -262,8 +386,47 @@ export default function PrivacyContent() {
           <span className="text-foreground font-medium">EEA/UK residents</span> have rights under the
           GDPR and UK GDPR, including the rights listed above. Our legal basis for processing your data
           is primarily the performance of a contract (providing services you requested) and compliance
-          with legal obligations.
+          with legal obligations. Transfers of your data outside the EEA or UK are described in
+          Section 4.5.
         </p>
+
+        <LegalSubSection title="8.1 Right to Complain to a Supervisory Authority">
+          <p>
+            If you are in the European Economic Area, the United Kingdom, or Switzerland, you have
+            the right under Article 77 of the GDPR, and the equivalent provision of the UK GDPR,
+            to lodge a complaint with a data protection supervisory authority. You can complain to
+            the authority in the country where you live, where you work, or where you believe the
+            problem occurred.
+          </p>
+          <p>
+            In the United Kingdom, that authority is the Information Commissioner&rsquo;s Office.
+            In the EEA, each member state has its own authority, and the European Data Protection
+            Board publishes the current list.
+          </p>
+          <p>
+            You do not have to come to us first, and exercising this right does not affect any
+            other remedy available to you. That said, we would genuinely rather hear about a
+            problem directly. Write to{' '}
+            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+              {siteConfig.email.support}
+            </a>{' '}
+            and we will take it seriously.
+          </p>
+        </LegalSubSection>
+
+        <LegalSubSection title="8.2 Requests About Data on Someone Else's Service">
+          <p>
+            If your personal data is held on a service that a WSLATL client runs on our
+            infrastructure, we are the processor of that data and not the controller, as explained
+            in Section 1.1. We are generally not able to access, correct, or delete it on your
+            request, because it is not ours to decide about.
+          </p>
+          <p>
+            Direct your request to the operator of the service you used. If you cannot identify or
+            reach them, contact us and we will forward your request to the client where we
+            reasonably can.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="9" title="Age Requirements & Children's Privacy">

@@ -53,7 +53,7 @@ export default function RefundContent() {
               <tr>
                 <td className="font-medium text-foreground">After 14 days</td>
                 <td>No refunds.</td>
-                <td>&mdash;</td>
+                <td>None</td>
               </tr>
             </tbody>
           </table>
@@ -65,7 +65,7 @@ export default function RefundContent() {
           renewal. Renewals reset their own 14-day window (see Section 9).
         </p>
 
-        <LegalSubSection title="2.1 48-Hour Window — Any Reason">
+        <LegalSubSection title="2.1 48-Hour Window, Any Reason">
           <p>
             If you request a refund within{' '}
             <span className="text-foreground font-medium">48 hours</span> of the initial purchase
@@ -79,7 +79,7 @@ export default function RefundContent() {
           </p>
         </LegalSubSection>
 
-        <LegalSubSection title="2.2 14-Day Window — Case-by-Case">
+        <LegalSubSection title="2.2 14-Day Window, Case-by-Case">
           <p>
             Between <span className="text-foreground font-medium">49 hours and 14 calendar days</span>{' '}
             of the initial purchase date, full refunds are issued only for the specific qualifying
@@ -98,16 +98,17 @@ export default function RefundContent() {
 
         <LegalSubSection title="3.1 Service Outage Exceeding SLA">
           <p>
-            If your service experiences an outage that exceeds the applicable uptime target from
-            our Terms of Service Section 5.1 (99.9% for VPS and Web hosting, 99.5% for game
-            server hosting), you may request a full refund for the affected service. Outages
-            caused by events outside our reasonable control (force majeure) do not qualify.
+            If your service experiences an outage that exceeds the applicable uptime target in our{' '}
+            <a href={siteConfig.paths.sla} className="text-primary hover:underline">Service Level Agreement</a>{' '}
+            (99.9% for VPS and Web hosting, 99.5% for game server hosting), you may request a full
+            refund for the affected service. Outages caused by events outside our reasonable
+            control (force majeure) do not qualify.
           </p>
           <p>
             To qualify, the outage must be verifiable through our status page, monitoring systems,
-            or your own documented evidence. The 10% SLA credit described in Terms Section 5.3
-            remains available as a separate remedy; this refund right is in addition to it, not
-            in place of it.
+            or your own documented evidence. The 10% SLA credit described in the Service Level
+            Agreement remains available as a separate remedy; this refund right is in addition to
+            it, not in place of it.
           </p>
         </LegalSubSection>
 
@@ -257,22 +258,77 @@ export default function RefundContent() {
 
       <LegalSection number="7" title="Processing & Method">
         <p>
-          Approved refunds are issued to the <span className="text-foreground font-medium">original payment method</span>{' '}
-          used for the purchase. We do not issue refunds to a different card, account, or
-          cryptocurrency wallet than the one originally charged.
+          An approved refund is issued in one of two forms: back to the original payment method,
+          or as account credit. We will tell you which form applies when we approve your request.
         </p>
-        <p>
-          Once we issue a refund, processing time depends on your payment provider:
-        </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
-          <li>Credit and debit card refunds typically appear within <span className="text-foreground font-medium">5 to 10 business days</span>, depending on the issuer</li>
-          <li>Bank transfer and ACH refunds can take up to 10 business days</li>
-          <li>Cryptocurrency and other payment methods are subject to the processing time of the underlying network or platform</li>
-        </ul>
-        <p className="mt-4">
-          If a refund has not appeared on your statement after 15 business days, contact us and
-          we will investigate with the payment processor.
-        </p>
+
+        <LegalSubSection title="7.1 Refund to the Original Payment Method">
+          <p>
+            Where a refund is returned to your payment method, it goes to the{' '}
+            <span className="text-foreground font-medium">original payment method</span> used for
+            the purchase. We do not refund to a different card or account than the one originally
+            charged.
+          </p>
+          <p>
+            Once we issue the refund, processing time depends on your payment provider:
+          </p>
+          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+            <li>Credit and debit card refunds typically appear within <span className="text-foreground font-medium">5 to 10 business days</span>, depending on the issuer</li>
+            <li>Bank transfer and ACH refunds can take up to 10 business days</li>
+            <li>Refunds through any other payment platform we accept are subject to the processing time of that platform</li>
+          </ul>
+          <p className="mt-4">
+            If a refund has not appeared on your statement after 15 business days, contact us and
+            we will investigate with the payment processor.
+          </p>
+        </LegalSubSection>
+
+        <LegalSubSection title="7.2 Refund as Account Credit">
+          <p>
+            We may instead approve a refund as{' '}
+            <span className="text-foreground font-medium">account credit</span>, added to the
+            balance on your WSLATL account. Account credit is spendable on any WSLATL invoice and
+            it does not expire, but it is{' '}
+            <span className="text-foreground font-medium">not redeemable for cash</span> and
+            cannot be withdrawn to a bank account or card. Full terms are on our{' '}
+            <a href={siteConfig.paths.accountCredit} className="text-primary hover:underline">Account Credit</a>{' '}
+            page.
+          </p>
+          <p>
+            Account credit is the appropriate outcome in situations such as these:
+          </p>
+          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+            <li>You asked for credit rather than money back, because you intend to keep hosting with us</li>
+            <li>The original payment method is closed, expired, or can no longer accept a return</li>
+            <li>The original charge was settled using account credit in the first place</li>
+            <li>The charge is old enough that the payment processor will no longer reverse it</li>
+          </ul>
+          <p className="mt-4">
+            Where you are entitled to a refund and you have asked for it back on your payment
+            method, we will not force credit on you as a substitute simply because it is more
+            convenient for us. If we propose credit and you would rather have the money returned,
+            say so and we will discuss it.
+          </p>
+        </LegalSubSection>
+
+        <LegalSubSection title="7.3 Refunds Are Not Prorated">
+          <p>
+            Refunds under this policy are issued for{' '}
+            <span className="text-foreground font-medium">whole billing terms only</span>. We do
+            not calculate a partial refund based on the number of days you used the service before
+            requesting the refund. A qualifying request within an eligible window is refunded in
+            full for the term in question, and a request outside those windows is not refunded at
+            all.
+          </p>
+          <p>
+            This cuts both ways and it is deliberate. You are not penalized for the days you used
+            inside the refund window, and equally you cannot recover a part-month by cancelling
+            partway through a term. As stated in Section 9.1 of our{' '}
+            <a href={siteConfig.paths.terms} className="text-primary hover:underline">Terms of Service</a>,
+            no refund is issued for the remaining days in a cancelled billing period unless this
+            policy applies.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="8" title="Service Cancellation on Refund">
@@ -281,6 +337,18 @@ export default function RefundContent() {
           process. Access to the service and any associated panels is revoked once the refund is
           processed.
         </p>
+        {/*
+          OWNER DECISION NEEDED: retention period must be reconciled across ToS 9.3, Privacy 5,
+          and config/accounts.php purge_grace_days.
+
+          The 14 days below is copied from Terms of Service Section 9.3. It is one of three
+          different numbers currently published or implemented for the same thing, and the other
+          two do not agree with it. See the fuller note in content/legal/terms.tsx Section 9.3.
+
+          Once the correct number is decided, this text must be updated at the same time as
+          Terms 9.3 and Privacy 5, and the code must be changed to match. Do not change the
+          number here on its own.
+        */}
         <p>
           Following termination, the data retention rules in our Terms of Service Section 9.3
           apply. Your data may be retained for up to{' '}

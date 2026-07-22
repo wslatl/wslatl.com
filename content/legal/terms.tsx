@@ -43,6 +43,35 @@ export default function TermsContent() {
           Services are subject to availability and may be modified, expanded, or discontinued at our
           discretion with reasonable notice to affected clients.
         </p>
+
+        <LegalSubSection title="2.1 Backups & Responsibility for Your Data">
+          <p>
+            Where a service includes backups, those backups are provided on a{' '}
+            <span className="text-foreground font-medium">best-effort basis</span> and are a
+            convenience rather than a guarantee. We do not warrant that a backup exists for any
+            particular service at any particular time, that a backup is complete or restorable, or
+            that a restore will succeed.
+          </p>
+          <p>
+            <span className="text-foreground font-medium">
+              You are responsible for maintaining your own independent backups
+            </span>{' '}
+            of any data you cannot afford to lose, stored somewhere other than the WSLATL service
+            that produced it. Any backup we provide is not a substitute for your own copies. This
+            allocation of responsibility is a material part of the pricing of our services and
+            should be read together with Section 10 (Disclaimer of Warranties) and Section 11
+            (Limitation of Liability).
+          </p>
+          <p>
+            What is included with each plan, how restores are requested, and what a restore
+            involves are set out in our{' '}
+            <a href={siteConfig.paths.backups} className="text-primary hover:underline">Backup Policy</a>{' '}
+            at{' '}
+            <a href={siteConfig.paths.backups} className="text-primary hover:underline">
+              {siteConfig.siteUrl}{siteConfig.paths.backups}
+            </a>, which is incorporated into these Terms by reference.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="3" title="Application & Account Registration">
@@ -96,7 +125,7 @@ export default function TermsContent() {
         <LegalSubSection title="4.4 Refund Policy">
           <p>
             Our refund policy is maintained as a separate document at{' '}
-            <a href={siteConfig.paths.refund} className="text-primary hover:underline">{siteConfig.siteUrl}{siteConfig.paths.refund.replace('/','')}</a>{' '}
+            <a href={siteConfig.paths.refund} className="text-primary hover:underline">{siteConfig.siteUrl}{siteConfig.paths.refund}</a>{' '}
             and is incorporated into these Terms by reference. The Refund Policy is the
             authoritative source for all questions about refund eligibility, windows, eligible
             reasons, processing, and non-refundable items. The rules in the Refund Policy control
@@ -123,6 +152,14 @@ export default function TermsContent() {
       </LegalSection>
 
       <LegalSection number="5" title="Service Level Agreement (SLA)">
+        <p>
+          Our Service Level Agreement is also published as a standalone document at{' '}
+          <a href={siteConfig.paths.sla} className="text-primary hover:underline">
+            {siteConfig.siteUrl}{siteConfig.paths.sla}
+          </a>, which is easier to find and to cite. That page restates this section; it does not
+          add to or change it. The commitments below are reproduced there in full, and if the two
+          ever differ, this section controls.
+        </p>
 
         <LegalSubSection title="5.1 Uptime Targets">
           <div className="overflow-x-auto mt-2">
@@ -187,7 +224,7 @@ export default function TermsContent() {
         <p>
           All use of WSLATL services is governed by our Acceptable Use Policy (AUP), which is
           incorporated into these Terms by reference and available at{' '}
-          <a href={siteConfig.paths.acceptableUse} className="text-primary hover:underline">{siteConfig.siteUrl}{siteConfig.paths.acceptableUse.replace('/','')}</a>.
+          <a href={siteConfig.paths.acceptableUse} className="text-primary hover:underline">{siteConfig.siteUrl}{siteConfig.paths.acceptableUse}</a>.
           You agree to comply with the AUP at all times.
         </p>
         <p>
@@ -216,8 +253,17 @@ export default function TermsContent() {
       <LegalSection number="8" title="DMCA & Copyright">
         <p>
           WSLATL LLC complies with the Digital Millennium Copyright Act (DMCA), 17 U.S.C. &sect;&nbsp;512.
-          If you believe that content hosted on WSLATL infrastructure infringes your copyright, please
-          send a written DMCA takedown notice to:
+          Our full DMCA Policy is published at{' '}
+          <a href={siteConfig.paths.dmca} className="text-primary hover:underline">
+            {siteConfig.siteUrl}{siteConfig.paths.dmca}
+          </a>{' '}
+          and is incorporated into these Terms by reference. It sets out our designated agent, the
+          counter-notice process, the statutory restoration timeline, and our repeat infringer
+          policy. Read it before serving notice on us or disputing a removal.
+        </p>
+        <p>
+          In summary: if you believe that content hosted on WSLATL infrastructure infringes your
+          copyright, send a written DMCA takedown notice to:
         </p>
         <div className="mt-3 p-4 rounded-xl border border-border/70 bg-card/30 text-sm space-y-1 relative overflow-hidden">
           <div aria-hidden className="absolute -top-px left-0 w-1/3 h-px bg-gradient-to-r from-primary/50 to-transparent" />
@@ -234,8 +280,12 @@ export default function TermsContent() {
           <li>Your physical or electronic signature</li>
         </ul>
         <p className="mt-4">
-          Counter-notices may be submitted to the same email address. We reserve the right to
-          terminate the accounts of clients who are repeat copyright infringers.
+          Counter-notices may be submitted to the same email address, and must meet the
+          requirements set out in Section 4 of our{' '}
+          <a href={siteConfig.paths.dmca} className="text-primary hover:underline">DMCA Policy</a>.
+          We reserve the right to terminate the accounts of clients who are repeat copyright
+          infringers, in accordance with the repeat infringer policy in Section 5 of that
+          document.
         </p>
       </LegalSection>
 
@@ -266,6 +316,37 @@ export default function TermsContent() {
         </LegalSubSection>
 
         <LegalSubSection title="9.3 Effect of Termination">
+          {/*
+            OWNER DECISION NEEDED: retention period must be reconciled across ToS 9.3, Privacy 5,
+            and config/accounts.php purge_grace_days.
+
+            There are currently THREE different numbers describing how long data survives after
+            termination, and they contradict each other:
+
+              - Terms of Service 9.3 (this section): "up to 14 days"
+              - Privacy Policy Section 5, "Post-termination data": "within 90 days"
+              - Application config, config/accounts.php purge_grace_days: 7
+
+            The Refund Policy Section 8 also restates the 14-day figure from this section.
+
+            This is the single most important item on this page to resolve. Publishing a
+            retention period the system does not implement is a misstatement to clients and a
+            regulatory problem under GDPR/CCPA storage-limitation and disclosure requirements;
+            deleting earlier than the published period means data a client was told they could
+            still recover is already gone.
+
+            Whatever is decided, ALL FOUR must be changed together:
+              1. this section
+              2. Privacy Policy Section 5
+              3. Refund Policy Section 8
+              4. config/accounts.php purge_grace_days in the billing panel
+
+            Note also that "post-termination data" in the Privacy Policy may be intended to mean
+            something broader than the server data this section is about. If so, they should be
+            separated explicitly rather than both being left to look like the same commitment.
+
+            Do not change the number below in isolation.
+          */}
           <p>
             Upon termination of your account:
           </p>

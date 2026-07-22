@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { Reveal } from '@/components/effects/reveal'
-import { legalPages } from '@/data/legal'
+import { primaryLegalPages, secondaryLegalPages } from '@/data/legal'
 import { siteConfig } from '@/config/site'
 
 interface LegalLayoutProps {
@@ -15,6 +15,13 @@ interface LegalLayoutProps {
 }
 
 export function LegalLayout({ title, description, effectiveDate, currentPath, children }: LegalLayoutProps) {
+  // The four primary documents always get a pill. If the reader is on one of
+  // the secondary documents, promote it into the pill row too so the active
+  // page is never hidden inside the overflow menu.
+  const activeSecondary = secondaryLegalPages.find((page) => page.href === currentPath)
+  const pillPages = activeSecondary ? [...primaryLegalPages, activeSecondary] : primaryLegalPages
+  const overflowPages = secondaryLegalPages.filter((page) => page.href !== currentPath)
+
   return (
     <main className="min-h-screen">
       <Header />
@@ -29,24 +36,55 @@ export function LegalLayout({ title, description, effectiveDate, currentPath, ch
         </nav>
 
         {/* Legal page switcher */}
-        <div className="flex flex-wrap gap-1.5 mb-12 p-1 rounded-full border border-border/70 bg-card/30 w-fit">
-          {legalPages.map((page) => {
-            const isActive = currentPath === page.href
-            return (
-              <Link
-                key={page.href}
-                href={page.href}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/40'
-                }`}
-              >
-                {page.label}
-              </Link>
-            )
-          })}
-        </div>
+        <nav aria-label="Legal documents" className="mb-12">
+          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl sm:rounded-full border border-border/70 bg-card/30 w-fit max-w-full">
+            {pillPages.map((page) => {
+              const isActive = currentPath === page.href
+              return (
+                <Link
+                  key={page.href}
+                  href={page.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent/40'
+                  }`}
+                >
+                  {page.label}
+                </Link>
+              )
+            })}
+
+            {overflowPages.length > 0 && (
+              <details className="group relative">
+                <summary className="list-none [&::-webkit-details-marker]:hidden cursor-pointer select-none flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-all duration-200">
+                  More legal
+                  <ChevronDown
+                    aria-hidden
+                    className="w-3.5 h-3.5 opacity-60 transition-transform duration-200 group-open:rotate-180"
+                  />
+                </summary>
+                <div className="absolute left-0 sm:left-auto sm:right-0 top-full mt-2 z-30 w-64 max-w-[calc(100vw-3rem)] p-1.5 rounded-xl border border-border/70 bg-card shadow-xl">
+                  {overflowPages.map((page) => (
+                    <Link
+                      key={page.href}
+                      href={page.href}
+                      className="block px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors"
+                    >
+                      <span className="block font-medium text-foreground/90">{page.label}</span>
+                      {page.summary && (
+                        <span className="block text-xs text-muted-foreground mt-0.5 leading-snug">
+                          {page.summary}
+                        </span>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </details>
+            )}
+          </div>
+        </nav>
 
         {/* Page header */}
         <div className="mb-14 pb-12 border-b border-border/60">

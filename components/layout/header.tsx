@@ -116,7 +116,7 @@ export function Header() {
           {/* Right: Login + hamburger */}
           <div className="flex-1 flex items-center justify-end gap-2">
 
-            {/* Desktop: pure hover dropdown — animated Login button */}
+            {/* Desktop: pure hover dropdown, animated Login button */}
             <div
               className="relative hidden lg:block"
               onMouseEnter={openLogin}
@@ -176,7 +176,7 @@ export function Header() {
               )}
             </div>
 
-            {/* Mobile: click-triggered Login dropdown — same animated button */}
+            {/* Mobile: click-triggered Login dropdown, same animated button */}
             <div className="lg:hidden">
               <DropdownMenu onOpenChange={setLoginOpen}>
                 <DropdownMenuTrigger asChild>

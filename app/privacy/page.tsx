@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { LegalLayout } from '@/components/layout/legal-layout'
 import PrivacyContent from '@/content/legal/privacy'
-import { siteConfig } from '@/config/site'
+import { siteConfig, legalEffectiveDate } from '@/config/site'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | WSLATL LLC',
@@ -13,7 +13,7 @@ export default function PrivacyPage() {
     <LegalLayout
       title="Privacy Policy"
       description="We collect only what we need to run your services. We do not sell your data, ever. Here is exactly what we do with the information you share with us."
-      effectiveDate={siteConfig.legal.effectiveDate}
+      effectiveDate={legalEffectiveDate('privacy')}
       currentPath={siteConfig.paths.privacy}
     >
       <PrivacyContent />
