@@ -24,6 +24,7 @@ export const siteConfig = {
     privacy:        '/privacy',
     terms:          '/terms',
     acceptableUse:  '/acceptable-use',
+    abuse:          '/abuse',
     refund:         '/refund',
     sla:            '/sla',
     dmca:           '/dmca',
@@ -36,6 +37,8 @@ export const siteConfig = {
   email: {
     support: 'support@wslatl.com',
     info:    'info@wslatl.com',
+    abuse:   'abuse@wslatl.com',
+    dmca:    'dmca@wslatl.com'
   },
 
   trustpilot: {
@@ -56,7 +59,7 @@ export const siteConfig = {
      * Fallback effective date. Only used if a document has no entry in
      * `effectiveDates` below. Prefer adding an entry there instead.
      */
-    effectiveDate: 'June 3, 2026',
+    effectiveDate: 'July 21, 2026',
 
     /**
      * Per-document effective dates.
@@ -67,15 +70,16 @@ export const siteConfig = {
      * actually takes effect.
      */
     effectiveDates: {
-      privacy:        'July 19, 2026',
-      terms:          'July 19, 2026',
-      acceptableUse:  'June 3, 2026',
-      refund:         'July 19, 2026',
-      sla:            'July 19, 2026',
-      dmca:           'July 19, 2026',
-      accountCredit:  'July 19, 2026',
-      subprocessors:  'July 19, 2026',
-      backups:        'July 19, 2026',
+      privacy:        'July 21, 2026',
+      terms:          'July 21, 2026',
+      acceptableUse:  'July 21, 2026',
+      abuse:          'July 21, 2026',
+      refund:         'July 21, 2026',
+      sla:            'July 21, 2026',
+      dmca:           'July 21, 2026',
+      accountCredit:  'July 21, 2026',
+      subprocessors:  'July 21, 2026',
+      backups:        'July 21, 2026',
     },
   },
 } as const

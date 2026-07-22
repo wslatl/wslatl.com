@@ -45,38 +45,12 @@ export default function BackupsContent() {
 
       <LegalSection number="3" title="What Is Included">
         <p>
-          What is backed up, how often, and how long a backup is kept depends on the service and
-          the plan. The plan details in effect for your service are shown in your billing portal
-          and on the plan page for that service.
+          What is backed up, how often it is taken, and how long it is kept depends on the service
+          and the plan. The table below summarizes what is included by service. Exact retention
+          windows for your specific service are shown in your billing portal, and you can always
+          confirm them with our team.
         </p>
 
-        {/*
-          OWNER DECISION NEEDED: per-plan backup inclusions.
-
-          The table below is deliberately unfilled. Do not populate it with estimates. Every cell
-          is an operational commitment a client can hold you to, and a published backup frequency
-          or retention count that the infrastructure does not actually meet is worse than
-          publishing nothing.
-
-          For each service type (Dedicated Servers, Game Server Hosting, VPS Hosting, Web
-          Hosting) confirm against the running infrastructure and then fill in:
-
-            - whether backups are included at all, or are an optional paid add-on
-            - what is captured (full image, filesystem only, databases only, config only)
-            - how often a backup is taken
-            - how many backups or how many days of history are retained
-            - where backups are stored, and specifically whether they are stored on the same
-              physical host as the service (if so, say so plainly: a same-host backup does not
-              protect against hardware loss)
-            - whether the client can trigger a backup or restore themselves from the panel
-
-          Note that Section 2 of the Terms of Service currently advertises "including SSL,
-          backups" for Web Hosting. Whatever is filled in here must be consistent with that
-          statement, or that statement needs to change.
-
-          Until this table is filled in, this page must not be linked from any marketing or
-          pricing page as evidence of what is included.
-        */}
         <div className="overflow-x-auto mt-3">
           <table className="legal-table">
             <thead>
@@ -84,46 +58,69 @@ export default function BackupsContent() {
                 <th>Service</th>
                 <th>Backups Included</th>
                 <th>What Is Captured</th>
-                <th>Frequency &amp; Retention</th>
+                <th>Frequency</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td className="font-medium text-foreground">Dedicated Servers</td>
-                <td>[TO BE COMPLETED]</td>
-                <td>[TO BE COMPLETED]</td>
-                <td>[TO BE COMPLETED]</td>
+                <td>Not included (self-managed)</td>
+                <td>Not applicable</td>
+                <td>Not applicable</td>
               </tr>
               <tr>
                 <td className="font-medium text-foreground">Game Server Hosting</td>
-                <td>[TO BE COMPLETED]</td>
-                <td>[TO BE COMPLETED]</td>
-                <td>[TO BE COMPLETED]</td>
+                <td>Included</td>
+                <td>Full server container</td>
+                <td>Monthly</td>
               </tr>
               <tr>
                 <td className="font-medium text-foreground">VPS Hosting</td>
-                <td>[TO BE COMPLETED]</td>
-                <td>[TO BE COMPLETED]</td>
-                <td>[TO BE COMPLETED]</td>
+                <td>Included <span className="text-muted-foreground">(launching soon)</span></td>
+                <td>Full disk image</td>
+                <td>Monthly</td>
               </tr>
               <tr>
                 <td className="font-medium text-foreground">Web Hosting</td>
-                <td>[TO BE COMPLETED]</td>
-                <td>[TO BE COMPLETED]</td>
-                <td>[TO BE COMPLETED]</td>
+                <td>Included</td>
+                <td>The website and its state</td>
+                <td>Monthly</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div className="mt-4">
-          <div className="legal-callout border-yellow-500/30 text-yellow-300">
-            <strong>Plan detail not yet published</strong>
-            The per-plan backup detail above is being confirmed against our infrastructure before
-            it is published, because we would rather publish nothing than publish a schedule we
-            cannot keep. In the meantime, ask us at {siteConfig.email.support} what is currently
-            in place for your specific service and we will tell you exactly what exists.
-          </div>
+        <div className="mt-5 space-y-3 text-[0.9375rem]">
+          <p>A few specifics behind the table:</p>
+          <ul className="list-disc pl-5 space-y-1.5">
+            <li>
+              <span className="text-foreground font-medium">Dedicated Servers.</span> A dedicated
+              server is your machine. You have full control of the operating system and everything
+              on it, and we do not take backups of it for you. Running and storing backups of a
+              dedicated server is your responsibility. We are happy to discuss a managed backup
+              arrangement on request.
+            </li>
+            <li>
+              <span className="text-foreground font-medium">Game Server Hosting.</span> We take a
+              backup of the full game server container on a monthly cycle.
+            </li>
+            <li>
+              <span className="text-foreground font-medium">VPS Hosting.</span> VPS hosting is
+              launching soon. When it goes live, we take a monthly backup of the full disk image of
+              each VPS. Until then, this row describes what is planned, not something already
+              running.
+            </li>
+            <li>
+              <span className="text-foreground font-medium">Web Hosting.</span> We take a monthly
+              backup of the website itself and its current state (its files and data), not the
+              whole hosting account around it.
+            </li>
+          </ul>
+          <p>
+            Where a backup is described as monthly, it is taken on an approximately monthly cycle,
+            not on a guaranteed calendar date. As set out in Section 4, every backup we take is
+            best-effort, and it is not a replacement for the independent copies you keep yourself.
+          </p>
         </div>
       </LegalSection>
 

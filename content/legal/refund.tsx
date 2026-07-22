@@ -53,7 +53,7 @@ export default function RefundContent() {
               <tr>
                 <td className="font-medium text-foreground">After 14 days</td>
                 <td>No refunds.</td>
-                <td>&mdash;</td>
+                <td>None</td>
               </tr>
             </tbody>
           </table>

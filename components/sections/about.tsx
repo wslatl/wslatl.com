@@ -97,7 +97,7 @@ export function About() {
               our clients like family and make sure they get the best experience they can.
             </blockquote>
             <figcaption className="mt-5 text-xs uppercase tracking-[0.2em] text-primary font-semibold">
-              — The WSLATL Team
+              The WSLATL Team
             </figcaption>
           </figure>
         </Reveal>

@@ -35,6 +35,7 @@ export const legalColumn: FooterColumn = {
     { label: 'Refund Policy',    href: '/refund' },
     { label: 'Service Level Agreement', href: '/sla' },
     { label: 'DMCA Policy',      href: '/dmca' },
+    { label: 'Abuse Policy',     href: '/abuse' },
     { label: 'Account Credit',   href: '/account-credit' },
     { label: 'Subprocessors',    href: '/subprocessors' },
     { label: 'Backups',          href: '/backups' },

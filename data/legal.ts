@@ -19,6 +19,7 @@ export const legalPages: LegalPage[] = [
 
   { label: 'Service Level Agreement', href: '/sla',            tier: 'secondary', summary: 'Uptime targets and service credits' },
   { label: 'DMCA Policy',             href: '/dmca',           tier: 'secondary', summary: 'Copyright notices and counter-notices' },
+  { label: 'Abuse Policy',            href: '/abuse',          tier: 'secondary', summary: 'Report abuse of our infrastructure' },
   { label: 'Account Credit',          href: '/account-credit', tier: 'secondary', summary: 'Stored value, gifting, and balances' },
   { label: 'Subprocessors',           href: '/subprocessors',  tier: 'secondary', summary: 'Who else touches your data' },
   { label: 'Backups',                 href: '/backups',        tier: 'secondary', summary: 'What is backed up and who owns it' },

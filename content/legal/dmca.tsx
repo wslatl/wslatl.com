@@ -34,29 +34,29 @@ export default function DmcaContent() {
         </p>
 
         {/*
-          OWNER DECISION NEEDED: designated agent registration.
+          Designated agent registration status.
 
-          The DMCA safe harbor under 17 U.S.C. 512(c)(2) requires the designated agent to be
-          registered with the US Copyright Office through the DMCA Designated Agent Directory
-          (dmca.copyright.gov). That is a paid filing that must be renewed every three years.
-          Publishing this page does NOT create the safe harbor on its own.
+          WSLATL acts as its own designated copyright agent; there is no separate named
+          individual. The contact details below are the channel we monitor for copyright
+          complaints.
 
-          Fill in the agent's real name, physical mailing address, telephone number, and email,
-          and complete the registration, before this page is treated as the operative notice
-          channel. Until the registration is completed, do not add any statement to this page
-          claiming that the agent is registered.
+          Note that the DMCA safe harbor under 17 U.S.C. 512(c)(2) requires the designated agent
+          to be registered with the US Copyright Office through the DMCA Designated Agent
+          Directory (dmca.copyright.gov), a paid filing renewed every three years. Publishing
+          this page does NOT create the safe harbor on its own. Until that filing is completed and
+          kept current, do not add any statement to this page claiming the agent is registered.
         */}
         <div className="mt-3 p-5 rounded-xl border border-border/70 bg-card/30 text-sm space-y-1.5 relative overflow-hidden">
           <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
           <p className="font-semibold text-foreground">Designated Copyright Agent</p>
-          <p><span className="text-foreground font-medium">Agent name:</span> [TO BE COMPLETED]</p>
+          <p><span className="text-foreground font-medium">Agent:</span> WSLATL Copyright Agent</p>
           <p><span className="text-foreground font-medium">Company:</span> WSLATL LLC</p>
           <p><span className="text-foreground font-medium">Mailing address:</span> 2414 County Road 1310, Moberly, MO 65270, United States</p>
           <p><span className="text-foreground font-medium">Telephone:</span> 1-660-998-8016</p>
           <p>
             <span className="text-foreground font-medium">Email:</span>{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
-              {siteConfig.email.support}
+            <a href={`mailto:${siteConfig.email.dmca}`} className="text-primary hover:underline">
+              {siteConfig.email.dmca}
             </a>
           </p>
           <p><span className="text-foreground font-medium">Subject line:</span> DMCA Takedown Notice</p>
