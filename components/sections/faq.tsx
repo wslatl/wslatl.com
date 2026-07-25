@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import Link from 'next/link'
 import { siteConfig } from '@/config/site'
 import { Reveal } from '@/components/effects/reveal'
@@ -24,6 +24,7 @@ function PlusMinus({ open }: { open: boolean }) {
 
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false)
+  const panelId = useId()
 
   return (
     <div
@@ -34,9 +35,11 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
       }`}
     >
       <button
+        type="button"
         className="w-full flex items-start justify-between gap-4 px-6 py-5 text-left transition-colors"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
+        aria-controls={panelId}
       >
         <span className="font-medium text-foreground text-sm md:text-base leading-snug">
           {question}
@@ -44,6 +47,8 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         <PlusMinus open={open} />
       </button>
       <div
+        id={panelId}
+        role="region"
         className={`grid transition-all duration-300 ease-in-out ${
           open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
         }`}

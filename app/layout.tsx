@@ -110,6 +110,9 @@ export default function RootLayout({
       className={`dark bg-background ${geist.variable} ${geistMono.variable} ${instrumentSerif.variable}`}
     >
       <body className="font-sans antialiased noise-overlay">
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <ScrollProgress />
         <AnimatedBackground />
         <div className="relative z-10">{children}</div>

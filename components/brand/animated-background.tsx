@@ -1,6 +1,9 @@
 'use client'
 
+import { useReducedMotion } from '@/hooks/use-reduced-motion'
+
 export function AnimatedBackground() {
+  const reduced = useReducedMotion()
   return (
     <div
       aria-hidden
@@ -12,7 +15,7 @@ export function AnimatedBackground() {
         style={{
           background:
             'radial-gradient(60% 50% at 50% 0%, rgba(59, 130, 246, 0.10) 0%, transparent 70%)',
-          animation: 'float 26s ease-in-out infinite',
+          animation: reduced ? undefined : 'float 26s ease-in-out infinite',
         }}
       />
       {/* Subtle vignette from the bottom */}

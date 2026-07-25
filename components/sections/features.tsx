@@ -32,7 +32,7 @@ export function Features() {
           <div className="mb-5">
             <div className="relative p-7 md:p-9 rounded-2xl border border-primary/25 bg-primary/[0.04] flex flex-col md:flex-row items-start gap-6 hover:border-primary/40 transition-all duration-300">
               <div className="w-14 h-14 rounded-2xl bg-primary/15 ring-1 ring-primary/20 flex items-center justify-center flex-shrink-0">
-                <SupportGlyph className="w-7 h-7 text-primary" />
+                <SupportGlyph aria-hidden="true" className="w-7 h-7 text-primary" />
               </div>
               <div className="flex-1">
                 <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-3 tracking-tight">
@@ -49,7 +49,7 @@ export function Features() {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/70 font-semibold transition-colors"
                 >
-                  Open a support ticket →
+                  Open a support ticket <span aria-hidden="true">→</span>
                 </Link>
               </div>
             </div>
@@ -73,7 +73,7 @@ export function Features() {
                   {num}
                 </span>
                 <div className="w-10 h-10 rounded-xl bg-primary/10 ring-1 ring-primary/15 flex items-center justify-center mb-4 group-hover:ring-primary/30 transition-all">
-                  <Icon className="w-5 h-5 text-primary" />
+                  <Icon aria-hidden="true" className="w-5 h-5 text-primary" />
                 </div>
                 <h3 className="text-base font-semibold text-foreground mb-2 tracking-tight">
                   {feature.title}

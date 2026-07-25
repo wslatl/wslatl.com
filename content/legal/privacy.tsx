@@ -279,8 +279,8 @@ export default function PrivacyContent() {
           <table className="legal-table">
             <thead>
               <tr>
-                <th>Data Type</th>
-                <th>Retention Period</th>
+                <th scope="col">Data Type</th>
+                <th scope="col">Retention Period</th>
               </tr>
             </thead>
             <tbody>

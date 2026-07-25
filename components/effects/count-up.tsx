@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useReducedMotion } from '@/hooks/use-reduced-motion'
 
 interface CountUpProps {
   to: number
@@ -22,6 +23,7 @@ export function CountUp({
   const [value, setValue] = useState(0)
   const ref = useRef<HTMLSpanElement>(null)
   const startedRef = useRef(false)
+  const reduced = useReducedMotion()
 
   useEffect(() => {
     if (!ref.current) return
@@ -31,6 +33,10 @@ export function CountUp({
         entries.forEach((entry) => {
           if (entry.isIntersecting && !startedRef.current) {
             startedRef.current = true
+            if (reduced) {
+              setValue(to)
+              return
+            }
             const start = performance.now()
             const tick = (now: number) => {
               const t = Math.min(1, (now - start) / duration)
@@ -47,7 +53,7 @@ export function CountUp({
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [to, duration])
+  }, [to, duration, reduced])
 
   const formatted =
     decimals > 0 ? value.toFixed(decimals) : Math.round(value).toString()

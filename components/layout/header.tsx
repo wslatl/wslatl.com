@@ -100,7 +100,7 @@ export function Header() {
           </div>
 
           {/* Center: Nav */}
-          <nav className="hidden lg:flex items-center gap-7">
+          <nav aria-label="Main" className="hidden lg:flex items-center gap-7">
             {mainLinks.map((link) => (
               <Link
                 key={link.label}
@@ -127,11 +127,14 @@ export function Header() {
                 data-open={loginOpen}
                 className={loginButtonClass}
                 aria-label="Open login menu"
+                aria-haspopup="true"
                 aria-expanded={loginOpen}
+                aria-controls="login-menu"
               >
-                <LogIn className="w-3.5 h-3.5 transition-transform duration-300 group-hover/login:translate-x-0.5" />
+                <LogIn aria-hidden="true" className="w-3.5 h-3.5 transition-transform duration-300 group-hover/login:translate-x-0.5" />
                 <span>Login</span>
                 <ChevronDown
+                  aria-hidden="true"
                   className={cn(
                     'w-3 h-3 opacity-60 transition-transform duration-300',
                     loginOpen && 'rotate-180',
@@ -153,7 +156,7 @@ export function Header() {
               </button>
 
               {loginOpen && (
-                <div className="absolute right-0 top-full pt-2 z-50">
+                <div id="login-menu" className="absolute right-0 top-full pt-2 z-50">
                   <div className="w-56 rounded-lg border border-border bg-popover/95 backdrop-blur text-popover-foreground shadow-xl p-1.5">
                     {loginLinks.map((item, idx) =>
                       item === null ? (
@@ -186,9 +189,10 @@ export function Header() {
                     className={loginButtonClass}
                     aria-label="Open login menu"
                   >
-                    <LogIn className="w-3.5 h-3.5" />
+                    <LogIn aria-hidden="true" className="w-3.5 h-3.5" />
                     <span>Login</span>
                     <ChevronDown
+                      aria-hidden="true"
                       className={cn(
                         'w-3 h-3 opacity-60 transition-transform duration-300',
                         loginOpen && 'rotate-180',
@@ -215,19 +219,22 @@ export function Header() {
             </div>
 
             <button
+              type="button"
               className="lg:hidden p-2 rounded-md hover:bg-accent transition-colors"
               onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={isOpen}
+              aria-controls="mobile-menu"
             >
-              {isOpen ? <X size={20} /> : <Menu size={20} />}
+              {isOpen ? <X aria-hidden="true" size={20} /> : <Menu aria-hidden="true" size={20} />}
             </button>
           </div>
         </div>
 
         {/* Mobile / tablet menu */}
         {isOpen && (
-          <div className="lg:hidden pb-4 pt-3 border-t border-border/60">
-            <div className="space-y-0.5 mb-4">
+          <div id="mobile-menu" className="lg:hidden pb-4 pt-3 border-t border-border/60">
+            <nav aria-label="Mobile" className="space-y-0.5 mb-4">
               {mainLinks.map((link) => (
                 <Link
                   key={link.label}
@@ -239,7 +246,7 @@ export function Header() {
                   {link.label}{link.external ? ' →' : ''}
                 </Link>
               ))}
-            </div>
+            </nav>
 
             <Button asChild className="w-full" size="sm">
               <Link

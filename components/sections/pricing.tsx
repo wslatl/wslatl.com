@@ -23,7 +23,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
       )}
     >
       <div className="flex items-start justify-between gap-3 mb-5">
-        <h4 className="text-lg font-semibold text-foreground tracking-tight">{plan.name}</h4>
+        <h3 className="text-lg font-semibold text-foreground tracking-tight">{plan.name}</h3>
         {popular && (
           <Badge
             variant="default"
@@ -44,7 +44,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
       <ul className="space-y-2 mb-6 flex-1">
         {plan.specs.map((spec) => (
           <li key={spec} className="flex items-start gap-2 text-sm text-foreground/80">
-            <ChevronRight className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
+            <ChevronRight aria-hidden="true" className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
             <span>{spec}</span>
           </li>
         ))}
@@ -55,7 +55,7 @@ function PricingCard({ plan }: { plan: PricingPlan }) {
         variant={popular ? 'default' : 'outline'}
         className="w-full mt-auto"
       >
-        <Link href={ORDER_HREF} target="_blank" rel="noopener noreferrer">
+        <Link href={ORDER_HREF} target="_blank" rel="noopener noreferrer" aria-label={`Order ${plan.name}`}>
           Order Now
         </Link>
       </Button>
@@ -71,18 +71,18 @@ function GroupBlock({ group }: { group: PricingTab['groups'][number] }) {
       <Reveal>
         <div className="mb-7 max-w-2xl">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mb-2">
-            <h3 className="text-xl md:text-2xl font-semibold text-foreground tracking-tight">
+            <h2 className="text-xl md:text-2xl font-semibold text-foreground tracking-tight">
               {group.label}{' · '}
               <span className="font-serif italic font-normal text-foreground/90">
                 {group.storageType}
               </span>
-            </h3>
+            </h2>
             {claim && ClaimIcon && (
               <span
                 aria-label={`Pricing advantage: ${claim.text}`}
                 className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20"
               >
-                <ClaimIcon className="w-3 h-3" />
+                <ClaimIcon aria-hidden="true" className="w-3 h-3" />
                 {claim.text}
               </span>
             )}
