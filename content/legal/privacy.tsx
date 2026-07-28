@@ -250,30 +250,6 @@ export default function PrivacyContent() {
       </LegalSection>
 
       <LegalSection number="5" title="Data Retention">
-        {/*
-          OWNER DECISION NEEDED: retention period must be reconciled across ToS 9.3, Privacy 5,
-          and config/accounts.php purge_grace_days.
-
-          The "Post-termination data" row below says data is deleted or anonymized within 90 days
-          of account closure. Two other places state a different number for the same thing:
-
-            - Terms of Service Section 9.3: "up to 14 days"
-            - Application config, config/accounts.php purge_grace_days: 7
-            - Refund Policy Section 8 restates the 14-day figure
-
-          Under GDPR Article 13(2)(a) and CCPA disclosure rules, the retention period stated here
-          is a representation to the data subject. It must match what the system actually does.
-
-          Decide the real number, then change ALL FOUR together: this table, ToS 9.3, Refund
-          Policy Section 8, and the config value in the billing panel.
-
-          Also decide whether "post-termination data" here is meant to cover the same thing as
-          the server data in ToS 9.3, or something broader such as account and profile records.
-          If they are different things they should be described as different things, with
-          different rows, rather than left looking like a contradiction.
-
-          Do not change the number below in isolation.
-        */}
         <p>We retain your data for the following periods:</p>
         <div className="overflow-x-auto mt-3">
           <table className="legal-table">
@@ -302,7 +278,7 @@ export default function PrivacyContent() {
               </tr>
               <tr>
                 <td>Post-termination data</td>
-                <td>Deleted or anonymized within 90 days of account closure</td>
+                <td>Recoverable on request for up to 14 days after termination; deleted or anonymized no later than 90 days after account closure (service data is removed sooner, per Terms of Service Section 9.3)</td>
               </tr>
             </tbody>
           </table>

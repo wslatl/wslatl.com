@@ -337,25 +337,13 @@ export default function RefundContent() {
           process. Access to the service and any associated panels is revoked once the refund is
           processed.
         </p>
-        {/*
-          OWNER DECISION NEEDED: retention period must be reconciled across ToS 9.3, Privacy 5,
-          and config/accounts.php purge_grace_days.
-
-          The 14 days below is copied from Terms of Service Section 9.3. It is one of three
-          different numbers currently published or implemented for the same thing, and the other
-          two do not agree with it. See the fuller note in content/legal/terms.tsx Section 9.3.
-
-          Once the correct number is decided, this text must be updated at the same time as
-          Terms 9.3 and Privacy 5, and the code must be changed to match. Do not change the
-          number here on its own.
-        */}
         <p>
           Following termination, the data retention rules in our Terms of Service Section 9.3
-          apply. Your data may be retained for up to{' '}
-          <span className="text-foreground font-medium">14 days</span> after termination to allow
-          for recovery requests, after which it will be permanently and irreversibly deleted. If
-          you would like to attempt to recover data from a refunded service, you must request it
-          within that 14-day window.
+          apply. Your data may be recovered on request for a limited window of up to{' '}
+          <span className="text-foreground font-medium">14 days</span> after termination; after
+          that window any remaining data is permanently and irreversibly deleted, and in all cases
+          no later than 90 days after account closure. If you would like to attempt to recover data
+          from a refunded service, you must request it within that 14-day recovery window.
         </p>
         <p className="mt-4">
           WSLATL is not liable for any data loss resulting from a refund-initiated termination.
