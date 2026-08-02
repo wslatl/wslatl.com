@@ -34,7 +34,7 @@ export function Contact() {
                 <div
                   className={`w-11 h-11 rounded-full ring-1 ${option.ring} ${option.bg} flex items-center justify-center flex-shrink-0`}
                 >
-                  <Icon className={`w-5 h-5 ${option.text}`} />
+                  <Icon aria-hidden="true" className={`w-5 h-5 ${option.text}`} />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-foreground text-sm mb-1 tracking-tight">
@@ -50,7 +50,7 @@ export function Contact() {
                   rel="noopener noreferrer"
                   className="text-xs font-semibold text-primary hover:text-primary/70 transition-colors"
                 >
-                  {option.cta} &rarr;
+                  {option.cta} <span aria-hidden="true">&rarr;</span>
                 </Link>
               </div>
             )

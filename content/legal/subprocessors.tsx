@@ -36,10 +36,10 @@ export default function SubprocessorsContent() {
           <table className="legal-table">
             <thead>
               <tr>
-                <th>Subprocessor</th>
-                <th>Purpose</th>
-                <th>Data Categories</th>
-                <th>Location</th>
+                <th scope="col">Subprocessor</th>
+                <th scope="col">Purpose</th>
+                <th scope="col">Data Categories</th>
+                <th scope="col">Location</th>
               </tr>
             </thead>
             <tbody>

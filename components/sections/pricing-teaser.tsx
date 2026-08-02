@@ -40,7 +40,7 @@ export function PricingTeaser() {
               >
                 <Link href="/pricing">
                   View All Plans
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight aria-hidden="true" className="w-4 h-4" />
                 </Link>
               </Button>
             </div>

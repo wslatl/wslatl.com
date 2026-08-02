@@ -33,8 +33,8 @@ export default function SlaContent() {
           <table className="legal-table">
             <thead>
               <tr>
-                <th>Service</th>
-                <th>Monthly Uptime Target</th>
+                <th scope="col">Service</th>
+                <th scope="col">Monthly Uptime Target</th>
               </tr>
             </thead>
             <tbody>

@@ -312,6 +312,25 @@ a:focus-visible {
   outline: none;
 }
 
+/* ----- Skip to main content link (visible on keyboard focus) ----- */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: transform 0.2s ease-out;
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
 /* ----- Reduced motion ----- */
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
@@ -328,6 +347,14 @@ a:focus-visible {
     opacity: 1 !important;
     transform: none !important;
     stroke-dashoffset: 0 !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
   }
 }
 

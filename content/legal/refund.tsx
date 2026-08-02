@@ -34,9 +34,9 @@ export default function RefundContent() {
           <table className="legal-table">
             <thead>
               <tr>
-                <th>Window</th>
-                <th>Eligibility</th>
-                <th>Refund Amount</th>
+                <th scope="col">Window</th>
+                <th scope="col">Eligibility</th>
+                <th scope="col">Refund Amount</th>
               </tr>
             </thead>
             <tbody>

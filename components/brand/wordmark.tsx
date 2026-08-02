@@ -20,7 +20,7 @@ export function Wordmark({ size = 'md', showText = true, className = '' }: Wordm
     <span className={cn('inline-flex items-center gap-2.5', className)}>
       <Image
         src="/favicon.png"
-        alt="WSLATL"
+        alt={showText ? '' : 'WSLATL'}
         width={d.logo}
         height={d.logo}
         priority

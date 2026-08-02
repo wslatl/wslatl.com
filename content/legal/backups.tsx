@@ -55,10 +55,10 @@ export default function BackupsContent() {
           <table className="legal-table">
             <thead>
               <tr>
-                <th>Service</th>
-                <th>Backups Included</th>
-                <th>What Is Captured</th>
-                <th>Frequency</th>
+                <th scope="col">Service</th>
+                <th scope="col">Backups Included</th>
+                <th scope="col">What Is Captured</th>
+                <th scope="col">Frequency</th>
               </tr>
             </thead>
             <tbody>

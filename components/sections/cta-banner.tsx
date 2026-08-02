@@ -62,7 +62,7 @@ export function CtaBanner() {
               className="gap-2 px-7 h-12 font-semibold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] ring-1 ring-white/5"
             >
               <Link href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-                <UserPlus size={17} />
+                <UserPlus aria-hidden="true" size={17} />
                 Register an Account
               </Link>
             </Button>
@@ -85,7 +85,7 @@ export function CtaBanner() {
             >
               <Link href="#contact">
                 Send an Application
-                <ChevronRight size={15} />
+                <ChevronRight aria-hidden="true" size={15} />
               </Link>
             </Button>
             </div>

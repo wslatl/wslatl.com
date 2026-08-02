@@ -84,7 +84,7 @@ export function HowItWorks() {
                   </span>
                   <div className="relative mb-5 z-10">
                     <div className="w-[4.5rem] h-[4.5rem] rounded-full bg-card border border-border flex items-center justify-center shadow-sm">
-                      <Icon className="w-6 h-6 text-primary" />
+                      <Icon aria-hidden="true" className="w-6 h-6 text-primary" />
                     </div>
                   </div>
 
@@ -101,7 +101,7 @@ export function HowItWorks() {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-sm text-primary font-medium hover:text-primary/70 transition-colors"
                     >
-                      {step.cta.label} →
+                      {step.cta.label} <span aria-hidden="true">→</span>
                     </Link>
                   )}
                 </div>

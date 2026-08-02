@@ -15,21 +15,23 @@ import { Footer } from '@/components/layout/footer'
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen page-enter">
+    <div className="relative min-h-screen page-enter">
       <Header />
-      <Hero />
-      <Clients />
-      <Stats />
-      <About />
-      <HowItWorks />
-      <Services />
-      <PricingTeaser />
-      <Features />
-      <Reviews />
-      <FAQ />
-      <CtaBanner />
-      <Contact />
+      <main id="main-content">
+        <Hero />
+        <Clients />
+        <Stats />
+        <About />
+        <HowItWorks />
+        <Services />
+        <PricingTeaser />
+        <Features />
+        <Reviews />
+        <FAQ />
+        <CtaBanner />
+        <Contact />
+      </main>
       <Footer />
-    </main>
+    </div>
   )
 }

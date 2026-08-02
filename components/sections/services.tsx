@@ -34,7 +34,7 @@ export function Services() {
               >
                 <div className="flex items-start justify-between mb-5 relative">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 ring-1 ring-primary/20 flex items-center justify-center">
-                    <Glyph className="w-6 h-6 text-primary" />
+                    <Glyph aria-hidden="true" className="w-6 h-6 text-primary" />
                   </div>
                   <Badge
                     variant="outline"
@@ -57,7 +57,7 @@ export function Services() {
                       key={feat}
                       className="flex items-start gap-2 text-sm text-foreground/80"
                     >
-                      <ChevronRight className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
+                      <ChevronRight aria-hidden="true" className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
                       <span>{feat}</span>
                     </li>
                   ))}
@@ -67,10 +67,11 @@ export function Services() {
                   href={service.ctaHref}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`Get started with ${service.title}`}
                   className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/70 font-semibold transition-colors mt-auto relative"
                 >
                   Get started
-                  <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+                  <ChevronRight aria-hidden="true" className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </div>
             )

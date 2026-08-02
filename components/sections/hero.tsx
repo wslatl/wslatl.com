@@ -39,7 +39,7 @@ export function Hero() {
             className="gap-2 px-7 h-12 text-sm font-semibold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] ring-1 ring-white/5"
           >
             <Link href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-              <UserPlus size={16} />
+              <UserPlus aria-hidden="true" size={16} />
               Get Started
             </Link>
           </Button>
@@ -62,7 +62,7 @@ export function Hero() {
           >
             <Link href="#services">
               See What We Offer
-              <ChevronRight size={15} />
+              <ChevronRight aria-hidden="true" size={15} />
             </Link>
           </Button>
         </div>

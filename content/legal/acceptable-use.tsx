@@ -322,9 +322,9 @@ export default function AcceptableUseContent() {
           <table className="legal-table">
             <thead>
               <tr>
-                <th>Severity</th>
-                <th>Examples</th>
-                <th>Response</th>
+                <th scope="col">Severity</th>
+                <th scope="col">Examples</th>
+                <th scope="col">Response</th>
               </tr>
             </thead>
             <tbody>

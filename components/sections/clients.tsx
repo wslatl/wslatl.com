@@ -19,8 +19,17 @@ export function Clients() {
         </div>
       </Reveal>
 
+      {/* Screen-reader list of clients, announced once (the marquee below is
+          decorative and repeats each logo, so it is hidden from assistive tech). */}
+      <ul className="sr-only">
+        {clients.map((client) => (
+          <li key={client.name}>{client.name}</li>
+        ))}
+      </ul>
+
       <Reveal delay={150}>
         <div
+          aria-hidden="true"
           className="max-w-5xl mx-auto overflow-hidden marquee-group"
           style={{
             WebkitMaskImage:
@@ -30,11 +39,8 @@ export function Clients() {
           }}
         >
           <div
-            className="flex items-center gap-14 marquee-track"
-            style={{
-              animation: 'scroll 60s linear infinite',
-              width: 'max-content',
-            }}
+            className="flex items-center gap-14 marquee-track animate-scroll"
+            style={{ width: 'max-content' }}
           >
             {scrollItems.map((client, idx) => (
               <div
@@ -43,7 +49,7 @@ export function Clients() {
               >
                 <Image
                   src={client.logo}
-                  alt={client.name}
+                  alt=""
                   width={client.width}
                   height={client.height}
                   className={`${client.hClass} w-auto object-contain opacity-50 hover:opacity-95 transition-opacity duration-300 grayscale-[0.3] hover:grayscale-0`}
