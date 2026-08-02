@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState, useRef, useEffect } from 'react'
 import { Menu, X, ChevronDown, LogIn } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -54,6 +55,14 @@ export function Header() {
   const [loginOpen, setLoginOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pathname = usePathname()
+
+  const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === '/') {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16)
@@ -105,6 +114,7 @@ export function Header() {
               <Link
                 key={link.label}
                 href={link.href}
+                onClick={link.href === '/' ? handleHomeClick : undefined}
                 {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                 className="relative text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium tracking-wide after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-foreground/60 after:transition-all hover:after:w-full"
               >
@@ -234,7 +244,10 @@ export function Header() {
                   href={link.href}
                   {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                   className="block px-3 py-2.5 rounded-md text-foreground hover:bg-accent transition-colors text-sm font-medium"
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => {
+                    if (link.href === '/') handleHomeClick(e)
+                    setIsOpen(false)
+                  }}
                 >
                   {link.label}{link.external ? ' →' : ''}
                 </Link>
