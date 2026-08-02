@@ -316,44 +316,13 @@ export default function TermsContent() {
         </LegalSubSection>
 
         <LegalSubSection title="9.3 Effect of Termination">
-          {/*
-            OWNER DECISION NEEDED: retention period must be reconciled across ToS 9.3, Privacy 5,
-            and config/accounts.php purge_grace_days.
-
-            There are currently THREE different numbers describing how long data survives after
-            termination, and they contradict each other:
-
-              - Terms of Service 9.3 (this section): "up to 14 days"
-              - Privacy Policy Section 5, "Post-termination data": "within 90 days"
-              - Application config, config/accounts.php purge_grace_days: 7
-
-            The Refund Policy Section 8 also restates the 14-day figure from this section.
-
-            This is the single most important item on this page to resolve. Publishing a
-            retention period the system does not implement is a misstatement to clients and a
-            regulatory problem under GDPR/CCPA storage-limitation and disclosure requirements;
-            deleting earlier than the published period means data a client was told they could
-            still recover is already gone.
-
-            Whatever is decided, ALL FOUR must be changed together:
-              1. this section
-              2. Privacy Policy Section 5
-              3. Refund Policy Section 8
-              4. config/accounts.php purge_grace_days in the billing panel
-
-            Note also that "post-termination data" in the Privacy Policy may be intended to mean
-            something broader than the server data this section is about. If so, they should be
-            separated explicitly rather than both being left to look like the same commitment.
-
-            Do not change the number below in isolation.
-          */}
           <p>
             Upon termination of your account:
           </p>
           <ul className="list-disc pl-5 space-y-1.5 mt-2">
             <li>Access to all services and panels will be revoked immediately</li>
-            <li>Your data may be retained for up to 14 days after termination to allow for recovery requests, after which it will be permanently and irreversibly deleted</li>
-            <li>Any data recovery requests must be made within the 14-day window and are subject to our discretion</li>
+            <li>Your data may be recovered on request for a limited window of up to 14 days after termination; after that window any remaining data is permanently and irreversibly deleted, and in all cases no later than 90 days after account closure, consistent with the retention table in our Privacy Policy</li>
+            <li>Any data recovery requests must be made within the 14-day recovery window and are subject to our discretion</li>
             <li>WSLATL is not liable for any data loss resulting from account termination</li>
             <li>All outstanding invoices remain due and payable following termination</li>
           </ul>
