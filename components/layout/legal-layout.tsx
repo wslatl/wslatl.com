@@ -26,7 +26,7 @@ export function LegalLayout({ title, description, effectiveDate, currentPath, ch
     <div className="min-h-screen">
       <Header />
 
-      <main id="main-content" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+      <main id="main-content" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 scroll-mt-20">
 
         {/* Breadcrumb */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm text-muted-foreground mb-8">
@@ -187,7 +187,7 @@ export function LegalSection({
 export function LegalSubSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="pl-4 sm:pl-5 border-l-2 border-primary/20">
-      <h3 className="font-semibold text-foreground mb-3 text-[11px] uppercase tracking-[0.18em] text-primary/90">
+      <h3 className="font-semibold text-foreground mb-3 text-[11px] uppercase tracking-[0.18em] text-primary">
         {title}
       </h3>
       <div className="space-y-3 text-muted-foreground text-[0.9375rem] leading-[1.75]">

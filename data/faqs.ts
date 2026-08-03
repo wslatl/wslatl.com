@@ -34,4 +34,19 @@ export const faqs: Faq[] = [
     answer:
       'Of course. Every client relationship is handled personally so upgrades, plan changes, and migrations are just a Discord message away. We usually get it sorted the same day.',
   },
+  {
+    question: 'How much does game server hosting cost?',
+    answer:
+      'Our budget game server plans start under $4 a month for 4GB of RAM on SATA SSD, and our premium NVMe plans start around $12 a month. See the full breakdown, including VPS pricing, on our pricing page.',
+  },
+  {
+    question: 'Is VPS hosting better than shared hosting?',
+    answer:
+      'For most people running a real project, yes. A VPS gives you dedicated CPU and RAM that nobody else touches, full root access, and no risk of a neighboring account tanking your performance. Shared hosting is cheaper but you are sharing resources with strangers.',
+  },
+  {
+    question: 'Do you offer DDoS protection?',
+    answer:
+      'Yes, DDoS protection is included on every game server plan at no extra cost. It is always on, not something you have to enable or pay to add later.',
+  },
 ]

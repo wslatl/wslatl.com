@@ -6,6 +6,12 @@ import { siteConfig, legalEffectiveDate } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Subprocessors | WSLATL LLC',
   description: 'The third parties that process personal data on behalf of WSLATL LLC, what each one receives, and how international transfers are handled.',
+  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.subprocessors}` },
+  openGraph: {
+    title: 'Subprocessors | WSLATL LLC',
+    description: 'The third parties that process personal data on behalf of WSLATL LLC, what each one receives, and how international transfers are handled.',
+    url: `${siteConfig.siteUrl}${siteConfig.paths.subprocessors}`,
+  },
 }
 
 export default function SubprocessorsPage() {

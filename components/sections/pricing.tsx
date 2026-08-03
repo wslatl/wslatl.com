@@ -109,17 +109,47 @@ export function Pricing() {
   const activeTab = pricingTabs.find((t) => t.id === activeId) ?? pricingTabs[0]
   const isGame = activeTab.id === 'game'
 
+  // Roving-tabindex keyboard support for the tablist below: Left/Right (and
+  // Home/End) move focus AND activate the corresponding panel, matching the
+  // WAI-ARIA APG "Tabs" pattern (automatic activation).
+  const handleTabKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const currentIndex = pricingTabs.findIndex((t) => t.id === activeId)
+    if (currentIndex === -1) return
+
+    let nextIndex: number | null = null
+    if (e.key === 'ArrowRight') nextIndex = (currentIndex + 1) % pricingTabs.length
+    else if (e.key === 'ArrowLeft') nextIndex = (currentIndex - 1 + pricingTabs.length) % pricingTabs.length
+    else if (e.key === 'Home') nextIndex = 0
+    else if (e.key === 'End') nextIndex = pricingTabs.length - 1
+
+    if (nextIndex === null) return
+    e.preventDefault()
+    const nextTab = pricingTabs[nextIndex]
+    setActiveId(nextTab.id)
+    document.getElementById(`pricing-tab-${nextTab.id}`)?.focus()
+  }
+
   return (
-    <section id="pricing" className="py-16 px-4 sm:px-6 lg:px-8">
+    <section id="pricing" className="py-16 px-4 sm:px-6 lg:px-8 scroll-mt-20">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-center mb-12">
-          <div className="flex flex-wrap gap-1.5 p-1 rounded-full border border-border/70 bg-card/30 w-fit">
+          <div
+            role="tablist"
+            aria-label="Pricing category"
+            onKeyDown={handleTabKeyDown}
+            className="flex flex-wrap gap-1.5 p-1 rounded-full border border-border/70 bg-card/30 w-fit"
+          >
             {pricingTabs.map((tab) => {
               const isActive = activeId === tab.id
               return (
                 <button
                   key={tab.id}
+                  id={`pricing-tab-${tab.id}`}
                   type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls={`pricing-panel-${tab.id}`}
+                  tabIndex={isActive ? 0 : -1}
                   onClick={() => setActiveId(tab.id)}
                   className={cn(
                     'px-5 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
@@ -127,7 +157,6 @@ export function Pricing() {
                       ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'text-muted-foreground hover:text-foreground hover:bg-accent/40',
                   )}
-                  aria-pressed={isActive}
                 >
                   {tab.label}
                 </button>
@@ -142,7 +171,12 @@ export function Pricing() {
           </p>
         )}
 
-        <div>
+        <div
+          role="tabpanel"
+          id={`pricing-panel-${activeId}`}
+          aria-labelledby={`pricing-tab-${activeId}`}
+          tabIndex={0}
+        >
           {activeTab.groups.map((group) => (
             <GroupBlock key={group.id} group={group} />
           ))}

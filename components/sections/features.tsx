@@ -47,7 +47,7 @@ export function Features() {
                   href={siteConfig.links.billing}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/70 font-semibold transition-colors"
+                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline underline-offset-2 font-semibold transition-colors"
                 >
                   Open a support ticket <span aria-hidden="true">→</span>
                 </Link>

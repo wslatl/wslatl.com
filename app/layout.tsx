@@ -18,21 +18,23 @@ const siteUrl = 'https://wslatl.com'
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'WSLATL LLC | Private Hosting, Personal Service',
+    default: 'Cheap VPS & Game Server Hosting | WSLATL LLC',
     template: '%s | WSLATL LLC',
   },
   description:
-    'Missouri-based private hosting company offering dedicated servers, game hosting, VPS, and web hosting. We treat every client like family.',
+    'Affordable VPS hosting, game server hosting (Minecraft, Rust, ARK, FiveM & more), and dedicated servers with DDoS protection and NVMe storage. Missouri-based, and we actually pick up.',
   applicationName: 'WSLATL LLC',
   keywords: [
     'WSLATL',
-    'private hosting',
+    'cheap VPS hosting',
+    'game server hosting',
+    'Minecraft server hosting',
+    'dedicated server hosting',
     'Missouri hosting',
-    'dedicated servers',
-    'game hosting',
-    'Pterodactyl',
-    'VPS hosting',
-    'web hosting',
+    'DDoS protected hosting',
+    'NVMe VPS',
+    'Pterodactyl hosting',
+    'private hosting',
     'application-only hosting',
   ],
   authors: [{ name: 'WSLATL LLC' }],
@@ -57,24 +59,24 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: siteUrl,
     siteName: 'WSLATL LLC',
-    title: 'WSLATL LLC | Private Hosting, Personal Service',
+    title: 'Cheap VPS & Game Server Hosting | WSLATL LLC',
     description:
-      'Missouri-based private hosting company offering dedicated servers, game hosting, VPS, and web hosting. We treat every client like family.',
+      'Affordable VPS hosting, game server hosting (Minecraft, Rust, ARK, FiveM & more), and dedicated servers with DDoS protection and NVMe storage. Missouri-based, and we actually pick up.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'WSLATL LLC | Private Hosting, Personal Service',
+        alt: 'WSLATL LLC - Cheap VPS & Game Server Hosting',
         type: 'image/png',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'WSLATL LLC | Private Hosting, Personal Service',
+    title: 'Cheap VPS & Game Server Hosting | WSLATL LLC',
     description:
-      'Missouri-based private hosting company offering dedicated servers, game hosting, VPS, and web hosting. We treat every client like family.',
+      'Affordable VPS hosting, game server hosting (Minecraft, Rust, ARK, FiveM & more), and dedicated servers with DDoS protection and NVMe storage.',
     images: ['/og-image.png'],
   },
   robots: {
@@ -99,6 +101,22 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'WSLATL LLC',
+  url: siteUrl,
+  logo: `${siteUrl}/favicon.png`,
+  description:
+    'Missouri-based private hosting company offering dedicated servers, game hosting, VPS, and web hosting.',
+  address: {
+    '@type': 'PostalAddress',
+    addressRegion: 'MO',
+    addressCountry: 'US',
+  },
+  sameAs: ['https://discord.gg/3eKawhSbAF'],
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -110,6 +128,13 @@ export default function RootLayout({
       className={`dark bg-background ${geist.variable} ${geistMono.variable} ${instrumentSerif.variable}`}
     >
       <body className="font-sans antialiased noise-overlay">
+        {/* Static, hand-authored content only (see organizationJsonLd above) - never
+            user input - so this is JSON-LD structured data, not an XSS surface. */}
+        {/* eslint-disable-next-line react/no-danger */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, '\\u003c') }}
+        />
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

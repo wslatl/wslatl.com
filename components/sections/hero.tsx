@@ -26,7 +26,8 @@ export function Hero() {
           style={{ animationDelay: '0.2s' }}
         >
           We have worked inside hosting companies. We know what goes wrong. WSLATL exists
-          to fix that. Dedicated servers, game hosting, VPS, and a team that picks up.
+          to fix that: affordable VPS hosting, Minecraft and game server hosting, and
+          dedicated servers, backed by a team that actually picks up.
         </p>
 
         <div
@@ -68,7 +69,7 @@ export function Hero() {
         </div>
 
         <p
-          className="mt-8 text-[11px] uppercase tracking-[0.22em] text-muted-foreground/55 animate-fade-in"
+          className="mt-8 text-[11px] uppercase tracking-[0.22em] text-muted-foreground/80 animate-fade-in"
           style={{ animationDelay: '0.5s' }}
         >
           Based in Missouri · Private Hosting · WSLATL LLC

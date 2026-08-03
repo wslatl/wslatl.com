@@ -6,6 +6,12 @@ import { siteConfig, legalEffectiveDate } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Service Level Agreement | WSLATL LLC',
   description: 'WSLATL LLC uptime targets by service type, scheduled maintenance notice, and how to claim a service credit.',
+  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.sla}` },
+  openGraph: {
+    title: 'Service Level Agreement | WSLATL LLC',
+    description: 'WSLATL LLC uptime targets by service type, scheduled maintenance notice, and how to claim a service credit.',
+    url: `${siteConfig.siteUrl}${siteConfig.paths.sla}`,
+  },
 }
 
 export default function SlaPage() {

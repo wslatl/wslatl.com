@@ -29,7 +29,7 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8 scroll-mt-20">
       <div className="max-w-6xl mx-auto">
 
         <Reveal>
@@ -99,7 +99,7 @@ export function HowItWorks() {
                       href={step.cta.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm text-primary font-medium hover:text-primary/70 transition-colors"
+                      className="inline-flex items-center gap-1 text-sm text-primary font-medium hover:underline underline-offset-2 transition-colors"
                     >
                       {step.cta.label} <span aria-hidden="true">→</span>
                     </Link>

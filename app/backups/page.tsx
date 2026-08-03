@@ -6,6 +6,12 @@ import { siteConfig, legalEffectiveDate } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Backup Policy | WSLATL LLC',
   description: 'What WSLATL LLC backs up, why backups are best-effort, why you should keep your own copies, and how to request a restore.',
+  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.backups}` },
+  openGraph: {
+    title: 'Backup Policy | WSLATL LLC',
+    description: 'What WSLATL LLC backs up, why backups are best-effort, why you should keep your own copies, and how to request a restore.',
+    url: `${siteConfig.siteUrl}${siteConfig.paths.backups}`,
+  },
 }
 
 export default function BackupsPage() {

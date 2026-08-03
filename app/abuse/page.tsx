@@ -6,6 +6,12 @@ import { siteConfig, legalEffectiveDate } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Abuse Policy | WSLATL LLC',
   description: 'How to report abuse of WSLATL LLC infrastructure (spam, network attacks, phishing, malware, illegal content) and how we handle reports.',
+  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.abuse}` },
+  openGraph: {
+    title: 'Abuse Policy | WSLATL LLC',
+    description: 'How to report abuse of WSLATL LLC infrastructure (spam, network attacks, phishing, malware, illegal content) and how we handle reports.',
+    url: `${siteConfig.siteUrl}${siteConfig.paths.abuse}`,
+  },
 }
 
 export default function AbusePage() {

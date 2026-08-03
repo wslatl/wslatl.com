@@ -30,7 +30,7 @@ const pillars: Pillar[] = [
 
 export function About() {
   return (
-    <section id="about" className="py-24 px-4 sm:px-6 lg:px-8">
+    <section id="about" className="py-24 px-4 sm:px-6 lg:px-8 scroll-mt-20">
       <div className="max-w-6xl mx-auto">
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start mb-20">

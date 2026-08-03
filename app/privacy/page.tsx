@@ -6,6 +6,12 @@ import { siteConfig, legalEffectiveDate } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Privacy Policy | WSLATL LLC',
   description: 'How WSLATL LLC collects, uses, and protects your personal information.',
+  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.privacy}` },
+  openGraph: {
+    title: 'Privacy Policy | WSLATL LLC',
+    description: 'How WSLATL LLC collects, uses, and protects your personal information.',
+    url: `${siteConfig.siteUrl}${siteConfig.paths.privacy}`,
+  },
 }
 
 export default function PrivacyPage() {
