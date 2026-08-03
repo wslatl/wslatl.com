@@ -1,7 +1,3 @@
-import type { ComponentType } from 'react'
-import {
-  ServerStackGlyph, ControllerGlyph, LayersGlyph, GlobeGlyph,
-} from '@/components/brand/glyphs'
 import { siteConfig } from '@/config/site'
 
 export interface Service {
@@ -9,9 +5,6 @@ export interface Service {
   badge: string
   description: string
   features: string[]
-  accent: string
-  halo: string
-  Glyph: ComponentType<{ className?: string }>
   ctaHref: string
 }
 
@@ -28,9 +21,6 @@ export const services: Service[] = [
       'IPMI and KVM remote access',
       'Managed or self managed',
     ],
-    accent: 'group-hover:border-blue-400/40',
-    halo: 'from-blue-500/8 to-indigo-500/4',
-    Glyph: ServerStackGlyph,
     ctaHref: siteConfig.links.register,
   },
   {
@@ -45,9 +35,6 @@ export const services: Service[] = [
       'Mod and plugin support',
       'Fast setup, usually same day',
     ],
-    accent: 'group-hover:border-purple-400/40',
-    halo: 'from-purple-500/8 to-pink-500/4',
-    Glyph: ControllerGlyph,
     ctaHref: siteConfig.links.register,
   },
   {
@@ -62,9 +49,6 @@ export const services: Service[] = [
       'SSD backed storage',
       '99.9% uptime SLA',
     ],
-    accent: 'group-hover:border-cyan-400/40',
-    halo: 'from-cyan-500/8 to-blue-500/4',
-    Glyph: LayersGlyph,
     ctaHref: siteConfig.links.register,
   },
   {
@@ -79,9 +63,6 @@ export const services: Service[] = [
       'One click app installs',
       'Personal support included',
     ],
-    accent: 'group-hover:border-emerald-400/40',
-    halo: 'from-emerald-500/8 to-teal-500/4',
-    Glyph: GlobeGlyph,
     ctaHref: siteConfig.links.register,
   },
 ]
