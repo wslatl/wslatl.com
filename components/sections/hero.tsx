@@ -26,7 +26,8 @@ export function Hero() {
           style={{ animationDelay: '0.2s' }}
         >
           We have worked inside hosting companies. We know what goes wrong. WSLATL exists
-          to fix that. Dedicated servers, game hosting, VPS, and a team that picks up.
+          to fix that: affordable VPS hosting, Minecraft and game server hosting, and
+          dedicated servers, backed by a team that actually picks up.
         </p>
 
         <div

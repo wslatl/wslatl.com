@@ -19,7 +19,8 @@ export function Services() {
               <span className="font-serif italic font-normal text-foreground/90">Nothing outsourced.</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-              From raw dedicated hardware to game servers, all managed personally by our team.
+              Dedicated servers, VPS hosting, and game server hosting, all managed personally
+              by our team.
             </p>
           </div>
         </Reveal>
