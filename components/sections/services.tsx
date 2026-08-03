@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
 import { Reveal, RevealGroup } from '@/components/effects/reveal'
 import { services } from '@/data/services'
 
@@ -15,8 +14,8 @@ export function Services() {
               What We Offer
             </p>
             <h2 className="text-balance text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-[-0.025em]">
-              Everything hosted.{' '}
-              <span className="font-serif italic font-normal text-foreground/90">Nothing outsourced.</span>
+              Servers, built{' '}
+              <span className="font-serif italic font-normal text-foreground/90">the way we&apos;d want them.</span>
             </h2>
             <p className="text-muted-foreground text-lg max-w-lg mx-auto">
               Dedicated servers, VPS hosting, and game server hosting, all managed personally
@@ -25,58 +24,49 @@ export function Services() {
           </div>
         </Reveal>
 
-        <RevealGroup as="div" className="grid md:grid-cols-2 gap-5" step={120}>
-          {services.map((service, idx) => {
-            const Glyph = service.Glyph
-            return (
-              <div
-                key={idx}
-                className={`group relative flex flex-col p-7 rounded-2xl border border-border/70 bg-gradient-to-br ${service.halo} ${service.accent} hover:-translate-y-0.5 hover:shadow-2xl hover:shadow-black/40 transition-all duration-300`}
-              >
-                <div className="flex items-start justify-between mb-5 relative">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 ring-1 ring-primary/20 flex items-center justify-center">
-                    <Glyph aria-hidden="true" className="w-6 h-6 text-primary" />
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className="text-[10px] font-medium uppercase tracking-[0.12em] border-border/80 text-muted-foreground bg-background/40"
-                  >
-                    {service.badge}
-                  </Badge>
-                </div>
-
-                <h3 className="text-xl font-semibold text-foreground mb-2 tracking-tight">
+        {/* A plain, hairline-divided list rather than a grid of matching
+            icon-badge-bullets cards - the service names carry enough weight
+            on their own, and four boxes trying to look identical is what
+            makes a page feel templated. */}
+        <RevealGroup
+          as="div"
+          className="max-w-4xl mx-auto divide-y divide-border/70 border-y border-border/70"
+          step={100}
+        >
+          {services.map((service, idx) => (
+            <div
+              key={idx}
+              className="group grid gap-3 py-9 sm:grid-cols-[13rem_1fr] sm:gap-8"
+            >
+              <div>
+                <h3 className="text-2xl font-bold tracking-tight text-foreground">
                   {service.title}
                 </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-5">
+                <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.1em] text-primary/80">
+                  {service.badge}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-muted-foreground leading-relaxed">
                   {service.description}
                 </p>
-
-                <ul className="space-y-2 mb-6 flex-1">
-                  {service.features.map((feat) => (
-                    <li
-                      key={feat}
-                      className="flex items-start gap-2 text-sm text-foreground/80"
-                    >
-                      <ChevronRight aria-hidden="true" className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-
+                <p className="mt-3 text-sm text-foreground/70">
+                  {service.features.join('  ·  ')}
+                </p>
                 <Link
                   href={service.ctaHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Get started with ${service.title}`}
-                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline underline-offset-2 font-semibold transition-colors mt-auto relative"
+                  className="mt-4 inline-flex items-center gap-1 text-sm text-primary hover:underline underline-offset-2 font-semibold transition-colors"
                 >
                   Get started
                   <ChevronRight aria-hidden="true" className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </div>
-            )
-          })}
+            </div>
+          ))}
         </RevealGroup>
       </div>
     </section>
