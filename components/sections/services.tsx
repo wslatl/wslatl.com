@@ -6,7 +6,7 @@ import { services } from '@/data/services'
 
 export function Services() {
   return (
-    <section id="services" className="py-24 px-4 sm:px-6 lg:px-8 relative">
+    <section id="services" className="py-24 px-4 sm:px-6 lg:px-8 relative scroll-mt-20">
       <div className="max-w-6xl mx-auto">
 
         <Reveal>
@@ -68,7 +68,7 @@ export function Services() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Get started with ${service.title}`}
-                  className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/70 font-semibold transition-colors mt-auto relative"
+                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline underline-offset-2 font-semibold transition-colors mt-auto relative"
                 >
                   Get started
                   <ChevronRight aria-hidden="true" className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />

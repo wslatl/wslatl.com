@@ -6,6 +6,12 @@ import { siteConfig, legalEffectiveDate } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Account Credit Terms | WSLATL LLC',
   description: 'How account credit works at WSLATL LLC: buying credit, applying it to invoices, gifting it to another account, and what it can and cannot be used for.',
+  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.accountCredit}` },
+  openGraph: {
+    title: 'Account Credit Terms | WSLATL LLC',
+    description: 'How account credit works at WSLATL LLC: buying credit, applying it to invoices, gifting it to another account, and what it can and cannot be used for.',
+    url: `${siteConfig.siteUrl}${siteConfig.paths.accountCredit}`,
+  },
 }
 
 export default function AccountCreditPage() {

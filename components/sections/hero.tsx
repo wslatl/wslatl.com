@@ -68,7 +68,7 @@ export function Hero() {
         </div>
 
         <p
-          className="mt-8 text-[11px] uppercase tracking-[0.22em] text-muted-foreground/55 animate-fade-in"
+          className="mt-8 text-[11px] uppercase tracking-[0.22em] text-muted-foreground/80 animate-fade-in"
           style={{ animationDelay: '0.5s' }}
         >
           Based in Missouri · Private Hosting · WSLATL LLC

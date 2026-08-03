@@ -5,7 +5,7 @@ import { reachOptions } from '@/data/reach-options'
 
 export function Contact() {
   return (
-    <section id="contact" className="py-20 px-4 sm:px-6 lg:px-8">
+    <section id="contact" className="py-20 px-4 sm:px-6 lg:px-8 scroll-mt-20">
       <div className="max-w-4xl mx-auto">
 
         <Reveal>
@@ -48,7 +48,7 @@ export function Contact() {
                   href={option.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs font-semibold text-primary hover:text-primary/70 transition-colors"
+                  className="text-xs font-semibold text-primary hover:underline underline-offset-2 transition-colors"
                 >
                   {option.cta} <span aria-hidden="true">&rarr;</span>
                 </Link>

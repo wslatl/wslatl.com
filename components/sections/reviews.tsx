@@ -8,7 +8,7 @@ export function Reviews() {
   return (
       <section
           id="reviews"
-          className="py-24 px-4 sm:px-6 lg:px-8"
+          className="py-24 px-4 sm:px-6 lg:px-8 scroll-mt-20"
           aria-labelledby="reviews-heading"
       >
         <div className="max-w-3xl mx-auto">

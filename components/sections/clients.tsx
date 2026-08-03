@@ -8,7 +8,7 @@ const scrollItems = Array.from({ length: SCROLL_REPEATS }, () => clients).flat()
 
 export function Clients() {
   return (
-    <section id="clients" className="py-16">
+    <section id="clients" className="py-16 scroll-mt-20">
       <Reveal>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 flex items-center gap-4">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-border to-transparent" />

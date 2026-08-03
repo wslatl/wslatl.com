@@ -6,6 +6,12 @@ import { siteConfig, legalEffectiveDate } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Acceptable Use Policy | WSLATL LLC',
   description: 'What is and is not permitted on WSLATL LLC hosting infrastructure.',
+  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.acceptableUse}` },
+  openGraph: {
+    title: 'Acceptable Use Policy | WSLATL LLC',
+    description: 'What is and is not permitted on WSLATL LLC hosting infrastructure.',
+    url: `${siteConfig.siteUrl}${siteConfig.paths.acceptableUse}`,
+  },
 }
 
 export default function AcceptableUsePage() {

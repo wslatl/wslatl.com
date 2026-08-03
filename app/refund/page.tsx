@@ -6,6 +6,12 @@ import { siteConfig, legalEffectiveDate } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Refund Policy | WSLATL LLC',
   description: 'How WSLATL LLC handles refund requests, including the 48-hour and 14-day refund windows, eligible reasons, and non-refundable items.',
+  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.refund}` },
+  openGraph: {
+    title: 'Refund Policy | WSLATL LLC',
+    description: 'How WSLATL LLC handles refund requests, including the 48-hour and 14-day refund windows, eligible reasons, and non-refundable items.',
+    url: `${siteConfig.siteUrl}${siteConfig.paths.refund}`,
+  },
 }
 
 export default function RefundPage() {

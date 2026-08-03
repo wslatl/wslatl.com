@@ -31,7 +31,7 @@ function LoginDropdownItems() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 cursor-pointer"
             >
-              <item.icon className="w-4 h-4" />
+              <item.icon aria-hidden="true" className="w-4 h-4" />
               {item.label}
             </Link>
           </DropdownMenuItem>
@@ -53,6 +53,13 @@ const loginButtonClass =
 export function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
+  // Desktop's Login menu gets its own open state (rather than sharing
+  // `loginOpen` with the mobile Radix menu below). It is now driven by a
+  // fully-controlled Radix DropdownMenu, and reusing the same boolean would
+  // make hovering the desktop trigger also flip `open` on the mobile
+  // instance (and vice versa) even though only one of the two is ever
+  // visible at a given viewport width.
+  const [desktopLoginOpen, setDesktopLoginOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pathname = usePathname()
@@ -81,11 +88,11 @@ export function Header() {
 
   const openLogin = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current)
-    setLoginOpen(true)
+    setDesktopLoginOpen(true)
   }
 
   const scheduleClose = () => {
-    closeTimer.current = setTimeout(() => setLoginOpen(false), 150)
+    closeTimer.current = setTimeout(() => setDesktopLoginOpen(false), 150)
   }
 
   return (
@@ -126,67 +133,59 @@ export function Header() {
           {/* Right: Login + hamburger */}
           <div className="flex-1 flex items-center justify-end gap-2">
 
-            {/* Desktop: pure hover dropdown, animated Login button */}
+            {/* Desktop: hover-opens, but built on Radix so it is also fully
+                keyboard operable (Enter/Space to open, Escape to close,
+                arrow keys between items, focus returns to the trigger on
+                close). Hovering the trigger or the menu itself keeps it
+                open; the DropdownMenuContent is teleported to a portal, so
+                its own mouse handlers (not just the wrapper div's) are what
+                keep hover-across-the-gap working. */}
             <div
               className="relative hidden lg:block"
               onMouseEnter={openLogin}
               onMouseLeave={scheduleClose}
             >
-              <button
-                type="button"
-                data-open={loginOpen}
-                className={loginButtonClass}
-                aria-label="Open login menu"
-                aria-haspopup="true"
-                aria-expanded={loginOpen}
-                aria-controls="login-menu"
-              >
-                <LogIn aria-hidden="true" className="w-3.5 h-3.5 transition-transform duration-300 group-hover/login:translate-x-0.5" />
-                <span>Login</span>
-                <ChevronDown
-                  aria-hidden="true"
-                  className={cn(
-                    'w-3 h-3 opacity-60 transition-transform duration-300',
-                    loginOpen && 'rotate-180',
-                  )}
-                />
-                {/* Sweep highlight on hover */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-md overflow-hidden"
+              <DropdownMenu open={desktopLoginOpen} onOpenChange={setDesktopLoginOpen}>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    data-open={desktopLoginOpen}
+                    className={loginButtonClass}
+                    aria-label="Open login menu"
+                  >
+                    <LogIn aria-hidden="true" className="w-3.5 h-3.5 transition-transform duration-300 group-hover/login:translate-x-0.5" />
+                    <span>Login</span>
+                    <ChevronDown
+                      aria-hidden="true"
+                      className={cn(
+                        'w-3 h-3 opacity-60 transition-transform duration-300',
+                        desktopLoginOpen && 'rotate-180',
+                      )}
+                    />
+                    {/* Sweep highlight on hover */}
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 rounded-md overflow-hidden"
+                    >
+                      <span
+                        className={cn(
+                          'absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.07] to-transparent',
+                          'transition-transform duration-500 ease-out',
+                          'group-hover/login:translate-x-full',
+                        )}
+                      />
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="w-56 rounded-lg bg-popover/95 backdrop-blur p-1.5"
+                  onMouseEnter={openLogin}
+                  onMouseLeave={scheduleClose}
                 >
-                  <span
-                    className={cn(
-                      'absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.07] to-transparent',
-                      'transition-transform duration-500 ease-out',
-                      'group-hover/login:translate-x-full',
-                    )}
-                  />
-                </span>
-              </button>
-
-              {loginOpen && (
-                <div id="login-menu" className="absolute right-0 top-full pt-2 z-50">
-                  <div className="w-56 rounded-lg border border-border bg-popover/95 backdrop-blur text-popover-foreground shadow-xl p-1.5">
-                    {loginLinks.map((item, idx) =>
-                      item === null ? (
-                        <div key={`sep-${idx}`} className="-mx-1 my-1 h-px bg-border" />
-                      ) : (
-                        <Link
-                          key={item.label}
-                          href={item.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
-                        >
-                          <item.icon className="w-4 h-4 text-muted-foreground" />
-                          {item.label}
-                        </Link>
-                      )
-                    )}
-                  </div>
-                </div>
-              )}
+                  <LoginDropdownItems />
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Mobile: click-triggered Login dropdown, same animated button */}

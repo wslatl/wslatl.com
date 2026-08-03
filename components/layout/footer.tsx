@@ -59,7 +59,11 @@ export function Footer() {
           {/* Link columns */}
           {footerColumns.map((col) => (
             <div key={col.title} className="md:px-6">
-              <h4 className="font-semibold text-foreground mb-4 text-sm tracking-tight">{col.title}</h4>
+              {/* h3, not h4: this is global chrome, not part of the page's
+                  main-content heading flow, and no page in this codebase
+                  ever reaches h4 in <main> - using h3 here guarantees the
+                  footer never introduces a heading-level skip on any page. */}
+              <h3 className="font-semibold text-foreground mb-4 text-sm tracking-tight">{col.title}</h3>
               <ul className="space-y-2.5 text-sm">
                 {col.links.map((l) => (
                   <li key={l.label}>

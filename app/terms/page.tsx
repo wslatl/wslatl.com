@@ -6,6 +6,12 @@ import { siteConfig, legalEffectiveDate } from '@/config/site'
 export const metadata: Metadata = {
   title: 'Terms of Service | WSLATL LLC',
   description: 'The terms and conditions governing your use of WSLATL LLC hosting services.',
+  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.terms}` },
+  openGraph: {
+    title: 'Terms of Service | WSLATL LLC',
+    description: 'The terms and conditions governing your use of WSLATL LLC hosting services.',
+    url: `${siteConfig.siteUrl}${siteConfig.paths.terms}`,
+  },
 }
 
 export default function TermsPage() {
