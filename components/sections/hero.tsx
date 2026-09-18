@@ -13,9 +13,11 @@ const entryPoints = [
 export function Hero() {
   return (
     <section aria-labelledby="hero-heading" className="shell pt-16 pb-14 text-center md:pt-24 md:pb-20">
+      {/* The slogan paints immediately (it is the page's largest content);
+          the supporting copy below rises in after it. */}
       <h1
         id="hero-heading"
-        className="animate-rise mx-auto max-w-5xl text-[clamp(3rem,10vw,7.25rem)] leading-[0.95] font-bold tracking-[-0.04em] text-balance text-foreground"
+        className="mx-auto max-w-5xl text-[clamp(3rem,10vw,7.25rem)] leading-[0.95] font-bold tracking-[-0.04em] text-balance text-foreground"
       >
         Hosting that
         <br />
@@ -25,7 +27,7 @@ export function Hero() {
 
       <p
         className="animate-rise mx-auto mt-8 max-w-xl text-base leading-relaxed text-pretty text-muted-foreground md:text-lg"
-        style={{ animationDelay: '120ms' }}
+        style={{ animationDelay: '60ms' }}
       >
         We have worked inside hosting companies. We know what goes wrong. WSLATL exists to fix that:
         affordable VPS hosting, Minecraft and game server hosting, and dedicated servers, backed by a

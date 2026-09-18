@@ -5,10 +5,12 @@ import { siteConfig } from '@/config/site'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
+// The serif is only ever set in italic (slogan, page titles, quotes), so the
+// upright face is not loaded at all.
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
-  style: ['normal', 'italic'],
+  style: 'italic',
   variable: '--font-serif',
 })
 

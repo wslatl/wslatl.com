@@ -172,22 +172,25 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
 }
 
 /* ----- Skip to main content link (visible on keyboard focus) ----- */
+/* Parked above the viewport (not just translated) so no screenshot or
+   stitched capture can catch it; it drops in over the header on focus. */
 .skip-link {
   position: fixed;
-  top: 0.75rem;
+  top: -5rem;
   left: 0.75rem;
   z-index: 100;
-  transform: translateY(-150%);
-  padding: 0.5rem 1rem;
+  padding: 0.625rem 1rem;
   border-radius: 0.5rem;
-  background: var(--foreground);
-  color: var(--background);
+  background: var(--primary);
+  color: var(--primary-foreground);
   font-size: 0.875rem;
   font-weight: 600;
-  transition: transform 0.2s ease-out;
+  box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.7);
+  transition: top 0.15s ease-out;
 }
+.skip-link:focus,
 .skip-link:focus-visible {
-  transform: translateY(0);
+  top: 0.75rem;
 }
 
 /* ----- Legal documents ----- */
