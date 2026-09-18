@@ -12,7 +12,7 @@ export default function BackupsContent() {
         </p>
         <p>
           It is incorporated into our{' '}
-          <a href={siteConfig.paths.terms} className="text-primary hover:underline">Terms of Service</a>{' '}
+          <a href={siteConfig.paths.terms}>Terms of Service</a>{' '}
           by reference and should be read alongside Section 2 (Description of Services), Section
           9.3 (Effect of Termination), and Section 11 (Limitation of Liability).
         </p>
@@ -202,11 +202,11 @@ export default function BackupsContent() {
       <LegalSection number="6" title="Requesting a Restore">
         <p>
           To request a restore, open a ticket in the billing portal at{' '}
-          <a href={siteConfig.links.billing} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+          <a href={siteConfig.links.billing} target="_blank" rel="noopener noreferrer">
             billing.wslatl.com
           </a>{' '}
           or email{' '}
-          <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+          <a href={`mailto:${siteConfig.email.support}`}>
             {siteConfig.email.support}
           </a>. Tell us:
         </p>
@@ -247,7 +247,7 @@ export default function BackupsContent() {
           <p>
             Where a restore has been carried out as a paid add-on, it is a consumed service and is
             not refundable, as set out in Section 5 of our{' '}
-            <a href={siteConfig.paths.refund} className="text-primary hover:underline">Refund Policy</a>.
+            <a href={siteConfig.paths.refund}>Refund Policy</a>.
           </p>
         </LegalSubSection>
       </LegalSection>
@@ -270,10 +270,10 @@ export default function BackupsContent() {
         <p>
           Backups contain your data and are protected with the same controls described in Section
           6 of our{' '}
-          <a href={siteConfig.paths.privacy} className="text-primary hover:underline">Privacy Policy</a>,
+          <a href={siteConfig.paths.privacy}>Privacy Policy</a>,
           including access controls limiting which members of our team can reach them. Where a
           backup is held on infrastructure operated by a partner, the recipients listed on our{' '}
-          <a href={siteConfig.paths.subprocessors} className="text-primary hover:underline">Subprocessors</a>{' '}
+          <a href={siteConfig.paths.subprocessors}>Subprocessors</a>{' '}
           page apply to that copy as well.
         </p>
       </LegalSection>
@@ -283,7 +283,7 @@ export default function BackupsContent() {
           We may update this Backup Policy to reflect changes in our infrastructure or our plans.
           When we make material changes, we will update the effective date at the top of this page
           and post the updated policy at{' '}
-          <a href={siteConfig.paths.backups} className="text-primary hover:underline">
+          <a href={siteConfig.paths.backups}>
             {siteConfig.siteUrl}{siteConfig.paths.backups}
           </a>. Changes that reduce what is included with a service you already hold will be
           notified by email before they take effect.
@@ -300,9 +300,9 @@ export default function BackupsContent() {
           <p>Missouri, United States</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>
+            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
             {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`} className="text-primary hover:underline">{siteConfig.email.info}</a>
+            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
           </p>
           <p>
             Discord:{' '}
@@ -310,7 +310,7 @@ export default function BackupsContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>

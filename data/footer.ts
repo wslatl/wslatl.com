@@ -1,50 +1,41 @@
 import { siteConfig } from '@/config/site'
+import { legalPages } from '@/data/legal'
+import { portalLinks, requestAccessLink, type NavLink } from '@/data/nav'
+import { pricingHref } from '@/lib/pricing'
 
 export interface FooterColumn {
   title: string
-  links: { label: string; href: string; external?: boolean }[]
-}
-
-export const servicesColumn: FooterColumn = {
-  title: 'Services',
-  links: [
-    { label: 'Dedicated Servers', href: '#services' },
-    { label: 'Game Hosting',      href: '#services' },
-    { label: 'VPS Hosting',       href: '#services' },
-    { label: 'Web Hosting',       href: '#services' },
-  ],
-}
-
-export const quickLinksColumn: FooterColumn = {
-  title: 'Quick Links',
-  links: [
-    { label: 'Billing Portal', href: siteConfig.links.billing,     external: true },
-    { label: 'Gaming Panel',   href: siteConfig.links.gamingPanel, external: true },
-    { label: 'VPS Panel',      href: siteConfig.links.vpsPanel,    external: true },
-    { label: 'Discord Server', href: siteConfig.links.discord,     external: true },
-    { label: 'Status Page',    href: siteConfig.links.status,      external: true },
-  ],
-}
-
-export const legalColumn: FooterColumn = {
-  title: 'Legal',
-  links: [
-    { label: 'Privacy Policy',   href: '/privacy' },
-    { label: 'Terms of Service', href: '/terms' },
-    { label: 'Acceptable Use',   href: '/acceptable-use' },
-    { label: 'Refund Policy',    href: '/refund' },
-    { label: 'Service Level Agreement', href: '/sla' },
-    { label: 'DMCA Policy',      href: '/dmca' },
-    { label: 'Abuse Policy',     href: '/abuse' },
-    { label: 'Account Credit',   href: '/account-credit' },
-    { label: 'Subprocessors',    href: '/subprocessors' },
-    { label: 'Backups',          href: '/backups' },
-    { label: 'Contact Us',       href: '/#contact' },
-  ],
+  links: NavLink[]
 }
 
 export const footerColumns: FooterColumn[] = [
-  servicesColumn,
-  quickLinksColumn,
-  legalColumn,
+  {
+    title: 'Hosting',
+    links: [
+      { label: 'VPS plans', href: pricingHref('vps') },
+      { label: 'Game server plans', href: pricingHref('game') },
+      { label: 'Supported games', href: '/games' },
+      { label: 'Dedicated servers', href: '/#services' },
+      { label: 'Web hosting', href: '/#services' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About us', href: '/#about' },
+      { label: 'How ordering works', href: '/#how-it-works' },
+      { label: 'Contact', href: siteConfig.paths.contact },
+      { label: 'Reviews on Trustpilot', href: siteConfig.trustpilot.profileUrl },
+      { label: 'Discord', href: siteConfig.links.discord },
+      { label: 'Status page', href: siteConfig.links.status },
+    ],
+  },
+  {
+    title: 'Client area',
+    links: [...portalLinks, requestAccessLink].map(({ label, href }) => ({ label, href })),
+  },
+  {
+    title: 'Legal',
+    links: legalPages.map(({ label, href }) => ({ label, href })),
+  },
 ]

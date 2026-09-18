@@ -1,28 +1,11 @@
-import type { Metadata } from 'next'
-import { LegalLayout } from '@/components/layout/legal-layout'
+import { LegalLayout, legalMetadata } from '@/components/layout/legal-layout'
 import TermsContent from '@/content/legal/terms'
-import { siteConfig, legalEffectiveDate } from '@/config/site'
+import { legalPage } from '@/data/legal'
 
-export const metadata: Metadata = {
-  title: 'Terms of Service | WSLATL LLC',
-  description: 'The terms and conditions governing your use of WSLATL LLC hosting services.',
-  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.terms}` },
-  openGraph: {
-    title: 'Terms of Service | WSLATL LLC',
-    description: 'The terms and conditions governing your use of WSLATL LLC hosting services.',
-    url: `${siteConfig.siteUrl}${siteConfig.paths.terms}`,
-  },
-}
+const page = legalPage('terms')
+
+export const metadata = legalMetadata(page)
 
 export default function TermsPage() {
-  return (
-    <LegalLayout
-      title="Terms of Service"
-      description="These terms govern your use of all services provided by WSLATL LLC. Please read them carefully before using our services. By using any WSLATL service, you agree to these terms."
-      effectiveDate={legalEffectiveDate('terms')}
-      currentPath={siteConfig.paths.terms}
-    >
-      <TermsContent />
-    </LegalLayout>
-  )
+  return <LegalLayout page={page} content={TermsContent} />
 }

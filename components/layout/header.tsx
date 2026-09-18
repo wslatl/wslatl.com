@@ -2,277 +2,147 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useRef, useEffect } from 'react'
-import { Menu, X, ChevronDown, LogIn } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { ArrowUpRight, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { SiteLink, isExternal } from '@/components/ui/site-link'
 import { Wordmark } from '@/components/brand/wordmark'
-import { mainLinks, loginLinks } from '@/data/nav'
+import { DiscordIcon } from '@/components/brand/icons'
+import { LoginMenu } from '@/components/layout/login-menu'
+import { mainNav } from '@/data/nav'
 import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
 
-function LoginDropdownItems() {
-  return (
-    <>
-      {loginLinks.map((item, idx) =>
-        item === null ? (
-          <DropdownMenuSeparator key={`sep-${idx}`} />
-        ) : (
-          <DropdownMenuItem key={item.label} asChild>
-            <Link
-              href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <item.icon aria-hidden="true" className="w-4 h-4" />
-              {item.label}
-            </Link>
-          </DropdownMenuItem>
-        )
-      )}
-    </>
-  )
+function isCurrent(pathname: string, href: string) {
+  if (isExternal(href) || href.includes('#')) return false
+  return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
 }
 
-const loginButtonClass =
-  'group/login relative flex items-center gap-1.5 h-9 px-3.5 text-[13px] font-medium rounded-md ' +
-  'border border-border/60 bg-transparent text-foreground ' +
-  'transition-all duration-300 ease-out ' +
-  'hover:border-primary/60 hover:bg-primary/10 hover:shadow-[0_0_0_4px_oklch(0.55_0.18_240/0.08)] hover:text-foreground ' +
-  'focus-visible:border-primary/70 focus-visible:ring-2 focus-visible:ring-primary/30 ' +
-  'data-[open=true]:border-primary/70 data-[open=true]:bg-primary/12 data-[open=true]:shadow-[0_0_0_4px_oklch(0.55_0.18_240/0.12)] ' +
-  'active:scale-[0.98]'
-
 export function Header() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [loginOpen, setLoginOpen] = useState(false)
-  // Desktop's Login menu gets its own open state (rather than sharing
-  // `loginOpen` with the mobile Radix menu below). It is now driven by a
-  // fully-controlled Radix DropdownMenu, and reusing the same boolean would
-  // make hovering the desktop trigger also flip `open` on the mobile
-  // instance (and vice versa) even though only one of the two is ever
-  // visible at a given viewport width.
-  const [desktopLoginOpen, setDesktopLoginOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pathname = usePathname()
+  // The menu remembers which page it was opened on, so navigating anywhere
+  // (a link, back/forward) closes it without an effect.
+  const [menuPath, setMenuPath] = useState<string | null>(null)
+  const menuOpen = menuPath === pathname
+  const closeMenu = () => setMenuPath(null)
 
-  const handleHomeClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (pathname === '/') {
-      e.preventDefault()
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuPath(null)
     }
-  }
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    if (typeof document === 'undefined') return
-    document.body.style.overflow = isOpen ? 'hidden' : ''
+    document.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
     return () => {
+      document.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''
     }
-  }, [isOpen])
-
-  const openLogin = () => {
-    if (closeTimer.current) clearTimeout(closeTimer.current)
-    setDesktopLoginOpen(true)
-  }
-
-  const scheduleClose = () => {
-    closeTimer.current = setTimeout(() => setDesktopLoginOpen(false), 150)
-  }
+  }, [menuOpen])
 
   return (
-    <header
-      className={cn(
-        'sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md',
-        'transition-[border-color,box-shadow,background-color] duration-300',
-        scrolled
-          ? 'border-border shadow-[0_8px_32px_-12px_rgba(0,0,0,0.6)]'
-          : 'border-transparent',
-      )}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-16">
+    <header className="site-header sticky top-0 z-50 border-b bg-background/85 backdrop-blur-md print:hidden">
+      <div className="shell flex h-16 items-center gap-6">
+        <Link href="/" className="-m-1 shrink-0 rounded-md p-1" aria-label="WSLATL home">
+          <Wordmark />
+        </Link>
 
-          {/* Left: Wordmark */}
-          <div className="flex-1 flex items-center">
-            <Link href="/" className="flex items-center flex-shrink-0" aria-label="WSLATL home">
-              <Wordmark size="md" showText={false} />
-            </Link>
-          </div>
-
-          {/* Center: Nav */}
-          <nav aria-label="Main" className="hidden lg:flex items-center gap-7">
-            {mainLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                onClick={link.href === '/' ? handleHomeClick : undefined}
-                {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                className="relative text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium tracking-wide after:absolute after:left-0 after:-bottom-1 after:h-px after:w-0 after:bg-foreground/60 after:transition-all hover:after:w-full"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Right: Login + hamburger */}
-          <div className="flex-1 flex items-center justify-end gap-2">
-
-            {/* Desktop: hover-opens, but built on Radix so it is also fully
-                keyboard operable (Enter/Space to open, Escape to close,
-                arrow keys between items, focus returns to the trigger on
-                close). Hovering the trigger or the menu itself keeps it
-                open; the DropdownMenuContent is teleported to a portal, so
-                its own mouse handlers (not just the wrapper div's) are what
-                keep hover-across-the-gap working. */}
-            <div
-              className="relative hidden lg:block"
-              onMouseEnter={openLogin}
-              onMouseLeave={scheduleClose}
-            >
-              <DropdownMenu open={desktopLoginOpen} onOpenChange={setDesktopLoginOpen}>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    data-open={desktopLoginOpen}
-                    className={loginButtonClass}
-                    aria-label="Open login menu"
+        <nav aria-label="Main" className="hidden lg:block">
+          <ul className="flex items-center gap-1">
+            {mainNav.map((link) => {
+              const current = isCurrent(pathname, link.href)
+              return (
+                <li key={link.href}>
+                  <SiteLink
+                    href={link.href}
+                    aria-current={current ? 'page' : undefined}
+                    className={cn(
+                      'inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                      current ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
+                    )}
                   >
-                    <LogIn aria-hidden="true" className="w-3.5 h-3.5 transition-transform duration-300 group-hover/login:translate-x-0.5" />
-                    <span>Login</span>
-                    <ChevronDown
-                      aria-hidden="true"
-                      className={cn(
-                        'w-3 h-3 opacity-60 transition-transform duration-300',
-                        desktopLoginOpen && 'rotate-180',
-                      )}
-                    />
-                    {/* Sweep highlight on hover */}
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute inset-0 rounded-md overflow-hidden"
-                    >
-                      <span
-                        className={cn(
-                          'absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.07] to-transparent',
-                          'transition-transform duration-500 ease-out',
-                          'group-hover/login:translate-x-full',
-                        )}
-                      />
-                    </span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="w-56 rounded-lg bg-popover/95 backdrop-blur p-1.5"
-                  onMouseEnter={openLogin}
-                  onMouseLeave={scheduleClose}
-                >
-                  <LoginDropdownItems />
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+                    {link.label}
+                    {isExternal(link.href) && <ArrowUpRight aria-hidden="true" className="size-3.5 opacity-60" />}
+                  </SiteLink>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
 
-            {/* Mobile: click-triggered Login dropdown, same animated button */}
-            <div className="lg:hidden">
-              <DropdownMenu onOpenChange={setLoginOpen}>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    type="button"
-                    data-open={loginOpen}
-                    className={loginButtonClass}
-                    aria-label="Open login menu"
-                  >
-                    <LogIn aria-hidden="true" className="w-3.5 h-3.5" />
-                    <span>Login</span>
-                    <ChevronDown
-                      aria-hidden="true"
-                      className={cn(
-                        'w-3 h-3 opacity-60 transition-transform duration-300',
-                        loginOpen && 'rotate-180',
-                      )}
-                    />
-                    <span
-                      aria-hidden
-                      className="pointer-events-none absolute inset-0 rounded-md overflow-hidden"
-                    >
-                      <span
-                        className={cn(
-                          'absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.07] to-transparent',
-                          'transition-transform duration-500 ease-out',
-                          'group-active/login:translate-x-full',
-                        )}
-                      />
-                    </span>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <LoginDropdownItems />
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            <button
-              type="button"
-              className="lg:hidden p-2 rounded-md hover:bg-accent transition-colors"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label={isOpen ? 'Close menu' : 'Open menu'}
-              aria-expanded={isOpen}
-              aria-controls="mobile-menu"
-            >
-              {isOpen ? <X aria-hidden="true" size={20} /> : <Menu aria-hidden="true" size={20} />}
-            </button>
-          </div>
+        <div className="ml-auto flex items-center gap-2">
+          <Button asChild variant="ghost" size="icon-sm" className="hidden sm:inline-flex">
+            <a href={siteConfig.links.discord} target="_blank" rel="noopener noreferrer" aria-label="WSLATL on Discord (opens in a new tab)">
+              <DiscordIcon className="size-[18px]" />
+            </a>
+          </Button>
+          <LoginMenu />
+          <Button asChild size="sm" className="hidden lg:inline-flex">
+            <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
+              Get started
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            className="text-foreground lg:hidden"
+            onClick={() => setMenuPath(menuOpen ? null : pathname)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+          >
+            {menuOpen ? <X aria-hidden="true" className="size-5" /> : <Menu aria-hidden="true" className="size-5" />}
+          </Button>
         </div>
-
-        {/* Mobile / tablet menu */}
-        {isOpen && (
-          <div id="mobile-menu" className="lg:hidden pb-4 pt-3 border-t border-border/60">
-            <nav aria-label="Mobile" className="space-y-0.5 mb-4">
-              {mainLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  className="block px-3 py-2.5 rounded-md text-foreground hover:bg-accent transition-colors text-sm font-medium"
-                  onClick={(e) => {
-                    if (link.href === '/') handleHomeClick(e)
-                    setIsOpen(false)
-                  }}
-                >
-                  {link.label}{link.external ? ' →' : ''}
-                </Link>
-              ))}
-            </nav>
-
-            <Button asChild className="w-full" size="sm">
-              <Link
-                href={siteConfig.links.register}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setIsOpen(false)}
-              >
-                Get Started
-              </Link>
-            </Button>
-          </div>
-        )}
       </div>
+
+      {menuOpen && (
+        <div
+          id="mobile-menu"
+          className="absolute inset-x-0 top-full h-[calc(100dvh-4rem)] overflow-y-auto border-t bg-background lg:hidden"
+        >
+          <nav aria-label="Main" className="shell py-4">
+            <ul className="divide-y divide-border">
+              {mainNav.map((link) => (
+                <li key={link.href}>
+                  <SiteLink
+                    href={link.href}
+                    onClick={closeMenu}
+                    aria-current={isCurrent(pathname, link.href) ? 'page' : undefined}
+                    className="flex items-center justify-between py-3.5 text-base font-medium text-foreground"
+                  >
+                    {link.label}
+                    {isExternal(link.href) && <ArrowUpRight aria-hidden="true" className="size-4 text-muted-foreground" />}
+                  </SiteLink>
+                </li>
+              ))}
+              <li>
+                <a
+                  href={siteConfig.links.discord}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeMenu}
+                  className="flex items-center justify-between py-3.5 text-base font-medium text-foreground"
+                >
+                  Discord
+                  <span className="sr-only"> (opens in a new tab)</span>
+                  <ArrowUpRight aria-hidden="true" className="size-4 text-muted-foreground" />
+                </a>
+              </li>
+            </ul>
+            <Button asChild size="lg" className="mt-6 w-full">
+              <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
+                Get started
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </Button>
+            <p className="mt-3 text-center text-sm text-muted-foreground">
+              New accounts are reviewed by a person, usually the same day.
+            </p>
+          </nav>
+        </div>
+      )}
     </header>
   )
 }

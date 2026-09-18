@@ -1,11 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
-import { AnimatedBackground } from '@/components/brand/animated-background'
-import { ScrollProgress } from '@/components/brand/scroll-progress'
+import { Geist, Instrument_Serif } from 'next/font/google'
+import { JsonLd } from '@/components/seo/json-ld'
+import { siteConfig } from '@/config/site'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
-const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' })
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: '400',
@@ -13,17 +12,18 @@ const instrumentSerif = Instrument_Serif({
   variable: '--font-serif',
 })
 
-const siteUrl = 'https://wslatl.com'
+const title = 'Cheap VPS & Game Server Hosting | WSLATL LLC'
+const description =
+  'Affordable VPS hosting, game server hosting (Minecraft, Rust, ARK, FiveM & more), and dedicated servers with DDoS protection and NVMe storage. Missouri-based, and we actually pick up.'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(siteConfig.siteUrl),
   title: {
-    default: 'Cheap VPS & Game Server Hosting | WSLATL LLC',
+    default: title,
     template: '%s | WSLATL LLC',
   },
-  description:
-    'Affordable VPS hosting, game server hosting (Minecraft, Rust, ARK, FiveM & more), and dedicated servers with DDoS protection and NVMe storage. Missouri-based, and we actually pick up.',
-  applicationName: 'WSLATL LLC',
+  description,
+  applicationName: siteConfig.name,
   keywords: [
     'WSLATL',
     'cheap VPS hosting',
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
     'private hosting',
     'application-only hosting',
   ],
-  authors: [{ name: 'WSLATL LLC' }],
-  creator: 'WSLATL LLC',
-  publisher: 'WSLATL LLC',
+  authors: [{ name: siteConfig.name }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
   category: 'technology',
   formatDetection: {
     email: false,
@@ -50,33 +50,28 @@ export const metadata: Metadata = {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
       { url: '/favicon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.png', type: 'image/png' },
     ],
-    apple: '/favicon.png',
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: siteUrl,
-    siteName: 'WSLATL LLC',
-    title: 'Cheap VPS & Game Server Hosting | WSLATL LLC',
-    description:
-      'Affordable VPS hosting, game server hosting (Minecraft, Rust, ARK, FiveM & more), and dedicated servers with DDoS protection and NVMe storage. Missouri-based, and we actually pick up.',
+    siteName: siteConfig.name,
+    title,
+    description,
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'WSLATL LLC - Cheap VPS & Game Server Hosting',
+        alt: 'WSLATL LLC: hosting that actually gives a damn',
         type: 'image/png',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cheap VPS & Game Server Hosting | WSLATL LLC',
-    description:
-      'Affordable VPS hosting, game server hosting (Minecraft, Rust, ARK, FiveM & more), and dedicated servers with DDoS protection and NVMe storage.',
+    title,
+    description,
     images: ['/og-image.png'],
   },
   robots: {
@@ -89,13 +84,10 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  alternates: {
-    canonical: siteUrl,
-  },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#3b82f6',
+  themeColor: '#050505',
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
@@ -104,17 +96,17 @@ export const viewport: Viewport = {
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
-  name: 'WSLATL LLC',
-  url: siteUrl,
-  logo: `${siteUrl}/favicon.png`,
-  description:
-    'Missouri-based private hosting company offering dedicated servers, game hosting, VPS, and web hosting.',
+  name: siteConfig.name,
+  url: siteConfig.siteUrl,
+  logo: `${siteConfig.siteUrl}/logo.png`,
+  description: siteConfig.description,
+  email: siteConfig.email.support,
   address: {
     '@type': 'PostalAddress',
     addressRegion: 'MO',
     addressCountry: 'US',
   },
-  sameAs: ['https://discord.gg/3eKawhSbAF'],
+  sameAs: [siteConfig.links.discord, siteConfig.trustpilot.profileUrl],
 }
 
 export default function RootLayout({
@@ -123,24 +115,18 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html
-      lang="en"
-      className={`dark bg-background ${geist.variable} ${geistMono.variable} ${instrumentSerif.variable}`}
-    >
-      <body className="font-sans antialiased noise-overlay">
-        {/* Static, hand-authored content only (see organizationJsonLd above) - never
-            user input - so this is JSON-LD structured data, not an XSS surface. */}
-        {/* eslint-disable-next-line react/no-danger */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, '\\u003c') }}
-        />
+    <html lang="en" className={`dark ${geist.variable} ${instrumentSerif.variable}`}>
+      <body className="relative isolate min-h-dvh font-sans antialiased">
+        <JsonLd data={organizationJsonLd} />
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <ScrollProgress />
-        <AnimatedBackground />
-        <div className="relative z-10">{children}</div>
+        {/* The blue wash at the top of every page. Static, so it costs nothing to scroll. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[46rem] bg-[radial-gradient(60%_60%_at_50%_0%,rgb(0_121_206/0.13)_0%,transparent_70%)]"
+        />
+        {children}
       </body>
     </html>
   )

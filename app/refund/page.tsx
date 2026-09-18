@@ -1,28 +1,11 @@
-import type { Metadata } from 'next'
-import { LegalLayout } from '@/components/layout/legal-layout'
+import { LegalLayout, legalMetadata } from '@/components/layout/legal-layout'
 import RefundContent from '@/content/legal/refund'
-import { siteConfig, legalEffectiveDate } from '@/config/site'
+import { legalPage } from '@/data/legal'
 
-export const metadata: Metadata = {
-  title: 'Refund Policy | WSLATL LLC',
-  description: 'How WSLATL LLC handles refund requests, including the 48-hour and 14-day refund windows, eligible reasons, and non-refundable items.',
-  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.refund}` },
-  openGraph: {
-    title: 'Refund Policy | WSLATL LLC',
-    description: 'How WSLATL LLC handles refund requests, including the 48-hour and 14-day refund windows, eligible reasons, and non-refundable items.',
-    url: `${siteConfig.siteUrl}${siteConfig.paths.refund}`,
-  },
-}
+const page = legalPage('refund')
+
+export const metadata = legalMetadata(page)
 
 export default function RefundPage() {
-  return (
-    <LegalLayout
-      title="Refund Policy"
-      description="We keep our refund policy straightforward. A 48-hour window for any reason. A 14-day window for real problems. Read on for exactly what is and is not eligible."
-      effectiveDate={legalEffectiveDate('refund')}
-      currentPath={siteConfig.paths.refund}
-    >
-      <RefundContent />
-    </LegalLayout>
-  )
+  return <LegalLayout page={page} content={RefundContent} />
 }

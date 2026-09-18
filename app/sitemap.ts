@@ -1,26 +1,28 @@
 import type { MetadataRoute } from 'next'
 import { games } from '@/data/games'
-import { primaryLegalPages, secondaryLegalPages } from '@/data/legal'
+import { legalPages } from '@/data/legal'
 import { siteConfig } from '@/config/site'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
+  const url = (path: string) => (path === '/' ? siteConfig.siteUrl : `${siteConfig.siteUrl}${path}`)
 
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: siteConfig.siteUrl, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${siteConfig.siteUrl}/pricing`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
-    { url: `${siteConfig.siteUrl}/games`, lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: url('/'), lastModified: now, changeFrequency: 'weekly', priority: 1 },
+    { url: url('/pricing'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: url('/games'), lastModified: now, changeFrequency: 'weekly', priority: 0.9 },
+    { url: url('/legal'), lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
   ]
 
   const gameRoutes: MetadataRoute.Sitemap = games.map((game) => ({
-    url: `${siteConfig.siteUrl}/games/${game.slug}`,
+    url: url(`/games/${game.slug}`),
     lastModified: now,
     changeFrequency: 'monthly',
     priority: 0.7,
   }))
 
-  const legalRoutes: MetadataRoute.Sitemap = [...primaryLegalPages, ...secondaryLegalPages].map((page) => ({
-    url: `${siteConfig.siteUrl}${page.href}`,
+  const legalRoutes: MetadataRoute.Sitemap = legalPages.map((page) => ({
+    url: url(page.href),
     lastModified: now,
     changeFrequency: 'yearly',
     priority: 0.3,

@@ -13,12 +13,12 @@ export default function AbuseContent() {
         </p>
         <p>
           It sits alongside our{' '}
-          <a href={siteConfig.paths.acceptableUse} className="text-primary hover:underline">Acceptable Use Policy</a>,
+          <a href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</a>,
           which defines what is and is not permitted on our infrastructure, and our{' '}
-          <a href={siteConfig.paths.terms} className="text-primary hover:underline">Terms of Service</a>,
+          <a href={siteConfig.paths.terms}>Terms of Service</a>,
           into which both are incorporated by reference. Copyright complaints are handled through
           our{' '}
-          <a href={siteConfig.paths.dmca} className="text-primary hover:underline">DMCA Policy</a>{' '}
+          <a href={siteConfig.paths.dmca}>DMCA Policy</a>{' '}
           rather than through this page.
         </p>
         <p>
@@ -39,7 +39,7 @@ export default function AbuseContent() {
           <p className="font-semibold text-foreground">Report abuse to:</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.email.abuse}`} className="text-primary hover:underline">
+            <a href={`mailto:${siteConfig.email.abuse}`}>
               {siteConfig.email.abuse}
             </a>{' '}
             (Subject: Abuse Report)
@@ -50,7 +50,7 @@ export default function AbuseContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>
@@ -84,7 +84,7 @@ export default function AbuseContent() {
       <LegalSection number="4" title="What We Treat as Abuse">
         <p>
           Abuse is any use of our infrastructure that violates our{' '}
-          <a href={siteConfig.paths.acceptableUse} className="text-primary hover:underline">Acceptable Use Policy</a>{' '}
+          <a href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</a>{' '}
           or applicable law. Common categories we act on include:
         </p>
         <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -119,7 +119,7 @@ export default function AbuseContent() {
         <p className="mt-4">
           For the full account of what is prohibited, see Sections 3 and 4 of the Acceptable Use
           Policy. Copyright infringement is handled separately under the{' '}
-          <a href={siteConfig.paths.dmca} className="text-primary hover:underline">DMCA Policy</a>.
+          <a href={siteConfig.paths.dmca}>DMCA Policy</a>.
         </p>
       </LegalSection>
 
@@ -187,7 +187,7 @@ export default function AbuseContent() {
       <LegalSection number="7" title="Law Enforcement Requests">
         <p>
           Law enforcement seeking records or preservation should contact us at{' '}
-          <a href={`mailto:${siteConfig.email.abuse}`} className="text-primary hover:underline">
+          <a href={`mailto:${siteConfig.email.abuse}`}>
             {siteConfig.email.abuse}
           </a>{' '}
           with &ldquo;Law Enforcement Request&rdquo; in the subject line. We respond to valid legal
@@ -204,7 +204,7 @@ export default function AbuseContent() {
           <li>
             <span className="text-foreground font-medium">Copyright.</span> Copyright takedown
             notices and counter-notices go through our{' '}
-            <a href={siteConfig.paths.dmca} className="text-primary hover:underline">DMCA Policy</a>,
+            <a href={siteConfig.paths.dmca}>DMCA Policy</a>,
             not this page.
           </li>
           <li>
@@ -216,7 +216,7 @@ export default function AbuseContent() {
           <li>
             <span className="text-foreground font-medium">Billing and account questions.</span>{' '}
             Questions about your own service or billing go to{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+            <a href={`mailto:${siteConfig.email.support}`}>
               {siteConfig.email.support}
             </a>, not the abuse channel.
           </li>
@@ -237,7 +237,7 @@ export default function AbuseContent() {
           We may update this Abuse Policy to reflect changes in our practices, our services, or
           applicable law. When we make material changes, we will update the effective date at the
           top of this page and post the updated policy at{' '}
-          <a href={siteConfig.paths.abuse} className="text-primary hover:underline">
+          <a href={siteConfig.paths.abuse}>
             {siteConfig.siteUrl}{siteConfig.paths.abuse}
           </a>.
         </p>
@@ -254,13 +254,13 @@ export default function AbuseContent() {
           <p>Missouri, United States</p>
           <p>
             Abuse:{' '}
-            <a href={`mailto:${siteConfig.email.abuse}`} className="text-primary hover:underline">{siteConfig.email.abuse}</a>
+            <a href={`mailto:${siteConfig.email.abuse}`}>{siteConfig.email.abuse}</a>
           </p>
           <p>
             General:{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>
+            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
             {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`} className="text-primary hover:underline">{siteConfig.email.info}</a>
+            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
           </p>
           <p>
             Discord:{' '}
@@ -268,7 +268,7 @@ export default function AbuseContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>

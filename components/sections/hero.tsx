@@ -1,80 +1,73 @@
 import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { ChevronRight, UserPlus } from 'lucide-react'
-import { DiscordIcon } from '@/components/brand/icons'
 import { siteConfig } from '@/config/site'
+import { formatPrice, pricingHref, startingPrice } from '@/lib/pricing'
+
+const entryPoints = [
+  { label: 'VPS hosting', detail: `from ${formatPrice(startingPrice('vps'))}/mo`, href: pricingHref('vps') },
+  { label: 'Game servers', detail: `from ${formatPrice(startingPrice('game'))}/mo`, href: pricingHref('game') },
+  { label: 'Dedicated and web hosting', detail: 'Quoted for your build', href: '/#services' },
+]
 
 export function Hero() {
   return (
-    <section className="relative flex items-center justify-center pt-24 pb-28 md:pt-32 md:pb-32 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto w-full text-center">
+    <section aria-labelledby="hero-heading" className="shell pt-16 pb-14 text-center md:pt-24 md:pb-20">
+      <h1
+        id="hero-heading"
+        className="animate-rise mx-auto max-w-5xl text-[clamp(3rem,10vw,7.25rem)] leading-[0.95] font-bold tracking-[-0.04em] text-balance text-foreground"
+      >
+        Hosting that
+        <br />
+        <span className="gradient-text font-serif font-normal tracking-[-0.02em] italic">actually</span> gives a
+        damn.
+      </h1>
 
-        <h1
-          className="text-balance text-5xl sm:text-6xl md:text-7xl lg:text-[7.5rem] font-bold tracking-[-0.04em] leading-[0.95] mb-7 animate-slide-up"
-          style={{ animationDelay: '0.1s' }}
-        >
-          Hosting that
-          <br />
-          <span className="font-serif italic font-normal gradient-text tracking-[-0.02em]">
-            actually
-          </span>{' '}
-          gives a damn.
-        </h1>
+      <p
+        className="animate-rise mx-auto mt-8 max-w-xl text-base leading-relaxed text-pretty text-muted-foreground md:text-lg"
+        style={{ animationDelay: '120ms' }}
+      >
+        We have worked inside hosting companies. We know what goes wrong. WSLATL exists to fix that:
+        affordable VPS hosting, Minecraft and game server hosting, and dedicated servers, backed by a
+        team that actually picks up.
+      </p>
 
-        <p
-          className="text-base md:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed mb-10 animate-slide-up"
-          style={{ animationDelay: '0.2s' }}
-        >
-          We have worked inside hosting companies. We know what goes wrong. WSLATL exists
-          to fix that: affordable VPS hosting, Minecraft and game server hosting, and
-          dedicated servers, backed by a team that actually picks up.
-        </p>
-
-        <div
-          className="flex flex-col sm:flex-row gap-2.5 justify-center items-center animate-slide-up"
-          style={{ animationDelay: '0.3s' }}
-        >
-          <Button
-            asChild
-            size="lg"
-            className="gap-2 px-7 h-12 text-sm font-semibold shadow-[inset_0_1px_0_0_rgba(255,255,255,0.12)] ring-1 ring-white/5"
-          >
-            <Link href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-              <UserPlus aria-hidden="true" size={16} />
-              Get Started
-            </Link>
-          </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="gap-2 px-7 h-12 text-sm font-semibold border-border/80"
-          >
-            <Link href={siteConfig.links.discord} target="_blank" rel="noopener noreferrer">
-              <DiscordIcon className="w-4 h-4" />
-              Talk to Us on Discord
-            </Link>
-          </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="ghost"
-            className="gap-1.5 px-5 h-12 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <Link href="#services">
-              See What We Offer
-              <ChevronRight aria-hidden="true" size={15} />
-            </Link>
-          </Button>
-        </div>
-
-        <p
-          className="mt-8 text-[11px] uppercase tracking-[0.22em] text-muted-foreground/80 animate-fade-in"
-          style={{ animationDelay: '0.5s' }}
-        >
-          Based in Missouri · Private Hosting · WSLATL LLC
-        </p>
+      <div
+        className="animate-rise mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
+        style={{ animationDelay: '220ms' }}
+      >
+        <Button asChild size="lg" className="w-full sm:w-auto">
+          <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
+            Get started
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        </Button>
+        <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+          <Link href="/pricing">See plans and pricing</Link>
+        </Button>
       </div>
+
+      <nav aria-label="Products" className="animate-rise mx-auto mt-14 max-w-3xl" style={{ animationDelay: '320ms' }}>
+        <ul className="grid gap-px overflow-hidden rounded-2xl border bg-border text-left sm:grid-cols-3">
+          {entryPoints.map((entry) => (
+            <li key={entry.label} className="bg-background">
+              <Link
+                href={entry.href}
+                className="group flex h-full items-center justify-between gap-3 px-5 py-4 transition-colors hover:bg-card/60"
+              >
+                <span>
+                  <span className="block text-sm font-semibold text-foreground">{entry.label}</span>
+                  <span className="mt-0.5 block text-sm text-muted-foreground tabular-nums">{entry.detail}</span>
+                </span>
+                <ArrowRight
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-foreground"
+                />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </section>
   )
 }

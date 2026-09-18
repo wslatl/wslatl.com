@@ -1,5 +1,6 @@
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
+import { UptimeTable } from '@/components/legal/uptime-table'
 
 export default function TermsContent() {
   return (
@@ -65,9 +66,9 @@ export default function TermsContent() {
           <p>
             What is included with each plan, how restores are requested, and what a restore
             involves are set out in our{' '}
-            <a href={siteConfig.paths.backups} className="text-primary hover:underline">Backup Policy</a>{' '}
+            <a href={siteConfig.paths.backups}>Backup Policy</a>{' '}
             at{' '}
-            <a href={siteConfig.paths.backups} className="text-primary hover:underline">
+            <a href={siteConfig.paths.backups}>
               {siteConfig.siteUrl}{siteConfig.paths.backups}
             </a>, which is incorporated into these Terms by reference.
           </p>
@@ -125,7 +126,7 @@ export default function TermsContent() {
         <LegalSubSection title="4.4 Refund Policy">
           <p>
             Our refund policy is maintained as a separate document at{' '}
-            <a href={siteConfig.paths.refund} className="text-primary hover:underline">{siteConfig.siteUrl}{siteConfig.paths.refund}</a>{' '}
+            <a href={siteConfig.paths.refund}>{siteConfig.siteUrl}{siteConfig.paths.refund}</a>{' '}
             and is incorporated into these Terms by reference. The Refund Policy is the
             authoritative source for all questions about refund eligibility, windows, eligible
             reasons, processing, and non-refundable items. The rules in the Refund Policy control
@@ -154,7 +155,7 @@ export default function TermsContent() {
       <LegalSection number="5" title="Service Level Agreement (SLA)">
         <p>
           Our Service Level Agreement is also published as a standalone document at{' '}
-          <a href={siteConfig.paths.sla} className="text-primary hover:underline">
+          <a href={siteConfig.paths.sla}>
             {siteConfig.siteUrl}{siteConfig.paths.sla}
           </a>, which is easier to find and to cite. That page restates this section; it does not
           add to or change it. The commitments below are reproduced there in full, and if the two
@@ -162,34 +163,7 @@ export default function TermsContent() {
         </p>
 
         <LegalSubSection title="5.1 Uptime Targets">
-          <div className="overflow-x-auto mt-2">
-            <table className="legal-table">
-              <thead>
-                <tr>
-                  <th scope="col">Service</th>
-                  <th scope="col">Monthly Uptime Target</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>VPS Hosting</td>
-                  <td>99.9%</td>
-                </tr>
-                <tr>
-                  <td>Web Hosting</td>
-                  <td>99.9%</td>
-                </tr>
-                <tr>
-                  <td>Game Server Hosting</td>
-                  <td>99.5%</td>
-                </tr>
-                <tr>
-                  <td>Dedicated Servers</td>
-                  <td>Best-effort; subject to hardware and datacenter availability</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <UptimeTable />
           <p className="mt-3">
             Uptime is measured per calendar month and excludes scheduled maintenance windows and
             downtime caused by events outside our reasonable control (see Section 15, Force Majeure).
@@ -224,7 +198,7 @@ export default function TermsContent() {
         <p>
           All use of WSLATL services is governed by our Acceptable Use Policy (AUP), which is
           incorporated into these Terms by reference and available at{' '}
-          <a href={siteConfig.paths.acceptableUse} className="text-primary hover:underline">{siteConfig.siteUrl}{siteConfig.paths.acceptableUse}</a>.
+          <a href={siteConfig.paths.acceptableUse}>{siteConfig.siteUrl}{siteConfig.paths.acceptableUse}</a>.
           You agree to comply with the AUP at all times.
         </p>
         <p>
@@ -254,7 +228,7 @@ export default function TermsContent() {
         <p>
           WSLATL LLC complies with the Digital Millennium Copyright Act (DMCA), 17 U.S.C. &sect;&nbsp;512.
           Our full DMCA Policy is published at{' '}
-          <a href={siteConfig.paths.dmca} className="text-primary hover:underline">
+          <a href={siteConfig.paths.dmca}>
             {siteConfig.siteUrl}{siteConfig.paths.dmca}
           </a>{' '}
           and is incorporated into these Terms by reference. It sets out our designated agent, the
@@ -282,7 +256,7 @@ export default function TermsContent() {
         <p className="mt-4">
           Counter-notices may be submitted to the same email address, and must meet the
           requirements set out in Section 4 of our{' '}
-          <a href={siteConfig.paths.dmca} className="text-primary hover:underline">DMCA Policy</a>.
+          <a href={siteConfig.paths.dmca}>DMCA Policy</a>.
           We reserve the right to terminate the accounts of clients who are repeat copyright
           infringers, in accordance with the repeat infringer policy in Section 5 of that
           document.
@@ -486,9 +460,9 @@ export default function TermsContent() {
           <p>Missouri, United States</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>
+            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
             {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`} className="text-primary hover:underline">{siteConfig.email.info}</a>
+            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
           </p>
           <p>
             Discord:{' '}
@@ -496,7 +470,7 @@ export default function TermsContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>

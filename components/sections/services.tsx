@@ -1,73 +1,104 @@
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
-import { Reveal, RevealGroup } from '@/components/effects/reveal'
-import { services } from '@/data/services'
+import { ArrowRight, Check, Gamepad2, Globe, HardDrive, Server, type LucideIcon } from 'lucide-react'
+import { SectionHeader } from '@/components/ui/section-header'
+import { services, type Service } from '@/data/services'
+import { formatPrice, pricingHref, productLine, specRanges, startingPrice } from '@/lib/pricing'
+
+const icons: Record<string, LucideIcon> = {
+  vps: Server,
+  game: Gamepad2,
+  dedicated: HardDrive,
+  web: Globe,
+}
+
+function specSummary(id: NonNullable<Service['pricing']>) {
+  const { cpu, ramGb, storageGb } = specRanges(id)
+  const line = productLine(id)
+  const planCount = line.groups.reduce((n, g) => n + g.plans.length, 0)
+  return `${planCount} plans from ${cpu.min} to ${cpu.max} ${line.cpuUnit}, ${ramGb.min} to ${ramGb.max} GB RAM, and ${storageGb.min} to ${storageGb.max} GB storage.`
+}
+
+function ServiceCtas({ service }: { service: Service }) {
+  const linkClass =
+    'group inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:text-foreground'
+  const arrow = <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5" />
+
+  if (service.pricing === 'vps') {
+    return (
+      <Link href={pricingHref('vps')} className={linkClass}>
+        Compare VPS plans {arrow}
+      </Link>
+    )
+  }
+  if (service.pricing === 'game') {
+    return (
+      <div className="flex flex-wrap gap-x-6 gap-y-2">
+        <Link href={pricingHref('game')} className={linkClass}>
+          Compare game server plans {arrow}
+        </Link>
+        <Link href="/games" className={linkClass}>
+          Find your game {arrow}
+        </Link>
+      </div>
+    )
+  }
+  return (
+    <Link href="/#contact" className={linkClass}>
+      Get a quote {arrow}
+    </Link>
+  )
+}
 
 export function Services() {
   return (
-    <section id="services" className="py-24 px-4 sm:px-6 lg:px-8 relative scroll-mt-20">
-      <div className="max-w-6xl mx-auto">
+    <section id="services" aria-labelledby="services-heading" className="py-20 md:py-28">
+      <div className="shell">
+        <SectionHeader id="services-heading" title="What we host">
+          <p>
+            VPS and game servers have published prices. Dedicated servers and web hosting are quoted
+            for what you actually need to run.
+          </p>
+        </SectionHeader>
 
-        <Reveal>
-          <div className="text-center mb-16">
-            <p className="text-[11px] font-semibold text-primary uppercase tracking-[0.22em] mb-3">
-              What We Offer
-            </p>
-            <h2 className="text-balance text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-[-0.025em]">
-              Servers, built{' '}
-              <span className="font-serif italic font-normal text-foreground/90">the way we&apos;d want them.</span>
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-lg mx-auto">
-              Dedicated servers, VPS hosting, and game server hosting, all managed personally
-              by our team.
-            </p>
-          </div>
-        </Reveal>
-
-        {/* A plain, hairline-divided list rather than a grid of matching
-            icon-badge-bullets cards - the service names carry enough weight
-            on their own, and four boxes trying to look identical is what
-            makes a page feel templated. */}
-        <RevealGroup
-          as="div"
-          className="max-w-4xl mx-auto divide-y divide-border/70 border-y border-border/70"
-          step={100}
-        >
-          {services.map((service, idx) => (
-            <div
-              key={idx}
-              className="group grid gap-3 py-9 sm:grid-cols-[13rem_1fr] sm:gap-8"
-            >
-              <div>
-                <h3 className="text-2xl font-bold tracking-tight text-foreground">
-                  {service.title}
-                </h3>
-                <p className="mt-1 text-[11px] font-medium uppercase tracking-[0.1em] text-primary/80">
-                  {service.badge}
-                </p>
+        <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border bg-border md:grid-cols-2">
+          {services.map((service) => {
+            const Icon = icons[service.id] ?? Server
+            return (
+            <article key={service.id} className="flex flex-col bg-background p-6 sm:p-8">
+              <Icon aria-hidden="true" className="size-6 text-link" strokeWidth={1.75} />
+              <div className="mt-5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <h3 className="text-xl font-semibold tracking-tight text-foreground">{service.title}</h3>
+                {service.pricing ? (
+                  <p className="text-sm text-muted-foreground tabular-nums">
+                    from{' '}
+                    <span className="text-2xl font-bold tracking-tight text-foreground">
+                      {formatPrice(startingPrice(service.pricing))}
+                    </span>
+                    /mo
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Quoted for your build</p>
+                )}
               </div>
-
-              <div>
-                <p className="text-muted-foreground leading-relaxed">
-                  {service.description}
-                </p>
-                <p className="mt-3 text-sm text-foreground/70">
-                  {service.features.join('  ·  ')}
-                </p>
-                <Link
-                  href={service.ctaHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Get started with ${service.title}`}
-                  className="mt-4 inline-flex items-center gap-1 text-sm text-primary hover:underline underline-offset-2 font-semibold transition-colors"
-                >
-                  Get started
-                  <ChevronRight aria-hidden="true" className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-                </Link>
+              <p className="mt-3 leading-relaxed text-muted-foreground">{service.description}</p>
+              <ul className="mt-5 space-y-2 text-sm text-foreground/90">
+                {service.features.map((feature) => (
+                  <li key={feature} className="flex gap-2.5">
+                    <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-link" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              {service.pricing && (
+                <p className="mt-5 text-sm text-muted-foreground">{specSummary(service.pricing)}</p>
+              )}
+              <div className="mt-auto pt-7">
+                <ServiceCtas service={service} />
               </div>
-            </div>
-          ))}
-        </RevealGroup>
+            </article>
+            )
+          })}
+        </div>
       </div>
     </section>
   )

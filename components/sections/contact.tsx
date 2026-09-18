@@ -1,62 +1,48 @@
-import Link from 'next/link'
-import { DiscordIcon } from '@/components/brand/icons'
-import { Reveal, RevealGroup } from '@/components/effects/reveal'
+import { Button } from '@/components/ui/button'
+import { sectionHeadingClass } from '@/components/ui/section-header'
+import { SiteLink } from '@/components/ui/site-link'
 import { reachOptions } from '@/data/reach-options'
+import { siteConfig } from '@/config/site'
 
 export function Contact() {
   return (
-    <section id="contact" className="py-20 px-4 sm:px-6 lg:px-8 scroll-mt-20">
-      <div className="max-w-4xl mx-auto">
-
-        <Reveal>
-          <div className="text-center mb-12">
-            <p className="text-[11px] font-semibold text-primary uppercase tracking-[0.22em] mb-3">
-              Get In Touch
-            </p>
-            <h2 className="text-balance text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-[-0.025em]">
-              We are{' '}
-              <span className="font-serif italic font-normal text-foreground/90">easy</span> to reach.
+    <section id="contact" aria-labelledby="contact-heading" className="pt-20 md:pt-28">
+      <div className="shell">
+        <div className="grid gap-12 rounded-3xl border border-primary/30 bg-card/30 p-6 sm:p-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:p-14">
+          <div>
+            <h2 id="contact-heading" className={sectionHeadingClass}>
+              A hosting company that treats you like a person. Imagine that.
             </h2>
-            <p className="text-lg text-muted-foreground max-w-md mx-auto">
-              Pick whatever way works for you. All roads lead to a real person.
+            <p className="mt-5 max-w-lg leading-relaxed text-muted-foreground">
+              Request access and an admin reviews your application. Once you are approved, we get you set
+              up fast. Most clients are live the same day.
             </p>
+            <Button asChild size="lg" className="mt-8">
+              <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
+                Request access
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </Button>
           </div>
-        </Reveal>
 
-        <RevealGroup as="div" className="grid sm:grid-cols-3 gap-3 mb-6" step={120}>
-          {reachOptions.map((option, idx) => {
-            const Icon = option.icon
-            return (
-              <div
-                key={idx}
-                className="group p-5 rounded-2xl border border-border/70 bg-card/30 hover:bg-card/60 transition-all duration-300 flex flex-col gap-3"
-              >
-                <div
-                  className={`w-11 h-11 rounded-full ring-1 ${option.ring} ${option.bg} flex items-center justify-center flex-shrink-0`}
-                >
-                  <Icon aria-hidden="true" className={`w-5 h-5 ${option.text}`} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground text-sm mb-1 tracking-tight">
-                    {option.title}
-                  </h3>
-                  <p className="text-muted-foreground text-xs leading-relaxed">
-                    {option.description}
-                  </p>
-                </div>
-                <Link
-                  href={option.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-semibold text-primary hover:underline underline-offset-2 transition-colors"
-                >
-                  {option.cta} <span aria-hidden="true">&rarr;</span>
-                </Link>
-              </div>
-            )
-          })}
-        </RevealGroup>
-
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">Prefer to talk first?</h3>
+            <ul className="mt-4 divide-y border-y">
+              {reachOptions.map((option) => (
+                <li key={option.title} className="py-5">
+                  <p className="font-medium text-foreground">{option.title}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{option.description}</p>
+                  <SiteLink
+                    href={option.href}
+                    className="mt-2 inline-block text-sm font-medium text-link underline underline-offset-4 hover:text-foreground"
+                  >
+                    {option.cta}
+                  </SiteLink>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
   )

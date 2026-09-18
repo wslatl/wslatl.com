@@ -1,114 +1,97 @@
-import Link from 'next/link'
-import { UserPlus, MessageSquare, Rocket } from 'lucide-react'
 import { siteConfig } from '@/config/site'
-import { Reveal, RevealGroup } from '@/components/effects/reveal'
+import { SectionHeader } from '@/components/ui/section-header'
+import { cn } from '@/lib/utils'
 
 const steps = [
   {
-    icon: UserPlus,
-    title: 'Register Your Account',
+    title: 'Request access',
     description:
-      'Head to billing.wslatl.com/register and sign up. Once you submit, an admin will review and approve your account before you can access services.',
-    cta: { label: 'Go to registration', href: siteConfig.links.register },
+      'Fill in a short application in the billing portal. A person reads every one, and most are approved the same day.',
   },
   {
-    icon: MessageSquare,
-    title: 'We Have a Conversation',
+    title: 'Tell us what you need',
     description:
-      'After your account is approved, reach out to us on Discord or open a billing ticket. We talk to you about what you need. No automated flow.',
-    cta: null,
+      'Once you are approved, message us on Discord or open a ticket. We talk through your setup with you. No automated flow.',
   },
   {
-    icon: Rocket,
-    title: 'Your Server Goes Live',
+    title: 'Your server goes live',
     description:
-      'We get you set up, walk you through your panel, and stay available after. Most clients are up and running the same day.',
-    cta: null,
+      'We set you up, walk you through your panel, and stay available after. Most clients are up and running the same day.',
   },
 ]
 
-export function HowItWorks() {
+interface HowItWorksProps {
+  /** Tighter version for the pricing page, without the section intro. */
+  compact?: boolean
+}
+
+export function HowItWorks({ compact = false }: HowItWorksProps) {
   return (
-    <section id="how-it-works" className="py-24 px-4 sm:px-6 lg:px-8 scroll-mt-20">
-      <div className="max-w-6xl mx-auto">
-
-        <Reveal>
-          <div className="text-center mb-16">
-            <p className="text-[11px] font-semibold text-primary uppercase tracking-[0.22em] mb-3">
-              Getting Started
+    <section
+      id="how-it-works"
+      aria-labelledby="how-it-works-heading"
+      className={cn(!compact && 'py-20 md:py-28')}
+    >
+      <div className={cn(!compact && 'shell')}>
+        <SectionHeader id="how-it-works-heading" title="How ordering works">
+          {!compact && (
+            <p>
+              We are application-only on purpose. It is how a small team keeps every client properly
+              looked after.
             </p>
-            <h2 className="text-balance text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-[-0.025em]">
-              Three steps.{' '}
-              <span className="font-serif italic font-normal text-foreground/90">No fluff.</span>
-            </h2>
-            <p className="text-muted-foreground text-lg max-w-md mx-auto">
-              We keep it simple on purpose. You should not need a tutorial to get hosted.
-            </p>
-          </div>
-        </Reveal>
+          )}
+        </SectionHeader>
 
-        <div className="relative">
-          {/* Animated dashed connector on desktop */}
-          <svg
-            aria-hidden
-            className="hidden md:block absolute top-[2.4rem] left-0 w-full h-8 pointer-events-none"
-            viewBox="0 0 800 32"
-            preserveAspectRatio="none"
+        {/* A real sequence, so numbered nodes joined by a rule: vertical on
+            phones, horizontal from md up. */}
+        <ol className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
+          {steps.map((step, idx) => (
+            <li
+              key={step.title}
+              className={cn(
+                'relative grid grid-cols-[2.5rem_1fr] gap-x-4 md:block',
+                idx < steps.length - 1 &&
+                  'before:absolute before:top-12 before:bottom-[-2rem] before:left-5 before:w-px before:bg-border md:before:top-5 md:before:right-[-1.5rem] md:before:bottom-auto md:before:left-14 md:before:h-px md:before:w-auto',
+              )}
+            >
+              <span
+                aria-hidden="true"
+                className="flex size-10 items-center justify-center rounded-full border border-primary/60 bg-background text-sm font-semibold text-link tabular-nums"
+              >
+                {idx + 1}
+              </span>
+              <div className="md:mt-6">
+                <h3 className="text-lg font-semibold tracking-tight text-foreground">
+                  <span className="sr-only">Step {idx + 1}: </span>
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.description}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <p className="mt-10 text-sm text-muted-foreground">
+          Ready?{' '}
+          <a
+            href={siteConfig.links.register}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-link underline underline-offset-4 hover:text-foreground"
           >
-            <line
-              x1="40"
-              y1="16"
-              x2="760"
-              y2="16"
-              className="dashed-connector"
-              stroke="currentColor"
-              strokeWidth="1"
-              style={{ color: 'oklch(0.55 0.18 240 / 0.45)' }}
-            />
-          </svg>
-
-          <RevealGroup as="div" className="grid md:grid-cols-3 gap-10 relative" step={140}>
-            {steps.map((step, idx) => {
-              const Icon = step.icon
-              const num = String(idx + 1).padStart(2, '0')
-              return (
-                <div
-                  key={idx}
-                  className="relative flex flex-col items-center text-center px-2"
-                >
-                  <span
-                    aria-hidden
-                    className="font-serif italic text-muted-foreground/40 text-2xl mb-2"
-                  >
-                    {num}
-                  </span>
-                  <div className="relative mb-5 z-10">
-                    <div className="w-[4.5rem] h-[4.5rem] rounded-full bg-card border border-border flex items-center justify-center shadow-sm">
-                      <Icon aria-hidden="true" className="w-6 h-6 text-primary" />
-                    </div>
-                  </div>
-
-                  <h3 className="text-lg font-semibold text-foreground mb-2 tracking-tight">
-                    {step.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed mb-3">
-                    {step.description}
-                  </p>
-                  {step.cta && (
-                    <Link
-                      href={step.cta.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm text-primary font-medium hover:underline underline-offset-2 transition-colors"
-                    >
-                      {step.cta.label} <span aria-hidden="true">→</span>
-                    </Link>
-                  )}
-                </div>
-              )
-            })}
-          </RevealGroup>
-        </div>
+            Request access<span className="sr-only"> (opens in a new tab)</span>
+          </a>{' '}
+          or{' '}
+          <a
+            href={siteConfig.links.discord}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-link underline underline-offset-4 hover:text-foreground"
+          >
+            ask us on Discord<span className="sr-only"> (opens in a new tab)</span>
+          </a>{' '}
+          first.
+        </p>
       </div>
     </section>
   )

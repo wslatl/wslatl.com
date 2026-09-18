@@ -1,38 +1,35 @@
-import type { LucideIcon } from 'lucide-react'
-import {
-  CreditCard, Gamepad2, Server, LayoutDashboard, HardDrive, UserPlus,
-} from 'lucide-react'
 import { siteConfig } from '@/config/site'
 
-export interface MainLink {
+export interface NavLink {
   label: string
   href: string
-  external: boolean
 }
 
-export interface LoginLink {
-  label: string
-  href: string
-  icon: LucideIcon
+export interface PortalLink extends NavLink {
+  description: string
 }
 
-export const mainLinks: MainLink[] = [
-  { label: 'Home',     href: '/',            external: false },
-  { label: 'Services', href: '/#services',   external: false },
-  { label: 'Pricing',  href: '/pricing',     external: false },
-  { label: 'Games',    href: '/games',       external: false },
-  { label: 'About',    href: '/#about',      external: false },
-  { label: 'Contact',  href: '/#contact',    external: false },
-  { label: 'Status',   href: siteConfig.links.status,  external: true  },
-  { label: 'Discord',  href: siteConfig.links.discord, external: true  },
+/** Header navigation. External URLs open in a new tab automatically. */
+export const mainNav: NavLink[] = [
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Game servers', href: '/games' },
+  { label: 'Services', href: '/#services' },
+  { label: 'About', href: '/#about' },
+  { label: 'Contact', href: '/#contact' },
+  { label: 'Status', href: siteConfig.links.status },
 ]
 
-export const loginLinks: (LoginLink | null)[] = [
-  { label: 'Billing Portal',   href: siteConfig.links.billing,     icon: CreditCard      },
-  { label: 'Register',         href: siteConfig.links.register,    icon: UserPlus        },
-  null,
-  { label: 'Gaming Panel',     href: siteConfig.links.gamingPanel, icon: Gamepad2        },
-  { label: 'VPS Panel',        href: siteConfig.links.vpsPanel,    icon: Server          },
-  { label: 'Dedicated Portal', href: siteConfig.links.dedicated,   icon: HardDrive       },
-  { label: 'cPanel',           href: siteConfig.links.cPanel,      icon: LayoutDashboard },
+/** Every client panel, shown in the header Login menu and the footer. */
+export const portalLinks: PortalLink[] = [
+  { label: 'Billing portal', href: siteConfig.links.billing, description: 'Invoices, orders, and support tickets' },
+  { label: 'Game panel', href: siteConfig.links.gamingPanel, description: 'Manage game servers' },
+  { label: 'VPS panel', href: siteConfig.links.vpsPanel, description: 'Manage your VPS' },
+  { label: 'Dedicated portal', href: siteConfig.links.dedicated, description: 'Manage dedicated servers' },
+  { label: 'cPanel', href: siteConfig.links.cPanel, description: 'Web hosting and email' },
 ]
+
+export const requestAccessLink: PortalLink = {
+  label: 'Request access',
+  href: siteConfig.links.register,
+  description: 'New here? Apply for an account',
+}

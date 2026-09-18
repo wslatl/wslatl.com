@@ -1,5 +1,6 @@
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
+import { uptimeTarget } from '@/data/sla'
 
 export default function RefundContent() {
   return (
@@ -12,7 +13,7 @@ export default function RefundContent() {
         </p>
         <p>
           This policy is incorporated into and made part of our{' '}
-          <a href="/terms" className="text-primary hover:underline">Terms of Service</a> by reference.
+          <a href="/terms">Terms of Service</a> by reference.
           The rules below are the authoritative source for refund eligibility, windows, and
           processing. In the event of any conflict between this Refund Policy and any other WSLATL
           document, this Refund Policy controls.
@@ -99,8 +100,8 @@ export default function RefundContent() {
         <LegalSubSection title="3.1 Service Outage Exceeding SLA">
           <p>
             If your service experiences an outage that exceeds the applicable uptime target in our{' '}
-            <a href={siteConfig.paths.sla} className="text-primary hover:underline">Service Level Agreement</a>{' '}
-            (99.9% for VPS and Web hosting, 99.5% for game server hosting), you may request a full
+            <a href={siteConfig.paths.sla}>Service Level Agreement</a>{' '}
+            ({uptimeTarget('vps')} for VPS and Web hosting, {uptimeTarget('game')} for game server hosting), you may request a full
             refund for the affected service. Outages caused by events outside our reasonable
             control (force majeure) do not qualify.
           </p>
@@ -200,7 +201,7 @@ export default function RefundContent() {
           <li>
             <span className="text-foreground font-medium">Services terminated for AUP or Terms violations:</span>{' '}
             If your service was suspended or terminated due to a violation of our{' '}
-            <a href={siteConfig.paths.acceptableUse} className="text-primary hover:underline">Acceptable Use Policy</a>{' '}
+            <a href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</a>{' '}
             or Terms of Service, no refund will be issued. This applies even if the termination
             occurred within 48 hours or within the 14-day window.
           </li>
@@ -216,14 +217,14 @@ export default function RefundContent() {
         <ul className="list-disc pl-5 space-y-1.5 mt-2">
           <li>
             <span className="text-foreground font-medium">Billing portal ticket:</span> Log in at{' '}
-            <a href={siteConfig.links.billing} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+            <a href={siteConfig.links.billing} target="_blank" rel="noopener noreferrer">
               billing.wslatl.com
             </a>{' '}
             and open a support ticket
           </li>
           <li>
             <span className="text-foreground font-medium">Email:</span>{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+            <a href={`mailto:${siteConfig.email.support}`}>
               {siteConfig.email.support}
             </a>
           </li>
@@ -233,7 +234,7 @@ export default function RefundContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>
@@ -291,7 +292,7 @@ export default function RefundContent() {
             it does not expire, but it is{' '}
             <span className="text-foreground font-medium">not redeemable for cash</span> and
             cannot be withdrawn to a bank account or card. Full terms are on our{' '}
-            <a href={siteConfig.paths.accountCredit} className="text-primary hover:underline">Account Credit</a>{' '}
+            <a href={siteConfig.paths.accountCredit}>Account Credit</a>{' '}
             page.
           </p>
           <p>
@@ -324,7 +325,7 @@ export default function RefundContent() {
             This cuts both ways and it is deliberate. You are not penalized for the days you used
             inside the refund window, and equally you cannot recover a part-month by cancelling
             partway through a term. As stated in Section 9.1 of our{' '}
-            <a href={siteConfig.paths.terms} className="text-primary hover:underline">Terms of Service</a>,
+            <a href={siteConfig.paths.terms}>Terms of Service</a>,
             no refund is issued for the remaining days in a cancelled billing period unless this
             policy applies.
           </p>
@@ -365,7 +366,7 @@ export default function RefundContent() {
         <p className="mt-4">
           We send invoice reminders before automatic renewals. If you are receiving renewals you
           did not intend, contact us immediately at{' '}
-          <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+          <a href={`mailto:${siteConfig.email.support}`}>
             {siteConfig.email.support}
           </a>{' '}
           and we will sort it out.
@@ -419,9 +420,9 @@ export default function RefundContent() {
           <p>Missouri, United States</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>
+            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
             {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`} className="text-primary hover:underline">{siteConfig.email.info}</a>
+            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
           </p>
           <p>
             Discord:{' '}
@@ -429,7 +430,7 @@ export default function RefundContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>

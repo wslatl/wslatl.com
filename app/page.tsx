@@ -1,18 +1,25 @@
 import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
+import { JsonLd } from '@/components/seo/json-ld'
 import { Hero } from '@/components/sections/hero'
 import { Clients } from '@/components/sections/clients'
-import { Stats } from '@/components/sections/stats'
-import { About } from '@/components/sections/about'
-import { HowItWorks } from '@/components/sections/how-it-works'
 import { Services } from '@/components/sections/services'
-import { PricingTeaser } from '@/components/sections/pricing-teaser'
-import { Features } from '@/components/sections/features'
+import { HowItWorks } from '@/components/sections/how-it-works'
+import { WhyUs } from '@/components/sections/why-us'
+import { About } from '@/components/sections/about'
 import { Reviews } from '@/components/sections/reviews'
 import { FAQ } from '@/components/sections/faq'
-import { CtaBanner } from '@/components/sections/cta-banner'
 import { Contact } from '@/components/sections/contact'
-import { Footer } from '@/components/layout/footer'
 import { faqs } from '@/data/faqs'
+import { pageMetadata } from '@/lib/metadata'
+
+export const metadata = pageMetadata({
+  title: 'Cheap VPS & Game Server Hosting | WSLATL LLC',
+  description:
+    'Affordable VPS hosting, game server hosting (Minecraft, Rust, ARK, FiveM & more), and dedicated servers with DDoS protection and NVMe storage. Missouri-based, and we actually pick up.',
+  path: '/',
+  absoluteTitle: true,
+})
 
 const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -26,32 +33,21 @@ const faqJsonLd = {
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen page-enter">
+    <>
       <Header />
-
-      {/* Static, hand-authored content from data/faqs.ts, never user input - see
-          the identical pattern (and the reasoning) on the per-game FAQ blocks. */}
-      {/* eslint-disable-next-line react/no-danger */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd).replace(/</g, '\\u003c') }}
-      />
-
-      <main id="main-content" className="scroll-mt-20">
+      <JsonLd data={faqJsonLd} />
+      <main id="main-content">
         <Hero />
         <Clients />
-        <Stats />
-        <About />
-        <HowItWorks />
         <Services />
-        <PricingTeaser />
-        <Features />
+        <HowItWorks />
+        <WhyUs />
+        <About />
         <Reviews />
-        <FAQ />
-        <CtaBanner />
+        <FAQ faqs={faqs} />
         <Contact />
       </main>
       <Footer />
-    </div>
+    </>
   )
 }

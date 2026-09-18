@@ -1,6 +1,11 @@
 /**
  * @type {import('next').NextConfig}
  */
+
+// React needs eval() in development for its debugging tools. Production
+// never does, so it only gets 'unsafe-eval' while running `next dev`.
+const isDev = process.env.NODE_ENV === 'development'
+
 const securityHeaders = [
   {
     key: 'X-DNS-Prefetch-Control',
@@ -27,25 +32,32 @@ const securityHeaders = [
     value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
   },
   {
+    key: 'Cross-Origin-Opener-Policy',
+    value: 'same-origin',
+  },
+  {
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
       "img-src 'self' data: blob:",
       "font-src 'self'",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline'",
+      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
       "connect-src 'self'",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
       "object-src 'none'",
-      "upgrade-insecure-requests",
+      'upgrade-insecure-requests',
     ].join('; '),
   },
 ]
 
 const nextConfig = {
+  poweredByHeader: false,
   images: {
+    // Every image in /public is already exported at its display size (see
+    // README), so there is nothing left for a runtime optimizer to do.
     unoptimized: true,
   },
   async headers() {
@@ -54,6 +66,17 @@ const nextConfig = {
         source: '/:path*',
         headers: securityHeaders,
       },
+    ]
+  },
+  async redirects() {
+    return [
+      // This page always described BeamMP; the old slug was a leftover.
+      { source: '/games/rust-console', destination: '/games/beammp', permanent: true },
+      // Neither game can be hosted by a third party (EA runs Battlefield 2042
+      // Portal servers; Hell Let Loose servers are only rented through its
+      // licensed partners), so their pages are gone.
+      { source: '/games/battlefield-2042-portal', destination: '/games', permanent: true },
+      { source: '/games/hell-let-loose', destination: '/games', permanent: true },
     ]
   },
 }

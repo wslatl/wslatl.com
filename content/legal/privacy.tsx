@@ -54,7 +54,7 @@ export default function PrivacyContent() {
             necessary to provide, maintain, or secure the service, or where we are legally
             required to. If you need a data processing agreement covering our role as processor,
             contact us at{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+            <a href={`mailto:${siteConfig.email.support}`}>
               {siteConfig.email.support}
             </a>.
           </p>
@@ -92,7 +92,7 @@ export default function PrivacyContent() {
             credits we issue, amounts applied to invoices, gifts sent or received, and the date,
             amount, and reason for each entry. This ledger is retained as part of your billing
             records. See our{' '}
-            <a href={siteConfig.paths.accountCredit} className="text-primary hover:underline">Account Credit Terms</a>{' '}
+            <a href={siteConfig.paths.accountCredit}>Account Credit Terms</a>{' '}
             for how the balance itself works.
           </p>
         </LegalSubSection>
@@ -187,7 +187,7 @@ export default function PrivacyContent() {
           <p className="mt-3">
             We publish the individual providers, not just these categories. Each subprocessor is
             named on our{' '}
-            <a href={siteConfig.paths.subprocessors} className="text-primary hover:underline">Subprocessors</a>{' '}
+            <a href={siteConfig.paths.subprocessors}>Subprocessors</a>{' '}
             page, together with what it is used for, what data categories it receives, and where
             it is located. That page is kept current as our infrastructure changes.
           </p>
@@ -239,10 +239,10 @@ export default function PrivacyContent() {
           <p>
             The mechanisms that apply to each recipient, and further detail on our transfer
             position, are set out on our{' '}
-            <a href={siteConfig.paths.subprocessors} className="text-primary hover:underline">Subprocessors</a>{' '}
+            <a href={siteConfig.paths.subprocessors}>Subprocessors</a>{' '}
             page. If you need a data processing agreement or a copy of the clauses as we apply
             them, contact us at{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+            <a href={`mailto:${siteConfig.email.support}`}>
               {siteConfig.email.support}
             </a>.
           </p>
@@ -304,7 +304,7 @@ export default function PrivacyContent() {
           No transmission over the internet is 100% secure. While we use industry-standard protections,
           we cannot guarantee absolute security. If you believe your account has been compromised,
           contact us immediately at{' '}
-          <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>.
+          <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>.
         </p>
         <p className="mt-3">
           In the event of a data breach that affects your information, we will notify you in accordance
@@ -349,7 +349,7 @@ export default function PrivacyContent() {
         </ul>
         <p className="mt-4">
           To exercise any of these rights, contact us at{' '}
-          <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>.
+          <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>.
           We will respond within 30 days. We may need to verify your identity before processing your request.
         </p>
         <p className="mt-3">
@@ -383,7 +383,7 @@ export default function PrivacyContent() {
             You do not have to come to us first, and exercising this right does not affect any
             other remedy available to you. That said, we would genuinely rather hear about a
             problem directly. Write to{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+            <a href={`mailto:${siteConfig.email.support}`}>
               {siteConfig.email.support}
             </a>{' '}
             and we will take it seriously.
@@ -440,7 +440,7 @@ export default function PrivacyContent() {
         <p className="mt-4">
           If you are a parent or guardian and believe your child under 13 has registered with us or
           provided us with personal information without your knowledge, contact us immediately at{' '}
-          <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>.
+          <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>.
           We will permanently remove the account and all associated data as quickly as possible.
         </p>
       </LegalSection>
@@ -481,9 +481,9 @@ export default function PrivacyContent() {
           <p>Missouri, United States</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>
+            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
             {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`} className="text-primary hover:underline">{siteConfig.email.info}</a>
+            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
           </p>
           <p>
             Discord:{' '}
@@ -491,7 +491,7 @@ export default function PrivacyContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>

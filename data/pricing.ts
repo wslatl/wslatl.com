@@ -1,90 +1,138 @@
-import type { LucideIcon } from 'lucide-react'
-import { TrendingDown } from 'lucide-react'
+/**
+ * Published plan pricing.
+ *
+ * This file is the single source of truth for every plan name, spec, and
+ * price on the site: the pricing page, the home page product overview, the
+ * per-game plan suggestions, and the FAQ answers all read from here. Change a
+ * number here and every surface follows. Never hard-code a price anywhere else.
+ */
 
-export interface PricingPlan {
+export type ProductLineId = 'vps' | 'game'
+export type StorageType = 'SATA SSD' | 'NVMe'
+
+export interface Plan {
+  /** Plan code exactly as it appears in the billing portal, e.g. `B-NYC-2`. */
   name: string
-  specs: string[]
+  /** vCPU (VPS) or vCore (game server) count. See `ProductLine.cpuUnit`. */
+  cpu: number
+  ramGb: number
+  storageGb: number
+  /** Monthly traffic allowance in TB. Omitted where we do not publish one. */
+  trafficTb?: number
+  /** Monthly price in USD. */
   price: number
   popular?: boolean
 }
 
-export interface PricingGroup {
+export interface PlanGroup {
   id: string
   label: string
-  storageType: 'SATA SSD' | 'NVMe'
+  tier: 'budget' | 'premium'
+  storageType: StorageType
   description: string
-  claim?: { text: string; icon: LucideIcon }
-  plans: PricingPlan[]
+  /** Price comparison against a named competitor, shown with the group heading. */
+  comparison?: string
+  plans: Plan[]
 }
 
-export interface PricingTab {
-  id: 'vps' | 'game'
+export interface ProductLine {
+  id: ProductLineId
   label: string
-  note?: string
-  groups: PricingGroup[]
+  /** Section id on /pricing, so `/pricing#game-servers` deep-links to it. */
+  anchor: string
+  cpuUnit: 'vCPU' | 'vCores'
+  intro: string
+  /** Included with every plan on this line. */
+  included: string[]
+  groups: PlanGroup[]
 }
 
-export const pricingTabs: PricingTab[] = [
+export const productLines: ProductLine[] = [
   {
     id: 'vps',
     label: 'VPS',
+    anchor: 'vps',
+    cpuUnit: 'vCPU',
+    intro:
+      'Isolated resources and full root access, with your choice of OS. Budget plans run on SATA SSD, Premium plans on NVMe with high-frequency Ryzen 9 cores.',
+    included: [
+      'Full root and sudo access',
+      'Your choice of OS',
+      'Upgrades and plan changes handled by a person',
+      'A real person to talk to if something breaks',
+    ],
     groups: [
       {
-        id: 'b-nyc',
+        id: 'budget-vps',
         label: 'Budget VPS',
+        tier: 'budget',
         storageType: 'SATA SSD',
         description: 'Solid SATA SSD storage at honest prices.',
-        claim: { text: '10% under Hosturly', icon: TrendingDown },
+        comparison: '10% under Hosturly',
         plans: [
-          { name: 'B-NYC-2',  specs: ['1 vCPU', '2GB RAM', '20GB SATA SSD', '1TB traffic'], price: 5.40  },
-          { name: 'B-NYC-4',  specs: ['1 vCPU', '4GB RAM', '30GB SATA SSD', '2TB traffic'], price: 10.80 },
-          { name: 'B-NYC-6',  specs: ['2 vCPU', '6GB RAM', '45GB SATA SSD', '3TB traffic'], price: 16.20 },
-          { name: 'B-NYC-8',  specs: ['2 vCPU', '8GB RAM', '60GB SATA SSD', '4TB traffic'], price: 21.60, popular: true },
-          { name: 'B-NYC-10', specs: ['4 vCPU', '10GB RAM', '75GB SATA SSD', '5TB traffic'], price: 27.00 },
+          { name: 'B-NYC-2', cpu: 1, ramGb: 2, storageGb: 20, trafficTb: 1, price: 5.4 },
+          { name: 'B-NYC-4', cpu: 1, ramGb: 4, storageGb: 30, trafficTb: 2, price: 10.8 },
+          { name: 'B-NYC-6', cpu: 2, ramGb: 6, storageGb: 45, trafficTb: 3, price: 16.2 },
+          { name: 'B-NYC-8', cpu: 2, ramGb: 8, storageGb: 60, trafficTb: 4, price: 21.6, popular: true },
+          { name: 'B-NYC-10', cpu: 4, ramGb: 10, storageGb: 75, trafficTb: 5, price: 27 },
         ],
       },
       {
-        id: 'p-vps',
+        id: 'premium-vps',
         label: 'Premium VPS',
+        tier: 'premium',
         storageType: 'NVMe',
-        description: 'NVMe drives on high-frequency Ryzen 9 cores. Real-world performance, not just bigger numbers.',
-        claim: { text: '10% under DigitalOcean', icon: TrendingDown },
+        description:
+          'NVMe drives on high-frequency Ryzen 9 cores. Real-world performance, not just bigger numbers.',
+        comparison: '10% under DigitalOcean',
         plans: [
-          { name: 'P-VPS-1', specs: ['1 vCPU', '1GB RAM', '25GB NVMe'],  price: 5.40  },
-          { name: 'P-VPS-2', specs: ['2 vCPU', '2GB RAM', '60GB NVMe'],  price: 16.20 },
-          { name: 'P-VPS-3', specs: ['2 vCPU', '4GB RAM', '80GB NVMe'],  price: 21.20, popular: true },
-          { name: 'P-VPS-4', specs: ['4 vCPU', '8GB RAM', '160GB NVMe'], price: 43.20 },
+          { name: 'P-VPS-1', cpu: 1, ramGb: 1, storageGb: 25, price: 5.4 },
+          { name: 'P-VPS-2', cpu: 2, ramGb: 2, storageGb: 60, price: 16.2 },
+          { name: 'P-VPS-3', cpu: 2, ramGb: 4, storageGb: 80, price: 21.2, popular: true },
+          { name: 'P-VPS-4', cpu: 4, ramGb: 8, storageGb: 160, price: 43.2 },
         ],
       },
     ],
   },
   {
     id: 'game',
-    label: 'Game Servers',
-    note: "These plans aren't locked to one game. Pick the RAM you need and run whatever you want. We handle most titles that offer a dedicated server, including Minecraft, Rust, CS2, ARK, Valheim, FiveM, and Palworld. Don't see yours? Just ask. We can almost always run it.",
+    label: 'Game servers',
+    anchor: 'game-servers',
+    cpuUnit: 'vCores',
+    intro:
+      "These plans aren't locked to one game. Pick the RAM you need and run whatever you want. We handle most titles that offer a dedicated server, including Minecraft, Rust, CS2, ARK, Valheim, FiveM, and Palworld. Don't see yours? Just ask. We can almost always run it.",
+    included: [
+      'Pterodactyl control panel',
+      'DDoS protection built in',
+      'Full mod and plugin support',
+      'Same-day setup, most of the time',
+      'A real person to talk to if something breaks',
+    ],
     groups: [
       {
         id: 'budget-game',
-        label: 'Budget Game Servers',
+        label: 'Budget game servers',
+        tier: 'budget',
         storageType: 'SATA SSD',
         description: 'Game servers on SATA SSD. We usually have you live the same day.',
-        claim: { text: '10% under Sparked', icon: TrendingDown },
+        comparison: '10% under Sparked',
         plans: [
-          { name: 'GAME-1', specs: ['4GB RAM', '2 vCores', '25GB SATA SSD'],   price: 3.60  },
-          { name: 'GAME-2', specs: ['8GB RAM', '2 vCores', '50GB SATA SSD'],   price: 7.20, popular: true },
-          { name: 'GAME-3', specs: ['16GB RAM', '3 vCores', '100GB SATA SSD'], price: 14.40 },
+          { name: 'GAME-1', cpu: 2, ramGb: 4, storageGb: 25, price: 3.6 },
+          { name: 'GAME-2', cpu: 2, ramGb: 8, storageGb: 50, price: 7.2, popular: true },
+          { name: 'GAME-3', cpu: 3, ramGb: 16, storageGb: 100, price: 14.4 },
         ],
       },
       {
         id: 'premium-game',
-        label: 'Premium Game Servers',
+        label: 'Premium game servers',
+        tier: 'premium',
         storageType: 'NVMe',
         description: 'NVMe drives and Ryzen 9 cores for when the budget line is not enough.',
-        claim: { text: '25% under Sparked', icon: TrendingDown },
+        comparison: '25% under Sparked',
         plans: [
-          { name: 'P-GAME-1', specs: ['4GB RAM',  '3 vCores', '100GB NVMe'], price: 12.00 },
-          { name: 'P-GAME-2', specs: ['8GB RAM',  '3 vCores', '100GB NVMe'], price: 24.00, popular: true },
-          { name: 'P-GAME-3', specs: ['16GB RAM', '3 vCores', '100GB NVMe'], price: 48.00 },
+          { name: 'P-GAME-1', cpu: 3, ramGb: 4, storageGb: 100, price: 12 },
+          { name: 'P-GAME-2', cpu: 3, ramGb: 8, storageGb: 100, price: 24, popular: true },
+          { name: 'P-GAME-3', cpu: 3, ramGb: 16, storageGb: 100, price: 48 },
         ],
       },
     ],

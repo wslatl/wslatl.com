@@ -1,5 +1,6 @@
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
+import { UptimeTable } from '@/components/legal/uptime-table'
 
 export default function SlaContent() {
   return (
@@ -12,10 +13,10 @@ export default function SlaContent() {
           claim when we fall short.
         </p>
         <div className="mt-3">
-          <div className="legal-callout border-primary/30 text-primary">
+          <div className="legal-callout border-primary/30 text-link">
             <strong>This is a restatement, not a new commitment</strong>
             This page reproduces Section 5 of our{' '}
-            <a href={siteConfig.paths.terms} className="text-primary hover:underline">Terms of Service</a>{' '}
+            <a href={siteConfig.paths.terms}>Terms of Service</a>{' '}
             as a standalone document so it is easier to find and cite. The commitments here are
             the same commitments already in the Terms. Nothing has been added, removed, or
             changed. If the two documents ever conflict, the Terms of Service controls.
@@ -29,34 +30,7 @@ export default function SlaContent() {
       </LegalSection>
 
       <LegalSection number="2" title="Uptime Targets">
-        <div className="overflow-x-auto mt-2">
-          <table className="legal-table">
-            <thead>
-              <tr>
-                <th scope="col">Service</th>
-                <th scope="col">Monthly Uptime Target</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>VPS Hosting</td>
-                <td>99.9%</td>
-              </tr>
-              <tr>
-                <td>Web Hosting</td>
-                <td>99.9%</td>
-              </tr>
-              <tr>
-                <td>Game Server Hosting</td>
-                <td>99.5%</td>
-              </tr>
-              <tr>
-                <td>Dedicated Servers</td>
-                <td>Best-effort; subject to hardware and datacenter availability</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <UptimeTable />
         <p className="mt-3">
           Uptime is measured per calendar month and excludes scheduled maintenance windows and
           downtime caused by events outside our reasonable control (see Section 15 of the Terms of
@@ -78,7 +52,7 @@ export default function SlaContent() {
             href={siteConfig.links.status}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline"
+           
           >
             status.wslatl.com
           </a>.
@@ -103,7 +77,7 @@ export default function SlaContent() {
             A service credit issued under this SLA is applied to your account balance as account
             credit. Once issued, it behaves like any other account credit: it is spendable on
             WSLATL invoices, it does not expire, and it is not redeemable for cash. See our{' '}
-            <a href={siteConfig.paths.accountCredit} className="text-primary hover:underline">Account Credit Terms</a>{' '}
+            <a href={siteConfig.paths.accountCredit}>Account Credit Terms</a>{' '}
             for the full treatment.
           </p>
         </LegalSubSection>
@@ -111,7 +85,7 @@ export default function SlaContent() {
         <LegalSubSection title="4.2 Relationship to the Refund Policy">
           <p>
             A service credit under this SLA and a refund under our{' '}
-            <a href={siteConfig.paths.refund} className="text-primary hover:underline">Refund Policy</a>{' '}
+            <a href={siteConfig.paths.refund}>Refund Policy</a>{' '}
             are separate remedies. As stated in Section 3.1 of the Refund Policy, an outage
             exceeding the applicable uptime target may also be a qualifying reason for a refund
             during the 14-day window, and that refund right is in addition to the 10% service
@@ -143,7 +117,7 @@ export default function SlaContent() {
           commitments here are made through the Terms and follow the notice process in Section 14
           of the Terms of Service. When the commitments change, we will update the effective date
           at the top of this page and post the updated SLA at{' '}
-          <a href={siteConfig.paths.sla} className="text-primary hover:underline">
+          <a href={siteConfig.paths.sla}>
             {siteConfig.siteUrl}{siteConfig.paths.sla}
           </a>.
         </p>
@@ -159,9 +133,9 @@ export default function SlaContent() {
           <p>Missouri, United States</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>
+            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
             {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`} className="text-primary hover:underline">{siteConfig.email.info}</a>
+            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
           </p>
           <p>
             Discord:{' '}
@@ -169,7 +143,7 @@ export default function SlaContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>

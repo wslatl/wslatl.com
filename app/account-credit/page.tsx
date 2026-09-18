@@ -1,28 +1,11 @@
-import type { Metadata } from 'next'
-import { LegalLayout } from '@/components/layout/legal-layout'
+import { LegalLayout, legalMetadata } from '@/components/layout/legal-layout'
 import AccountCreditContent from '@/content/legal/account-credit'
-import { siteConfig, legalEffectiveDate } from '@/config/site'
+import { legalPage } from '@/data/legal'
 
-export const metadata: Metadata = {
-  title: 'Account Credit Terms | WSLATL LLC',
-  description: 'How account credit works at WSLATL LLC: buying credit, applying it to invoices, gifting it to another account, and what it can and cannot be used for.',
-  alternates: { canonical: `${siteConfig.siteUrl}${siteConfig.paths.accountCredit}` },
-  openGraph: {
-    title: 'Account Credit Terms | WSLATL LLC',
-    description: 'How account credit works at WSLATL LLC: buying credit, applying it to invoices, gifting it to another account, and what it can and cannot be used for.',
-    url: `${siteConfig.siteUrl}${siteConfig.paths.accountCredit}`,
-  },
-}
+const page = legalPage('accountCredit')
+
+export const metadata = legalMetadata(page)
 
 export default function AccountCreditPage() {
-  return (
-    <LegalLayout
-      title="Account Credit Terms"
-      description="Account credit is prepaid value you spend on WSLATL services. It does not expire and it is not redeemable for cash. Here is exactly how it works."
-      effectiveDate={legalEffectiveDate('accountCredit')}
-      currentPath={siteConfig.paths.accountCredit}
-    >
-      <AccountCreditContent />
-    </LegalLayout>
-  )
+  return <LegalLayout page={page} content={AccountCreditContent} />
 }

@@ -10,7 +10,7 @@ export default function SubprocessorsContent() {
           (&ldquo;WSLATL,&rdquo; &ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) so that
           we can operate our website, billing portal, hosting panels, and support channels. It
           supports Section 4.1 of our{' '}
-          <a href={siteConfig.paths.privacy} className="text-primary hover:underline">Privacy Policy</a>,
+          <a href={siteConfig.paths.privacy}>Privacy Policy</a>,
           which describes these recipients only by category.
         </p>
         <p>
@@ -137,7 +137,7 @@ export default function SubprocessorsContent() {
           We may add or replace a subprocessor as our infrastructure changes. When we do, we will
           update this page. Active clients who have asked to be notified of subprocessor changes
           will be told by email; you can opt in by writing to{' '}
-          <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+          <a href={`mailto:${siteConfig.email.support}`}>
             {siteConfig.email.support}
           </a>.
         </p>
@@ -247,7 +247,7 @@ export default function SubprocessorsContent() {
           If you require a data processing agreement, a copy of the Standard Contractual Clauses
           as we apply them, or a transfer impact assessment for your own compliance file, contact
           us at{' '}
-          <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+          <a href={`mailto:${siteConfig.email.support}`}>
             {siteConfig.email.support}
           </a>{' '}
           and we will work through it with you.
@@ -278,7 +278,7 @@ export default function SubprocessorsContent() {
           obligations of a controller under the GDPR or other applicable law fall on you. That
           includes having a lawful basis, providing notice to your own users, and maintaining your
           own record of processing. See Section 12 of our{' '}
-          <a href={siteConfig.paths.terms} className="text-primary hover:underline">Terms of Service</a>{' '}
+          <a href={siteConfig.paths.terms}>Terms of Service</a>{' '}
           for the related indemnity.
         </p>
       </LegalSection>
@@ -288,7 +288,7 @@ export default function SubprocessorsContent() {
           We will keep this page current as our infrastructure changes. When a subprocessor is
           added or replaced, we will update the effective date at the top of this page and post
           the updated list at{' '}
-          <a href={siteConfig.paths.subprocessors} className="text-primary hover:underline">
+          <a href={siteConfig.paths.subprocessors}>
             {siteConfig.siteUrl}{siteConfig.paths.subprocessors}
           </a>.
         </p>
@@ -305,9 +305,9 @@ export default function SubprocessorsContent() {
           <p>Missouri, United States</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>
+            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
             {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`} className="text-primary hover:underline">{siteConfig.email.info}</a>
+            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
           </p>
           <p>
             Discord:{' '}
@@ -315,7 +315,7 @@ export default function SubprocessorsContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>

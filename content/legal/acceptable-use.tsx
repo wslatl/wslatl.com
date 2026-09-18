@@ -12,7 +12,7 @@ export default function AcceptableUseContent() {
         </p>
         <p>
           This AUP is incorporated into and made part of our{' '}
-          <a href="/terms" className="text-primary hover:underline">Terms of Service</a>. By using
+          <a href="/terms">Terms of Service</a>. By using
           any WSLATL service, you agree to comply with this policy. Violations may result in
           immediate suspension or termination of your services without refund, and potentially
           referral to law enforcement.
@@ -287,7 +287,7 @@ export default function AcceptableUseContent() {
           <p className="font-semibold text-foreground">Report abuse to:</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+            <a href={`mailto:${siteConfig.email.support}`}>
               {siteConfig.email.support}
             </a>{' '}
             (Subject: Abuse Report)
@@ -298,7 +298,7 @@ export default function AcceptableUseContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>
@@ -391,7 +391,7 @@ export default function AcceptableUseContent() {
           <p>Missouri, United States</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>
+            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
           </p>
           <p>
             Discord:{' '}
@@ -399,7 +399,7 @@ export default function AcceptableUseContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>

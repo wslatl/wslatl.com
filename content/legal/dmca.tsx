@@ -16,7 +16,7 @@ export default function DmcaContent() {
           This policy is written to align with the Digital Millennium Copyright Act,
           17 U.S.C. &sect;&nbsp;512. It replaces and expands the summary previously contained in
           Section 8 of our{' '}
-          <a href={siteConfig.paths.terms} className="text-primary hover:underline">Terms of Service</a>,
+          <a href={siteConfig.paths.terms}>Terms of Service</a>,
           and is incorporated into those Terms by reference.
         </p>
         <p>
@@ -55,7 +55,7 @@ export default function DmcaContent() {
           <p><span className="text-foreground font-medium">Telephone:</span> 1-660-998-8016</p>
           <p>
             <span className="text-foreground font-medium">Email:</span>{' '}
-            <a href={`mailto:${siteConfig.email.dmca}`} className="text-primary hover:underline">
+            <a href={`mailto:${siteConfig.email.dmca}`}>
               {siteConfig.email.dmca}
             </a>
           </p>
@@ -198,7 +198,7 @@ export default function DmcaContent() {
             has already been deleted under our retention rules, and a counter-notice does not
             pause billing, suspension for non-payment, or any separate enforcement action taken
             under our{' '}
-            <a href={siteConfig.paths.acceptableUse} className="text-primary hover:underline">Acceptable Use Policy</a>.
+            <a href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</a>.
           </p>
         </LegalSubSection>
 
@@ -264,7 +264,7 @@ export default function DmcaContent() {
         */}
         <p className="mt-4">
           Termination under this section is a termination for cause. As set out in our{' '}
-          <a href={siteConfig.paths.refund} className="text-primary hover:underline">Refund Policy</a>,
+          <a href={siteConfig.paths.refund}>Refund Policy</a>,
           services terminated for violations of our Terms or Acceptable Use Policy are not
           eligible for a refund.
         </p>
@@ -289,12 +289,12 @@ export default function DmcaContent() {
         <p>
           This policy covers copyright only. Complaints about trademark infringement,
           defamation, privacy violations, or other unlawful content should be sent to{' '}
-          <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">
+          <a href={`mailto:${siteConfig.email.support}`}>
             {siteConfig.email.support}
           </a>{' '}
           with a clear description of the material, its location, and the legal basis for your
           complaint. Those complaints are handled under our{' '}
-          <a href={siteConfig.paths.acceptableUse} className="text-primary hover:underline">Acceptable Use Policy</a>{' '}
+          <a href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</a>{' '}
           rather than under the DMCA.
         </p>
       </LegalSection>
@@ -304,7 +304,7 @@ export default function DmcaContent() {
           We may update this DMCA Policy to reflect changes in our practices or in applicable
           law. When we make material changes, we will update the effective date at the top of
           this page and post the updated policy at{' '}
-          <a href={siteConfig.paths.dmca} className="text-primary hover:underline">
+          <a href={siteConfig.paths.dmca}>
             {siteConfig.siteUrl}{siteConfig.paths.dmca}
           </a>.
         </p>
@@ -321,9 +321,9 @@ export default function DmcaContent() {
           <p>Missouri, United States</p>
           <p>
             Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`} className="text-primary hover:underline">{siteConfig.email.support}</a>
+            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
             {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`} className="text-primary hover:underline">{siteConfig.email.info}</a>
+            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
           </p>
           <p>
             Discord:{' '}
@@ -331,7 +331,7 @@ export default function DmcaContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+             
             >
               {siteConfig.legal.discordVanity}
             </a>
