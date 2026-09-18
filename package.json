@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build"
+    "check": "npm run lint && npm run test && npm run build && npm run typecheck"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.24",
