@@ -16,7 +16,7 @@ export function WhyUs() {
           {commitments.map((item) => (
             <div key={item.value} className="flex flex-col-reverse justify-end bg-background p-5 sm:p-6">
               <dt className="mt-2 text-sm leading-snug text-muted-foreground">{item.label}</dt>
-              <dd className="text-2xl font-bold tracking-[-0.03em] whitespace-nowrap text-foreground tabular-nums sm:text-3xl">
+              <dd className="text-xl font-bold tracking-[-0.03em] whitespace-nowrap text-foreground tabular-nums min-[360px]:text-2xl sm:text-3xl">
                 {item.value}
               </dd>
             </div>

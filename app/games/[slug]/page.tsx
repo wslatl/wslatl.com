@@ -22,6 +22,26 @@ interface PageProps {
 
 export const dynamicParams = false
 
+/** "GAME-1 ($3.60/mo) or P-GAME-1 ($12.00/mo)", or a way to ask when nothing is big enough. */
+function PlansThatFit({ ramGb }: { ramGb: number }) {
+  const fits = smallestPlansWithRam('game', ramGb)
+  if (fits.length === 0) {
+    return (
+      <Link href="/#contact" className="text-link underline underline-offset-4 hover:text-foreground">
+        Bigger than our game plans: ask us
+      </Link>
+    )
+  }
+  return fits.map(({ plan }, i) => (
+    <span key={plan.name}>
+      {i > 0 && ' or '}
+      <span className="whitespace-nowrap">
+        <span className="font-medium text-foreground">{plan.name}</span> ({formatPrice(plan.price)}/mo)
+      </span>
+    </span>
+  ))
+}
+
 export function generateStaticParams() {
   return games.map((game) => ({ slug: game.slug }))
 }
@@ -100,7 +120,8 @@ export default async function GamePage({ params }: PageProps) {
           <h2 id="ram-heading" className="text-2xl font-semibold tracking-tight text-foreground">
             How much RAM does {game.name} need?
           </h2>
-          <div className="mt-5 overflow-hidden rounded-xl border">
+          {/* Table from sm up; stacked rows on phones, where three columns would crush the plan names. */}
+          <div className="mt-5 hidden overflow-hidden rounded-xl border sm:block">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">
                 Recommended RAM for {game.name} and the smallest plans that cover it
@@ -113,32 +134,31 @@ export default async function GamePage({ params }: PageProps) {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {game.recommendedRam.map((row) => {
-                  const fits = smallestPlansWithRam('game', ramNeedGb(row))
-                  return (
-                    <tr key={row.players}>
-                      <th scope="row" className="px-4 py-3.5 font-medium text-foreground">{row.players}</th>
-                      <td className="px-4 py-3.5 text-foreground/90">{row.ram}</td>
-                      <td className="px-4 py-3.5 text-muted-foreground tabular-nums">
-                        {fits.length > 0 ? (
-                          fits.map(({ plan }, i) => (
-                            <span key={plan.name}>
-                              {i > 0 && ' or '}
-                              <span className="font-medium text-foreground">{plan.name}</span> ({formatPrice(plan.price)}/mo)
-                            </span>
-                          ))
-                        ) : (
-                          <Link href="/#contact" className="text-link underline underline-offset-4 hover:text-foreground">
-                            Bigger than our game plans: ask us
-                          </Link>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
+                {game.recommendedRam.map((row) => (
+                  <tr key={row.players}>
+                    <th scope="row" className="px-4 py-3.5 font-medium text-foreground">{row.players}</th>
+                    <td className="px-4 py-3.5 whitespace-nowrap text-foreground/90">{row.ram}</td>
+                    <td className="px-4 py-3.5 text-muted-foreground tabular-nums">
+                      <PlansThatFit ramGb={ramNeedGb(row)} />
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
+          <ul className="mt-5 divide-y rounded-xl border sm:hidden">
+            {game.recommendedRam.map((row) => (
+              <li key={row.players} className="p-4">
+                <p className="flex items-baseline justify-between gap-3">
+                  <span className="font-medium text-foreground">{row.players}</span>
+                  <span className="shrink-0 text-sm whitespace-nowrap text-foreground/90">{row.ram}</span>
+                </p>
+                <p className="mt-1.5 text-sm text-muted-foreground tabular-nums">
+                  Fits: <PlansThatFit ramGb={ramNeedGb(row)} />
+                </p>
+              </li>
+            ))}
+          </ul>
           <p className="mt-3 text-sm text-muted-foreground">
             These are starting points, not hard limits. Every plan can be changed later as your server grows.
           </p>
