@@ -24,7 +24,7 @@ export function Reviews() {
             </a>
           </p>
         </div>
-        <Button asChild size="lg" className="justify-self-start">
+        <Button asChild size="lg" className="h-auto min-h-11 justify-self-start py-2.5 text-center whitespace-normal">
           <a href={siteConfig.trustpilot.profileUrl} target="_blank" rel="noopener noreferrer">
             {reviewsSection.cta}
             <ArrowUpRight aria-hidden="true" />

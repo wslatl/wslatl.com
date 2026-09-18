@@ -12,15 +12,19 @@ function sourceFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name)
     if (statSync(path).isDirectory()) return sourceFiles(path)
-    return /\.(tsx?|mjs|css|md)$/.test(name) ? [path] : []
+    return /\.(tsx?|mjs|mts|css|md|ya?ml|json)$/.test(name) ? [path] : []
   })
 }
 
 describe('house style', () => {
   it('has no em dashes anywhere in the site source', () => {
-    const files = ['app', 'components', 'config', 'content', 'data', 'lib', 'tests']
+    const files = ['app', 'components', 'config', 'content', 'data', 'lib', 'tests', '.github']
       .flatMap((dir) => sourceFiles(join(root, dir)))
-      .concat(join(root, 'README.md'))
+      .concat(
+        ['README.md', 'package.json', 'next.config.mjs', 'eslint.config.mjs', 'vitest.config.mts'].map((f) =>
+          join(root, f),
+        ),
+      )
     // Built from parts so this file does not match itself.
     const emDash = String.fromCharCode(0x2014)
     const entity = '&' + 'mdash;'
@@ -50,6 +54,19 @@ describe('games', () => {
 
   it('features at least one game', () => {
     expect(games.some((g) => g.featured)).toBe(true)
+  })
+
+  it('lists RAM rows smallest first, since the first row sets the "from" price', () => {
+    for (const game of games) {
+      const needs = game.recommendedRam.map(ramNeedGb)
+      expect(needs, game.slug).toEqual([...needs].sort((a, b) => a - b))
+    }
+  })
+
+  it('reads the top of a RAM range, decimals included', () => {
+    expect(ramNeedGb({ players: '', ram: '2-4GB' })).toBe(4)
+    expect(ramNeedGb({ players: '', ram: '16GB+ per map' })).toBe(16)
+    expect(ramNeedGb({ players: '', ram: '1.5GB' })).toBe(1.5)
   })
 })
 

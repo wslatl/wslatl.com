@@ -15,12 +15,14 @@ interface PageHeaderProps {
   breadcrumbs?: Crumb[]
   /** Plain-text name of this page, for the breadcrumb trail. */
   crumbLabel?: string
+  /** This page's path, so structured data can end the trail on it. */
+  path?: string
   children?: React.ReactNode
   className?: string
 }
 
 /** Title block shared by every inner page: breadcrumb, serif title, intro. */
-export function PageHeader({ title, breadcrumbs, crumbLabel, children, className }: PageHeaderProps) {
+export function PageHeader({ title, breadcrumbs, crumbLabel, path, children, className }: PageHeaderProps) {
   const trail = breadcrumbs && crumbLabel ? [{ label: 'Home', href: '/' }, ...breadcrumbs] : null
 
   return (
@@ -46,7 +48,7 @@ export function PageHeader({ title, breadcrumbs, crumbLabel, children, className
             data={{
               '@context': 'https://schema.org',
               '@type': 'BreadcrumbList',
-              itemListElement: trail.map((crumb, i) => ({
+              itemListElement: [...trail, ...(path ? [{ label: crumbLabel, href: path }] : [])].map((crumb, i) => ({
                 '@type': 'ListItem',
                 position: i + 1,
                 name: crumb.label,

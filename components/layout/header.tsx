@@ -28,9 +28,11 @@ export function Header() {
 
   return (
     <header className="site-header sticky top-0 z-50 border-b bg-background/85 backdrop-blur-md print:hidden">
-      <div className="shell flex h-16 items-center gap-6">
+      {/* A size container, so the wordmark text can step aside when enlarged
+          text leaves no room (the query is in rem, so it follows font size). */}
+      <div className="shell @container flex h-16 items-center gap-3 lg:gap-6">
         <Link href="/" className="-m-1 flex shrink-0 items-center rounded-md p-1" aria-label="WSLATL home">
-          <Wordmark />
+          <Wordmark textClassName="@max-[17.5rem]:hidden" />
         </Link>
 
         <nav aria-label="Main" className="hidden lg:block">
@@ -42,6 +44,9 @@ export function Header() {
                   <SiteLink
                     href={link.href}
                     aria-current={current ? 'page' : undefined}
+                    // A 404 is prerendered without the visitor's URL, so the
+                    // current-page mark can legitimately differ on the client.
+                    suppressHydrationWarning
                     className={cn(
                       'inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
                       current ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
@@ -83,7 +88,20 @@ export function Header() {
         </div>
       </div>
 
-      <div id="mobile-menu" ref={menuRef} popover="auto" className="mobile-menu lg:hidden">
+      <div
+        id="mobile-menu"
+        ref={menuRef}
+        popover="auto"
+        className="mobile-menu lg:hidden"
+        // The menu covers the page, so once keyboard focus leaves it (Tab past
+        // the last link) close it rather than let focus land on hidden content.
+        onBlur={(e) => {
+          const next = e.relatedTarget as HTMLElement | null
+          if (!next) return
+          if (e.currentTarget.contains(next) || next.getAttribute('popovertarget') === 'mobile-menu') return
+          closeMenu()
+        }}
+      >
         <nav aria-label="Main" className="shell py-4">
           <ul className="divide-y divide-border">
             {mainNav.map((link) => (
@@ -92,6 +110,7 @@ export function Header() {
                   href={link.href}
                   onClick={closeMenu}
                   aria-current={isCurrent(pathname, link.href) ? 'page' : undefined}
+                  suppressHydrationWarning
                   className="flex items-center justify-between py-3.5 text-base font-medium text-foreground aria-[current=page]:text-link"
                 >
                   {link.label}

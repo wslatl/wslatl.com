@@ -234,7 +234,6 @@ export default function RefundContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-             
             >
               {siteConfig.legal.discordVanity}
             </a>
@@ -430,7 +429,6 @@ export default function RefundContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-             
             >
               {siteConfig.legal.discordVanity}
             </a>

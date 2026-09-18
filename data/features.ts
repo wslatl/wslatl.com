@@ -12,7 +12,7 @@ export const commitments: Commitment[] = [
   { value: uptimeTarget('vps'), label: 'Uptime target on VPS and web hosting' },
   { value: 'Under 1 hr', label: 'Typical first reply on Discord in active hours' },
   { value: 'Same day', label: 'Most servers go live the day you are approved' },
-  { value: 'Locked', label: 'Your sign-up price is your renewal price' },
+  { value: '30 days', label: 'Written notice before any price increase' },
 ]
 
 export interface Feature {

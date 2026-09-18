@@ -38,7 +38,7 @@ export default function GamesPage() {
     <>
       <Header />
       <Main className="shell">
-        <PageHeader title="Game server hosting" breadcrumbs={[]} crumbLabel="Games">
+        <PageHeader title="Game server hosting" breadcrumbs={[]} crumbLabel="Games" path="/games">
           <p>
             Every game runs on the same Pterodactyl-powered plans: you pick the RAM, not a game-locked
             package. Find your game for realistic RAM guidance, then compare{' '}

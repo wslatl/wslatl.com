@@ -310,7 +310,6 @@ export default function BackupsContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-             
             >
               {siteConfig.legal.discordVanity}
             </a>

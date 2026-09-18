@@ -50,7 +50,6 @@ export default function AbuseContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-             
             >
               {siteConfig.legal.discordVanity}
             </a>
@@ -268,7 +267,6 @@ export default function AbuseContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-             
             >
               {siteConfig.legal.discordVanity}
             </a>

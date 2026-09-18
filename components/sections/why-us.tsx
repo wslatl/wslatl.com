@@ -12,16 +12,19 @@ export function WhyUs() {
           <p>We have seen how the big hosts operate. We built WSLATL to be the direct opposite.</p>
         </SectionHeader>
 
-        <dl className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border bg-border lg:grid-cols-4">
-          {commitments.map((item) => (
-            <div key={item.value} className="flex flex-col-reverse justify-end bg-background p-5 sm:p-6">
-              <dt className="mt-2 text-sm leading-snug text-muted-foreground">{item.label}</dt>
-              <dd className="text-xl font-bold tracking-[-0.03em] whitespace-nowrap text-foreground tabular-nums min-[360px]:text-2xl sm:text-3xl">
-                {item.value}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        {/* Columns follow the strip's own width in rem, so enlarged text gets fewer, wider cells. */}
+        <div className="@container mt-12">
+          <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border bg-border @min-[18rem]:grid-cols-2 @min-[50rem]:grid-cols-4">
+            {commitments.map((item) => (
+              <div key={item.value} className="flex flex-col-reverse justify-end bg-background p-5 sm:p-6">
+                <dt className="mt-2 text-sm leading-snug text-muted-foreground">{item.label}</dt>
+                <dd className="text-xl font-bold tracking-[-0.03em] text-foreground tabular-nums min-[360px]:text-2xl sm:text-3xl">
+                  {item.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
         <p className="mt-4 text-sm text-muted-foreground">
           Uptime targets for every service, and the credits you get if we miss one, are in our{' '}
           <Link href={siteConfig.paths.sla} className="text-link underline underline-offset-4 hover:text-foreground">

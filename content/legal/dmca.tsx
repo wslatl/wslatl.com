@@ -331,7 +331,6 @@ export default function DmcaContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-             
             >
               {siteConfig.legal.discordVanity}
             </a>

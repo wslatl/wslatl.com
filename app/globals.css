@@ -171,6 +171,48 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
   background-clip: text;
 }
 
+/* ----- Client logo marquee ----- */
+.marquee-viewport {
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee 45s linear infinite;
+}
+.marquee-viewport:hover .marquee-track,
+.marquee:has(.marquee-toggle input:checked) .marquee-track {
+  animation-play-state: paused;
+}
+.marquee:has(.marquee-toggle input:checked) .marquee-toggle {
+  color: var(--foreground);
+}
+/* Reduced motion: no loop, just the logos once, centered and wrapping. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none !important;
+    width: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 1.5rem;
+  }
+  .marquee-track > div {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 1.5rem;
+  }
+  .marquee-viewport {
+    mask-image: none;
+  }
+  .marquee-dup,
+  .marquee-toggle {
+    display: none;
+  }
+}
+
 /* ----- Skip to main content link (visible on keyboard focus) ----- */
 /* Parked above the viewport (not just translated) so no screenshot or
    stitched capture can catch it; it drops in over the header on focus. */
@@ -203,6 +245,15 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
 }
 .legal-body a:hover {
   color: var(--foreground);
+}
+/* Links that leave the site say so, visually and to screen readers (via the
+   alternative text after the slash). */
+.legal-body a[target='_blank']::after {
+  content: '↗' / ' (opens in a new tab)';
+  display: inline-block;
+  margin-left: 0.15em;
+  font-size: 0.8em;
+  text-decoration: none;
 }
 
 /* ----- Legal-page tables ----- */

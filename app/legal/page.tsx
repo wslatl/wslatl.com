@@ -19,7 +19,7 @@ export default function LegalIndexPage() {
     <>
       <Header />
       <Main className="shell">
-        <PageHeader title="Legal" breadcrumbs={[]} crumbLabel="Legal">
+        <PageHeader title="Legal" breadcrumbs={[]} crumbLabel="Legal" path="/legal">
           <p>
             Our policies, written to be read. Each one shows the date it took effect, and each one can
             change on its own, so check the date on the document you are relying on.

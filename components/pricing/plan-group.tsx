@@ -29,8 +29,8 @@ function PopularTag() {
 }
 
 /**
- * One plan group (e.g. "Budget VPS") as a spec table on tablet and up, and
- * as a stacked list on phones. Only one of the two is ever displayed, so
+ * One plan group (e.g. "Budget VPS") as a spec table when its container has room, and
+ * as a stacked list when it does not. Only one of the two is ever displayed, so
  * assistive tech sees a single copy.
  */
 export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
@@ -38,7 +38,7 @@ export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
   const headingId = `${group.id}-heading`
 
   return (
-    <section aria-labelledby={headingId} className="scroll-mt-28">
+    <section aria-labelledby={headingId} className="@container">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <h3 id={headingId} className="text-xl font-semibold tracking-tight text-foreground">
           {group.label}
@@ -53,8 +53,8 @@ export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
       </div>
       <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{group.description}</p>
 
-      {/* Tablet and up: comparison table */}
-      <div className="mt-5 hidden overflow-hidden rounded-xl border md:block">
+      {/* Wide containers (in rem, so large text counts): comparison table */}
+      <div className="mt-5 hidden overflow-hidden rounded-xl border @min-[44rem]:block">
         <table className="w-full table-fixed text-left text-sm tabular-nums">
           <caption className="sr-only">
             {group.label} plans, monthly prices in US dollars
@@ -109,8 +109,8 @@ export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
         </table>
       </div>
 
-      {/* Phones: stacked plans */}
-      <ul className="mt-5 divide-y rounded-xl border md:hidden">
+      {/* Narrow containers: stacked plans */}
+      <ul className="mt-5 divide-y rounded-xl border @min-[44rem]:hidden">
         {group.plans.map((plan) => (
           <li key={plan.name} className={cn('p-4', plan.popular && 'bg-primary/[0.05]')}>
             <div className="flex items-start justify-between gap-3">
@@ -123,7 +123,7 @@ export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
                 <span className="text-sm text-muted-foreground">/mo</span>
               </p>
             </div>
-            <dl className={cn('mt-3 grid gap-2 text-sm tabular-nums', showTraffic ? 'grid-cols-4' : 'grid-cols-3')}>
+            <dl className={cn('mt-3 grid grid-cols-2 gap-2 text-sm tabular-nums', showTraffic ? '@min-[20rem]:grid-cols-4' : '@min-[16rem]:grid-cols-3')}>
               <div>
                 <dt className="text-xs text-muted-foreground">{line.cpuUnit}</dt>
                 <dd className="text-foreground/90">{plan.cpu}</dd>

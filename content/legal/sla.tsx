@@ -52,7 +52,6 @@ export default function SlaContent() {
             href={siteConfig.links.status}
             target="_blank"
             rel="noopener noreferrer"
-           
           >
             status.wslatl.com
           </a>.
@@ -143,7 +142,6 @@ export default function SlaContent() {
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
-             
             >
               {siteConfig.legal.discordVanity}
             </a>

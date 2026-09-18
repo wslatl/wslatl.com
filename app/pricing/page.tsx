@@ -15,7 +15,7 @@ import { Main } from '@/components/layout/main'
 
 export const metadata = pageMetadata({
   title: 'Cheap VPS & Game Server Hosting Pricing',
-  description: `Published monthly pricing for VPS hosting from ${formatPrice(startingPrice('vps'))} and game server hosting from ${formatPrice(startingPrice('game'))}, on SATA SSD or NVMe. No renewal price traps: the price you sign up at is the price you keep.`,
+  description: `Published monthly pricing for VPS hosting from ${formatPrice(startingPrice('vps'))} and game server hosting from ${formatPrice(startingPrice('game'))}, on SATA SSD or NVMe. No teaser rates, and at least 30 days' notice before any price increase.`,
   path: '/pricing',
 })
 
@@ -61,8 +61,8 @@ export default function PricingPage() {
         <div className="shell">
           <PageHeader title="Pricing">
             <p>
-              Every plan is billed monthly in US dollars. No renewal price traps: the price you sign up
-              at is the price you keep.
+              Every plan is billed monthly in US dollars. No renewal price traps: these are the regular
+              monthly prices, and any increase comes with at least 30 days&rsquo; written notice.
             </p>
             <p className="mt-3 text-base">
               Ordering starts with a short application, and most are approved the same day.{' '}
@@ -90,7 +90,7 @@ export default function PricingPage() {
           />
 
           {productLines.map((line) => (
-            <section key={line.id} id={line.anchor} aria-labelledby={`${line.anchor}-heading`} className="scroll-mt-32 pt-14 md:pt-20">
+            <section key={line.id} id={line.anchor} aria-labelledby={`${line.anchor}-heading`} className="scroll-mt-14 pt-14 md:pt-20">
               <div className="grid gap-8 lg:grid-cols-[1fr_20rem] lg:gap-14">
                 <div>
                   <h2 id={`${line.anchor}-heading`} className="text-3xl font-bold tracking-[-0.03em] text-foreground md:text-4xl">

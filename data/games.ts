@@ -23,14 +23,18 @@ export interface GameEntry {
 
 /**
  * Every game below runs on the same RAM-tier plans described in
- * data/pricing.ts (the "game" tab): you are not buying a Minecraft plan or a
- * Rust plan, you are buying RAM and cores, and you can point Pterodactyl at
- * whichever egg the game needs. That's a real, accurate claim (see the note
- * on the pricing page's game tab), so a dedicated landing page per game is
- * describing a real, working purchase path, not promising something the
- * panel can't deliver. Games rotate faster than this file will realistically
- * be revisited, so keep entries here honest and specific rather than padding
- * the list with titles nobody actually asks us to run.
+ * data/pricing.ts (the "game" product line): you are not buying a Minecraft
+ * plan or a Rust plan, you are buying RAM and cores, and you can point
+ * Pterodactyl at whichever egg the game needs. That's a real, accurate claim
+ * (see the game server intro on /pricing), so a dedicated landing page per
+ * game is describing a real, working purchase path, not promising something
+ * the panel can't deliver. Only list games a third party can actually host.
+ * Games rotate faster than this file will realistically be revisited, so keep
+ * entries here honest and specific rather than padding the list with titles
+ * nobody actually asks us to run.
+ *
+ * recommendedRam rows go from the smallest setup to the largest: the first
+ * row sets the "from" price shown on /games and on each game page.
  */
 export const games: GameEntry[] = [
   // ── Survival & sandbox ──────────────────────────────────────────────
@@ -50,7 +54,7 @@ export const games: GameEntry[] = [
     ],
     popularFor: ['Paper + plugin survival', 'ATM9 and RLCraft modpacks', 'Bedrock cross-play servers', 'creative build servers'],
     faqs: [
-      { q: 'Can I run a modded server like RLCraft or ATM9?', a: 'Yes. Modded Minecraft is memory-hungry and benefits from the extra vCores on the Premium NVMe tier, but the Budget tier runs light modpacks fine.' },
+      { q: 'Can I run a modded server like RLCraft or ATM9?', a: 'Yes. Modded Minecraft is memory-hungry and benefits from the NVMe storage and Ryzen 9 cores on the Premium tier, but the Budget tier runs light modpacks fine.' },
       { q: 'Do you support Bedrock players on a Java server?', a: 'Yes, via a Geyser/Floodgate-compatible egg, so Java and Bedrock/console players can share one world.' },
     ],
   },
@@ -164,7 +168,7 @@ export const games: GameEntry[] = [
   { slug: 'barotrauma', name: 'Barotrauma', category: 'Survival & Sandbox', tagline: 'Submarine crew survival, part sim, part horror.', description: 'A 2D submarine-crew simulation with real system management (reactors, hull breaches, hostile creatures). Dedicated hosting keeps runs going without a single point of failure on the host\'s connection.', recommendedRam: [{ players: '4-8 players', ram: '2-4GB' }], popularFor: ['crew-based co-op sessions'], faqs: [] },
   { slug: 'eco', name: 'Eco', category: 'Survival & Sandbox', tagline: 'Collaborative survival built around a shared economy.', description: 'A civilization-building survival game where the whole point is a shared economy and ecosystem. Runs best with more RAM as your world and player count grow.', recommendedRam: [{ players: '10-20 players', ram: '6-8GB' }], popularFor: ['civilization and economy servers'], faqs: [] },
   { slug: 'don-t-starve-together', name: "Don't Starve Together", category: 'Survival & Sandbox', tagline: 'Co-op survival in Klei\'s gothic art style.', description: 'The multiplayer take on Don\'t Starve. Very light to host, even for a full lobby, and mods add little overhead.', recommendedRam: [{ players: '2-6 players', ram: '1-2GB' }], popularFor: ['modded co-op worlds'], faqs: [] },
-  { slug: 'factorio', name: 'Factorio', category: 'Survival & Sandbox', tagline: 'Automation and factory-building, famously CPU-bound.', description: 'A factory-automation game whose late-game bases are notoriously CPU-intensive as belts and machines multiply, so this one benefits from the higher core counts on our Premium tier more than most.', recommendedRam: [{ players: '2-8 players, early game', ram: '2GB' }, { players: 'large late-game factories', ram: '4-8GB, prioritize cores' }], popularFor: ['long-running automation servers'], faqs: [{ q: 'Why does Factorio need more cores instead of RAM?', a: 'Factorio\'s simulation is single-threaded and CPU-bound as your factory grows, so a plan with strong per-core clocks (our Ryzen 9 Premium tier) keeps UPS stable longer than just adding RAM.' }] },
+  { slug: 'factorio', name: 'Factorio', category: 'Survival & Sandbox', tagline: 'Automation and factory-building, famously CPU-bound.', description: 'A factory-automation game whose late-game bases are notoriously CPU-intensive as belts and machines multiply, so this one benefits from the faster Ryzen 9 cores on our Premium tier more than most.', recommendedRam: [{ players: '2-8 players, early game', ram: '2GB' }, { players: 'large late-game factories', ram: '4-8GB, CPU speed matters more' }], popularFor: ['long-running automation servers'], faqs: [{ q: 'Why does Factorio need faster cores more than RAM?', a: 'Factorio\'s simulation is single-threaded and CPU-bound as your factory grows, so a plan with strong per-core clocks (our Ryzen 9 Premium tier) keeps UPS stable longer than just adding RAM.' }] },
   { slug: 'muck', name: 'Muck', category: 'Survival & Sandbox', tagline: 'Fast, chaotic roguelike survival co-op.', description: 'A quick-session roguelike survival game meant for short, chaotic co-op runs. Minimal hosting requirements.', recommendedRam: [{ players: '2-4 players', ram: '1-2GB' }], popularFor: ['quick-session co-op groups'], faqs: [] },
   { slug: 'unturned', name: 'Unturned', category: 'Survival & Sandbox', tagline: 'Free-to-play blocky zombie survival with a huge modding scene.', description: 'A free, blocky zombie-survival sandbox with an active Workshop modding scene through Rocket and Unturned 3.x plugin frameworks.', recommendedRam: [{ players: '10-24 players', ram: '2-4GB' }, { players: '32+ players, modded', ram: '4-6GB' }], popularFor: ['Rocket-modded roleplay servers'], faqs: [] },
 
@@ -254,7 +258,7 @@ export const gameCategories = Array.from(new Set(games.map((g) => g.category)))
  * "16GB+ per map" -> 16). Used to suggest the smallest plan that fits.
  */
 export function ramNeedGb(row: RamRow): number {
-  const numbers = row.ram.match(/\d+/g)?.map(Number) ?? []
+  const numbers = row.ram.match(/\d+(?:\.\d+)?/g)?.map(Number) ?? []
   if (numbers.length === 0) throw new Error(`Unparseable RAM value "${row.ram}"`)
   return Math.max(...numbers)
 }

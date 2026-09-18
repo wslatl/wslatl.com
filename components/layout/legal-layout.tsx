@@ -138,11 +138,11 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
           <aside className="hidden lg:block print:hidden">
             <div className="sticky top-16 max-h-[calc(100dvh-4rem)] space-y-10 overflow-y-auto pt-24 pb-10">
               <nav aria-label="On this page">
-                <h2 className="mb-3 text-sm font-semibold text-foreground">On this page</h2>
+                <p className="mb-3 text-sm font-semibold text-foreground">On this page</p>
                 <TocList entries={toc} />
               </nav>
               <nav aria-label="Legal documents">
-                <h2 className="mb-3 text-sm font-semibold text-foreground">Legal documents</h2>
+                <p className="mb-3 text-sm font-semibold text-foreground">Legal documents</p>
                 <DocList current={page.href} />
               </nav>
             </div>
@@ -153,6 +153,7 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
               title={page.title}
               breadcrumbs={[{ label: 'Legal', href: '/legal' }]}
               crumbLabel={page.label}
+              path={page.href}
             >
               <p>{page.intro}</p>
             </PageHeader>

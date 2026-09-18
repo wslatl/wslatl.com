@@ -9,7 +9,7 @@ import { PlanGroupTable } from '@/components/pricing/plan-group'
 import { FaqList } from '@/components/sections/faq'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Button } from '@/components/ui/button'
-import { games, gameBySlug, ramNeedGb } from '@/data/games'
+import { games, gameBySlug, ramNeedGb, type RamRow } from '@/data/games'
 import { siteConfig } from '@/config/site'
 import { cheapestPlanWithRam, formatPrice, productLine, smallestPlansWithRam } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
@@ -22,9 +22,14 @@ interface PageProps {
 
 export const dynamicParams = false
 
-/** "GAME-1 ($3.60/mo) or P-GAME-1 ($12.00/mo)", or a way to ask when nothing is big enough. */
-function PlansThatFit({ ramGb }: { ramGb: number }) {
-  const fits = smallestPlansWithRam('game', ramGb)
+/**
+ * "GAME-1 ($3.60/mo) or P-GAME-1 ($12.00/mo)", or a way to ask when nothing is
+ * big enough. Rows sized "per map" (clusters) name the plan for each map,
+ * since every map in a cluster runs as its own server.
+ */
+function PlansThatFit({ row }: { row: RamRow }) {
+  const fits = smallestPlansWithRam('game', ramNeedGb(row))
+  const perMap = /per map/i.test(row.ram)
   if (fits.length === 0) {
     return (
       <Link href="/#contact" className="text-link underline underline-offset-4 hover:text-foreground">
@@ -34,6 +39,7 @@ function PlansThatFit({ ramGb }: { ramGb: number }) {
   }
   return fits.map(({ plan }, i) => (
     <span key={plan.name}>
+      {i === 0 && perMap && 'Per map: '}
       {i > 0 && ' or '}
       <span className="whitespace-nowrap">
         <span className="font-medium text-foreground">{plan.name}</span> ({formatPrice(plan.price)}/mo)
@@ -93,14 +99,15 @@ export default async function GamePage({ params }: PageProps) {
             title={`${game.name} server hosting`}
             breadcrumbs={[{ label: 'Games', href: '/games' }]}
             crumbLabel={game.name}
+            path={`/games/${game.slug}`}
           >
             <p>{game.description}</p>
           </PageHeader>
 
-          <div className="-mt-2 flex flex-col gap-3 sm:flex-row sm:items-center lg:hidden">
-            <Button asChild size="lg">
+          <div className="-mt-2 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:hidden">
+            <Button asChild size="lg" className="h-auto min-h-11 py-2.5 text-center whitespace-normal">
               <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-                Order a {game.name} server
+                Order your {game.name} server
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
             </Button>
@@ -116,12 +123,12 @@ export default async function GamePage({ params }: PageProps) {
             . Plans are not locked to one game, so you can switch titles any time.
           </p>
 
-        <section aria-labelledby="ram-heading" className="mt-16">
+        <section aria-labelledby="ram-heading" className="@container mt-16">
           <h2 id="ram-heading" className="text-2xl font-semibold tracking-tight text-foreground">
             How much RAM does {game.name} need?
           </h2>
-          {/* Table from sm up; stacked rows on phones, where three columns would crush the plan names. */}
-          <div className="mt-5 hidden overflow-hidden rounded-xl border sm:block">
+          {/* A table when there is room (measured in rem, so enlarged text counts); stacked rows otherwise, where three columns would crush the plan names. */}
+          <div className="mt-5 hidden overflow-hidden rounded-xl border @min-[36rem]:block">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">
                 Recommended RAM for {game.name} and the smallest plans that cover it
@@ -139,14 +146,14 @@ export default async function GamePage({ params }: PageProps) {
                     <th scope="row" className="px-4 py-3.5 font-medium text-foreground">{row.players}</th>
                     <td className="px-4 py-3.5 whitespace-nowrap text-foreground/90">{row.ram}</td>
                     <td className="px-4 py-3.5 text-muted-foreground tabular-nums">
-                      <PlansThatFit ramGb={ramNeedGb(row)} />
+                      <PlansThatFit row={row} />
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <ul className="mt-5 divide-y rounded-xl border sm:hidden">
+          <ul className="mt-5 divide-y rounded-xl border @min-[36rem]:hidden">
             {game.recommendedRam.map((row) => (
               <li key={row.players} className="p-4">
                 <p className="flex items-baseline justify-between gap-3">
@@ -154,7 +161,7 @@ export default async function GamePage({ params }: PageProps) {
                   <span className="shrink-0 text-sm whitespace-nowrap text-foreground/90">{row.ram}</span>
                 </p>
                 <p className="mt-1.5 text-sm text-muted-foreground tabular-nums">
-                  Fits: <PlansThatFit ramGb={ramNeedGb(row)} />
+                  Fits: <PlansThatFit row={row} />
                 </p>
               </li>
             ))}
@@ -183,9 +190,9 @@ export default async function GamePage({ params }: PageProps) {
                 </p>
               </>
             )}
-            <Button asChild size="lg" className="mt-6 w-full">
+            <Button asChild size="lg" className="mt-6 h-auto min-h-11 w-full py-2.5 text-center whitespace-normal">
               <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-                Order a {game.name} server
+                Order your {game.name} server
                 <span className="sr-only"> (opens in a new tab)</span>
               </a>
             </Button>
