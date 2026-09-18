@@ -12,15 +12,6 @@ export function Reviews() {
             {reviewsSection.title}
           </h2>
           <p className="mt-3 leading-relaxed text-muted-foreground">{reviewsSection.body}</p>
-        </div>
-        <div className="lg:max-w-xs">
-          <Button asChild size="lg">
-            <a href={siteConfig.trustpilot.profileUrl} target="_blank" rel="noopener noreferrer">
-              {reviewsSection.cta}
-              <ArrowUpRight aria-hidden="true" />
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
-          </Button>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
             {reviewsSection.ask}{' '}
             <a
@@ -33,6 +24,13 @@ export function Reviews() {
             </a>
           </p>
         </div>
+        <Button asChild size="lg" className="justify-self-start">
+          <a href={siteConfig.trustpilot.profileUrl} target="_blank" rel="noopener noreferrer">
+            {reviewsSection.cta}
+            <ArrowUpRight aria-hidden="true" />
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        </Button>
       </div>
     </section>
   )
