@@ -4,6 +4,7 @@ import { Header } from '@/components/layout/header'
 import { Footer } from '@/components/layout/footer'
 import { Button } from '@/components/ui/button'
 import { siteConfig } from '@/config/site'
+import { Main } from '@/components/layout/main'
 
 export const metadata: Metadata = {
   title: 'Page not found',
@@ -21,7 +22,7 @@ export default function NotFound() {
   return (
     <>
       <Header />
-      <main id="main-content" className="shell pt-20 pb-10 md:pt-28">
+      <Main className="shell pt-20 pb-10 md:pt-28">
         <p className="text-sm font-medium text-link">404</p>
         <h1 className="mt-3 font-serif text-5xl text-foreground italic md:text-6xl">This page does not exist.</h1>
         <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
@@ -46,7 +47,7 @@ export default function NotFound() {
             </a>
           </Button>
         </div>
-      </main>
+      </Main>
       <Footer />
     </>
   )

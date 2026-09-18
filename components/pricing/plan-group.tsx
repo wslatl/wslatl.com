@@ -62,12 +62,12 @@ export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
           {/* Fixed widths so tables with the same columns line up down the page. */}
           <colgroup>
             <col />
-            <col className="w-24" />
-            <col className="w-28" />
-            <col className="w-28" />
-            {showTraffic && <col className="w-28" />}
-            <col className="w-36" />
-            <col className="w-28" />
+            <col className="w-20 lg:w-24" />
+            <col className="w-[4.5rem] lg:w-28" />
+            <col className="w-[5.5rem] lg:w-28" />
+            {showTraffic && <col className="w-[4.5rem] lg:w-28" />}
+            <col className="w-28 lg:w-36" />
+            <col className="w-[6.5rem] lg:w-28" />
           </colgroup>
           <thead className="bg-card/50 text-muted-foreground">
             <tr>

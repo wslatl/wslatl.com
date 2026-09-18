@@ -14,6 +14,7 @@ import { siteConfig } from '@/config/site'
 import { cheapestPlanWithRam, formatPrice, productLine, smallestPlansWithRam } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
 import { slugify } from '@/lib/utils'
+import { Main } from '@/components/layout/main'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -65,7 +66,7 @@ export default async function GamePage({ params }: PageProps) {
         />
       )}
 
-      <main id="main-content" className="shell">
+      <Main className="shell">
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-14 xl:gap-20">
         <div className="min-w-0">
           <PageHeader
@@ -262,7 +263,7 @@ export default async function GamePage({ params }: PageProps) {
             </ul>
           </section>
         )}
-      </main>
+      </Main>
       <Footer />
     </>
   )

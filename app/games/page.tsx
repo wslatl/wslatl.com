@@ -6,6 +6,7 @@ import { GameDirectory, type GameListing } from '@/components/games/game-directo
 import { games, gameCategories, ramNeedGb } from '@/data/games'
 import { cheapestPlanWithRam, formatPrice, pricingHref, startingPrice } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
+import { Main } from '@/components/layout/main'
 
 // The four named in the title, plus the rest rounded down to a tidy "40+".
 const moreCount = Math.floor((games.length - 4) / 10) * 10
@@ -36,7 +37,7 @@ export default function GamesPage() {
   return (
     <>
       <Header />
-      <main id="main-content" className="shell">
+      <Main className="shell">
         <PageHeader title="Game server hosting" breadcrumbs={[]} crumbLabel="Games">
           <p>
             Every game runs on the same Pterodactyl-powered plans: you pick the RAM, not a game-locked
@@ -49,7 +50,7 @@ export default function GamesPage() {
         </PageHeader>
 
         <GameDirectory games={listings} categories={gameCategories} />
-      </main>
+      </Main>
       <Footer />
     </>
   )

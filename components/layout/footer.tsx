@@ -9,7 +9,7 @@ export function Footer() {
     <footer className="mt-24 border-t bg-card/20 print:hidden">
       <div className="shell grid gap-12 py-14 lg:grid-cols-[1.1fr_3fr]">
         <div className="max-w-xs">
-          <Link href="/" className="-m-1 inline-block rounded-md p-1" aria-label="WSLATL home">
+          <Link href="/" className="-m-1 inline-flex items-center rounded-md p-1" aria-label="WSLATL home">
             <Wordmark />
           </Link>
           <p className="mt-4 text-sm leading-relaxed text-muted-foreground">

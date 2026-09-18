@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useRef } from 'react'
 import { ArrowUpRight, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SiteLink, isExternal } from '@/components/ui/site-link'
@@ -20,29 +20,16 @@ function isCurrent(pathname: string, href: string) {
 
 export function Header() {
   const pathname = usePathname()
-  // The menu remembers which page it was opened on, so navigating anywhere
-  // (a link, back/forward) closes it without an effect.
-  const [menuPath, setMenuPath] = useState<string | null>(null)
-  const menuOpen = menuPath === pathname
-  const closeMenu = () => setMenuPath(null)
-
-  useEffect(() => {
-    if (!menuOpen) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuPath(null)
-    }
-    document.addEventListener('keydown', onKey)
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
-    }
-  }, [menuOpen])
+  // The mobile menu is a native popover: the browser opens and closes it
+  // (button, Escape, tap outside) with or without JavaScript. Script is only
+  // needed to close it after an in-app navigation keeps the page mounted.
+  const menuRef = useRef<HTMLDivElement>(null)
+  const closeMenu = () => menuRef.current?.hidePopover()
 
   return (
     <header className="site-header sticky top-0 z-50 border-b bg-background/85 backdrop-blur-md print:hidden">
       <div className="shell flex h-16 items-center gap-6">
-        <Link href="/" className="-m-1 shrink-0 rounded-md p-1" aria-label="WSLATL home">
+        <Link href="/" className="-m-1 flex shrink-0 items-center rounded-md p-1" aria-label="WSLATL home">
           <Wordmark />
         </Link>
 
@@ -87,62 +74,56 @@ export function Header() {
             variant="ghost"
             size="icon-sm"
             className="text-foreground lg:hidden"
-            onClick={() => setMenuPath(menuOpen ? null : pathname)}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
+            popoverTarget="mobile-menu"
+            aria-label="Menu"
           >
-            {menuOpen ? <X aria-hidden="true" className="size-5" /> : <Menu aria-hidden="true" className="size-5" />}
+            <Menu aria-hidden="true" className="menu-icon-closed size-5" />
+            <X aria-hidden="true" className="menu-icon-open hidden size-5" />
           </Button>
         </div>
       </div>
 
-      {menuOpen && (
-        <div
-          id="mobile-menu"
-          className="absolute inset-x-0 top-full h-[calc(100dvh-4rem)] overflow-y-auto border-t bg-background lg:hidden"
-        >
-          <nav aria-label="Main" className="shell py-4">
-            <ul className="divide-y divide-border">
-              {mainNav.map((link) => (
-                <li key={link.href}>
-                  <SiteLink
-                    href={link.href}
-                    onClick={closeMenu}
-                    aria-current={isCurrent(pathname, link.href) ? 'page' : undefined}
-                    className="flex items-center justify-between py-3.5 text-base font-medium text-foreground"
-                  >
-                    {link.label}
-                    {isExternal(link.href) && <ArrowUpRight aria-hidden="true" className="size-4 text-muted-foreground" />}
-                  </SiteLink>
-                </li>
-              ))}
-              <li>
-                <a
-                  href={siteConfig.links.discord}
-                  target="_blank"
-                  rel="noopener noreferrer"
+      <div id="mobile-menu" ref={menuRef} popover="auto" className="mobile-menu lg:hidden">
+        <nav aria-label="Main" className="shell py-4">
+          <ul className="divide-y divide-border">
+            {mainNav.map((link) => (
+              <li key={link.href}>
+                <SiteLink
+                  href={link.href}
                   onClick={closeMenu}
-                  className="flex items-center justify-between py-3.5 text-base font-medium text-foreground"
+                  aria-current={isCurrent(pathname, link.href) ? 'page' : undefined}
+                  className="flex items-center justify-between py-3.5 text-base font-medium text-foreground aria-[current=page]:text-link"
                 >
-                  Discord
-                  <span className="sr-only"> (opens in a new tab)</span>
-                  <ArrowUpRight aria-hidden="true" className="size-4 text-muted-foreground" />
-                </a>
+                  {link.label}
+                  {isExternal(link.href) && <ArrowUpRight aria-hidden="true" className="size-4 text-muted-foreground" />}
+                </SiteLink>
               </li>
-            </ul>
-            <Button asChild size="lg" className="mt-6 w-full">
-              <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
-                Get started
+            ))}
+            <li>
+              <a
+                href={siteConfig.links.discord}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={closeMenu}
+                className="flex items-center justify-between py-3.5 text-base font-medium text-foreground"
+              >
+                Discord
                 <span className="sr-only"> (opens in a new tab)</span>
+                <ArrowUpRight aria-hidden="true" className="size-4 text-muted-foreground" />
               </a>
-            </Button>
-            <p className="mt-3 text-center text-sm text-muted-foreground">
-              New accounts are reviewed by a person, usually the same day.
-            </p>
-          </nav>
-        </div>
-      )}
+            </li>
+          </ul>
+          <Button asChild size="lg" className="mt-6 w-full">
+            <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>
+              Get started
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </Button>
+          <p className="mt-3 text-center text-sm text-muted-foreground">
+            New accounts are reviewed by a person, usually the same day.
+          </p>
+        </nav>
+      </div>
     </header>
   )
 }

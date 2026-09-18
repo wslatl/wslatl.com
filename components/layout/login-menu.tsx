@@ -32,7 +32,11 @@ export function LoginMenu() {
           <DropdownMenuItem key={link.href} asChild>
             <a href={link.href} target="_blank" rel="noopener noreferrer" className="flex-col items-start gap-0.5">
               <span className="font-medium text-foreground">{link.label}</span>
-              <span className="text-xs text-muted-foreground">{link.description}</span>
+              <span className="text-xs text-muted-foreground">
+                <span className="sr-only">: </span>
+                {link.description}
+                <span className="sr-only"> (opens in a new tab)</span>
+              </span>
             </a>
           </DropdownMenuItem>
         ))}
@@ -42,7 +46,11 @@ export function LoginMenu() {
             <UserPlus aria-hidden="true" />
             <span className="flex flex-col">
               <span className="font-medium text-foreground">{requestAccessLink.label}</span>
-              <span className="text-xs text-muted-foreground">{requestAccessLink.description}</span>
+              <span className="text-xs text-muted-foreground">
+                <span className="sr-only">: </span>
+                {requestAccessLink.description}
+                <span className="sr-only"> (opens in a new tab)</span>
+              </span>
             </span>
           </a>
         </DropdownMenuItem>

@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { legalPages } from '@/data/legal'
 import { legalEffectiveDate } from '@/config/site'
 import { pageMetadata } from '@/lib/metadata'
+import { Main } from '@/components/layout/main'
 
 export const metadata = pageMetadata({
   title: 'Legal',
@@ -17,7 +18,7 @@ export default function LegalIndexPage() {
   return (
     <>
       <Header />
-      <main id="main-content" className="shell">
+      <Main className="shell">
         <PageHeader title="Legal" breadcrumbs={[]} crumbLabel="Legal">
           <p>
             Our policies, written to be read. Each one shows the date it took effect, and each one can
@@ -38,7 +39,7 @@ export default function LegalIndexPage() {
             </li>
           ))}
         </ul>
-      </main>
+      </Main>
       <Footer />
     </>
   )

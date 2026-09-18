@@ -11,6 +11,7 @@ import { productLines, type ProductLine } from '@/data/pricing'
 import { uptimeTarget } from '@/data/sla'
 import { formatPrice, specRanges, startingPrice } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
+import { Main } from '@/components/layout/main'
 
 export const metadata = pageMetadata({
   title: 'Cheap VPS & Game Server Hosting Pricing',
@@ -56,7 +57,7 @@ export default function PricingPage() {
   return (
     <>
       <Header />
-      <main id="main-content">
+      <Main>
         <div className="shell">
           <PageHeader title="Pricing">
             <p>
@@ -138,7 +139,7 @@ export default function PricingPage() {
             <HowItWorks compact />
           </div>
         </div>
-      </main>
+      </Main>
       <Footer />
     </>
   )

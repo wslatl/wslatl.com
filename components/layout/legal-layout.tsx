@@ -8,6 +8,7 @@ import { legalPages, type LegalPage } from '@/data/legal'
 import { legalEffectiveDate, siteConfig } from '@/config/site'
 import { pageMetadata } from '@/lib/metadata'
 import { cn, slugify } from '@/lib/utils'
+import { Main } from '@/components/layout/main'
 
 export function legalMetadata(page: LegalPage) {
   return pageMetadata({ title: page.title, description: page.metaDescription, path: page.href })
@@ -132,7 +133,7 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
   return (
     <>
       <Header />
-      <main id="main-content" className="shell">
+      <Main className="shell">
         <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[15rem_minmax(0,1fr)] xl:gap-16">
           <aside className="hidden lg:block print:hidden">
             <div className="sticky top-16 max-h-[calc(100dvh-4rem)] space-y-10 overflow-y-auto pt-24 pb-10">
@@ -216,7 +217,7 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
             </aside>
           </div>
         </div>
-      </main>
+      </Main>
       <Footer />
     </>
   )

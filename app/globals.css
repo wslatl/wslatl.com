@@ -126,6 +126,33 @@
   }
 }
 
+/* ----- Mobile menu: a native popover under the header ----- */
+.mobile-menu {
+  position: fixed;
+  inset: 4rem 0 0 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border: 0;
+  border-top: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+}
+/* Lock page scroll while the menu covers it, and swap the button icon. */
+@media (width < 64rem) {
+  body:has(.mobile-menu:popover-open) {
+    overflow: hidden;
+  }
+}
+header:has(.mobile-menu:popover-open) .menu-icon-closed {
+  display: none;
+}
+header:has(.mobile-menu:popover-open) .menu-icon-open {
+  display: block;
+}
+
 /* ----- Hero entrance: the one orchestrated motion on the site ----- */
 @keyframes rise {
   from {

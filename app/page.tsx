@@ -12,6 +12,7 @@ import { FAQ } from '@/components/sections/faq'
 import { Contact } from '@/components/sections/contact'
 import { faqs } from '@/data/faqs'
 import { pageMetadata } from '@/lib/metadata'
+import { Main } from '@/components/layout/main'
 
 export const metadata = pageMetadata({
   title: 'Cheap VPS & Game Server Hosting | WSLATL LLC',
@@ -36,7 +37,7 @@ export default function Home() {
     <>
       <Header />
       <JsonLd data={faqJsonLd} />
-      <main id="main-content">
+      <Main>
         <Hero />
         <Clients />
         <Services />
@@ -46,7 +47,7 @@ export default function Home() {
         <Reviews />
         <FAQ faqs={faqs} />
         <Contact />
-      </main>
+      </Main>
       <Footer />
     </>
   )
