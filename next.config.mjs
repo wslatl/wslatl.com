@@ -1,6 +1,4 @@
-/**
- * @type {import('next').NextConfig}
- */
+import shortLinks from './config/links.json' with { type: 'json' }
 
 const legalSlugs = [
   'privacy',
@@ -66,6 +64,7 @@ const securityHeaders = [
   },
 ]
 
+/** @satisfies {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
   images: {
@@ -95,6 +94,11 @@ const nextConfig = {
       // licensed partners), so their pages are gone.
       { source: '/games/battlefield-2042-portal', destination: '/games', permanent: true },
       { source: '/games/hell-let-loose', destination: '/games', permanent: true },
+      // Short links: /billing, /discord, and the rest. Every page links to
+      // these paths instead of the panel or profile itself, so a destination
+      // changes in config/links.json alone. Temporary on purpose: browsers
+      // cache permanent redirects and would keep using an old destination.
+      ...Object.values(shortLinks).map(({ path, url }) => ({ source: path, destination: url, permanent: false })),
     ]
   },
 }

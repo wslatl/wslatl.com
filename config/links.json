@@ -1,0 +1,13 @@
+{
+  "billing": { "path": "/billing", "url": "https://billing.wslatl.com" },
+  "register": { "path": "/register", "url": "https://billing.wslatl.com/register" },
+  "gamingPanel": { "path": "/game-panel", "url": "https://panel.wslatl.com" },
+  "vpsPanel": { "path": "/vps-panel", "url": "https://vps.wslatl.com" },
+  "dedicated": { "path": "/dedicated-portal", "url": "https://dedicated.wslatl.com/" },
+  "cPanel": { "path": "/cpanel", "url": "https://r3.directdns.com:2083/" },
+  "status": { "path": "/status", "url": "https://status.wslatl.com" },
+  "discord": { "path": "/discord", "url": "https://discord.gg/3eKawhSbAF" },
+  "github": { "path": "/github", "url": "https://github.com/wslatl" },
+  "trustpilot": { "path": "/trustpilot", "url": "https://www.trustpilot.com/review/wslatl.com" },
+  "credits": { "path": "/rejectmodders", "url": "https://rejectmodders.dev" }
+}

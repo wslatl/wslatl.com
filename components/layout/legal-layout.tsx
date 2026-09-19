@@ -9,6 +9,7 @@ import { legalEffectiveDate, siteConfig } from '@/config/site'
 import { pageMetadata } from '@/lib/metadata'
 import { cn, slugify } from '@/lib/utils'
 import { Main } from '@/components/layout/main'
+import { Email } from '@/components/ui/email'
 
 export function legalMetadata(page: LegalPage) {
   return pageMetadata({ title: page.title, description: page.metaDescription, path: page.href })
@@ -40,7 +41,7 @@ export function LegalSubSection({ title, children }: { title: string; children: 
   return (
     <div className="border-l-2 border-primary/30 pl-4 sm:pl-5">
       <h3 className="mb-3 text-sm font-semibold text-foreground">{title}</h3>
-      <div className="space-y-3 text-[0.9375rem] leading-[1.75] text-muted-foreground">{children}</div>
+      <div className="space-y-4 text-[0.9375rem] leading-[1.75] text-muted-foreground">{children}</div>
     </div>
   )
 }
@@ -135,8 +136,10 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
       <Header />
       <Main className="shell">
         <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[15rem_minmax(0,1fr)] xl:gap-16">
-          <aside className="hidden lg:block print:hidden">
-            <div className="scroll-quiet sticky top-16 max-h-[calc(100dvh-4rem)] space-y-10 overflow-y-auto pt-24 pb-10">
+          {/* The offset lives on the aside, so once the sidebar sticks it sits
+              just under the header instead of 6rem down the screen. */}
+          <aside className="hidden pt-16 lg:block print:hidden">
+            <div className="scroll-quiet scroll-fade sticky top-16 max-h-[calc(100dvh-4rem)] space-y-10 overflow-y-auto pt-8 pb-10">
               <nav aria-label="On this page">
                 <p className="mb-3 text-sm font-semibold text-foreground">On this page</p>
                 <TocList entries={toc} />
@@ -170,9 +173,7 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
               <div className="flex gap-2">
                 <dt className="text-muted-foreground">Questions</dt>
                 <dd>
-                  <a href={`mailto:${siteConfig.email.support}`} className="font-medium text-link hover:text-foreground">
-                    {siteConfig.email.support}
-                  </a>
+                  <Email name="support" className="font-medium text-link hover:text-foreground" />
                 </dd>
               </div>
             </dl>
@@ -203,9 +204,7 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
                 We are a small team. You can actually talk to us.
               </p>
               <p className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
-                <a href={`mailto:${siteConfig.email.support}`} className="text-link underline underline-offset-4 hover:text-foreground">
-                  {siteConfig.email.support}
-                </a>
+                <Email name="support" className="text-link underline underline-offset-4 hover:text-foreground" />
                 <a
                   href={siteConfig.links.discord}
                   target="_blank"

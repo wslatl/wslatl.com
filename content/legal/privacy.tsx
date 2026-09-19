@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
+import { CompanyContact, ScrollTable, Tier, Tiers } from '@/components/legal/blocks'
+import { Email } from '@/components/ui/email'
 
 export default function PrivacyContent() {
   return (
@@ -24,25 +26,25 @@ export default function PrivacyContent() {
             Hosting involves two different kinds of data, and our legal role is different for
             each. The distinction matters, so it is worth stating plainly.
           </p>
-          <ul className="list-disc pl-5 space-y-2 mt-2">
+          <ul>
             <li>
-              <span className="text-foreground font-medium">Your account data.</span> The
+              <strong>Your account data.</strong> The
               information you give us so we can open and run your account: your name, contact
               details, billing records, support tickets, and the panel activity described in
               Section 2. For this data, WSLATL is the{' '}
-              <span className="text-foreground font-medium">controller</span>. We decide what is
+              <strong>controller</strong>. We decide what is
               collected and why, and this Privacy Policy describes that decision.
             </li>
             <li>
-              <span className="text-foreground font-medium">Data you put on your own services.</span>{' '}
+              <strong>Data you put on your own services.</strong>{' '}
               Whatever you or your users store on a server we host for you: databases, game server
               data, uploaded files, website content, application logs. For this data, WSLATL is a{' '}
-              <span className="text-foreground font-medium">processor</span>, not the controller.
+              <strong>processor</strong>, not the controller.
               We store and transmit it so the service works, and we do not decide what you collect
               or why you collect it.
             </li>
           </ul>
-          <p className="mt-3">
+          <p>
             If you host other people&rsquo;s personal data on a WSLATL service, you are the
             controller of it. The obligations that come with that role are yours: having a lawful
             basis for the processing, giving notice to your own users, honoring their rights
@@ -55,9 +57,7 @@ export default function PrivacyContent() {
             necessary to provide, maintain, or secure the service, or where we are legally
             required to. If you need a data processing agreement covering our role as processor,
             contact us at{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>
-              {siteConfig.email.support}
-            </a>.
+            <Email name="support" />.
           </p>
         </LegalSubSection>
       </LegalSection>
@@ -67,7 +67,7 @@ export default function PrivacyContent() {
 
         <LegalSubSection title="2.1 Account & Registration Information">
           <p>When you apply for or create an account, we collect:</p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+          <ul>
             <li>Full name</li>
             <li>Email address</li>
             <li>Billing address</li>
@@ -86,9 +86,9 @@ export default function PrivacyContent() {
             </li>
             <li>Any information you voluntarily provide during the application or onboarding process</li>
           </ul>
-          <p className="mt-3">
+          <p>
             We also maintain an{' '}
-            <span className="text-foreground font-medium">account credit ledger</span> for your
+            <strong>account credit ledger</strong> for your
             account, recording every change to your credit balance including top-up purchases,
             credits we issue, amounts applied to invoices, gifts sent or received, and the date,
             amount, and reason for each entry. This ledger is retained as part of your billing
@@ -103,7 +103,7 @@ export default function PrivacyContent() {
             Payments are processed through our billing portal using third-party payment processors that
             are PCI-DSS compliant. We do not store your full card number or CVV. We retain:
           </p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+          <ul>
             <li>Invoice history and billing records</li>
             <li>Payment method type (card brand, last four digits)</li>
             <li>Transaction IDs and dates</li>
@@ -113,7 +113,7 @@ export default function PrivacyContent() {
 
         <LegalSubSection title="2.3 Service & Usage Data">
           <p>When you use our hosting services, we collect:</p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+          <ul>
             <li>IP addresses assigned to or used by your services</li>
             <li>Server resource utilization (CPU, RAM, bandwidth, disk usage)</li>
             <li>Access and activity logs for control panels and dashboards</li>
@@ -125,7 +125,7 @@ export default function PrivacyContent() {
 
         <LegalSubSection title="2.4 Communications Data">
           <p>When you contact us, we retain records of:</p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+          <ul>
             <li>Support tickets and their full contents</li>
             <li>Discord communications (messages in our server or direct messages with our team)</li>
             <li>Email correspondence</li>
@@ -135,7 +135,7 @@ export default function PrivacyContent() {
 
         <LegalSubSection title="2.5 Website Data">
           <p>When you visit wslatl.com, we may collect:</p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+          <ul>
             <li>IP address and general geographic region</li>
             <li>Browser type and operating system</li>
             <li>Pages visited and time spent on the site</li>
@@ -147,7 +147,7 @@ export default function PrivacyContent() {
 
       <LegalSection number="3" title="How We Use Your Information">
         <p>We use the information we collect exclusively to:</p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>Provision, operate, and maintain your hosting services</li>
           <li>Process payments, generate invoices, and manage your billing account</li>
           <li>Verify your identity and prevent fraudulent account creation</li>
@@ -159,7 +159,7 @@ export default function PrivacyContent() {
           <li>Send service-related communications such as maintenance notices, billing alerts, and account updates</li>
           <li>Improve our services and infrastructure based on usage patterns</li>
         </ul>
-        <p className="mt-4 font-medium text-foreground">
+        <p className="font-medium text-foreground">
           We do not use your data for advertising. We do not sell, rent, or trade your personal information
           to any third party for any commercial purpose.
         </p>
@@ -177,7 +177,7 @@ export default function PrivacyContent() {
             only the data necessary to perform their function and are contractually required to protect
             that data. This includes:
           </p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+          <ul>
             <li>Payment processors (to handle billing transactions)</li>
             <li>Data center and infrastructure partners (for physical server hosting)</li>
             <li>Bot and abuse protection, content delivery, and DNS providers</li>
@@ -185,7 +185,7 @@ export default function PrivacyContent() {
             <li>Address autocomplete and geocoding for address entry forms</li>
             <li>Status monitoring services (e.g., status.wslatl.com)</li>
           </ul>
-          <p className="mt-3">
+          <p>
             We publish the individual providers, not just these categories. Each subprocessor is
             named on our{' '}
             <Link href={siteConfig.paths.subprocessors}>Subprocessors</Link>{' '}
@@ -206,7 +206,7 @@ export default function PrivacyContent() {
           <p>
             We may share IP addresses, network logs, or other technical data with:
           </p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+          <ul>
             <li>Other hosting providers investigating abuse originating from our network</li>
             <li>Abuse registries (e.g., AbuseIPDB) when addressing confirmed network abuse</li>
             <li>Law enforcement agencies when investigating illegal activity</li>
@@ -243,16 +243,14 @@ export default function PrivacyContent() {
             <Link href={siteConfig.paths.subprocessors}>Subprocessors</Link>{' '}
             page. If you need a data processing agreement or a copy of the clauses as we apply
             them, contact us at{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>
-              {siteConfig.email.support}
-            </a>.
+            <Email name="support" />.
           </p>
         </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="5" title="Data Retention">
         <p>We retain your data for the following periods:</p>
-        <div className="overflow-x-auto mt-3">
+        <ScrollTable label="Data retention periods">
           <table className="legal-table">
             <thead>
               <tr>
@@ -283,8 +281,8 @@ export default function PrivacyContent() {
               </tr>
             </tbody>
           </table>
-        </div>
-        <p className="mt-4">
+        </ScrollTable>
+        <p>
           Data may be retained beyond these periods if required by applicable law, an ongoing legal
           proceeding, or a legitimate business dispute.
         </p>
@@ -294,20 +292,20 @@ export default function PrivacyContent() {
         <p>
           Protecting your data is a core responsibility we take seriously. Our security measures include:
         </p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>Encryption of sensitive data at rest and in transit (HTTPS/TLS for all panels and portals)</li>
           <li>Hashed and salted password storage: plaintext passwords are never stored or visible to us</li>
           <li>Strict internal access controls limiting who on our team can view customer data</li>
           <li>Regular review and hardening of our hosting infrastructure</li>
           <li>Monitoring for unusual access patterns and potential intrusions</li>
         </ul>
-        <p className="mt-4">
+        <p>
           No transmission over the internet is 100% secure. While we use industry-standard protections,
           we cannot guarantee absolute security. If you believe your account has been compromised,
           contact us immediately at{' '}
-          <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>.
+          <Email name="support" />.
         </p>
-        <p className="mt-3">
+        <p>
           In the event of a data breach that affects your information, we will notify you in accordance
           with applicable law, including Missouri&apos;s data breach notification statute
           (Mo. Rev. Stat. &sect;&nbsp;407.1500), as promptly as circumstances allow.
@@ -318,18 +316,18 @@ export default function PrivacyContent() {
         <p>
           We use cookies minimally and only where necessary. Our use of cookies includes:
         </p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>
-            <span className="text-foreground font-medium">Session cookies:</span> Required to keep you
+            <strong>Session cookies:</strong> Required to keep you
             logged in to our billing portal and hosting panels. These expire when you close your browser
             or log out.
           </li>
           <li>
-            <span className="text-foreground font-medium">Preference cookies:</span> May store display
+            <strong>Preference cookies:</strong> May store display
             preferences or settings you have chosen within our panels.
           </li>
         </ul>
-        <p className="mt-4">
+        <p>
           We do not use third-party advertising cookies, tracking pixels, or behavioral analytics tools
           on wslatl.com. You can manage or disable cookies in your browser settings, but doing so may
           affect the functionality of authenticated areas like our billing portal and hosting panels.
@@ -340,27 +338,27 @@ export default function PrivacyContent() {
         <p>
           Depending on your location, you may have the following rights regarding your personal data:
         </p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
-          <li><span className="text-foreground font-medium">Access:</span> Request a copy of the personal data we hold about you.</li>
-          <li><span className="text-foreground font-medium">Correction:</span> Request that we correct inaccurate or incomplete data.</li>
-          <li><span className="text-foreground font-medium">Deletion:</span> Request deletion of your personal data, subject to legal retention requirements.</li>
-          <li><span className="text-foreground font-medium">Portability:</span> Request your data in a structured, machine-readable format.</li>
-          <li><span className="text-foreground font-medium">Restriction:</span> Request that we limit how we process your data.</li>
-          <li><span className="text-foreground font-medium">Objection:</span> Object to certain types of data processing.</li>
+        <ul>
+          <li><strong>Access:</strong> Request a copy of the personal data we hold about you.</li>
+          <li><strong>Correction:</strong> Request that we correct inaccurate or incomplete data.</li>
+          <li><strong>Deletion:</strong> Request deletion of your personal data, subject to legal retention requirements.</li>
+          <li><strong>Portability:</strong> Request your data in a structured, machine-readable format.</li>
+          <li><strong>Restriction:</strong> Request that we limit how we process your data.</li>
+          <li><strong>Objection:</strong> Object to certain types of data processing.</li>
         </ul>
-        <p className="mt-4">
+        <p>
           To exercise any of these rights, contact us at{' '}
-          <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>.
+          <Email name="support" />.
           We will respond within 30 days. We may need to verify your identity before processing your request.
         </p>
-        <p className="mt-3">
-          <span className="text-foreground font-medium">California residents</span> may have additional
+        <p>
+          <strong>California residents</strong> may have additional
           rights under the California Consumer Privacy Act (CCPA) and California Privacy Rights Act (CPRA),
           including the right to know what personal information is sold or shared and the right to opt out.
           We do not sell personal information, so opt-out rights under CCPA do not apply.
         </p>
-        <p className="mt-3">
-          <span className="text-foreground font-medium">EEA/UK residents</span> have rights under the
+        <p>
+          <strong>EEA/UK residents</strong> have rights under the
           GDPR and UK GDPR, including the rights listed above. Our legal basis for processing your data
           is primarily the performance of a contract (providing services you requested) and compliance
           with legal obligations. Transfers of your data outside the EEA or UK are described in
@@ -384,9 +382,7 @@ export default function PrivacyContent() {
             You do not have to come to us first, and exercising this right does not affect any
             other remedy available to you. That said, we would genuinely rather hear about a
             problem directly. Write to{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>
-              {siteConfig.email.support}
-            </a>{' '}
+            <Email name="support" />{' '}
             and we will take it seriously.
           </p>
         </LegalSubSection>
@@ -409,18 +405,15 @@ export default function PrivacyContent() {
       <LegalSection number="9" title="Age Requirements & Children's Privacy">
         <p>We have a strict three-tier age policy that applies to our website, billing portal, and all hosting services:</p>
 
-        <div className="mt-4 space-y-4">
-          <div className="legal-callout border-red-500/30 text-red-300">
-            <strong>Under 13: Not Permitted</strong>
+        <Tiers>
+          <Tier tone="critical" title="Under 13: Not Permitted">
             Individuals under the age of 13 are strictly prohibited from using any WSLATL service,
             including our website, billing portal, and hosting panels. We do not knowingly collect
             personal information from anyone under 13. If we discover or are notified that a user
             is under 13, their account will be immediately and permanently banned and all associated
             data will be deleted. We take this seriously and have zero tolerance for underage access.
-          </div>
-
-          <div className="legal-callout border-yellow-500/30 text-yellow-300">
-            <strong>Ages 13 to 17: Permitted With Adult Consent</strong>
+          </Tier>
+          <Tier tone="caution" title="Ages 13 to 17: Permitted With Adult Consent">
             We welcome users aged 13 through 17, but a parent or legal guardian must provide
             explicit consent before the account is used. By registering or using our services,
             users in this age group confirm that a parent or guardian has reviewed and agreed to
@@ -428,20 +421,18 @@ export default function PrivacyContent() {
             The consenting adult assumes full responsibility for the minor&apos;s account activity
             and any associated charges. If we discover an account in this age range was created
             without adult consent, we will suspend the account until valid consent is provided.
-          </div>
-
-          <div className="legal-callout border-green-500/30 text-green-300">
-            <strong>18 and Over: Fully Permitted</strong>
+          </Tier>
+          <Tier tone="good" title="18 and Over: Fully Permitted">
             Adults 18 years of age or older may register and use our services without any
             additional consent requirements, subject to account approval under our application-only
             model and compliance with our Terms and Acceptable Use Policy.
-          </div>
-        </div>
+          </Tier>
+        </Tiers>
 
-        <p className="mt-4">
+        <p>
           If you are a parent or guardian and believe your child under 13 has registered with us or
           provided us with personal information without your knowledge, contact us immediately at{' '}
-          <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>.
+          <Email name="support" />.
           We will permanently remove the account and all associated data as quickly as possible.
         </p>
       </LegalSection>
@@ -460,12 +451,12 @@ export default function PrivacyContent() {
           We may update this Privacy Policy from time to time to reflect changes in our practices,
           legal requirements, or services. When we make material changes, we will:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
+        <ul>
           <li>Update the &ldquo;Effective Date&rdquo; at the top of this page</li>
           <li>Notify active clients via email with a summary of what changed</li>
           <li>Post the updated policy at {siteConfig.paths.privacy}</li>
         </ul>
-        <p className="mt-4">
+        <p>
           Your continued use of our services after the effective date of any changes constitutes your
           acceptance of the updated Privacy Policy. If you disagree with material changes, you may
           cancel your service before the effective date.
@@ -476,27 +467,7 @@ export default function PrivacyContent() {
         <p>
           Questions, concerns, or requests related to this Privacy Policy should be directed to:
         </p>
-        <div className="mt-4 p-5 rounded-xl border border-border/70 bg-card/30 space-y-1.5 text-sm relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p className="font-semibold text-foreground">WSLATL LLC</p>
-          <p>Missouri, United States</p>
-          <p>
-            Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
-            {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
-          </p>
-          <p>
-            Discord:{' '}
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteConfig.legal.discordVanity}
-            </a>
-          </p>
-        </div>
+        <CompanyContact />
       </LegalSection>
     </>
   )

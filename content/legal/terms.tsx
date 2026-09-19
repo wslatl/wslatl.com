@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
 import { UptimeTable } from '@/components/legal/uptime-table'
+import { CompanyContact, InfoCard, InfoRow } from '@/components/legal/blocks'
+import { Email } from '@/components/ui/email'
 
 export default function TermsContent() {
   return (
@@ -12,7 +14,7 @@ export default function TermsContent() {
           (&ldquo;WSLATL,&rdquo; &ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;), you
           (&ldquo;Client,&rdquo; &ldquo;you,&rdquo; or &ldquo;your&rdquo;) confirm that:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
+        <ul>
           <li>
             You meet our age requirements: you are either (a) 18 years of age or older, or (b) between
             the ages of 13 and 17 and have obtained the explicit consent of a parent or legal guardian
@@ -24,7 +26,7 @@ export default function TermsContent() {
           <li>You have read, understood, and agree to be bound by these Terms of Service, our Privacy Policy, and our Acceptable Use Policy</li>
           <li>If you are accepting on behalf of a company or other legal entity, you have the authority to bind that entity to these terms</li>
         </ul>
-        <p className="mt-4">
+        <p>
           If you do not agree to these terms, do not use our services. These Terms, together with our
           Privacy Policy and Acceptable Use Policy, form the complete agreement between you and WSLATL LLC.
         </p>
@@ -35,13 +37,13 @@ export default function TermsContent() {
           WSLATL LLC provides private, application-based hosting services to approved clients. Our
           services include, but are not limited to:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
-          <li><span className="text-foreground font-medium">Dedicated Servers:</span> Physical server hardware provisioned exclusively for a single client, available managed or unmanaged</li>
-          <li><span className="text-foreground font-medium">Game Server Hosting:</span> Game servers managed through the Pterodactyl panel, supporting titles including Minecraft, Rust, CS2, ARK, Valheim, FiveM, and others</li>
-          <li><span className="text-foreground font-medium">VPS Hosting:</span> Isolated virtual private servers with full root access and your choice of operating system</li>
-          <li><span className="text-foreground font-medium">Web Hosting:</span> Managed hosting for websites and web applications including SSL, backups, and support</li>
+        <ul>
+          <li><strong>Dedicated Servers:</strong> Physical server hardware provisioned exclusively for a single client, available managed or unmanaged</li>
+          <li><strong>Game Server Hosting:</strong> Game servers managed through the Pterodactyl panel, supporting titles including Minecraft, Rust, CS2, ARK, Valheim, FiveM, and others</li>
+          <li><strong>VPS Hosting:</strong> Isolated virtual private servers with full root access and your choice of operating system</li>
+          <li><strong>Web Hosting:</strong> Managed hosting for websites and web applications including SSL, backups, and support</li>
         </ul>
-        <p className="mt-4">
+        <p>
           Services are subject to availability and may be modified, expanded, or discontinued at our
           discretion with reasonable notice to affected clients.
         </p>
@@ -49,15 +51,15 @@ export default function TermsContent() {
         <LegalSubSection title="2.1 Backups & Responsibility for Your Data">
           <p>
             Where a service includes backups, those backups are provided on a{' '}
-            <span className="text-foreground font-medium">best-effort basis</span> and are a
+            <strong>best-effort basis</strong> and are a
             convenience rather than a guarantee. We do not warrant that a backup exists for any
             particular service at any particular time, that a backup is complete or restorable, or
             that a restore will succeed.
           </p>
           <p>
-            <span className="text-foreground font-medium">
+            <strong>
               You are responsible for maintaining your own independent backups
-            </span>{' '}
+            </strong>{' '}
             of any data you cannot afford to lose, stored somewhere other than the WSLATL service
             that produced it. Any backup we provide is not a substitute for your own copies. This
             allocation of responsibility is a material part of the pricing of our services and
@@ -81,13 +83,13 @@ export default function TermsContent() {
           WSLATL operates as a private, application-only hosting company. Access to our services is
           not automatic and requires review and approval by our team. The following conditions apply:
         </p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>You must submit an application through our billing portal at billing.wslatl.com and be explicitly approved before any services are provisioned</li>
           <li>We reserve the right to decline any application at our sole discretion, without obligation to provide a reason</li>
           <li>You must provide accurate, current, and complete information during registration and keep it up to date</li>
           <li>You are solely responsible for maintaining the security of your account credentials, including your password and any API keys</li>
           <li>One account per individual or business entity is permitted unless we have expressly authorized additional accounts in writing</li>
-          <li>You must notify us immediately at {siteConfig.email.support} if you suspect unauthorized access to your account</li>
+          <li>You must notify us immediately at <Email name="support" /> if you suspect unauthorized access to your account</li>
           <li>Sharing your account credentials with any third party is prohibited unless explicitly permitted in writing</li>
         </ul>
       </LegalSection>
@@ -116,9 +118,9 @@ export default function TermsContent() {
             Services are considered past due if payment is not received by the invoice due date.
             The following applies to overdue accounts:
           </p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
-            <li>Services may be suspended if payment is not received within <span className="text-foreground font-medium">7 days</span> of the due date</li>
-            <li>Suspended services may be terminated and data permanently deleted if payment is not received within <span className="text-foreground font-medium">14 days</span> of suspension</li>
+          <ul>
+            <li>Services may be suspended if payment is not received within <strong>7 days</strong> of the due date</li>
+            <li>Suspended services may be terminated and data permanently deleted if payment is not received within <strong>14 days</strong> of suspension</li>
             <li>WSLATL is not liable for data loss, business interruption, or any other damages resulting from service suspension or termination due to non-payment</li>
             <li>A reactivation fee may apply to services that were suspended for non-payment</li>
           </ul>
@@ -138,7 +140,7 @@ export default function TermsContent() {
         <LegalSubSection title="4.5 Price Changes">
           <p>
             WSLATL reserves the right to change service pricing. We will provide at least{' '}
-            <span className="text-foreground font-medium">30 days&rsquo; written notice</span> of any
+            <strong>30 days&rsquo; written notice</strong> of any
             price increase via email to your registered address. Existing services will be honored at
             the current price until the first renewal date following that notice period.
           </p>
@@ -165,7 +167,7 @@ export default function TermsContent() {
 
         <LegalSubSection title="5.1 Uptime Targets">
           <UptimeTable />
-          <p className="mt-3">
+          <p>
             Uptime is measured per calendar month and excludes scheduled maintenance windows and
             downtime caused by events outside our reasonable control (see Section 15, Force Majeure).
           </p>
@@ -173,7 +175,7 @@ export default function TermsContent() {
 
         <LegalSubSection title="5.2 Scheduled Maintenance">
           <p>
-            We will provide at least <span className="text-foreground font-medium">24 hours&rsquo; advance notice</span> for
+            We will provide at least <strong>24 hours&rsquo; advance notice</strong> for
             scheduled maintenance windows via our status page (status.wslatl.com) and/or email to
             affected clients. Emergency maintenance required to protect service integrity or security
             may be performed without prior notice, though we will communicate as quickly as possible.
@@ -183,13 +185,13 @@ export default function TermsContent() {
         <LegalSubSection title="5.3 SLA Credits">
           <p>
             If we fail to meet the applicable uptime target due to our fault, you may request a service
-            credit equal to <span className="text-foreground font-medium">10% of the affected service&apos;s monthly cost</span> per
+            credit equal to <strong>10% of the affected service&apos;s monthly cost</strong> per
             qualifying incident. Credits are applied to your account balance and will not exceed the
             cost of one full month of the affected service. Service credits are your sole and exclusive
             remedy for uptime failures and do not entitle you to a cash refund.
           </p>
-          <p className="mt-2">
-            To request a credit, contact us within 15 days of the incident at {siteConfig.email.support} with
+          <p>
+            To request a credit, contact us within 15 days of the incident at <Email name="support" /> with
             the date, duration, and nature of the outage.
           </p>
         </LegalSubSection>
@@ -240,13 +242,16 @@ export default function TermsContent() {
           In summary: if you believe that content hosted on WSLATL infrastructure infringes your
           copyright, send a written DMCA takedown notice to:
         </p>
-        <div className="mt-3 p-4 rounded-xl border border-border/70 bg-card/30 text-sm space-y-1 relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/3 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p><span className="text-foreground font-medium">Email:</span> {siteConfig.email.support}</p>
-          <p><span className="text-foreground font-medium">Subject Line:</span> DMCA Takedown Notice</p>
-        </div>
-        <p className="mt-4">Your notice must include, under penalty of perjury:</p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
+        <InfoCard>
+          <InfoRow label="Email">
+            <Email name="support" />
+          </InfoRow>
+          <InfoRow label="Subject line">
+            DMCA Takedown Notice
+          </InfoRow>
+        </InfoCard>
+        <p>Your notice must include, under penalty of perjury:</p>
+        <ul>
           <li>Your contact information (name, address, phone number, email)</li>
           <li>A description of the copyrighted work you claim has been infringed</li>
           <li>Identification of the allegedly infringing material and its location on our infrastructure</li>
@@ -254,7 +259,7 @@ export default function TermsContent() {
           <li>A statement that the information in the notice is accurate and, under penalty of perjury, that you are the copyright owner or authorized to act on behalf of the owner</li>
           <li>Your physical or electronic signature</li>
         </ul>
-        <p className="mt-4">
+        <p>
           Counter-notices may be submitted to the same email address, and must meet the
           requirements set out in Section 4 of our{' '}
           <Link href={siteConfig.paths.dmca}>DMCA Policy</Link>.
@@ -280,7 +285,7 @@ export default function TermsContent() {
           <p>
             We may suspend or terminate your services immediately and without prior notice if:
           </p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+          <ul>
             <li>You violate these Terms, the Acceptable Use Policy, or our Privacy Policy</li>
             <li>You have outstanding unpaid invoices past the grace period (see Section 4.3)</li>
             <li>Your activities pose an active risk to our network infrastructure, other clients, or third parties on the internet</li>
@@ -294,7 +299,7 @@ export default function TermsContent() {
           <p>
             Upon termination of your account:
           </p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+          <ul>
             <li>Access to all services and panels will be revoked immediately</li>
             <li>Your data may be recovered on request for a limited window of up to 14 days after termination; after that window any remaining data is permanently and irreversibly deleted, and in all cases no later than 90 days after account closure, consistent with the retention table in our Privacy Policy</li>
             <li>Any data recovery requests must be made within the 14-day recovery window and are subject to our discretion</li>
@@ -310,14 +315,14 @@ export default function TermsContent() {
           OF ANY KIND, EITHER EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW,
           WSLATL LLC EXPRESSLY DISCLAIMS ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2 uppercase text-sm">
+        <ul className="uppercase">
           <li>Implied warranties of merchantability and fitness for a particular purpose</li>
           <li>Warranties of non-infringement</li>
           <li>Warranties that services will be uninterrupted, error-free, or free of harmful components</li>
           <li>Warranties that defects will be corrected within any specific timeframe</li>
           <li>Warranties regarding the accuracy or completeness of any content</li>
         </ul>
-        <p className="mt-4">
+        <p>
           Some jurisdictions do not allow the exclusion of certain warranties. In those jurisdictions,
           our disclaimers apply to the maximum extent permitted by law.
         </p>
@@ -328,20 +333,20 @@ export default function TermsContent() {
           TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, WSLATL LLC AND ITS MEMBERS, MANAGERS,
           OFFICERS, EMPLOYEES, CONTRACTORS, AND AGENTS SHALL NOT BE LIABLE FOR ANY:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2 uppercase text-sm">
+        <ul className="uppercase">
           <li>Indirect, incidental, special, consequential, or punitive damages</li>
           <li>Loss of profits, revenue, data, goodwill, or business opportunities</li>
           <li>Damages arising from unauthorized access to or alteration of your data</li>
           <li>Damages arising from your reliance on information obtained through our services</li>
           <li>Damages caused by events outside our reasonable control</li>
         </ul>
-        <p className="mt-4">
+        <p>
           OUR TOTAL CUMULATIVE LIABILITY TO YOU FOR ALL CLAIMS ARISING FROM OR RELATED TO THESE
           TERMS OR YOUR USE OF OUR SERVICES SHALL NOT EXCEED THE TOTAL AMOUNT YOU PAID TO WSLATL LLC
-          IN THE <span className="font-bold">THREE (3) MONTHS</span> IMMEDIATELY PRECEDING THE EVENT
+          IN THE <strong>THREE (3) MONTHS</strong> IMMEDIATELY PRECEDING THE EVENT
           GIVING RISE TO THE CLAIM.
         </p>
-        <p className="mt-3">
+        <p>
           Some jurisdictions do not permit certain liability limitations. In those jurisdictions,
           our liability is limited to the fullest extent permitted by law.
         </p>
@@ -354,14 +359,14 @@ export default function TermsContent() {
           liabilities, damages, losses, costs, and expenses (including reasonable attorneys&rsquo;
           fees) arising out of or in connection with:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
+        <ul>
           <li>Your use of our services in violation of these Terms, the AUP, or applicable law</li>
           <li>Content you host, transmit, or store on WSLATL infrastructure</li>
           <li>Your violation of any third-party rights, including intellectual property rights</li>
           <li>Any false or fraudulent information you provide to WSLATL</li>
           <li>Any dispute between you and a third party arising from your use of our services</li>
         </ul>
-        <p className="mt-4">
+        <p>
           WSLATL reserves the right to assume the exclusive defense and control of any matter subject
           to indemnification by you, at your expense, and you agree to cooperate with our defense.
         </p>
@@ -380,9 +385,9 @@ export default function TermsContent() {
         </p>
         <p>
           Before initiating formal legal proceedings, both parties agree to attempt to resolve
-          disputes informally. To initiate informal resolution, contact us at {siteConfig.email.support}
+          disputes informally. To initiate informal resolution, contact us at <Email name="support" />
           with a written description of the dispute. If the dispute is not resolved within{' '}
-          <span className="text-foreground font-medium">30 days</span> of that notice, either party
+          <strong>30 days</strong> of that notice, either party
           may pursue formal legal remedies.
         </p>
       </LegalSection>
@@ -391,12 +396,12 @@ export default function TermsContent() {
         <p>
           WSLATL reserves the right to modify these Terms at any time. For material changes, we will:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
-          <li>Provide at least <span className="text-foreground font-medium">14 days&rsquo; advance notice</span> via email to your registered address</li>
+        <ul>
+          <li>Provide at least <strong>14 days&rsquo; advance notice</strong> via email to your registered address</li>
           <li>Post the updated Terms at {siteConfig.paths.terms} with a revised effective date</li>
           <li>Summarize the changes in the notification email</li>
         </ul>
-        <p className="mt-4">
+        <p>
           Your continued use of our services after the effective date of any revised Terms constitutes
           your acceptance of those changes. If you object to material changes, you may cancel your
           service before the effective date and receive a pro-rated refund for any prepaid period,
@@ -455,27 +460,7 @@ export default function TermsContent() {
         <p>
           Questions about these Terms of Service should be directed to:
         </p>
-        <div className="mt-4 p-5 rounded-xl border border-border/70 bg-card/30 space-y-1.5 text-sm relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p className="font-semibold text-foreground">WSLATL LLC</p>
-          <p>Missouri, United States</p>
-          <p>
-            Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
-            {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
-          </p>
-          <p>
-            Discord:{' '}
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteConfig.legal.discordVanity}
-            </a>
-          </p>
-        </div>
+        <CompanyContact />
       </LegalSection>
     </>
   )

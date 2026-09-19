@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
+import { Callout, CompanyContact } from '@/components/legal/blocks'
+import { Email } from '@/components/ui/email'
+import { ShortLink } from '@/components/ui/short-link'
 
 export default function AccountCreditContent() {
   return (
@@ -20,7 +23,7 @@ export default function AccountCreditContent() {
           balance is and how it behaves.
         </p>
         <p>Credit can reach your account in three ways:</p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
+        <ul>
           <li>You purchase it directly as a top-up through the billing portal</li>
           <li>We issue it to you, for example as the outcome of an approved refund request or a service credit under our{' '}
             <Link href={siteConfig.paths.sla}>Service Level Agreement</Link>
@@ -34,32 +37,29 @@ export default function AccountCreditContent() {
           Account credit is stored value for use against WSLATL services. It is important that you
           understand what it is not:
         </p>
-        <div className="mt-4">
-          <div className="legal-callout border-yellow-500/30 text-yellow-300">
-            <strong>Not a deposit account</strong>
-            Account credit is not a bank deposit, is not held in a deposit account, is not insured
-            by the FDIC or any other insurer, and is not a stored value instrument issued by a
-            bank. WSLATL is not a bank or a money transmitter, and your credit balance is not
-            protected the way funds held at a financial institution are.
-          </div>
-        </div>
-        <ul className="list-disc pl-5 space-y-2 mt-4">
+        <Callout tone="caution" title="Not a deposit account">
+          Account credit is not a bank deposit, is not held in a deposit account, is not insured
+          by the FDIC or any other insurer, and is not a stored value instrument issued by a
+          bank. WSLATL is not a bank or a money transmitter, and your credit balance is not
+          protected the way funds held at a financial institution are.
+        </Callout>
+        <ul>
           <li>
-            <span className="text-foreground font-medium">It earns no interest.</span> A credit
+            <strong>It earns no interest.</strong> A credit
             balance does not accrue interest, yield, or any other return, however long it is held.
           </li>
           <li>
-            <span className="text-foreground font-medium">It is not redeemable for cash.</span>{' '}
+            <strong>It is not redeemable for cash.</strong>{' '}
             Credit cannot be withdrawn, cashed out, paid to a bank account, or converted back to
             the payment method that funded it.
           </li>
           <li>
-            <span className="text-foreground font-medium">It is not transferable outside WSLATL.</span>{' '}
+            <strong>It is not transferable outside WSLATL.</strong>{' '}
             Credit may only be applied to WSLATL invoices or gifted to another WSLATL account as
             described in Section 5. It cannot be sold, assigned, or transferred to a third party.
           </li>
           <li>
-            <span className="text-foreground font-medium">It is not a credit line.</span> Credit is
+            <strong>It is not a credit line.</strong> Credit is
             money you or someone else has already paid, or that we have already issued to you. It
             does not let you carry a negative balance.
           </li>
@@ -71,15 +71,13 @@ export default function AccountCreditContent() {
         <LegalSubSection title="3.1 Top-Ups">
           <p>
             You can add credit to your account from the billing portal at{' '}
-            <a href={siteConfig.links.billing} target="_blank" rel="noopener noreferrer">
-              billing.wslatl.com
-            </a>. Top-ups are charged to your selected payment method at the time of purchase and
+            <ShortLink name="billing" />. Top-ups are charged to your selected payment method at the time of purchase and
             are added to your balance once the payment clears.
           </p>
           <p>
             Top-up amounts are currently limited to a minimum of{' '}
-            <span className="text-foreground font-medium">$5.00</span> and a maximum of{' '}
-            <span className="text-foreground font-medium">$1,000.00</span> per transaction. These
+            <strong>$5.00</strong> and a maximum of{' '}
+            <strong>$1,000.00</strong> per transaction. These
             limits are operational rather than contractual and may be changed in the portal at any
             time. The portal shows the limits in effect when you make the purchase.
           </p>
@@ -105,28 +103,23 @@ export default function AccountCreditContent() {
             billing portal, showing the date, the amount, the direction of the movement, and the
             reason. The ledger is the authoritative record of your balance. If you believe an
             entry is wrong, contact us at{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>
-              {siteConfig.email.support}
-            </a>{' '}
+            <Email name="support" />{' '}
             and we will investigate.
           </p>
         </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="4" title="Expiry & Refundability">
-        <div className="mt-1">
-          <div className="legal-callout border-green-500/30 text-green-300">
-            <strong>Account credit does not expire</strong>
-            Your credit balance has no expiry date. We do not apply dormancy fees, maintenance
-            fees, inactivity fees, or any other deduction that reduces an unused balance over
-            time. Credit remains available for as long as your account is open.
-          </div>
-        </div>
+        <Callout tone="good" title="Account credit does not expire">
+          Your credit balance has no expiry date. We do not apply dormancy fees, maintenance
+          fees, inactivity fees, or any other deduction that reduces an unused balance over
+          time. Credit remains available for as long as your account is open.
+        </Callout>
 
         <LegalSubSection title="4.1 Credit Is Non-Refundable">
           <p>
             Purchased credit is{' '}
-            <span className="text-foreground font-medium">non-refundable</span>. Once a top-up has
+            <strong>non-refundable</strong>. Once a top-up has
             been added to your balance, we do not reverse the purchase or return the money to your
             payment method. Because credit does not expire, an unused balance remains yours to
             spend on WSLATL services rather than being forfeited.
@@ -156,37 +149,37 @@ export default function AccountCreditContent() {
           between accounts inside our platform; it does not send money to a person and it is not a
           payment service.
         </p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>
-            <span className="text-foreground font-medium">You must have the balance.</span> The
+            <strong>You must have the balance.</strong> The
             gift amount is deducted from your available credit at the time you send it. You cannot
             gift more than you hold.
           </li>
           <li>
-            <span className="text-foreground font-medium">The recipient must accept it.</span> A
+            <strong>The recipient must accept it.</strong> A
             gift is held pending until the recipient accepts it. Until acceptance, the amount is
             not spendable by either party. It is reserved against your balance and is not yet part
             of the recipient&rsquo;s balance.
           </li>
           <li>
-            <span className="text-foreground font-medium">Gifts are final once accepted.</span>{' '}
+            <strong>Gifts are final once accepted.</strong>{' '}
             Once the recipient accepts a gift, the credit belongs to their account. We will not
             reverse an accepted gift on request, including if you sent it to the wrong account or
             changed your mind. Check the recipient before you send.
           </li>
           <li>
-            <span className="text-foreground font-medium">Gifting does not create refund rights.</span>{' '}
+            <strong>Gifting does not create refund rights.</strong>{' '}
             A gift is not a purchase by the recipient. Neither the sender nor the recipient gains
             a refund right in respect of the gifted amount beyond what the original purchase
             carried.
           </li>
           <li>
-            <span className="text-foreground font-medium">Both accounts must be in good standing.</span>{' '}
+            <strong>Both accounts must be in good standing.</strong>{' '}
             We may decline or hold a gift where either account is suspended, under investigation,
             or associated with a payment dispute.
           </li>
         </ul>
-        <p className="mt-4">
+        <p>
           Gifting exists so you can help out someone you know. Using it to sell credit for value
           outside our platform, to move funds between unrelated parties, or to obscure the source
           of a payment is prohibited and will be treated under Section 6.
@@ -199,39 +192,39 @@ export default function AccountCreditContent() {
           where the credit was not legitimately obtained or where the underlying payment has
           failed. This applies in particular to:
         </p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>
-            <span className="text-foreground font-medium">Charged-back or reversed purchases.</span>{' '}
+            <strong>Charged-back or reversed purchases.</strong>{' '}
             If the payment that funded a top-up is charged back, disputed, reversed, or otherwise
             fails after the credit has been added, we will remove the corresponding credit from
             the balance. If the credit has already been spent, the resulting shortfall becomes an
             amount due on your account.
           </li>
           <li>
-            <span className="text-foreground font-medium">Fraudulently obtained credit.</span>{' '}
+            <strong>Fraudulently obtained credit.</strong>{' '}
             Credit purchased with a stolen or unauthorized payment method, obtained through false
             information, or obtained by exploiting a defect in our billing system may be reversed
             regardless of how much time has passed.
           </li>
           <li>
-            <span className="text-foreground font-medium">Credit moved to evade reversal.</span>{' '}
+            <strong>Credit moved to evade reversal.</strong>{' '}
             Where credit subject to reversal has been gifted onward, we may reverse it from the
             receiving account. Accepting a gift does not shield the credit from reversal if the
             credit was fraudulently obtained.
           </li>
           <li>
-            <span className="text-foreground font-medium">Credit issued in error.</span> Credit
+            <strong>Credit issued in error.</strong> Credit
             applied to your account through an administrative or system error may be corrected. We
             will tell you when we do this and explain the correction.
           </li>
         </ul>
-        <p className="mt-4">
+        <p>
           Where we reverse credit, we will record the reversal in your transaction ledger with the
           reason. Accounts involved in credit fraud may also be suspended or terminated under
           Section 9.2 of our{' '}
           <Link href={siteConfig.paths.terms}>Terms of Service</Link>.
         </p>
-        <p className="mt-3">
+        <p>
           If you believe a charge on your account is wrong, contact us before filing a chargeback.
           We will investigate a billing error under Section 3.2 of our{' '}
           <Link href={siteConfig.paths.refund}>Refund Policy</Link>{' '}
@@ -268,17 +261,14 @@ export default function AccountCreditContent() {
           Do not publish a number, a holding period, or a forfeiture rule here until that
           decision is made.
         */}
-        <div className="mt-3">
-          <div className="legal-callout border-yellow-500/30 text-yellow-300">
-            <strong>Balance on closure: pending</strong>
-            The treatment of a remaining credit balance when an account is closed is being
-            finalized and is not yet stated in this document. Until it is published here, if you
-            close your account holding a balance, contact us at {siteConfig.email.support} and we
-            will handle it with you directly and in good faith.
-          </div>
-        </div>
+        <Callout tone="caution" title="Balance on closure: pending">
+          The treatment of a remaining credit balance when an account is closed is being
+          finalized and is not yet stated in this document. Until it is published here, if you
+          close your account holding a balance, contact us at <Email name="support" /> and we
+          will handle it with you directly and in good faith.
+        </Callout>
 
-        <p className="mt-4">
+        <p>
           Nothing in this section limits our right to reverse credit under Section 6, or to apply
           a credit balance against invoices that are outstanding at the time of closure. Amounts
           you owe us at closure remain due and payable under Section 9.3 of our Terms of Service.
@@ -317,27 +307,7 @@ export default function AccountCreditContent() {
         <p>
           Questions about your credit balance, a ledger entry, or a gift should be directed to:
         </p>
-        <div className="mt-4 p-5 rounded-xl border border-border/70 bg-card/30 space-y-1.5 text-sm relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p className="font-semibold text-foreground">WSLATL LLC</p>
-          <p>Missouri, United States</p>
-          <p>
-            Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
-            {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
-          </p>
-          <p>
-            Discord:{' '}
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteConfig.legal.discordVanity}
-            </a>
-          </p>
-        </div>
+        <CompanyContact />
       </LegalSection>
     </>
   )

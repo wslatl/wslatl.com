@@ -25,7 +25,7 @@ export const footerColumns: FooterColumn[] = [
       { label: 'About us', href: '/#about' },
       { label: 'How ordering works', href: '/#how-it-works' },
       { label: 'Contact', href: siteConfig.paths.contact },
-      { label: 'Reviews on Trustpilot', href: siteConfig.trustpilot.profileUrl },
+      { label: 'Reviews on Trustpilot', href: siteConfig.links.trustpilot },
       { label: 'Discord', href: siteConfig.links.discord },
       { label: 'Status page', href: siteConfig.links.status },
     ],

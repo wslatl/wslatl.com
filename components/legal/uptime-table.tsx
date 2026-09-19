@@ -1,9 +1,10 @@
+import { ScrollTable } from '@/components/legal/blocks'
 import { uptimeTargets } from '@/data/sla'
 
 /** The SLA uptime table, shared by the Terms of Service and the SLA page. */
 export function UptimeTable() {
   return (
-    <div className="mt-2 overflow-x-auto">
+    <ScrollTable label="Monthly uptime targets">
       <table className="legal-table">
         <thead>
           <tr>
@@ -20,6 +21,6 @@ export function UptimeTable() {
           ))}
         </tbody>
       </table>
-    </div>
+    </ScrollTable>
   )
 }

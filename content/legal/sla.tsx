@@ -2,6 +2,9 @@ import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
 import { UptimeTable } from '@/components/legal/uptime-table'
+import { Callout, CompanyContact } from '@/components/legal/blocks'
+import { Email } from '@/components/ui/email'
+import { ShortLink } from '@/components/ui/short-link'
 
 export default function SlaContent() {
   return (
@@ -13,17 +16,14 @@ export default function SlaContent() {
           meet for each service type, how we handle maintenance, and the service credit you can
           claim when we fall short.
         </p>
-        <div className="mt-3">
-          <div className="legal-callout border-primary/30 text-link">
-            <strong>This is a restatement, not a new commitment</strong>
-            This page reproduces Section 5 of our{' '}
-            <Link href={siteConfig.paths.terms}>Terms of Service</Link>{' '}
-            as a standalone document so it is easier to find and cite. The commitments here are
-            the same commitments already in the Terms. Nothing has been added, removed, or
-            changed. If the two documents ever conflict, the Terms of Service controls.
-          </div>
-        </div>
-        <p className="mt-4">
+        <Callout tone="note" title="This is a restatement, not a new commitment">
+          This page reproduces Section 5 of our{' '}
+          <Link href={siteConfig.paths.terms}>Terms of Service</Link>{' '}
+          as a standalone document so it is easier to find and cite. The commitments here are
+          the same commitments already in the Terms. Nothing has been added, removed, or
+          changed. If the two documents ever conflict, the Terms of Service controls.
+        </Callout>
+        <p>
           This SLA applies to clients with active, paid services in good standing. It does not
           apply to suspended services, services in a non-payment grace period, trial or
           complimentary arrangements, or services terminated for cause.
@@ -32,7 +32,7 @@ export default function SlaContent() {
 
       <LegalSection number="2" title="Uptime Targets">
         <UptimeTable />
-        <p className="mt-3">
+        <p>
           Uptime is measured per calendar month and excludes scheduled maintenance windows and
           downtime caused by events outside our reasonable control (see Section 15 of the Terms of
           Service, Force Majeure).
@@ -42,33 +42,27 @@ export default function SlaContent() {
       <LegalSection number="3" title="Scheduled Maintenance">
         <p>
           We will provide at least{' '}
-          <span className="text-foreground font-medium">24 hours&rsquo; advance notice</span> for
+          <strong>24 hours&rsquo; advance notice</strong> for
           scheduled maintenance windows via our status page (status.wslatl.com) and/or email to
           affected clients. Emergency maintenance required to protect service integrity or security
           may be performed without prior notice, though we will communicate as quickly as possible.
         </p>
         <p>
           Our status page is at{' '}
-          <a
-            href={siteConfig.links.status}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            status.wslatl.com
-          </a>.
+          <ShortLink name="status" />.
         </p>
       </LegalSection>
 
       <LegalSection number="4" title="Service Credits">
         <p>
           If we fail to meet the applicable uptime target due to our fault, you may request a service
-          credit equal to <span className="text-foreground font-medium">10% of the affected service&apos;s monthly cost</span> per
+          credit equal to <strong>10% of the affected service&apos;s monthly cost</strong> per
           qualifying incident. Credits are applied to your account balance and will not exceed the
           cost of one full month of the affected service. Service credits are your sole and exclusive
           remedy for uptime failures and do not entitle you to a cash refund.
         </p>
-        <p className="mt-2">
-          To request a credit, contact us within 15 days of the incident at {siteConfig.email.support} with
+        <p>
+          To request a credit, contact us within 15 days of the incident at <Email name="support" /> with
           the date, duration, and nature of the outage.
         </p>
 
@@ -100,11 +94,11 @@ export default function SlaContent() {
           Consistent with Section 2 above, the uptime targets in this SLA do not cover downtime
           attributable to:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
+        <ul>
           <li>Scheduled maintenance windows notified in accordance with Section 3</li>
           <li>Events outside our reasonable control, as described in Section 15 of the Terms of Service</li>
         </ul>
-        <p className="mt-3">
+        <p>
           The dedicated server line in the table above is a best-effort target rather than a
           measured percentage, because availability depends on hardware and on the datacenter
           hosting it.
@@ -127,27 +121,7 @@ export default function SlaContent() {
         <p>
           Service credit claims and questions about this SLA should be directed to:
         </p>
-        <div className="mt-4 p-5 rounded-xl border border-border/70 bg-card/30 space-y-1.5 text-sm relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p className="font-semibold text-foreground">WSLATL LLC</p>
-          <p>Missouri, United States</p>
-          <p>
-            Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
-            {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
-          </p>
-          <p>
-            Discord:{' '}
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteConfig.legal.discordVanity}
-            </a>
-          </p>
-        </div>
+        <CompanyContact />
       </LegalSection>
     </>
   )

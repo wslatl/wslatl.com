@@ -36,10 +36,12 @@ components/
   sections/                Home page sections.
   pricing/                 Plan tables and the sticky section switcher.
   games/                   Game directory (the only client-side search on the site).
-  legal/                   Pieces shared between legal documents (the SLA uptime table).
+  legal/                   The blocks every legal document is built from, and the SLA uptime table.
   seo/json-ld.tsx          Structured data.
 
-config/site.ts             Links, emails, paths, credits, legal metadata and effective dates.
+config/site.ts             Company details, paths, credits, legal metadata and effective dates.
+config/links.json          Where each short link (/billing, /discord, ...) sends people.
+config/emails.ts           Our email addresses. Server-only; rendered through <Email>.
 content/legal/             The text of each policy; index.ts maps each document to its text.
 data/                      Everything else the pages render (see below).
 lib/                       pricing helpers, pageMetadata(), cn() and slugify().
@@ -58,7 +60,8 @@ Some facts appear on many pages. Each one is defined exactly once, and everythin
 | Uptime targets | `data/sla.ts` | Terms of Service, SLA, Refund Policy, home page commitments, pricing page |
 | Legal document titles and dates | `data/legal.ts` and `config/site.ts` | Legal pages, `/legal`, footer, sitemap |
 | Games | `data/games.ts` | `/games`, game pages, sitemap |
-| Panel and portal URLs | `config/site.ts` | Header, footer, every call to action |
+| Panel, portal, and profile URLs | `config/links.json` | Every button and link (through short links), redirects, structured data |
+| Email addresses | `config/emails.ts` | Every address on the site, through `<Email>` |
 
 Never type a price, a plan spec, or an uptime figure anywhere else. Format prices with `formatPrice()` from `lib/pricing.ts`.
 
@@ -71,6 +74,30 @@ Use `pageMetadata({ title, description, path })` from `lib/metadata.ts` for ever
 Retired URLs get a permanent redirect in `next.config.mjs`, in the same change that moves the page. The link tests check that every redirect lands on a page that exists. The legal documents moved from the site root to `/legal/...` in September 2026; their old paths (`/privacy`, `/terms`, and so on) redirect, and a test fails if any document loses its redirect. Always link to a legal document through `siteConfig.paths`, never a typed-out path (a test enforces this too).
 
 To add a legal document: add its path to `siteConfig.paths` and its date to `effectiveDates`, add an entry to `data/legal.ts`, write the text in `content/legal/`, and register it in `content/legal/index.ts`. The route, footer link, sitemap entry, and table of contents follow automatically.
+
+---
+
+## Short links
+
+Every link to a panel, portal, or profile goes through a short path on this site: `/billing`, `/register`, `/game-panel`, `/vps-panel`, `/dedicated-portal`, `/cpanel`, `/status`, `/discord`, `/github`, `/trustpilot`, and `/rejectmodders`. Pages link to the path; `next.config.mjs` redirects it to the destination in `config/links.json`.
+
+To change where one goes, edit its `url` in `config/links.json`. Nothing else changes: every button on the site follows, and so does every `wslatl.com/discord` link already shared in a chat or an email. To add one, add an entry there and link to `siteConfig.links.<name>`, or `<ShortLink name="..." />` in running text, which shows the short address itself.
+
+These redirects are temporary (307) on purpose. Browsers cache permanent redirects, so a visitor who clicked once would keep going to an old destination. Tests fail if a short link is permanent, collides with a page, or if a destination URL is typed into a page directly.
+
+---
+
+## Email addresses
+
+Addresses live only in `config/emails.ts` and are rendered with `<Email name="support" />`. The page carries the address scrambled; the browser rebuilds it into a mailto link once a person moves the mouse, touches the screen, scrolls, or presses a key (`lib/presence.ts`). Anything that only reads the HTML, which is how address harvesters work, sees a "Show email address" button and no address. The button also reveals it, which is how screen reader users get to it. Structured data carries no email for the same reason.
+
+`config/emails.ts` imports `server-only`, so importing it from a Client Component fails the build instead of shipping every address in a script. A test fails if an address appears anywhere else in the source.
+
+---
+
+## Legal documents
+
+Documents are built from a handful of blocks in `components/legal/blocks.tsx`, so all ten look alike: `Callout` (with a tone: note, good, caution, critical), `InfoCard` and `InfoRow` for boxed details, `CompanyContact` for the closing contact card, `Tiers` and `Tier` for rules that step up in severity, and `ScrollTable` around every table. Spacing, lists, links, and bold text come from `LegalSection` and the `.legal-body` styles, so a document should not need class names of its own.
 
 ---
 
@@ -112,7 +139,7 @@ CI (`.github/workflows/ci.yml`) runs lint, tests, build, and typecheck on every 
 
 ## Configuration
 
-All runtime site config lives in `config/site.ts`: company name and location, the site URL (used for canonical URLs and the sitemap), panel and social links, internal paths, contact emails, the footer credit, and per-document legal effective dates. When you revise a policy, bump only that document's entry in `effectiveDates`. There are no environment variables.
+Runtime site config lives in `config/site.ts`: company name and location, the site URL (used for canonical URLs and the sitemap), internal paths, the footer credit, and per-document legal effective dates. Link destinations are in `config/links.json` and email addresses in `config/emails.ts`. When you revise a policy, bump only that document's entry in `effectiveDates`. There are no environment variables.
 
 ---
 

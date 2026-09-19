@@ -1,8 +1,11 @@
 import { Button } from '@/components/ui/button'
 import { sectionHeadingClass } from '@/components/ui/section-header'
+import { Email } from '@/components/ui/email'
 import { SiteLink } from '@/components/ui/site-link'
 import { reachOptions } from '@/data/reach-options'
 import { siteConfig } from '@/config/site'
+
+const ctaClass = 'mt-2 inline-block text-sm font-medium text-link underline underline-offset-4 hover:text-foreground'
 
 export function Contact() {
   return (
@@ -32,12 +35,13 @@ export function Contact() {
                 <li key={option.title} className="py-5">
                   <p className="font-medium text-foreground">{option.title}</p>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{option.description}</p>
-                  <SiteLink
-                    href={option.href}
-                    className="mt-2 inline-block text-sm font-medium text-link underline underline-offset-4 hover:text-foreground"
-                  >
-                    {option.cta}
-                  </SiteLink>
+                  {'email' in option ? (
+                    <Email name={option.email} className={ctaClass} />
+                  ) : (
+                    <SiteLink href={option.href} className={ctaClass}>
+                      {option.cta}
+                    </SiteLink>
+                  )}
                 </li>
               ))}
             </ul>

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Wordmark } from '@/components/brand/wordmark'
+import { Email } from '@/components/ui/email'
 import { SiteLink } from '@/components/ui/site-link'
 import { footerColumns } from '@/data/footer'
 import { siteConfig } from '@/config/site'
@@ -17,9 +18,7 @@ export function Footer() {
             gives a damn.
           </p>
           <p className="mt-4 text-sm">
-            <a href={`mailto:${siteConfig.email.support}`} className="text-foreground hover:text-link">
-              {siteConfig.email.support}
-            </a>
+            <Email name="support" className="text-foreground hover:text-link" />
           </p>
         </div>
 
@@ -47,7 +46,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} {siteConfig.legal.companyName}. All rights reserved.
           </p>
           <p>
-            <SiteLink href={siteConfig.credits.href} className="transition-colors hover:text-foreground">
+            <SiteLink href={siteConfig.links.credits} className="transition-colors hover:text-foreground">
               {siteConfig.credits.label}
             </SiteLink>
           </p>

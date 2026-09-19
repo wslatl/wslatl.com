@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
+import { Callout, CompanyContact, InfoCard, InfoRow } from '@/components/legal/blocks'
+import { Email } from '@/components/ui/email'
+import { ShortLink } from '@/components/ui/short-link'
 
 export default function AbuseContent() {
   return (
@@ -35,28 +38,15 @@ export default function AbuseContent() {
           email) is being used for abusive, illegal, or harmful activity, report it to our abuse
           team. This is the fastest way to reach the people who can act on it.
         </p>
-        <div className="mt-4 p-5 rounded-xl border border-border/70 bg-card/30 space-y-2 text-sm relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p className="font-semibold text-foreground">Report abuse to:</p>
-          <p>
-            Email:{' '}
-            <a href={`mailto:${siteConfig.email.abuse}`}>
-              {siteConfig.email.abuse}
-            </a>{' '}
-            (Subject: Abuse Report)
-          </p>
-          <p>
-            Discord:{' '}
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteConfig.legal.discordVanity}
-            </a>
-          </p>
-        </div>
-        <p className="mt-4">
+        <InfoCard title="Report abuse to">
+          <InfoRow label="Email">
+            <Email name="abuse" /> (Subject: Abuse Report)
+          </InfoRow>
+          <InfoRow label="Discord">
+            <ShortLink name="discord" />
+          </InfoRow>
+        </InfoCard>
+        <p>
           Email is the channel we monitor for abuse and the one that creates a record we can act
           on. A report made only in a Discord channel may be missed; if a matter is time-sensitive,
           email it.
@@ -68,14 +58,14 @@ export default function AbuseContent() {
           The more precise your report, the faster we can find the source and act. Please include
           as much of the following as you have:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
+        <ul>
           <li>The IP address, domain, URL, or server involved</li>
           <li>Timestamps of the activity, with the time zone or an offset from UTC</li>
           <li>Relevant log excerpts, email headers, or packet captures, pasted as text where possible</li>
           <li>A clear description of the activity and why you believe it is abusive</li>
           <li>How to contact you if we need more information</li>
         </ul>
-        <p className="mt-4">
+        <p>
           Logs are most useful in their original text form with full headers intact. Screenshots
           are fine as a supplement, but they are harder to verify on their own.
         </p>
@@ -87,36 +77,36 @@ export default function AbuseContent() {
           <Link href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</Link>{' '}
           or applicable law. Common categories we act on include:
         </p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>
-            <span className="text-foreground font-medium">Network attacks.</span> DDoS traffic,
+            <strong>Network attacks.</strong> DDoS traffic,
             port and vulnerability scanning, brute-force attempts, or intrusion attempts
             originating from our IP space.
           </li>
           <li>
-            <span className="text-foreground font-medium">Spam and unsolicited mail.</span> Bulk or
+            <strong>Spam and unsolicited mail.</strong> Bulk or
             unsolicited email, open mail relays, and mail spoofing.
           </li>
           <li>
-            <span className="text-foreground font-medium">Phishing and fraud.</span> Pages or
+            <strong>Phishing and fraud.</strong> Pages or
             services built to steal credentials or payment details, or to deceive people for
             financial gain.
           </li>
           <li>
-            <span className="text-foreground font-medium">Malware.</span> Hosting or distributing
+            <strong>Malware.</strong> Hosting or distributing
             viruses, ransomware, command-and-control servers, or other malicious software.
           </li>
           <li>
-            <span className="text-foreground font-medium">Illegal content.</span> Content that is
+            <strong>Illegal content.</strong> Content that is
             unlawful to host, including the material described in Section 3 of our Acceptable Use
             Policy.
           </li>
           <li>
-            <span className="text-foreground font-medium">Harassment and threats.</span> Using our
+            <strong>Harassment and threats.</strong> Using our
             services to harass, threaten, dox, or endanger a person.
           </li>
         </ul>
-        <p className="mt-4">
+        <p>
           For the full account of what is prohibited, see Sections 3 and 4 of the Acceptable Use
           Policy. Copyright infringement is handled separately under the{' '}
           <Link href={siteConfig.paths.dmca}>DMCA Policy</Link>.
@@ -125,19 +115,19 @@ export default function AbuseContent() {
 
       <LegalSection number="5" title="What Happens After You Report">
         <p>We review every credible report. Our general process is:</p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>
-            <span className="text-foreground font-medium">We acknowledge it.</span> We aim to
+            <strong>We acknowledge it.</strong> We aim to
             confirm receipt of an emailed report as quickly as we can, and we prioritize active,
             ongoing abuse over routine work.
           </li>
           <li>
-            <span className="text-foreground font-medium">We investigate.</span> We identify the
+            <strong>We investigate.</strong> We identify the
             service involved, review the evidence, and determine whether our policies or the law
             have been broken.
           </li>
           <li>
-            <span className="text-foreground font-medium">We act proportionately.</span> Depending
+            <strong>We act proportionately.</strong> Depending
             on severity, we may contact the client for remediation, remove or disable specific
             content, suspend the service, or terminate the account. Enforcement follows Section 9
             of the Acceptable Use Policy.
@@ -171,25 +161,20 @@ export default function AbuseContent() {
           affected networks. We preserve evidence and report to law enforcement where the law
           requires it or where the conduct warrants it.
         </p>
-        <div className="mt-4">
-          <div className="legal-callout border-red-500/30 text-red-300">
-            <strong>Child sexual abuse material</strong>
-            We have zero tolerance for child sexual abuse material (CSAM). Confirmed CSAM is
-            reported immediately to the National Center for Missing &amp; Exploited Children
-            (NCMEC) and to law enforcement, the account is terminated, and evidence is preserved.
-            To report suspected CSAM on our infrastructure, email {siteConfig.email.abuse} with
-            &ldquo;CSAM&rdquo; in the subject line, or report directly to NCMEC through its
-            CyberTipline.
-          </div>
-        </div>
+        <Callout tone="critical" title="Child sexual abuse material">
+          We have zero tolerance for child sexual abuse material (CSAM). Confirmed CSAM is
+          reported immediately to the National Center for Missing &amp; Exploited Children
+          (NCMEC) and to law enforcement, the account is terminated, and evidence is preserved.
+          To report suspected CSAM on our infrastructure, email <Email name="abuse" /> with
+          &ldquo;CSAM&rdquo; in the subject line, or report directly to NCMEC through its
+          CyberTipline.
+        </Callout>
       </LegalSection>
 
       <LegalSection number="7" title="Law Enforcement Requests">
         <p>
           Law enforcement seeking records or preservation should contact us at{' '}
-          <a href={`mailto:${siteConfig.email.abuse}`}>
-            {siteConfig.email.abuse}
-          </a>{' '}
+          <Email name="abuse" />{' '}
           with &ldquo;Law Enforcement Request&rdquo; in the subject line. We respond to valid legal
           process served on WSLATL LLC, and we will preserve relevant records on a properly scoped
           preservation request while the appropriate process is obtained. We do not disclose client
@@ -200,25 +185,23 @@ export default function AbuseContent() {
 
       <LegalSection number="8" title="Reports We Cannot Action Here">
         <p>Some matters belong in a different channel:</p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>
-            <span className="text-foreground font-medium">Copyright.</span> Copyright takedown
+            <strong>Copyright.</strong> Copyright takedown
             notices and counter-notices go through our{' '}
             <Link href={siteConfig.paths.dmca}>DMCA Policy</Link>,
             not this page.
           </li>
           <li>
-            <span className="text-foreground font-medium">Content we do not host.</span> For a
+            <strong>Content we do not host.</strong> For a
             domain registered elsewhere, content on a third-party network, or an account on a
             platform we do not operate, we are not the correct recipient and cannot remove the
             material. Report it to the operator of that service.
           </li>
           <li>
-            <span className="text-foreground font-medium">Billing and account questions.</span>{' '}
+            <strong>Billing and account questions.</strong>{' '}
             Questions about your own service or billing go to{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>
-              {siteConfig.email.support}
-            </a>, not the abuse channel.
+            <Email name="support" />, not the abuse channel.
           </li>
         </ul>
       </LegalSection>
@@ -248,31 +231,14 @@ export default function AbuseContent() {
           Abuse reports should go to our abuse team. General questions about this policy can be sent
           to the addresses below.
         </p>
-        <div className="mt-4 p-5 rounded-xl border border-border/70 bg-card/30 space-y-1.5 text-sm relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p className="font-semibold text-foreground">WSLATL LLC</p>
-          <p>Missouri, United States</p>
-          <p>
-            Abuse:{' '}
-            <a href={`mailto:${siteConfig.email.abuse}`}>{siteConfig.email.abuse}</a>
-          </p>
-          <p>
-            General:{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
-            {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
-          </p>
-          <p>
-            Discord:{' '}
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteConfig.legal.discordVanity}
-            </a>
-          </p>
-        </div>
+        <CompanyContact>
+          <InfoRow label="Abuse">
+            <Email name="abuse" />
+          </InfoRow>
+          <InfoRow label="General">
+            <Email name="support" /> or <Email name="info" />
+          </InfoRow>
+        </CompanyContact>
       </LegalSection>
     </>
   )

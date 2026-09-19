@@ -5,6 +5,7 @@ import { games, ramNeedGb } from '@/data/games'
 import { legalPages } from '@/data/legal'
 import { uptimeTarget, uptimeTargets } from '@/data/sla'
 import { siteConfig } from '@/config/site'
+import { scrambleEmail, unscrambleEmail } from '@/lib/email-cipher'
 
 const root = join(__dirname, '..')
 
@@ -46,6 +47,26 @@ describe('legal paths', () => {
       .flatMap((dir) => sourceFiles(join(root, dir)))
       .filter((file) => literal.test(readFileSync(file, 'utf8')))
     expect(offenders).toEqual([])
+  })
+})
+
+describe('email protection', () => {
+  it('keeps every address in config/emails.ts, so pages can only render them through <Email>', () => {
+    const address = /[a-z0-9._%+-]+@wslatl\.com/i
+    const offenders = ['app', 'components', 'config', 'content', 'data', 'lib']
+      .flatMap((dir) => sourceFiles(join(root, dir)))
+      .filter((file) => !file.endsWith(join('config', 'emails.ts')))
+      .filter((file) => address.test(readFileSync(file, 'utf8')))
+    expect(offenders).toEqual([])
+  })
+
+  it('scrambles an address beyond what a harvester matches, and gets it back', () => {
+    for (const address of ['support@wslatl.com', 'dmca@wslatl.com', 'a.b+c@example.org']) {
+      const code = scrambleEmail(address)
+      expect(code).toMatch(/^[0-9a-f]+$/)
+      expect(code).not.toContain('@')
+      expect(unscrambleEmail(code)).toBe(address)
+    }
   })
 })
 

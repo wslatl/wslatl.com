@@ -163,6 +163,12 @@
 .scroll-quiet:focus-within::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
 }
+/* Scroll areas fade out at their edges instead of slicing a line of text in
+   half. The area's own padding is at least as tall as the fade, so when
+   everything fits, or at either end of the scroll, only padding is faded. */
+.scroll-fade {
+  mask-image: linear-gradient(to bottom, transparent, black 2rem, black calc(100% - 2.5rem), transparent);
+}
 
 /* ----- Header: the hairline border fades in once the page scrolls ----- */
 /* Pure CSS, no scroll listener. Browsers without scroll timelines keep the border. */
@@ -228,6 +234,28 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  /* The gradient only paints inside the element's box, and italic letters
+     lean past it (the tail of the y in "actually" was cut off). Padding widens
+     the painted area; the negative margin keeps the layout where it was. */
+  padding: 0 0.2em 0.15em;
+  margin-inline: -0.2em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* The "Show email address" placeholder (components/ui/email-link.tsx). In the
+   components layer, so a className passed in (footer, legal meta) wins. */
+@layer components {
+  .email-reveal {
+    color: var(--link);
+    text-decoration: underline dotted;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .email-reveal:hover {
+    color: var(--foreground);
+  }
 }
 
 /* ----- Client logo marquee ----- */
@@ -305,6 +333,26 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
 .legal-body a:hover {
   color: var(--foreground);
 }
+/* One list style and one bold style for every document. */
+.legal-body :is(ul, ol) {
+  padding-left: 1.25rem;
+}
+.legal-body ul {
+  list-style: disc;
+}
+.legal-body ol {
+  list-style: decimal;
+}
+.legal-body li + li {
+  margin-top: 0.5rem;
+}
+.legal-body li::marker {
+  color: color-mix(in oklch, var(--muted-foreground) 70%, transparent);
+}
+.legal-body strong {
+  font-weight: 600;
+  color: var(--foreground);
+}
 /* Links that leave the site say so, visually and to screen readers (via the
    alternative text after the slash). */
 .legal-body a[target='_blank']::after {
@@ -344,30 +392,119 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
   border-bottom: 0;
 }
 
-/* ----- Legal-page callout boxes ----- */
+/* ----- Legal-page blocks (components/legal/blocks.tsx) ----- */
+/* Tones color the accent of a callout or tier, never its text. */
+[data-tone] {
+  --tone: var(--link);
+}
+[data-tone='good'] {
+  --tone: oklch(0.78 0.15 155);
+}
+[data-tone='caution'] {
+  --tone: oklch(0.83 0.14 85);
+}
+[data-tone='critical'] {
+  --tone: oklch(0.7 0.19 25);
+}
+
 .legal-callout {
   position: relative;
   padding: 1rem 1.25rem 1rem 2.75rem;
   border-radius: 0.75rem;
-  font-size: 0.9375rem;
-  line-height: 1.65;
-  border: 1px solid;
-  background: color-mix(in oklch, var(--card) 40%, transparent);
+  border: 1px solid color-mix(in oklch, var(--tone) 35%, transparent);
+  background: color-mix(in oklch, var(--tone) 6%, transparent);
 }
 .legal-callout::before {
   content: '';
   position: absolute;
-  left: 1rem;
-  top: 1.05rem;
+  left: 1.125rem;
+  top: 1.6rem;
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 9999px;
-  background: currentColor;
+  background: var(--tone);
 }
-.legal-callout strong {
-  color: var(--foreground);
-  display: block;
+.legal-callout-title {
   margin-bottom: 0.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* A details card. The hairline along the top is the same brand accent the
+   rest of the site's cards use. */
+.legal-card {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  background:
+    linear-gradient(to right, color-mix(in oklch, var(--primary) 50%, transparent), transparent 50%) top / 100% 1px
+      no-repeat,
+    color-mix(in oklch, var(--card) 30%, transparent);
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+.legal-card-title {
+  font-weight: 600;
+  color: var(--foreground);
+}
+.legal-card dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.375rem 1rem;
+}
+.legal-card :is(.legal-card-title, .legal-card-title + p) + dl {
+  margin-top: 0.75rem;
+}
+.legal-card dl > div {
+  display: contents;
+}
+.legal-card dt {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.legal-tiers {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  background: color-mix(in oklch, var(--card) 30%, transparent);
+}
+.legal-body .legal-tiers ul {
+  display: grid;
+  gap: 1rem;
+  padding: 0;
+  list-style: none;
+}
+.legal-tiers .legal-card-title + ul {
+  margin-top: 0.75rem;
+}
+.legal-body .legal-tiers li {
+  position: relative;
+  margin: 0;
+  padding-left: 1.5rem;
+}
+.legal-tiers li::before {
+  content: '';
+  position: absolute;
+  left: 0.125rem;
+  top: 0.6rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--tone);
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--tone) 15%, transparent);
+}
+.legal-tiers strong {
+  display: block;
+}
+
+.legal-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+}
+.legal-table-wrap:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 /* ----- FAQ disclosure: animate the answer open where the browser can ----- */

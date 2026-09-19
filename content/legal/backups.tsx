@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
+import { Callout, CompanyContact, ScrollTable } from '@/components/legal/blocks'
+import { Email } from '@/components/ui/email'
+import { ShortLink } from '@/components/ui/short-link'
 
 export default function BackupsContent() {
   return (
@@ -27,16 +30,13 @@ export default function BackupsContent() {
       </LegalSection>
 
       <LegalSection number="2" title="The Short Version">
-        <div className="mt-1">
-          <div className="legal-callout border-red-500/30 text-red-300">
-            <strong>Keep your own backups</strong>
-            Any backup we provide is a convenience, not a guarantee. It is best-effort and it is
-            not a substitute for your own independent copies of your data. If your data matters
-            to you, you must maintain your own backups, stored somewhere other than the service
-            they came from. Do not rely on us as your only copy.
-          </div>
-        </div>
-        <p className="mt-4">
+        <Callout tone="critical" title="Keep your own backups">
+          Any backup we provide is a convenience, not a guarantee. It is best-effort and it is
+          not a substitute for your own independent copies of your data. If your data matters
+          to you, you must maintain your own backups, stored somewhere other than the service
+          they came from. Do not rely on us as your only copy.
+        </Callout>
+        <p>
           We take backups because they are useful and because they help us help you. We take them
           seriously. But backups can fail, can be incomplete, can be corrupted, and can be
           unavailable at the moment you need them most. Every hosting provider that tells you
@@ -52,7 +52,7 @@ export default function BackupsContent() {
           confirm them with our team.
         </p>
 
-        <div className="overflow-x-auto mt-3">
+        <ScrollTable label="Backups by service">
           <table className="legal-table">
             <thead>
               <tr>
@@ -89,40 +89,38 @@ export default function BackupsContent() {
               </tr>
             </tbody>
           </table>
-        </div>
+        </ScrollTable>
 
-        <div className="mt-5 space-y-3 text-[0.9375rem]">
-          <p>A few specifics behind the table:</p>
-          <ul className="list-disc pl-5 space-y-1.5">
-            <li>
-              <span className="text-foreground font-medium">Dedicated Servers.</span> A dedicated
-              server is your machine. You have full control of the operating system and everything
-              on it, and we do not take backups of it for you. Running and storing backups of a
-              dedicated server is your responsibility. We are happy to discuss a managed backup
-              arrangement on request.
-            </li>
-            <li>
-              <span className="text-foreground font-medium">Game Server Hosting.</span> We take a
-              backup of the full game server container on a monthly cycle.
-            </li>
-            <li>
-              <span className="text-foreground font-medium">VPS Hosting.</span> VPS hosting is
-              launching soon. When it goes live, we take a monthly backup of the full disk image of
-              each VPS. Until then, this row describes what is planned, not something already
-              running.
-            </li>
-            <li>
-              <span className="text-foreground font-medium">Web Hosting.</span> We take a monthly
-              backup of the website itself and its current state (its files and data), not the
-              whole hosting account around it.
-            </li>
-          </ul>
-          <p>
-            Where a backup is described as monthly, it is taken on an approximately monthly cycle,
-            not on a guaranteed calendar date. As set out in Section 4, every backup we take is
-            best-effort, and it is not a replacement for the independent copies you keep yourself.
-          </p>
-        </div>
+        <p>A few specifics behind the table:</p>
+        <ul>
+          <li>
+            <strong>Dedicated Servers.</strong> A dedicated
+            server is your machine. You have full control of the operating system and everything
+            on it, and we do not take backups of it for you. Running and storing backups of a
+            dedicated server is your responsibility. We are happy to discuss a managed backup
+            arrangement on request.
+          </li>
+          <li>
+            <strong>Game Server Hosting.</strong> We take a
+            backup of the full game server container on a monthly cycle.
+          </li>
+          <li>
+            <strong>VPS Hosting.</strong> VPS hosting is
+            launching soon. When it goes live, we take a monthly backup of the full disk image of
+            each VPS. Until then, this row describes what is planned, not something already
+            running.
+          </li>
+          <li>
+            <strong>Web Hosting.</strong> We take a monthly
+            backup of the website itself and its current state (its files and data), not the
+            whole hosting account around it.
+          </li>
+        </ul>
+        <p>
+          Where a backup is described as monthly, it is taken on an approximately monthly cycle,
+          not on a guaranteed calendar date. As set out in Section 4, every backup we take is
+          best-effort, and it is not a replacement for the independent copies you keep yourself.
+        </p>
       </LegalSection>
 
       <LegalSection number="4" title="Backups Are Best-Effort">
@@ -130,14 +128,14 @@ export default function BackupsContent() {
           Where backups are included with your service, we provide them on a best-effort basis. We
           do not warrant that:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
+        <ul>
           <li>A backup exists for any particular service at any particular point in time</li>
           <li>A backup taken is complete, uncorrupted, or restorable</li>
           <li>A restore will succeed, or will succeed within any particular timeframe</li>
           <li>Data recovered from a backup will be current as of any particular moment</li>
           <li>A backup will survive the loss of the underlying infrastructure</li>
         </ul>
-        <p className="mt-4">
+        <p>
           This is consistent with the disclaimers in Section 10 and the limitation of liability in
           Section 11 of our Terms of Service. Nothing in this policy creates a warranty that those
           sections exclude.
@@ -148,7 +146,7 @@ export default function BackupsContent() {
             A backup is a copy of your data taken at a point in time. It does not protect you from
             everything, and in particular it does not protect against:
           </p>
-          <ul className="list-disc pl-5 space-y-1.5 mt-2">
+          <ul>
             <li>
               Damage that is itself backed up, such as a corrupted database or a bad deployment
               that was captured before you noticed the problem
@@ -170,30 +168,30 @@ export default function BackupsContent() {
           You are responsible for the data you store on our infrastructure. Specifically, you
           agree that:
         </p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>
-            <span className="text-foreground font-medium">You maintain your own backups.</span>{' '}
+            <strong>You maintain your own backups.</strong>{' '}
             You are responsible for keeping current, independent copies of any data you cannot
             afford to lose, stored off the WSLATL service that produced it.
           </li>
           <li>
-            <span className="text-foreground font-medium">You verify that your backups work.</span>{' '}
+            <strong>You verify that your backups work.</strong>{' '}
             A backup you have never restored from is a hypothesis, not a backup. Test yours.
           </li>
           <li>
-            <span className="text-foreground font-medium">You take a copy before risky changes.</span>{' '}
+            <strong>You take a copy before risky changes.</strong>{' '}
             Before an operating system reinstall, a plan change, a migration, a cancellation, or
             any other operation that may destroy data, take your own copy first. We will not be
             able to undo a destructive action you asked for.
           </li>
           <li>
-            <span className="text-foreground font-medium">You export before you leave.</span> If
+            <strong>You export before you leave.</strong> If
             you cancel a service or let it lapse, export your data before the termination takes
             effect. Post-termination retention is limited and is described in Section 9.3 of the
             Terms of Service.
           </li>
           <li>
-            <span className="text-foreground font-medium">You keep your own users&rsquo; data safe.</span>{' '}
+            <strong>You keep your own users&rsquo; data safe.</strong>{' '}
             If other people rely on the service you run on our infrastructure, their backup
             expectations are your responsibility, not ours.
           </li>
@@ -203,15 +201,11 @@ export default function BackupsContent() {
       <LegalSection number="6" title="Requesting a Restore">
         <p>
           To request a restore, open a ticket in the billing portal at{' '}
-          <a href={siteConfig.links.billing} target="_blank" rel="noopener noreferrer">
-            billing.wslatl.com
-          </a>{' '}
+          <ShortLink name="billing" />{' '}
           or email{' '}
-          <a href={`mailto:${siteConfig.email.support}`}>
-            {siteConfig.email.support}
-          </a>. Tell us:
+          <Email name="support" />. Tell us:
         </p>
-        <ul className="list-disc pl-5 space-y-1.5 mt-2">
+        <ul>
           <li>The service the restore is for</li>
           <li>What was lost, and as precisely as you can, when it was lost</li>
           <li>The point in time you would like to restore to</li>
@@ -295,27 +289,7 @@ export default function BackupsContent() {
         <p>
           Restore requests and questions about backups should be directed to:
         </p>
-        <div className="mt-4 p-5 rounded-xl border border-border/70 bg-card/30 space-y-1.5 text-sm relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p className="font-semibold text-foreground">WSLATL LLC</p>
-          <p>Missouri, United States</p>
-          <p>
-            Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
-            {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
-          </p>
-          <p>
-            Discord:{' '}
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteConfig.legal.discordVanity}
-            </a>
-          </p>
-        </div>
+        <CompanyContact />
       </LegalSection>
     </>
   )

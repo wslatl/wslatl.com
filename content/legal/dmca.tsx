@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
+import { Callout, CompanyContact, InfoCard, InfoRow } from '@/components/legal/blocks'
+import { Email } from '@/components/ui/email'
 
 export default function DmcaContent() {
   return (
@@ -47,32 +49,34 @@ export default function DmcaContent() {
           this page does NOT create the safe harbor on its own. Until that filing is completed and
           kept current, do not add any statement to this page claiming the agent is registered.
         */}
-        <div className="mt-3 p-5 rounded-xl border border-border/70 bg-card/30 text-sm space-y-1.5 relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p className="font-semibold text-foreground">Designated Copyright Agent</p>
-          <p><span className="text-foreground font-medium">Agent:</span> WSLATL Copyright Agent</p>
-          <p><span className="text-foreground font-medium">Company:</span> WSLATL LLC</p>
-          <p><span className="text-foreground font-medium">Mailing address:</span> 2414 County Road 1310, Moberly, MO 65270, United States</p>
-          <p><span className="text-foreground font-medium">Telephone:</span> 1-660-998-8016</p>
-          <p>
-            <span className="text-foreground font-medium">Email:</span>{' '}
-            <a href={`mailto:${siteConfig.email.dmca}`}>
-              {siteConfig.email.dmca}
-            </a>
-          </p>
-          <p><span className="text-foreground font-medium">Subject line:</span> DMCA Takedown Notice</p>
-        </div>
+        <InfoCard title="Designated Copyright Agent">
+          <InfoRow label="Agent">
+            WSLATL Copyright Agent
+          </InfoRow>
+          <InfoRow label="Company">
+            WSLATL LLC
+          </InfoRow>
+          <InfoRow label="Mailing address">
+            2414 County Road 1310, Moberly, MO 65270, United States
+          </InfoRow>
+          <InfoRow label="Telephone">
+            1-660-998-8016
+          </InfoRow>
+          <InfoRow label="Email">
+            <Email name="dmca" />
+          </InfoRow>
+          <InfoRow label="Subject line">
+            DMCA Takedown Notice
+          </InfoRow>
+        </InfoCard>
 
-        <div className="mt-4">
-          <div className="legal-callout border-yellow-500/30 text-yellow-300">
-            <strong>Agent registration status</strong>
-            The contact details above are the channel we monitor for copyright complaints. We do
-            not claim on this page that a designated agent registration has been completed with
-            the United States Copyright Office. If you need to confirm the current registration
-            status before serving notice, contact us at {siteConfig.email.support} and we will
-            tell you.
-          </div>
-        </div>
+        <Callout tone="caution" title="Agent registration status">
+          The contact details above are the channel we monitor for copyright complaints. We do
+          not claim on this page that a designated agent registration has been completed with
+          the United States Copyright Office. If you need to confirm the current registration
+          status before serving notice, contact us at <Email name="support" /> and we will
+          tell you.
+        </Callout>
       </LegalSection>
 
       <LegalSection number="3" title="Filing a Takedown Notice">
@@ -81,7 +85,7 @@ export default function DmcaContent() {
           infringement must be a written communication that includes substantially all of the
           following six elements:
         </p>
-        <ol className="list-decimal pl-5 space-y-2 mt-3">
+        <ol>
           <li>
             A physical or electronic signature of a person authorized to act on behalf of the
             owner of an exclusive right that is allegedly infringed.
@@ -111,7 +115,7 @@ export default function DmcaContent() {
             right that is allegedly infringed.
           </li>
         </ol>
-        <p className="mt-4">
+        <p>
           A notice that does not substantially comply with all six elements may not be treated as
           valid notice. If your notice is incomplete, we will tell you what is missing where we
           reasonably can.
@@ -154,7 +158,7 @@ export default function DmcaContent() {
           To be effective under 17 U.S.C. &sect;&nbsp;512(g)(3), a counter-notification must be a
           written communication that includes substantially all of the following:
         </p>
-        <ol className="list-decimal pl-5 space-y-2 mt-3">
+        <ol>
           <li>Your physical or electronic signature.</li>
           <li>
             Identification of the material that has been removed or to which access has been
@@ -185,9 +189,9 @@ export default function DmcaContent() {
           <p>
             Under 17 U.S.C. &sect;&nbsp;512(g)(2)(C), we will replace the removed material or
             restore access{' '}
-            <span className="text-foreground font-medium">
+            <strong>
               not less than 10 and not more than 14 business days
-            </span>{' '}
+            </strong>{' '}
             following receipt of the counter-notification, unless our designated agent first
             receives notice from the original complaining party that they have filed an action
             seeking a court order to restrain the client from engaging in infringing activity
@@ -220,31 +224,31 @@ export default function DmcaContent() {
           accounts of clients who are repeat infringers.
         </p>
         <p>How we implement that policy:</p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>
-            <span className="text-foreground font-medium">We record every notice.</span> Each
+            <strong>We record every notice.</strong> Each
             compliant takedown notice we act on is recorded against the client account
             responsible for the affected service.
           </li>
           <li>
-            <span className="text-foreground font-medium">We notify the client.</span> The client
+            <strong>We notify the client.</strong> The client
             is informed of the complaint, what was removed or disabled, and that the complaint
             has been recorded against their account.
           </li>
           <li>
-            <span className="text-foreground font-medium">Repeat complaints escalate.</span>{' '}
+            <strong>Repeat complaints escalate.</strong>{' '}
             Further compliant notices against the same account lead to escalating action, which
             may include a formal warning, suspension of the affected service, and termination of
             the account.
           </li>
           <li>
-            <span className="text-foreground font-medium">Successful counter-notices do not count.</span>{' '}
+            <strong>Successful counter-notices do not count.</strong>{' '}
             A complaint that is withdrawn, or that is resolved in the client&rsquo;s favor through
             a counter-notification with no court action following, is not counted against the
             account.
           </li>
           <li>
-            <span className="text-foreground font-medium">Egregious cases are immediate.</span>{' '}
+            <strong>Egregious cases are immediate.</strong>{' '}
             Where the infringement is flagrant, commercial in scale, or accompanied by other
             violations of our Acceptable Use Policy, we may terminate an account without waiting
             for a further notice.
@@ -263,7 +267,7 @@ export default function DmcaContent() {
           apply it consistently. Do NOT publish a number here unless the billing panel actually
           tracks strikes per account and you intend to enforce it exactly as written.
         */}
-        <p className="mt-4">
+        <p>
           Termination under this section is a termination for cause. As set out in our{' '}
           <Link href={siteConfig.paths.refund}>Refund Policy</Link>,
           services terminated for violations of our Terms or Acceptable Use Policy are not
@@ -290,9 +294,7 @@ export default function DmcaContent() {
         <p>
           This policy covers copyright only. Complaints about trademark infringement,
           defamation, privacy violations, or other unlawful content should be sent to{' '}
-          <a href={`mailto:${siteConfig.email.support}`}>
-            {siteConfig.email.support}
-          </a>{' '}
+          <Email name="support" />{' '}
           with a clear description of the material, its location, and the legal basis for your
           complaint. Those complaints are handled under our{' '}
           <Link href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</Link>{' '}
@@ -316,27 +318,7 @@ export default function DmcaContent() {
           Copyright notices and counter-notices should go to the designated agent listed in
           Section 2. General questions about this policy can be sent to:
         </p>
-        <div className="mt-4 p-5 rounded-xl border border-border/70 bg-card/30 space-y-1.5 text-sm relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p className="font-semibold text-foreground">WSLATL LLC</p>
-          <p>Missouri, United States</p>
-          <p>
-            Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
-            {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
-          </p>
-          <p>
-            Discord:{' '}
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteConfig.legal.discordVanity}
-            </a>
-          </p>
-        </div>
+        <CompanyContact />
       </LegalSection>
     </>
   )

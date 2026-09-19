@@ -1,11 +1,13 @@
 import { siteConfig } from '@/config/site'
+import type { EmailName } from '@/config/emails'
 
-export interface ReachOption {
+interface ReachOptionBase {
   title: string
   description: string
-  cta: string
-  href: string
 }
+
+/** A way to reach us: a link with its own button text, or one of our emails. */
+export type ReachOption = ReachOptionBase & ({ cta: string; href: string } | { email: EmailName })
 
 export const reachOptions: ReachOption[] = [
   {
@@ -24,7 +26,6 @@ export const reachOptions: ReachOption[] = [
   {
     title: 'Email',
     description: 'Prefer email? A person reads every message.',
-    cta: siteConfig.email.support,
-    href: `mailto:${siteConfig.email.support}`,
+    email: 'support',
   },
 ]

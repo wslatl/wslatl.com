@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
+import { Callout, CompanyContact, ScrollTable } from '@/components/legal/blocks'
+import { Email } from '@/components/ui/email'
 
 export default function SubprocessorsContent() {
   return (
@@ -33,7 +35,7 @@ export default function SubprocessorsContent() {
           relevant, the general footprint of the infrastructure it uses.
         </p>
 
-        <div className="overflow-x-auto mt-3">
+        <ScrollTable label="Subprocessors">
           <table className="legal-table">
             <thead>
               <tr>
@@ -106,7 +108,7 @@ export default function SubprocessorsContent() {
               </tr>
             </tbody>
           </table>
-        </div>
+        </ScrollTable>
 
         {/*
           OWNER DECISION NEEDED: datacenter partner identity and location.
@@ -124,23 +126,18 @@ export default function SubprocessorsContent() {
           A GDPR subprocessor list that omits the entity holding the hardware is not complete,
           and a client asking for a data processing agreement will ask for exactly this.
         */}
-        <div className="mt-4">
-          <div className="legal-callout border-yellow-500/30 text-yellow-300">
-            <strong>Datacenter partner: to be published</strong>
-            The operator and location of the facilities housing our servers are being confirmed
-            and will be named here. If you need this information before it is published, for
-            example to complete your own vendor review, contact us at {siteConfig.email.support}
-            and we will provide it.
-          </div>
-        </div>
+        <Callout tone="caution" title="Datacenter partner: to be published">
+          The operator and location of the facilities housing our servers are being confirmed
+          and will be named here. If you need this information before it is published, for
+          example to complete your own vendor review, contact us at <Email name="support" />
+          and we will provide it.
+        </Callout>
 
-        <p className="mt-4">
+        <p>
           We may add or replace a subprocessor as our infrastructure changes. When we do, we will
           update this page. Active clients who have asked to be notified of subprocessor changes
           will be told by email; you can opt in by writing to{' '}
-          <a href={`mailto:${siteConfig.email.support}`}>
-            {siteConfig.email.support}
-          </a>.
+          <Email name="support" />.
         </p>
       </LegalSection>
 
@@ -197,22 +194,22 @@ export default function SubprocessorsContent() {
           recipients. Where we transfer personal data out of the EEA or the UK, we rely on the
           following:
         </p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>
-            <span className="text-foreground font-medium">Necessity for the contract.</span> For
+            <strong>Necessity for the contract.</strong> For
             most transfers, the transfer is necessary to perform the contract you have asked us to
             perform. You cannot be given a server in our facility without your data reaching our
             facility.
           </li>
           <li>
-            <span className="text-foreground font-medium">Standard Contractual Clauses.</span>{' '}
+            <strong>Standard Contractual Clauses.</strong>{' '}
             Where a subprocessor offers them, we rely on the European Commission&rsquo;s Standard
             Contractual Clauses, and on the UK International Data Transfer Addendum for UK
             transfers. Several of the providers listed above incorporate these clauses into their
             standard data processing terms.
           </li>
           <li>
-            <span className="text-foreground font-medium">Provider-level frameworks.</span> Some
+            <strong>Provider-level frameworks.</strong> Some
             of the providers listed above maintain their own certifications or transfer mechanisms
             covering the data they receive. Those mechanisms are the provider&rsquo;s, not ours,
             and you should consult the provider&rsquo;s own privacy documentation for detail.
@@ -240,17 +237,15 @@ export default function SubprocessorsContent() {
                if not, a representative must be appointed and named on this page and in the
                Privacy Policy.
         */}
-        <p className="mt-4">
+        <p>
           WSLATL does not currently maintain its own certification under the EU-US Data Privacy
           Framework. We do not claim adequacy on that basis.
         </p>
-        <p className="mt-3">
+        <p>
           If you require a data processing agreement, a copy of the Standard Contractual Clauses
           as we apply them, or a transfer impact assessment for your own compliance file, contact
           us at{' '}
-          <a href={`mailto:${siteConfig.email.support}`}>
-            {siteConfig.email.support}
-          </a>{' '}
+          <Email name="support" />{' '}
           and we will work through it with you.
         </p>
       </LegalSection>
@@ -259,22 +254,22 @@ export default function SubprocessorsContent() {
         <p>
           There is an important distinction between the two kinds of data involved in hosting.
         </p>
-        <ul className="list-disc pl-5 space-y-2 mt-2">
+        <ul>
           <li>
-            <span className="text-foreground font-medium">Your account data.</span> The
+            <strong>Your account data.</strong> The
             information you give us to open and run your account, such as your name, email
             address, billing address, and invoice history. WSLATL is the controller of this data
             and the subprocessors listed above are engaged by us.
           </li>
           <li>
-            <span className="text-foreground font-medium">Data on your services.</span> Whatever
+            <strong>Data on your services.</strong> Whatever
             you or your users store on a server we host for you, including databases, game server
             data, uploaded files, and application logs. You decide what is collected and why.
             WSLATL is a processor of that data, not the controller, and this subprocessor list is
             not a list of your subprocessors.
           </li>
         </ul>
-        <p className="mt-4">
+        <p>
           If you are hosting other people&rsquo;s personal data on a WSLATL service, the
           obligations of a controller under the GDPR or other applicable law fall on you. That
           includes having a lawful basis, providing notice to your own users, and maintaining your
@@ -300,27 +295,7 @@ export default function SubprocessorsContent() {
           Questions about this list, requests for a data processing agreement, and privacy
           requests generally should be directed to:
         </p>
-        <div className="mt-4 p-5 rounded-xl border border-border/70 bg-card/30 space-y-1.5 text-sm relative overflow-hidden">
-          <div aria-hidden className="absolute -top-px left-0 w-1/2 h-px bg-gradient-to-r from-primary/50 to-transparent" />
-          <p className="font-semibold text-foreground">WSLATL LLC</p>
-          <p>Missouri, United States</p>
-          <p>
-            Email:{' '}
-            <a href={`mailto:${siteConfig.email.support}`}>{siteConfig.email.support}</a>
-            {' '}or{' '}
-            <a href={`mailto:${siteConfig.email.info}`}>{siteConfig.email.info}</a>
-          </p>
-          <p>
-            Discord:{' '}
-            <a
-              href={siteConfig.links.discord}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {siteConfig.legal.discordVanity}
-            </a>
-          </p>
-        </div>
+        <CompanyContact />
       </LegalSection>
     </>
   )

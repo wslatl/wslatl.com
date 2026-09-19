@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Geist, Instrument_Serif } from 'next/font/google'
 import { JsonLd } from '@/components/seo/json-ld'
 import { siteConfig } from '@/config/site'
+import { shortLinks } from '@/config/links'
 import './globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
@@ -102,13 +103,13 @@ const organizationJsonLd = {
   url: siteConfig.siteUrl,
   logo: `${siteConfig.siteUrl}/logo.png`,
   description: siteConfig.description,
-  email: siteConfig.email.support,
   address: {
     '@type': 'PostalAddress',
     addressRegion: 'MO',
     addressCountry: 'US',
   },
-  sameAs: [siteConfig.links.discord, siteConfig.trustpilot.profileUrl],
+  // Profiles by their real addresses: search engines match these, not redirects.
+  sameAs: [shortLinks.discord.url, shortLinks.trustpilot.url, shortLinks.github.url],
 }
 
 export default function RootLayout({

@@ -7,6 +7,7 @@ import { legalPages, legalSlug } from '@/data/legal'
 import { games } from '@/data/games'
 import { productLines } from '@/data/pricing'
 import { reachOptions } from '@/data/reach-options'
+import { isShortLink, shortLinks } from '@/config/links'
 import nextConfig from '../next.config.mjs'
 
 const root = join(__dirname, '..')
@@ -40,6 +41,14 @@ function appRoutes(): Set<string> {
   return routes
 }
 
+function sourceFiles(dir: string): string[] {
+  return readdirSync(dir).flatMap((name) => {
+    const path = join(dir, name)
+    if (statSync(path).isDirectory()) return sourceFiles(path)
+    return /\.(tsx?|mjs|json)$/.test(name) ? [path] : []
+  })
+}
+
 /** Section ids rendered on the home page, found in the section components. */
 function homeSectionIds(): Set<string> {
   const dir = join(root, 'components', 'sections')
@@ -59,6 +68,7 @@ const pricingAnchors = new Set(productLines.map((l) => l.anchor))
 function brokenReason(href: string): string | null {
   const [path, hash] = href.split('#')
   const route = path === '' ? '/' : path
+  if (isShortLink(route)) return null
   if (!routes.has(route)) return `no route for ${href}`
   if (hash && route === '/' && !sectionIds.has(hash)) return `no #${hash} on the home page`
   if (hash && route === '/pricing' && !pricingAnchors.has(hash)) return `no #${hash} on /pricing`
@@ -71,7 +81,7 @@ const allLinks = [
   requestAccessLink,
   ...footerColumns.flatMap((c) => c.links),
   ...legalPages.map((p) => ({ label: p.label, href: p.href })),
-  ...reachOptions.map((o) => ({ label: o.title, href: o.href })),
+  ...reachOptions.flatMap((o) => ('href' in o ? [{ label: o.title, href: o.href }] : [])),
 ]
 
 // Every check collects all failures and asserts once, so a broken link
@@ -92,9 +102,41 @@ describe('links', () => {
 
   it('redirects retired URLs to pages that exist', async () => {
     const redirects = await nextConfig.redirects()
-    expect(redirects.length).toBeGreaterThan(0)
+    const retired = redirects.filter((r) => r.permanent)
+    expect(retired.length).toBeGreaterThan(0)
     expect(redirects.filter((r) => routes.has(r.source)).map((r) => r.source)).toEqual([])
-    expect(redirects.filter((r) => !routes.has(r.destination)).map((r) => r.destination)).toEqual([])
+    expect(retired.filter((r) => !routes.has(r.destination)).map((r) => r.destination)).toEqual([])
+  })
+
+  it('redirects every short link, temporarily, to its https destination', async () => {
+    const redirects = await nextConfig.redirects()
+    const problems = Object.entries(shortLinks).flatMap(([name, { path, url }]) => {
+      const redirect = redirects.find((r) => r.source === path)
+      if (!/^\/[a-z0-9-]+$/.test(path)) return [`${name}: ${path} is not a simple path`]
+      if (!url.startsWith('https://')) return [`${name}: ${url} is not https`]
+      if (!redirect) return [`${name}: no redirect for ${path}`]
+      // Permanent redirects are cached by browsers, which would pin visitors
+      // to an old destination after it changes.
+      if (redirect.permanent) return [`${name}: ${path} must not be permanent`]
+      if (redirect.destination !== url) return [`${name}: ${path} goes to ${redirect.destination}`]
+      return []
+    })
+    expect(problems).toEqual([])
+    const paths = Object.values(shortLinks).map((link) => link.path)
+    expect(new Set(paths).size).toBe(paths.length)
+  })
+
+  it('links to panels and profiles only through their short links', () => {
+    // Typing a destination into a page defeats the point: it would not follow
+    // the next change to config/links.json.
+    const destinations = Object.values(shortLinks).map((link) => link.url.replace(/\/$/, ''))
+    const offenders = ['app', 'components', 'content', 'data', 'lib']
+      .flatMap((dir) => sourceFiles(join(root, dir)))
+      .flatMap((file) => {
+        const text = readFileSync(file, 'utf8')
+        return destinations.filter((url) => text.includes(url)).map((url) => `${relative(root, file)}: ${url}`)
+      })
+    expect(offenders).toEqual([])
   })
 
   it('keeps every legal document reachable at its old top-level URL', async () => {
