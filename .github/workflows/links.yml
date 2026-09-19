@@ -29,7 +29,9 @@ jobs:
           echo "urls=$pages" >> "$GITHUB_OUTPUT"
       - name: Check every link on them
         id: lychee
-        uses: lycheeverse/lychee-action@v2
+        # Pinned to a commit: a tag can be moved to other code, and this is
+        # the one action here that is not from GitHub. Dependabot bumps it.
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: --config lychee.toml ${{ steps.pages.outputs.urls }}
           output: ${{ runner.temp }}/links.md
