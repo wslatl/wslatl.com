@@ -142,6 +142,27 @@
     scrollbar-width: thin;
   }
 }
+/* Quiet scroll areas (the legal sidebar): the thumb only shows while the
+   area is hovered or holds keyboard focus. It still scrolls with the wheel,
+   touch, and Tab the whole time, so nothing becomes unreachable. This uses
+   the standard properties, which Chrome and Firefox repaint on hover (Chrome
+   does not repaint ::-webkit-scrollbar parts on a parent's :hover). */
+.scroll-quiet {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+.scroll-quiet:hover,
+.scroll-quiet:focus-within {
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+/* Safari has no standard scrollbar-color yet, so it uses these instead. */
+.scroll-quiet::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+.scroll-quiet:hover::-webkit-scrollbar-thumb,
+.scroll-quiet:focus-within::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+}
 
 /* ----- Header: the hairline border fades in once the page scrolls ----- */
 /* Pure CSS, no scroll listener. Browsers without scroll timelines keep the border. */

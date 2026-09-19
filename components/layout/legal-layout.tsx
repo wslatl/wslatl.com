@@ -136,7 +136,7 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
       <Main className="shell">
         <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[15rem_minmax(0,1fr)] xl:gap-16">
           <aside className="hidden lg:block print:hidden">
-            <div className="sticky top-16 max-h-[calc(100dvh-4rem)] space-y-10 overflow-y-auto pt-24 pb-10">
+            <div className="scroll-quiet sticky top-16 max-h-[calc(100dvh-4rem)] space-y-10 overflow-y-auto pt-24 pb-10">
               <nav aria-label="On this page">
                 <p className="mb-3 text-sm font-semibold text-foreground">On this page</p>
                 <TocList entries={toc} />
