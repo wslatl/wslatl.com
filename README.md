@@ -26,7 +26,7 @@ app/
   games/page.tsx           Game directory with search.
   games/[slug]/page.tsx    One page per game, statically generated from data/games.ts.
   legal/page.tsx           Index of every legal document.
-  <policy>/page.tsx        One thin route per policy (privacy, terms, sla, ...).
+  legal/[slug]/page.tsx    Every policy, at /legal/privacy, /legal/terms, and so on.
   not-found.tsx, error.tsx Branded 404 and error pages.
   sitemap.ts, robots.ts    Generated from the same data the pages use.
 
@@ -40,7 +40,7 @@ components/
   seo/json-ld.tsx          Structured data.
 
 config/site.ts             Links, emails, paths, credits, legal metadata and effective dates.
-content/legal/             The text of each policy.
+content/legal/             The text of each policy; index.ts maps each document to its text.
 data/                      Everything else the pages render (see below).
 lib/                       pricing helpers, pageMetadata(), cn() and slugify().
 tests/                     Vitest suites for data, links, and house style.
@@ -68,7 +68,9 @@ Never type a price, a plan spec, or an uptime figure anywhere else. Format price
 
 Use `pageMetadata({ title, description, path })` from `lib/metadata.ts` for every new page. It sets the canonical URL and the full Open Graph and Twitter set. Next.js replaces a nested `openGraph` object instead of merging it, so hand-written page metadata silently loses the share image.
 
-Retired URLs get a permanent redirect in `next.config.mjs`. The link tests check that every redirect lands on a page that exists.
+Retired URLs get a permanent redirect in `next.config.mjs`, in the same change that moves the page. The link tests check that every redirect lands on a page that exists. The legal documents moved from the site root to `/legal/...` in September 2026; their old paths (`/privacy`, `/terms`, and so on) redirect, and a test fails if any document loses its redirect. Always link to a legal document through `siteConfig.paths`, never a typed-out path (a test enforces this too).
+
+To add a legal document: add its path to `siteConfig.paths` and its date to `effectiveDates`, add an entry to `data/legal.ts`, write the text in `content/legal/`, and register it in `content/legal/index.ts`. The route, footer link, sitemap entry, and table of contents follow automatically.
 
 ---
 

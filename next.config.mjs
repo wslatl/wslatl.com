@@ -2,6 +2,19 @@
  * @type {import('next').NextConfig}
  */
 
+const legalSlugs = [
+  'privacy',
+  'terms',
+  'acceptable-use',
+  'refund',
+  'sla',
+  'dmca',
+  'abuse',
+  'account-credit',
+  'subprocessors',
+  'backups',
+]
+
 // React needs eval() in development for its debugging tools. Production
 // never does, so it only gets 'unsafe-eval' while running `next dev`.
 const isDev = process.env.NODE_ENV === 'development'
@@ -70,6 +83,11 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Legal documents moved from the site root to /legal on 2026-09-19. Old
+      // links live on in emails, forms, the billing portal, and search results,
+      // so every old path keeps working. tests/links.test.ts checks this list
+      // covers every document in data/legal.ts.
+      ...legalSlugs.map((slug) => ({ source: `/${slug}`, destination: `/legal/${slug}`, permanent: true })),
       // This page always described BeamMP; the old slug was a leftover.
       { source: '/games/rust-console', destination: '/games/beammp', permanent: true },
       // Neither game can be hosted by a third party (EA runs Battlefield 2042

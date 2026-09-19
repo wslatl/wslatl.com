@@ -36,6 +36,19 @@ describe('house style', () => {
   })
 })
 
+describe('legal paths', () => {
+  it('links to legal documents through siteConfig.paths, never a hard-coded path', () => {
+    // A literal "/terms" silently goes stale when documents move (they did,
+    // to /legal/...). Every legal link has to come from config.
+    const slugs = legalPages.map((page) => page.href.split('/').pop())
+    const literal = new RegExp(`["'\`]/(legal/)?(${slugs.join('|')})["'\`#]`)
+    const offenders = ['app', 'components', 'content', 'data', 'lib']
+      .flatMap((dir) => sourceFiles(join(root, dir)))
+      .filter((file) => literal.test(readFileSync(file, 'utf8')))
+    expect(offenders).toEqual([])
+  })
+})
+
 describe('games', () => {
   it('has unique, URL-safe slugs', () => {
     const slugs = games.map((g) => g.slug)

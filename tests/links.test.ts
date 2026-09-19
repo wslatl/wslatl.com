@@ -3,13 +3,19 @@ import { join, relative, sep } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { mainNav, portalLinks, requestAccessLink } from '@/data/nav'
 import { footerColumns } from '@/data/footer'
-import { legalPages } from '@/data/legal'
+import { legalPages, legalSlug } from '@/data/legal'
 import { games } from '@/data/games'
 import { productLines } from '@/data/pricing'
 import { reachOptions } from '@/data/reach-options'
 import nextConfig from '../next.config.mjs'
 
 const root = join(__dirname, '..')
+
+/** The slugs each dynamic route is statically generated for. */
+const dynamicSlugs: Record<string, string[]> = {
+  '/games/[slug]': games.map((game) => game.slug),
+  '/legal/[slug]': legalPages.map(legalSlug),
+}
 
 /** Every route the app serves, read from the app directory. */
 function appRoutes(): Set<string> {
@@ -20,8 +26,10 @@ function appRoutes(): Set<string> {
       if (statSync(path).isDirectory()) walk(path)
       else if (name === 'page.tsx') {
         const route = '/' + relative(join(root, 'app'), dir).split(sep).join('/')
-        if (route.includes('[slug]')) {
-          for (const game of games) routes.add(route.replace('[slug]', game.slug))
+        if (route.includes('[')) {
+          const slugs = dynamicSlugs[route]
+          if (!slugs) throw new Error(`Add ${route} to dynamicSlugs in tests/links.test.ts`)
+          for (const slug of slugs) routes.add(route.replace('[slug]', slug))
         } else {
           routes.add(route === '/' ? '/' : route.replace(/\/$/, ''))
         }
@@ -87,5 +95,15 @@ describe('links', () => {
     expect(redirects.length).toBeGreaterThan(0)
     expect(redirects.filter((r) => routes.has(r.source)).map((r) => r.source)).toEqual([])
     expect(redirects.filter((r) => !routes.has(r.destination)).map((r) => r.destination)).toEqual([])
+  })
+
+  it('keeps every legal document reachable at its old top-level URL', async () => {
+    // Legal pages moved from /privacy to /legal/privacy (and so on). Old links
+    // must keep working, so each document needs a permanent redirect.
+    const redirects = await nextConfig.redirects()
+    const missing = legalPages
+      .map((page) => ({ from: `/${legalSlug(page)}`, to: page.href }))
+      .filter(({ from, to }) => !redirects.some((r) => r.source === from && r.destination === to && r.permanent))
+    expect(missing).toEqual([])
   })
 })

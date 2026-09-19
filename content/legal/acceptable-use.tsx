@@ -13,7 +13,7 @@ export default function AcceptableUseContent() {
         </p>
         <p>
           This AUP is incorporated into and made part of our{' '}
-          <Link href="/terms">Terms of Service</Link>. By using
+          <Link href={siteConfig.paths.terms}>Terms of Service</Link>. By using
           any WSLATL service, you agree to comply with this policy. Violations may result in
           immediate suspension or termination of your services without refund, and potentially
           referral to law enforcement.

@@ -114,8 +114,14 @@ export const legalPages: LegalPage[] = [
   },
 ]
 
-export function legalPage(key: LegalDocumentKey): LegalPage {
-  const page = legalPages.find((p) => p.key === key)
-  if (!page) throw new Error(`Unknown legal document "${key}"`)
-  return page
+/** Every legal document is served at /legal/<slug>. */
+export const LEGAL_BASE_PATH = '/legal'
+
+/** The last path segment, for example privacy for the Privacy Policy. */
+export function legalSlug(page: LegalPage): string {
+  return page.href.slice(LEGAL_BASE_PATH.length + 1)
+}
+
+export function legalPageBySlug(slug: string): LegalPage | undefined {
+  return legalPages.find((page) => legalSlug(page) === slug)
 }

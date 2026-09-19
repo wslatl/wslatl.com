@@ -14,7 +14,7 @@ export default function RefundContent() {
         </p>
         <p>
           This policy is incorporated into and made part of our{' '}
-          <Link href="/terms">Terms of Service</Link> by reference.
+          <Link href={siteConfig.paths.terms}>Terms of Service</Link> by reference.
           The rules below are the authoritative source for refund eligibility, windows, and
           processing. In the event of any conflict between this Refund Policy and any other WSLATL
           document, this Refund Policy controls.
