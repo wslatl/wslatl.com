@@ -1,0 +1,52 @@
+name: Lighthouse
+
+# Builds the site and audits key pages (settings in lighthouserc.json).
+# Accessibility, best practices, and SEO must stay at 100, and page weight
+# and layout shift have budgets. The full reports are kept as an artifact.
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', '.github/**', 'tests/**']
+  pull_request:
+    paths-ignore: ['**.md', 'tests/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # Started here rather than by Lighthouse itself, so a server that never
+      # comes up fails in seconds instead of hanging the run.
+      - name: Start the built site
+        run: |
+          npm run start -- --port 3100 &
+          for _ in $(seq 1 60); do
+            curl -fsS http://localhost:3100/ > /dev/null && exit 0
+            sleep 1
+          done
+          echo "The site did not start" >&2
+          exit 1
+      - name: Audit key pages
+        run: npx --yes @lhci/cli@0.15.1 autorun
+      - name: Keep the reports
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse-reports
+          path: lighthouse-reports/
+          retention-days: 14

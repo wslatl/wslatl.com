@@ -1,0 +1,51 @@
+name: Tracking issue
+description: >-
+  Keeps one issue per recurring check. Opens it when the check first fails,
+  updates its report in place while it keeps failing (no notification spam),
+  and closes it with a comment once the check passes again.
+
+inputs:
+  title:
+    description: Issue title. It is also how the issue is found again, so keep it fixed.
+    required: true
+  label:
+    description: Label for the issue. Created if the repository does not have it yet.
+    required: true
+  report:
+    description: Path to the Markdown report that becomes the issue body.
+    required: true
+  failing:
+    description: "'true' when the check found a problem."
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Open, update, or close the issue
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+        TITLE: ${{ inputs.title }}
+        LABEL: ${{ inputs.label }}
+        REPORT: ${{ inputs.report }}
+        FAILING: ${{ inputs.failing }}
+        RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        number=$(gh issue list --state open --label "$LABEL" --json number,title \
+          --jq '.[] | select(.title == env.TITLE) | .number' | head -n 1)
+        if [ "$FAILING" = "true" ]; then
+          # Issue bodies top out at 65,536 characters.
+          { head -c 60000 "$REPORT"; printf '\n\n---\nFrom [this run](%s).\n' "$RUN_URL"; } > "$RUNNER_TEMP/issue-body.md"
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --body-file "$RUNNER_TEMP/issue-body.md"
+            echo "Updated #$number"
+          else
+            gh label create "$LABEL" --color d93f0b --description "Opened by a scheduled check" 2>/dev/null || true
+            gh issue create --title "$TITLE" --label "$LABEL" --body-file "$RUNNER_TEMP/issue-body.md"
+          fi
+        elif [ -n "$number" ]; then
+          gh issue close "$number" --comment "Resolved: [this run]($RUN_URL) found nothing left to fix."
+        else
+          echo "Nothing to report and no open issue."
+        fi

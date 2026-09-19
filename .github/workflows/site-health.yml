@@ -1,0 +1,51 @@
+name: Site health
+
+# Every six hours: checks production with scripts/check-site.mjs (pages,
+# 404s, security headers, moved pages, short links, TLS certificate). A
+# failure opens one issue, "wslatl.com health check is failing", which closes
+# itself when the site recovers. Run it by hand against any URL, such as a
+# staging copy, to check a deploy before it goes live.
+on:
+  schedule:
+    - cron: '15 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Site to check
+        default: https://wslatl.com
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SITE_URL: ${{ inputs.url || 'https://wslatl.com' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - name: Check the site
+        id: check
+        run: |
+          status=0
+          node scripts/check-site.mjs "$SITE_URL" > "$RUNNER_TEMP/health.md" || status=$?
+          cat "$RUNNER_TEMP/health.md" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -ne 0 ]; then failing=true; else failing=false; fi
+          echo "failing=$failing" >> "$GITHUB_OUTPUT"
+      # Only production gets an issue; a hand-run check of another URL just
+      # reports in the summary.
+      - if: env.SITE_URL == 'https://wslatl.com'
+        uses: ./.github/actions/tracking-issue
+        with:
+          title: wslatl.com health check is failing
+          label: site-health
+          report: ${{ runner.temp }}/health.md
+          failing: ${{ steps.check.outputs.failing }}
+      - name: Fail when a check failed
+        if: steps.check.outputs.failing == 'true'
+        run: exit 1

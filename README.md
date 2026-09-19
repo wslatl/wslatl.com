@@ -45,6 +45,7 @@ config/emails.ts           Our email addresses. Server-only; rendered through <E
 content/legal/             The text of each policy; index.ts maps each document to its text.
 data/                      Everything else the pages render (see below).
 lib/                       pricing helpers, pageMetadata(), cn() and slugify().
+scripts/                   Checks that need a build or a live site (see Automation).
 tests/                     Vitest suites for data, links, and house style.
 ```
 
@@ -127,13 +128,37 @@ Then open [http://localhost:3000](http://localhost:3000). Pass a port with `npm 
 | `npm run lint:fix` | Same, applying the safe automatic fixes |
 | `npm test` | Vitest: pricing invariants, link integrity, redirects, legal data, and a no-em-dash check |
 | `npm run typecheck` | `tsc` (TypeScript 7) against the whole project; run after a build |
-| `npm run check` | All of the above, in the order CI runs them |
+| `npm run scan:build` | Fails if an email address reached the build output |
+| `npm run check:site <url>` | Checks a running site: pages, headers, redirects, short links, certificate |
+| `npm run check` | Lint, test, build, scan, typecheck, in the order CI runs them |
 
 Linting runs in two passes. [Oxlint](https://oxc.rs/docs/guide/usage/linter) goes first and does most of the work in well under a second (config in `.oxlintrc.json`: correctness rules fail the lint, suspicious patterns warn). ESLint then covers only what Oxlint cannot check yet, mainly the React Compiler hook rules and the rest of the Next.js set; `eslint-plugin-oxlint` switches off every ESLint rule Oxlint already runs, so nothing is reported twice. To silence a rule on one line, use an `oxlint-disable-next-line` comment with a reason.
 
 TypeScript 7 provides `tsc`. The `typescript` package is aliased to `@typescript/typescript6` because ESLint's TypeScript parser still needs the TypeScript 6 API. ESLint stays on 9.x until `eslint-plugin-react` supports 10.
 
-CI (`.github/workflows/ci.yml`) runs lint, tests, build, and typecheck on every push to `main` and every pull request.
+The Node.js version lives in `.nvmrc`; every workflow reads it from there.
+
+---
+
+## Automation
+
+| Workflow | Runs | What it does when it fails |
+| --- | --- | --- |
+| CI | Every push and pull request | Lint, tests, build, email scan, typecheck. Red check on the commit. |
+| Outdated packages | Mondays | Keeps one issue listing packages with newer versions. It closes itself once everything is current. |
+| Security audit | Daily, and on dependency changes | Fails on a known vulnerability or a bad registry signature. |
+| CodeQL | Push, pull request, weekly | Static analysis of the site code and these workflows. Findings appear under Security. |
+| Dependency review | Pull requests | Blocks a pull request that would add a vulnerable package. |
+| Lighthouse | Push and pull request | Accessibility, best practices, and SEO must stay at 100, with page weight and layout shift budgets (`lighthouserc.json`). Reports are kept as an artifact. |
+| Broken links | Mondays | Opens every page in the live sitemap and follows every link (`lychee.toml`). Broken ones go in one issue. |
+| Site health | Every six hours | Checks production with `scripts/check-site.mjs`. A failure opens one issue that closes itself when the site recovers. Run it by hand against any URL to check a deploy. |
+| Workflow lint | Changes under `.github` | actionlint, including shellcheck on every `run` step. |
+
+Dependabot (`.github/dependabot.yml`) opens grouped pull requests for npm packages and action versions every Monday, three days after a release so a hijacked version that gets pulled quickly never arrives. Majors held back on purpose are listed there and in `scripts/outdated-report.mjs`.
+
+The scheduled workflows write to one issue each rather than a new one every week: opened on the first failure, quietly updated while it keeps failing, closed with a comment when it passes again (`.github/actions/tracking-issue`).
+
+GitHub turns off scheduled workflows in a repository with no activity for 60 days, and mails the person who last edited a schedule when one fails.
 
 ---
 

@@ -1,0 +1,45 @@
+# Weekly pull requests that keep dependencies current. Minor and patch
+# updates arrive together in one pull request; each major comes on its own,
+# since those are the ones worth reading. A new release waits three days
+# before Dependabot offers it, which keeps a hijacked release that gets
+# pulled within hours from ever reaching this repository.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/Chicago
+    cooldown:
+      default-days: 3
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    # Held back on purpose. Keep in step with heldMajors in
+    # scripts/outdated-report.mjs, which says why.
+    ignore:
+      - dependency-name: eslint
+        update-types: [version-update:semver-major]
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: America/Chicago
+    cooldown:
+      default-days: 3
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ['*']

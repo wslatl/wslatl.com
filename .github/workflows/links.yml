@@ -1,0 +1,46 @@
+name: Broken links
+
+# Every Monday: opens every page in the live sitemap and checks every link
+# on it, on this site and off it (settings in lychee.toml). Broken ones go
+# into one issue, "Broken links on wslatl.com", which closes itself once
+# they are fixed.
+on:
+  schedule:
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  SITE_URL: https://wslatl.com
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: List the pages in the sitemap
+        id: pages
+        run: |
+          pages=$(curl -fsSL "$SITE_URL/sitemap.xml" | grep -o '<loc>[^<]*' | sed 's/<loc>//' | tr '\n' ' ')
+          echo "urls=$pages" >> "$GITHUB_OUTPUT"
+      - name: Check every link on them
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --config lychee.toml ${{ steps.pages.outputs.urls }}
+          output: ${{ runner.temp }}/links.md
+          fail: false
+          jobSummary: true
+      - uses: ./.github/actions/tracking-issue
+        with:
+          title: Broken links on wslatl.com
+          label: broken-links
+          report: ${{ runner.temp }}/links.md
+          failing: ${{ steps.lychee.outputs.exit_code != 0 }}
+      - name: Fail when a link is broken
+        if: steps.lychee.outputs.exit_code != 0
+        run: exit 1

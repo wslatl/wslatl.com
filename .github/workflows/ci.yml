@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -11,13 +15,14 @@ concurrency:
 
 jobs:
   check:
+    name: Lint, test, build, typecheck
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run lint
@@ -25,4 +30,6 @@ jobs:
       # The build generates the route types next-env.d.ts points at, so the
       # standalone typecheck runs after it.
       - run: npm run build
+      - name: No email address in what the site serves
+        run: npm run scan:build
       - run: npm run typecheck

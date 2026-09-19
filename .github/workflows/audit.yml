@@ -1,0 +1,36 @@
+name: Security audit
+
+# Daily, and whenever the dependencies change: fails on a known
+# vulnerability, or on a package whose registry signature does not check out.
+on:
+  push:
+    branches: [main]
+    paths: [package.json, package-lock.json]
+  pull_request:
+    paths: [package.json, package-lock.json]
+  schedule:
+    - cron: '30 11 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Registry signatures and provenance
+        run: npm audit signatures
+      # The site's own dependencies run on the server, so any advisory counts.
+      - name: Vulnerabilities in what the site runs
+        run: npm audit --omit=dev --audit-level=moderate
+      # Build tools never reach visitors; fail on the serious ones.
+      - name: Vulnerabilities in the build tools
+        run: npm audit --audit-level=high

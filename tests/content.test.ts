@@ -19,12 +19,18 @@ function sourceFiles(dir: string): string[] {
 
 describe('house style', () => {
   it('has no em dashes anywhere in the site source', () => {
-    const files = ['app', 'components', 'config', 'content', 'data', 'lib', 'tests', '.github']
+    const files = ['app', 'components', 'config', 'content', 'data', 'lib', 'scripts', 'tests', '.github']
       .flatMap((dir) => sourceFiles(join(root, dir)))
       .concat(
-        ['README.md', 'package.json', 'next.config.mjs', 'eslint.config.mjs', 'vitest.config.mts'].map((f) =>
-          join(root, f),
-        ),
+        [
+          'README.md',
+          'package.json',
+          'next.config.mjs',
+          'eslint.config.mjs',
+          'vitest.config.mts',
+          'lighthouserc.json',
+          'lychee.toml',
+        ].map((f) => join(root, f)),
       )
     // Built from parts so this file does not match itself.
     const emDash = String.fromCharCode(0x2014)

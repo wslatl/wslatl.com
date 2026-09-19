@@ -1,0 +1,20 @@
+name: Dependency review
+
+# On pull requests (Dependabot's included): blocks one that would add a
+# package with a known vulnerability. The report is in the job summary.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: moderate

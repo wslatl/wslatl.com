@@ -1,0 +1,17 @@
+# Settings for the weekly link check (.github/workflows/links.yml), which
+# opens every page in the live sitemap and follows every link on it.
+
+# Be patient with slow hosts before calling a link broken.
+max_retries = 3
+retry_wait_time = 5
+timeout = 30
+max_concurrency = 8
+
+# 429 means a host rate-limited us, not that the page is gone.
+accept = ["200..=299", "429"]
+
+# Addresses are not in the HTML at all (see "Email addresses" in README.md).
+include_mail = false
+
+# Nothing on this site should point at a private address.
+exclude_all_private = true

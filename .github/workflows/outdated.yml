@@ -1,0 +1,36 @@
+name: Outdated packages
+
+# Every Monday: lists packages with newer versions and keeps one issue,
+# "Outdated packages", up to date with that list. The issue closes itself
+# once everything is current. Dependabot opens the pull requests.
+on:
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Build the report
+        id: report
+        run: |
+          node scripts/outdated-report.mjs > "$RUNNER_TEMP/outdated.md"
+          cat "$RUNNER_TEMP/outdated.md" >> "$GITHUB_STEP_SUMMARY"
+      - uses: ./.github/actions/tracking-issue
+        with:
+          title: Outdated packages
+          label: dependencies
+          report: ${{ runner.temp }}/outdated.md
+          failing: ${{ steps.report.outputs.needs-attention }}
