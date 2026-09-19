@@ -1,4 +1,6 @@
 import { siteConfig } from '@/config/site'
+import { localePath, type Locale } from '@/i18n/config'
+import type { Copy } from '@/i18n/copy/en'
 
 export interface NavLink {
   label: string
@@ -10,26 +12,29 @@ export interface PortalLink extends NavLink {
 }
 
 /** Header navigation. External URLs open in a new tab automatically. */
-export const mainNav: NavLink[] = [
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Game servers', href: '/games' },
-  { label: 'Services', href: '/#services' },
-  { label: 'About', href: '/#about' },
-  { label: 'Contact', href: '/#contact' },
-  { label: 'Status', href: siteConfig.links.status },
-]
+export function mainNav(t: Copy, locale: Locale): NavLink[] {
+  const path = (href: string) => localePath(locale, href)
+  return [
+    { label: t.nav.pricing, href: path('/pricing') },
+    { label: t.nav.games, href: path('/games') },
+    { label: t.nav.services, href: path('/#services') },
+    { label: t.nav.about, href: path('/#about') },
+    { label: t.nav.contact, href: path('/#contact') },
+    { label: t.nav.status, href: siteConfig.links.status },
+  ]
+}
 
 /** Every client panel, shown in the header Login menu and the footer. */
-export const portalLinks: PortalLink[] = [
-  { label: 'Billing portal', href: siteConfig.links.billing, description: 'Invoices, orders, and support tickets' },
-  { label: 'Game panel', href: siteConfig.links.gamingPanel, description: 'Manage game servers' },
-  { label: 'VPS panel', href: siteConfig.links.vpsPanel, description: 'Manage your VPS' },
-  { label: 'Dedicated portal', href: siteConfig.links.dedicated, description: 'Manage dedicated servers' },
-  { label: 'cPanel', href: siteConfig.links.cPanel, description: 'Web hosting and email' },
-]
+export function portalLinks(t: Copy): PortalLink[] {
+  return [
+    { ...t.portals.billing, href: siteConfig.links.billing },
+    { ...t.portals.gamingPanel, href: siteConfig.links.gamingPanel },
+    { ...t.portals.vpsPanel, href: siteConfig.links.vpsPanel },
+    { ...t.portals.dedicated, href: siteConfig.links.dedicated },
+    { ...t.portals.cPanel, href: siteConfig.links.cPanel },
+  ]
+}
 
-export const requestAccessLink: PortalLink = {
-  label: 'Request access',
-  href: siteConfig.links.register,
-  description: 'New here? Apply for an account',
+export function requestAccessLink(t: Copy): PortalLink {
+  return { ...t.portals.register, href: siteConfig.links.register }
 }

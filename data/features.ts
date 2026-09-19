@@ -3,19 +3,23 @@ import { Cpu, ShieldCheck, UserCheck } from 'lucide-react'
 import { uptimeTarget } from '@/data/sla'
 
 export interface Commitment {
+  /** Stable key for translations; see i18n/content/types.ts. */
+  id: string
   value: string
   label: string
 }
 
 /** Concrete promises, each backed by a policy page or our own FAQ. Keep labels short and even. */
 export const commitments: Commitment[] = [
-  { value: uptimeTarget('vps'), label: 'Uptime target on VPS and web hosting' },
-  { value: 'Under 1 hr', label: 'Typical first reply on Discord in active hours' },
-  { value: 'Same day', label: 'Most servers go live the day you are approved' },
-  { value: '30 days', label: 'Written notice before any price increase' },
+  { id: 'uptime', value: uptimeTarget('vps'), label: 'Uptime target on VPS and web hosting' },
+  { id: 'reply', value: 'Under 1 hr', label: 'Typical first reply on Discord in active hours' },
+  { id: 'live', value: 'Same day', label: 'Most servers go live the day you are approved' },
+  { id: 'notice', value: '30 days', label: 'Written notice before any price increase' },
 ]
 
 export interface Feature {
+  /** Stable key for translations; see i18n/content/types.ts. */
+  id: string
   title: string
   description: string
   icon?: LucideIcon
@@ -23,6 +27,7 @@ export interface Feature {
 
 /** The lead promise, shown large beside the list. */
 export const leadFeature: Feature = {
+  id: 'real-person',
   title: 'You talk to a real person. Every time.',
   description:
     'No bot wall and no scripted responses. Open a ticket in your billing portal, ping us on Discord, or DM us directly, and you get someone who knows what they are doing and cares about your server.',
@@ -30,18 +35,21 @@ export const leadFeature: Feature = {
 
 export const features: Feature[] = [
   {
+    id: 'hardware',
     title: 'Hardware that holds up',
     icon: Cpu,
     description:
       'NVMe SSDs, high frequency CPUs, redundant network paths, and low latency routing. Built to run hard without cutting corners.',
   },
   {
+    id: 'uptime',
     title: 'Online when it counts',
     icon: ShieldCheck,
     description:
       'DDoS mitigation built in from the start. If something tries to knock you offline, we handle it.',
   },
   {
+    id: 'application-only',
     title: 'Picky for good reason',
     icon: UserCheck,
     description:

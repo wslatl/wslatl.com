@@ -1,44 +1,38 @@
 import Image from 'next/image'
 import { sectionHeadingClass } from '@/components/ui/section-header'
-import { team } from '@/data/team'
+import { copy } from '@/i18n/copy'
+import { localizedTeam } from '@/i18n/content'
 
 export function About() {
+  const t = copy().home.about
+  const team = localizedTeam()
+
   return (
     <section id="about" aria-labelledby="about-heading" className="py-20 md:py-28">
       <div className="shell">
         <h2 id="about-heading" className={`${sectionHeadingClass} max-w-4xl`}>
-          We built WSLATL because we got tired of watching hosting companies ignore their clients.
+          {t.heading}
         </h2>
 
         <div className="mt-12 grid gap-14 lg:grid-cols-[1.1fr_1fr] lg:gap-20">
           <div>
             <div className="space-y-4 leading-relaxed text-muted-foreground">
-              <p>
-                We have worked inside hosting companies. We have seen how tickets pile up, how clients get
-                passed around, how no one actually knows your setup. It is frustrating and it is entirely
-                avoidable.
-              </p>
-              <p>
-                So we started WSLATL. Based in Missouri, privately run, and small enough that every client
-                actually gets our attention. We are not trying to be the biggest hosting company. We are
-                trying to be the one you would actually recommend to a friend.
-              </p>
-              <p className="font-medium text-foreground">
-                Every client here is treated like family. That is the only way we know how to do this.
-              </p>
+              {t.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+              <p className="font-medium text-foreground">{t.closing}</p>
             </div>
 
             <figure className="mt-10 border-l-2 border-primary/60 pl-6">
               <blockquote className="font-serif text-2xl leading-snug text-foreground italic md:text-[1.7rem]">
-                &ldquo;In the hosting industry it is tough and you have to stand out. We just want to treat
-                our clients like family and make sure they get the best experience they can.&rdquo;
+                &ldquo;{t.quote}&rdquo;
               </blockquote>
-              <figcaption className="mt-4 text-sm text-muted-foreground">The WSLATL team</figcaption>
+              <figcaption className="mt-4 text-sm text-muted-foreground">{t.quoteAttribution}</figcaption>
             </figure>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-foreground">The people behind WSLATL</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t.teamHeading}</h3>
             <ul className="mt-5 divide-y border-y">
               {team.map((member) => (
                 <li key={member.name} className="flex gap-4 py-6">

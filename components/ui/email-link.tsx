@@ -8,6 +8,8 @@ import { cn } from '@/lib/utils'
 interface EmailLinkProps {
   /** The address, scrambled by scrambleEmail(). */
   code: string
+  /** What the placeholder button says, in the page's language. */
+  label: string
   className?: string
 }
 
@@ -17,7 +19,7 @@ interface EmailLinkProps {
  * browsing the page may never send the input events that reveal it, so the
  * button reveals it too, then moves focus to the link it becomes.
  */
-export function EmailLink({ code, className }: EmailLinkProps) {
+export function EmailLink({ code, label, className }: EmailLinkProps) {
   const present = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
   const link = useRef<HTMLAnchorElement>(null)
   const [focusOnReveal, setFocusOnReveal] = useState(false)
@@ -36,7 +38,7 @@ export function EmailLink({ code, className }: EmailLinkProps) {
           markPresent()
         }}
       >
-        Show email address
+        {label}
       </button>
     )
   }

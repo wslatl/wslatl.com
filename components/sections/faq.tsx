@@ -3,6 +3,7 @@ import { siteConfig } from '@/config/site'
 import { SectionHeader } from '@/components/ui/section-header'
 import type { Faq } from '@/data/faqs'
 import { cn } from '@/lib/utils'
+import { copy } from '@/i18n/copy'
 
 /**
  * Native <details> disclosures: keyboard and screen reader support for free,
@@ -28,21 +29,24 @@ export function FaqList({ faqs, className }: { faqs: Faq[]; className?: string }
 }
 
 export function FAQ({ faqs }: { faqs: Faq[] }) {
+  const t = copy()
+
   return (
     <section id="faq" aria-labelledby="faq-heading" className="py-20 md:py-28">
       <div className="shell grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
-        <SectionHeader id="faq-heading" title="Common questions">
+        <SectionHeader id="faq-heading" title={t.home.faq.heading}>
           <p>
-            Still not sure?{' '}
+            {t.home.faq.stillNotSure}{' '}
             <a
               href={siteConfig.links.discord}
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-link underline underline-offset-4 hover:text-foreground"
             >
-              Ask us on Discord<span className="sr-only"> (opens in a new tab)</span>
+              {t.home.faq.askOnDiscord}
+              <span className="sr-only">{t.header.newTab}</span>
             </a>
-            . We are always around.
+            {t.home.faq.alwaysAround}
           </p>
         </SectionHeader>
         <FaqList faqs={faqs} />

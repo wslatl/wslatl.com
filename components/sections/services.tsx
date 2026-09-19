@@ -1,8 +1,12 @@
 import Link from 'next/link'
 import { ArrowRight, Check, Gamepad2, Globe, HardDrive, Server, type LucideIcon } from 'lucide-react'
 import { SectionHeader } from '@/components/ui/section-header'
-import { services, type Service } from '@/data/services'
-import { formatPrice, pricingHref, productLine, specRanges, startingPrice } from '@/lib/pricing'
+import type { Service } from '@/data/services'
+import { formatPrice, pricingHref, specRanges, startingPrice } from '@/lib/pricing'
+import { copy } from '@/i18n/copy'
+import { getLocale } from '@/i18n/locale'
+import { localePath } from '@/i18n/config'
+import { localizedProductLine, localizedServices } from '@/i18n/content'
 
 const icons: Record<string, LucideIcon> = {
   vps: Server,
@@ -13,51 +17,61 @@ const icons: Record<string, LucideIcon> = {
 
 function specSummary(id: NonNullable<Service['pricing']>) {
   const { cpu, ramGb, storageGb } = specRanges(id)
-  const line = productLine(id)
-  const planCount = line.groups.reduce((n, g) => n + g.plans.length, 0)
-  return `${planCount} plans from ${cpu.min} to ${cpu.max} ${line.cpuUnit}, ${ramGb.min} to ${ramGb.max} GB RAM, and ${storageGb.min} to ${storageGb.max} GB storage.`
+  const line = localizedProductLine(id)
+  return copy().home.services.specSummary({
+    plans: line.groups.reduce((n, g) => n + g.plans.length, 0),
+    cpuMin: cpu.min,
+    cpuMax: cpu.max,
+    cpuUnit: line.cpuUnit,
+    ramMin: ramGb.min,
+    ramMax: ramGb.max,
+    storageMin: storageGb.min,
+    storageMax: storageGb.max,
+  })
 }
 
 function ServiceCtas({ service }: { service: Service }) {
+  const t = copy().home.services
+  const locale = getLocale()
   const linkClass =
     'group inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:text-foreground'
   const arrow = <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5" />
 
   if (service.pricing === 'vps') {
     return (
-      <Link href={pricingHref('vps')} className={linkClass}>
-        Compare VPS plans {arrow}
+      <Link href={localePath(locale, pricingHref('vps'))} className={linkClass}>
+        {t.compareVps} {arrow}
       </Link>
     )
   }
   if (service.pricing === 'game') {
     return (
       <div className="flex flex-wrap gap-x-6 gap-y-2">
-        <Link href={pricingHref('game')} className={linkClass}>
-          Compare game server plans {arrow}
+        <Link href={localePath(locale, pricingHref('game'))} className={linkClass}>
+          {t.compareGame} {arrow}
         </Link>
-        <Link href="/games" className={linkClass}>
-          Find your game {arrow}
+        <Link href={localePath(locale, '/games')} className={linkClass}>
+          {t.findGame} {arrow}
         </Link>
       </div>
     )
   }
   return (
-    <Link href="/#contact" className={linkClass}>
-      Get a quote {arrow}
+    <Link href={localePath(locale, '/#contact')} className={linkClass}>
+      {t.getQuote} {arrow}
     </Link>
   )
 }
 
 export function Services() {
+  const t = copy().home.services
+  const services = localizedServices()
+
   return (
     <section id="services" aria-labelledby="services-heading" className="py-20 md:py-28">
       <div className="shell">
-        <SectionHeader id="services-heading" title="What we host">
-          <p>
-            VPS and game servers have published prices. Dedicated servers and web hosting are quoted
-            for what you actually need to run.
-          </p>
+        <SectionHeader id="services-heading" title={t.heading}>
+          <p>{t.intro}</p>
         </SectionHeader>
 
         <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border bg-border md:grid-cols-2">
@@ -70,14 +84,14 @@ export function Services() {
                 <h3 className="text-xl font-semibold tracking-tight text-foreground">{service.title}</h3>
                 {service.pricing ? (
                   <p className="text-sm text-muted-foreground tabular-nums">
-                    from{' '}
+                    {t.from}{' '}
                     <span className="text-2xl font-bold tracking-tight text-foreground">
                       {formatPrice(startingPrice(service.pricing))}
                     </span>
-                    /mo
+                    {t.perMonth}
                   </p>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Quoted for your build</p>
+                  <p className="text-sm text-muted-foreground">{t.quoted}</p>
                 )}
               </div>
               <p className="mt-3 leading-relaxed text-muted-foreground">{service.description}</p>

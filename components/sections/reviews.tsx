@@ -1,9 +1,13 @@
 import { ArrowUpRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { reviewsSection } from '@/data/reviews'
 import { siteConfig } from '@/config/site'
+import { copy } from '@/i18n/copy'
+import { localizedReviews } from '@/i18n/content'
 
 export function Reviews() {
+  const t = copy().header
+  const reviewsSection = localizedReviews()
+
   return (
     <section id="reviews" aria-labelledby="reviews-heading" className="shell">
       <div className="grid gap-8 rounded-2xl border bg-card/30 p-6 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-16">
@@ -20,7 +24,7 @@ export function Reviews() {
               rel="noopener noreferrer"
               className="underline underline-offset-4 hover:text-foreground"
             >
-              How Trustpilot works<span className="sr-only"> (opens in a new tab)</span>
+              {reviewsSection.learnMore}<span className="sr-only">{t.newTab}</span>
             </a>
           </p>
         </div>
@@ -28,7 +32,7 @@ export function Reviews() {
           <a href={siteConfig.links.trustpilot} target="_blank" rel="noopener noreferrer">
             {reviewsSection.cta}
             <ArrowUpRight aria-hidden="true" />
-            <span className="sr-only"> (opens in a new tab)</span>
+            <span className="sr-only">{t.newTab}</span>
           </a>
         </Button>
       </div>

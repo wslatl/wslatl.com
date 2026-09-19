@@ -1,15 +1,24 @@
 import Link from 'next/link'
 import { Check } from 'lucide-react'
 import { SectionHeader } from '@/components/ui/section-header'
-import { commitments, features, leadFeature } from '@/data/features'
 import { siteConfig } from '@/config/site'
+import { copy } from '@/i18n/copy'
+import { getLocale } from '@/i18n/locale'
+import { localePath } from '@/i18n/config'
+import { localizedCommitments, localizedFeatures, localizedLeadFeature } from '@/i18n/content'
 
 export function WhyUs() {
+  const t = copy()
+  const locale = getLocale()
+  const commitments = localizedCommitments()
+  const features = localizedFeatures()
+  const leadFeature = localizedLeadFeature()
+
   return (
     <section id="why-us" aria-labelledby="why-us-heading" className="border-y bg-card/20 py-20 md:py-28">
       <div className="shell">
-        <SectionHeader id="why-us-heading" title="The difference is personal.">
-          <p>We have seen how the big hosts operate. We built WSLATL to be the direct opposite.</p>
+        <SectionHeader id="why-us-heading" title={t.home.whyUs.heading}>
+          <p>{t.home.whyUs.intro}</p>
         </SectionHeader>
 
         {/* Columns follow the strip's own width in rem, so enlarged text gets fewer, wider cells. */}
@@ -26,9 +35,12 @@ export function WhyUs() {
           </dl>
         </div>
         <p className="mt-4 text-sm text-muted-foreground">
-          Uptime targets for every service, and the credits you get if we miss one, are in our{' '}
-          <Link href={siteConfig.paths.sla} className="text-link underline underline-offset-4 hover:text-foreground">
-            Service Level Agreement
+          {t.home.whyUs.slaNotePrefix}{' '}
+          <Link
+            href={localePath(locale, siteConfig.paths.sla)}
+            className="text-link underline underline-offset-4 hover:text-foreground"
+          >
+            {t.home.whyUs.slaLink}
           </Link>
           .
         </p>
@@ -46,7 +58,8 @@ export function WhyUs() {
                 rel="noopener noreferrer"
                 className="text-link underline underline-offset-4 hover:text-foreground"
               >
-                Join our Discord<span className="sr-only"> (opens in a new tab)</span>
+                {t.home.whyUs.joinDiscord}
+                <span className="sr-only">{t.header.newTab}</span>
               </a>
               <a
                 href={siteConfig.links.billing}
@@ -54,7 +67,8 @@ export function WhyUs() {
                 rel="noopener noreferrer"
                 className="text-link underline underline-offset-4 hover:text-foreground"
               >
-                Open a ticket<span className="sr-only"> (opens in a new tab)</span>
+                {t.home.whyUs.openTicket}
+                <span className="sr-only">{t.header.newTab}</span>
               </a>
             </p>
           </div>

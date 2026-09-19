@@ -4,6 +4,7 @@ import type { PlanGroup, ProductLine } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
 import { formatGb, formatPrice, formatTraffic } from '@/lib/pricing'
 import { cn } from '@/lib/utils'
+import { copy } from '@/i18n/copy'
 
 interface PlanGroupTableProps {
   line: ProductLine
@@ -11,10 +12,12 @@ interface PlanGroupTableProps {
 }
 
 function OrderButton({ planName, emphasis, className }: { planName: string; emphasis: boolean; className?: string }) {
+  const t = copy().pricing
   return (
     <Button asChild size="sm" variant={emphasis ? 'default' : 'outline'} className={className}>
       <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-        Order<span className="sr-only"> {planName} (opens in a new tab)</span>
+        {t.table.order}
+        <span className="sr-only">{t.table.orderPlan(planName)}</span>
       </a>
     </Button>
   )
@@ -34,6 +37,7 @@ function PopularTag() {
  * assistive tech sees a single copy.
  */
 export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
+  const t = copy().pricing
   const showTraffic = group.plans.some((p) => p.trafficTb !== undefined)
   const headingId = `${group.id}-heading`
 
@@ -43,7 +47,9 @@ export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
         <h3 id={headingId} className="text-xl font-semibold tracking-tight text-foreground">
           {group.label}
         </h3>
-        <span className="text-sm text-muted-foreground">{group.storageType} storage</span>
+        <span className="text-sm text-muted-foreground">
+          {group.storageType} {t.storageSuffix}
+        </span>
         {group.comparison && (
           <span className="inline-flex items-center gap-1 text-sm text-link">
             <TrendingDown aria-hidden="true" className="size-3.5" />
@@ -57,7 +63,7 @@ export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
       <div className="mt-5 hidden overflow-hidden rounded-xl border @min-[44rem]:block">
         <table className="w-full table-fixed text-left text-sm tabular-nums">
           <caption className="sr-only">
-            {group.label} plans, monthly prices in US dollars
+            {t.table.caption(group.label)}
           </caption>
           {/* Fixed widths so tables with the same columns line up down the page. */}
           <colgroup>
@@ -71,13 +77,13 @@ export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
           </colgroup>
           <thead className="bg-card/50 text-muted-foreground">
             <tr>
-              <th scope="col" className="px-5 py-3 font-medium">Plan</th>
+              <th scope="col" className="px-5 py-3 font-medium">{t.table.plan}</th>
               <th scope="col" className="px-4 py-3 font-medium">{line.cpuUnit}</th>
-              <th scope="col" className="px-4 py-3 font-medium">RAM</th>
-              <th scope="col" className="px-4 py-3 font-medium">Storage</th>
-              {showTraffic && <th scope="col" className="px-4 py-3 font-medium">Traffic</th>}
-              <th scope="col" className="px-4 py-3 text-right font-medium">Price</th>
-              <th scope="col" className="px-5 py-3"><span className="sr-only">Order</span></th>
+              <th scope="col" className="px-4 py-3 font-medium">{t.table.ram}</th>
+              <th scope="col" className="px-4 py-3 font-medium">{t.table.storage}</th>
+              {showTraffic && <th scope="col" className="px-4 py-3 font-medium">{t.table.traffic}</th>}
+              <th scope="col" className="px-4 py-3 text-right font-medium">{t.table.price}</th>
+              <th scope="col" className="px-5 py-3"><span className="sr-only">{t.table.order}</span></th>
             </tr>
           </thead>
           <tbody className="divide-y">

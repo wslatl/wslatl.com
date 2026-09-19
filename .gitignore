@@ -35,3 +35,6 @@ pnpm-debug.log*
 # lighthouse ci
 .lighthouseci/
 lighthouse-reports/
+
+# local editor and agent tooling
+.claude/

@@ -1,24 +1,7 @@
 import { siteConfig } from '@/config/site'
 import { SectionHeader } from '@/components/ui/section-header'
 import { cn } from '@/lib/utils'
-
-const steps = [
-  {
-    title: 'Request access',
-    description:
-      'Fill in a short application in the billing portal. A person reads every one, and most are approved the same day.',
-  },
-  {
-    title: 'Tell us what you need',
-    description:
-      'Once you are approved, message us on Discord or open a ticket. We talk through your setup with you. No automated flow.',
-  },
-  {
-    title: 'Your server goes live',
-    description:
-      'We set you up, walk you through your panel, and stay available after. Most clients are up and running the same day.',
-  },
-]
+import { copy } from '@/i18n/copy'
 
 interface HowItWorksProps {
   /** Tighter version for the pricing page, without the section intro. */
@@ -26,6 +9,9 @@ interface HowItWorksProps {
 }
 
 export function HowItWorks({ compact = false }: HowItWorksProps) {
+  const t = copy().home.howItWorks
+  const steps = t.steps
+
   return (
     <section
       id="how-it-works"
@@ -33,13 +19,8 @@ export function HowItWorks({ compact = false }: HowItWorksProps) {
       className={cn(!compact && 'py-20 md:py-28')}
     >
       <div className={cn(!compact && 'shell')}>
-        <SectionHeader id="how-it-works-heading" title="How ordering works">
-          {!compact && (
-            <p>
-              We are application-only on purpose. It is how a small team keeps every client properly
-              looked after.
-            </p>
-          )}
+        <SectionHeader id="how-it-works-heading" title={t.heading}>
+          {!compact && <p>{t.intro}</p>}
         </SectionHeader>
 
         {/* A real sequence, so numbered nodes joined by a rule: vertical on
@@ -62,7 +43,7 @@ export function HowItWorks({ compact = false }: HowItWorksProps) {
               </span>
               <div className="md:mt-6">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
-                  <span className="sr-only">Step {idx + 1}: </span>
+                  <span className="sr-only">{t.step(idx + 1)}</span>
                   {step.title}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.description}</p>
@@ -72,25 +53,27 @@ export function HowItWorks({ compact = false }: HowItWorksProps) {
         </ol>
 
         <p className="mt-10 text-sm text-muted-foreground">
-          Ready?{' '}
+          {t.readyPrefix}{' '}
           <a
             href={siteConfig.links.register}
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-link underline underline-offset-4 hover:text-foreground"
           >
-            Request access<span className="sr-only"> (opens in a new tab)</span>
+            {t.requestAccess}
+            <span className="sr-only">{copy().header.newTab}</span>
           </a>{' '}
-          or{' '}
+          {t.or}{' '}
           <a
             href={siteConfig.links.discord}
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-link underline underline-offset-4 hover:text-foreground"
           >
-            ask us on Discord<span className="sr-only"> (opens in a new tab)</span>
+            {t.askOnDiscord}
+            <span className="sr-only">{copy().header.newTab}</span>
           </a>{' '}
-          first.
+          {t.readySuffix}
         </p>
       </div>
     </section>

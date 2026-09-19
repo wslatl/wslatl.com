@@ -2,23 +2,26 @@ import Image from 'next/image'
 import { Pause } from 'lucide-react'
 import { clients } from '@/data/clients'
 import { cn } from '@/lib/utils'
+import { copy } from '@/i18n/copy'
 
 /** Two copies make one seamless loop; each copy repeats the list so it is wider than any screen. */
 const LOOP_COPIES = 2
 const REPEATS_PER_COPY = 2
 
 export function Clients() {
+  const t = copy().home.clients
+
   return (
     <section aria-labelledby="clients-heading" className="marquee shell pb-6">
       <div className="flex items-center justify-center gap-3">
         <h2 id="clients-heading" className="text-sm text-muted-foreground">
-          Trusted by our clients
+          {t.heading}
         </h2>
         {/* Moving content needs a way to stop it (WCAG 2.2.2). A checkbox works without JavaScript. */}
         <label className="marquee-toggle inline-flex cursor-pointer items-center rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring">
           <input type="checkbox" className="sr-only" />
           <Pause aria-hidden="true" className="size-3.5" />
-          <span className="sr-only">Pause the scrolling client logos</span>
+          <span className="sr-only">{t.pause}</span>
         </label>
       </div>
 
@@ -31,8 +34,8 @@ export function Clients() {
 
       <div aria-hidden="true" className="marquee-viewport mt-7 overflow-hidden">
         <div className="marquee-track flex w-max">
-          {Array.from({ length: LOOP_COPIES }, (_slot, copy) => (
-            <div key={copy} className={cn('flex shrink-0 items-center', copy > 0 && 'marquee-dup')}>
+          {Array.from({ length: LOOP_COPIES }, (_slot, loop) => (
+            <div key={loop} className={cn('flex shrink-0 items-center', loop > 0 && 'marquee-dup')}>
               {Array.from({ length: REPEATS_PER_COPY }, (_set, repeat) =>
                 clients.map((client) => (
                   <div

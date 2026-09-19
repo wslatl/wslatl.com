@@ -1,8 +1,11 @@
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
 import { JsonLd } from '@/components/seo/json-ld'
-import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
+import { pageUrl } from '@/lib/metadata'
+import { copy } from '@/i18n/copy'
+import { getLocale } from '@/i18n/locale'
+import { localePath } from '@/i18n/config'
 
 export interface Crumb {
   label: string
@@ -23,7 +26,8 @@ interface PageHeaderProps {
 
 /** Title block shared by every inner page: breadcrumb, serif title, intro. */
 export function PageHeader({ title, breadcrumbs, crumbLabel, path, children, className }: PageHeaderProps) {
-  const trail = breadcrumbs && crumbLabel ? [{ label: 'Home', href: '/' }, ...breadcrumbs] : null
+  const locale = getLocale()
+  const trail = breadcrumbs && crumbLabel ? [{ label: copy().breadcrumbs.home, href: '/' }, ...breadcrumbs] : null
 
   return (
     <div className={cn('pt-14 pb-10 md:pt-20 md:pb-14', className)}>
@@ -33,7 +37,7 @@ export function PageHeader({ title, breadcrumbs, crumbLabel, path, children, cla
             <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
               {trail.map((crumb) => (
                 <li key={crumb.href} className="flex items-center gap-1.5">
-                  <Link href={crumb.href} className="transition-colors hover:text-foreground">
+                  <Link href={localePath(locale, crumb.href)} className="transition-colors hover:text-foreground">
                     {crumb.label}
                   </Link>
                   <ChevronRight aria-hidden="true" className="size-3.5 opacity-60" />
@@ -52,7 +56,7 @@ export function PageHeader({ title, breadcrumbs, crumbLabel, path, children, cla
                 '@type': 'ListItem',
                 position: i + 1,
                 name: crumb.label,
-                item: `${siteConfig.siteUrl}${crumb.href === '/' ? '' : crumb.href}`,
+                item: pageUrl(locale, crumb.href),
               })),
             }}
           />

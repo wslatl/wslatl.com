@@ -94,6 +94,10 @@ const nextConfig = {
       // licensed partners), so their pages are gone.
       { source: '/games/battlefield-2042-portal', destination: '/games', permanent: true },
       { source: '/games/hell-let-loose', destination: '/games', permanent: true },
+      // English is served at the plain paths (middleware.ts rewrites them),
+      // so /en/... would be a second address for the same page.
+      { source: '/en', destination: '/', permanent: true },
+      { source: '/en/:path*', destination: '/:path*', permanent: true },
       // Short links: /billing, /discord, and the rest. Every page links to
       // these paths instead of the panel or profile itself, so a destination
       // changes in config/links.json alone. Temporary on purpose: browsers

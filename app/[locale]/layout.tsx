@@ -3,7 +3,10 @@ import { Geist, Instrument_Serif } from 'next/font/google'
 import { JsonLd } from '@/components/seo/json-ld'
 import { siteConfig } from '@/config/site'
 import { shortLinks } from '@/config/links'
-import './globals.css'
+import { locales, openGraphLocales } from '@/i18n/config'
+import { getLocale, setLocale } from '@/i18n/locale'
+import { copy } from '@/i18n/copy'
+import '../globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
 // The serif is only ever set in italic (slogan, page titles, quotes), so the
@@ -57,7 +60,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    locale: 'en_US',
+    locale: openGraphLocales.en,
     siteName: siteConfig.name,
     title,
     description,
@@ -89,6 +92,12 @@ export const metadata: Metadata = {
   },
 }
 
+export const dynamicParams = false
+
+export function generateStaticParams() {
+  return locales.map((locale) => ({ locale }))
+}
+
 export const viewport: Viewport = {
   themeColor: '#050505',
   colorScheme: 'dark',
@@ -112,17 +121,26 @@ const organizationJsonLd = {
   sameAs: [shortLinks.discord.url, shortLinks.trustpilot.url, shortLinks.github.url],
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode
+  params: Promise<{ locale: string }>
 }>) {
+  // Set before anything below renders: every Server Component under here
+  // reads the language from this (i18n/locale.ts), which also rejects a
+  // language that is not ours.
+  setLocale((await params).locale)
+  const locale = getLocale()
+  const t = copy()
+
   return (
-    <html lang="en" className={`dark ${geist.variable} ${instrumentSerif.variable}`}>
+    <html lang={locale} className={`dark ${geist.variable} ${instrumentSerif.variable}`}>
       <body className="relative isolate min-h-dvh font-sans antialiased">
         <JsonLd data={organizationJsonLd} />
         <a href="#main-content" className="skip-link">
-          Skip to main content
+          {t.header.skipToContent}
         </a>
         {/* The blue wash at the top of every page. Static, so it costs nothing to scroll. */}
         <div

@@ -6,7 +6,9 @@ import { footerColumns } from '@/data/footer'
 import { legalPages, legalSlug } from '@/data/legal'
 import { games } from '@/data/games'
 import { productLines } from '@/data/pricing'
-import { reachOptions } from '@/data/reach-options'
+import { siteConfig } from '@/config/site'
+import { en } from '@/i18n/copy/en'
+import { defaultLocale } from '@/i18n/config'
 import { isShortLink, shortLinks } from '@/config/links'
 import nextConfig from '../next.config.mjs'
 
@@ -26,7 +28,10 @@ function appRoutes(): Set<string> {
       const path = join(dir, name)
       if (statSync(path).isDirectory()) walk(path)
       else if (name === 'page.tsx') {
-        const route = '/' + relative(join(root, 'app'), dir).split(sep).join('/')
+        // Routes live under app/[locale]; links are written without the
+        // language, which localePath() adds when a page renders.
+        const full = '/' + relative(join(root, 'app'), dir).split(sep).join('/')
+        const route = full.replace(/^\/\[locale\]/, '') || '/'
         if (route.includes('[')) {
           const slugs = dynamicSlugs[route]
           if (!slugs) throw new Error(`Add ${route} to dynamicSlugs in tests/links.test.ts`)
@@ -75,13 +80,18 @@ function brokenReason(href: string): string | null {
   return null
 }
 
+const contactOptions = [
+  { label: en.home.contact.options.discord.cta, href: siteConfig.links.discord },
+  { label: en.home.contact.options.billing.cta, href: siteConfig.links.billing },
+]
+
 const allLinks = [
-  ...mainNav,
-  ...portalLinks,
-  requestAccessLink,
-  ...footerColumns.flatMap((c) => c.links),
+  ...mainNav(en, defaultLocale),
+  ...portalLinks(en),
+  requestAccessLink(en),
+  ...footerColumns(en, defaultLocale, legalPages).flatMap((c) => c.links),
   ...legalPages.map((p) => ({ label: p.label, href: p.href })),
-  ...reachOptions.flatMap((o) => ('href' in o ? [{ label: o.title, href: o.href }] : [])),
+  ...contactOptions,
 ]
 
 // Every check collects all failures and asserts once, so a broken link
@@ -102,10 +112,21 @@ describe('links', () => {
 
   it('redirects retired URLs to pages that exist', async () => {
     const redirects = await nextConfig.redirects()
-    const retired = redirects.filter((r) => r.permanent)
+    // Pattern rules (/en/:path*) stand for many pages at once, so they are
+    // checked on their own below rather than looked up as a single route.
+    const single = redirects.filter((r) => !r.source.includes(':') && !r.destination.includes(':'))
+    const retired = single.filter((r) => r.permanent)
     expect(retired.length).toBeGreaterThan(0)
-    expect(redirects.filter((r) => routes.has(r.source)).map((r) => r.source)).toEqual([])
+    expect(single.filter((r) => routes.has(r.source)).map((r) => r.source)).toEqual([])
     expect(retired.filter((r) => !routes.has(r.destination)).map((r) => r.destination)).toEqual([])
+  })
+
+  it('sends the /en prefix to the plain English URL', async () => {
+    // English is served at /pricing, not /en/pricing (proxy.ts). Both would
+    // otherwise be the same page at two addresses.
+    const redirects = await nextConfig.redirects()
+    expect(redirects).toContainEqual({ source: '/en', destination: '/', permanent: true })
+    expect(redirects).toContainEqual({ source: '/en/:path*', destination: '/:path*', permanent: true })
   })
 
   it('redirects every short link, temporarily, to its https destination', async () => {

@@ -2,22 +2,31 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Check } from 'lucide-react'
-import { Header } from '@/components/layout/header'
+import { SiteHeader } from '@/components/layout/site-header'
 import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
 import { PlanGroupTable } from '@/components/pricing/plan-group'
 import { FaqList } from '@/components/sections/faq'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Button } from '@/components/ui/button'
-import { games, gameBySlug, ramNeedGb, type RamRow } from '@/data/games'
+import { games, ramNeedGb, type RamRow } from '@/data/games'
 import { siteConfig } from '@/config/site'
-import { cheapestPlanWithRam, formatPrice, productLine, smallestPlansWithRam } from '@/lib/pricing'
+import { cheapestPlanWithRam, formatPrice, smallestPlansWithRam } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
 import { slugify } from '@/lib/utils'
 import { Main } from '@/components/layout/main'
+import { localePath, type Locale } from '@/i18n/config'
+import { getLocale, setLocale } from '@/i18n/locale'
+import { copy } from '@/i18n/copy'
+import { localizedGames, localizedProductLine } from '@/i18n/content'
 
 interface PageProps {
-  params: Promise<{ slug: string }>
+  params: Promise<{ locale: Locale; slug: string }>
+}
+
+/** The game in the language of the page, or nothing when the slug is unknown. */
+function localizedGame(slug: string) {
+  return localizedGames().find((game) => game.slug === slug)
 }
 
 export const dynamicParams = false
@@ -28,19 +37,23 @@ export const dynamicParams = false
  * since every map in a cluster runs as its own server.
  */
 function PlansThatFit({ row }: { row: RamRow }) {
+  const t = copy().games.detail
   const fits = smallestPlansWithRam('game', ramNeedGb(row))
   const perMap = /per map/i.test(row.ram)
   if (fits.length === 0) {
     return (
-      <Link href="/#contact" className="text-link underline underline-offset-4 hover:text-foreground">
-        Bigger than our game plans: ask us
+      <Link
+        href={localePath(getLocale(), '/#contact')}
+        className="text-link underline underline-offset-4 hover:text-foreground"
+      >
+        {t.tooBig}
       </Link>
     )
   }
   return fits.map(({ plan }, i) => (
     <span key={plan.name}>
-      {i === 0 && perMap && 'Per map: '}
-      {i > 0 && ' or '}
+      {i === 0 && perMap && t.perMap}
+      {i > 0 && t.or}
       <span className="whitespace-nowrap">
         <span className="font-medium text-foreground">{plan.name}</span> ({formatPrice(plan.price)}/mo)
       </span>
@@ -53,31 +66,36 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { slug } = await params
-  const game = gameBySlug(slug)
+  const { locale, slug } = await params
+  setLocale(locale)
+  const game = localizedGame(slug)
   if (!game) return {}
 
   return pageMetadata({
-    title: `${game.name} Server Hosting`,
-    description: `${game.name} server hosting on NVMe and SATA SSD hardware with DDoS protection and a Pterodactyl panel. ${game.tagline}`,
+    title: copy().games.detail.metaTitle(game.name),
+    description: `${copy().games.detail.heading(game.name)}. ${game.tagline}`,
     path: `/games/${game.slug}`,
+    locale,
   })
 }
 
 export default async function GamePage({ params }: PageProps) {
-  const { slug } = await params
-  const game = gameBySlug(slug)
+  const { locale, slug } = await params
+  setLocale(locale)
+  const t = copy()
+  const path = (href: string) => localePath(locale, href)
+  const game = localizedGame(slug)
   if (!game) notFound()
 
-  const line = productLine('game')
+  const line = localizedProductLine('game')
   // The cheapest plan that covers the smallest recommended setup.
   const entry = cheapestPlanWithRam('game', ramNeedGb(game.recommendedRam[0]))
-  const related = games.filter((g) => g.category === game.category && g.slug !== game.slug).slice(0, 8)
-  const faqs = game.faqs.map((faq) => ({ question: faq.q, answer: faq.a }))
+  const related = localizedGames().filter((g) => g.category === game.category && g.slug !== game.slug).slice(0, 8)
+  const faqs = game.faqs.map((faq, i) => ({ id: `${game.slug}-faq-${i}`, question: faq.q, answer: faq.a }))
 
   return (
     <>
-      <Header />
+      <SiteHeader />
       {faqs.length > 0 && (
         <JsonLd
           data={{
@@ -96,8 +114,8 @@ export default async function GamePage({ params }: PageProps) {
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-14 xl:gap-20">
         <div className="min-w-0">
           <PageHeader
-            title={`${game.name} server hosting`}
-            breadcrumbs={[{ label: 'Games', href: '/games' }]}
+            title={t.games.detail.heading(game.name)}
+            breadcrumbs={[{ label: t.games.crumb, href: '/games' }]}
             crumbLabel={game.name}
             path={`/games/${game.slug}`}
           >
@@ -107,37 +125,40 @@ export default async function GamePage({ params }: PageProps) {
           <div className="-mt-2 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:hidden">
             <Button asChild size="lg" className="h-auto min-h-11 py-2.5 text-center whitespace-normal">
               <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-                Order your {game.name} server
-                <span className="sr-only"> (opens in a new tab)</span>
+                {t.games.detail.order(game.name)}
+                <span className="sr-only">{t.header.newTab}</span>
               </a>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <a href="#plans">Compare plans</a>
+              <a href="#plans">{t.games.detail.comparePlans}</a>
             </Button>
           </div>
           <p className="mt-4 text-sm text-muted-foreground lg:mt-0">
-            Listed under{' '}
-            <Link href={`/games#${slugify(game.category)}`} className="text-link underline underline-offset-4 hover:text-foreground">
+            {t.games.detail.listedUnderPrefix}{' '}
+            <Link
+              href={path(`/games#${slugify(game.category)}`)}
+              className="text-link underline underline-offset-4 hover:text-foreground"
+            >
               {game.category}
             </Link>
-            . Plans are not locked to one game, so you can switch titles any time.
+            {t.games.detail.listedUnderSuffix}
           </p>
 
         <section aria-labelledby="ram-heading" className="@container mt-16">
           <h2 id="ram-heading" className="text-2xl font-semibold tracking-tight text-foreground">
-            How much RAM does {game.name} need?
+            {t.games.detail.ramHeading(game.name)}
           </h2>
           {/* A table when there is room (measured in rem, so enlarged text counts); stacked rows otherwise, where three columns would crush the plan names. */}
           <div className="mt-5 hidden overflow-hidden rounded-xl border @min-[36rem]:block">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">
-                Recommended RAM for {game.name} and the smallest plans that cover it
+                {t.games.detail.ramCaption(game.name)}
               </caption>
               <thead className="bg-card/50 text-muted-foreground">
                 <tr>
-                  <th scope="col" className="px-4 py-3 font-medium">Setup</th>
-                  <th scope="col" className="px-4 py-3 font-medium">Recommended RAM</th>
-                  <th scope="col" className="px-4 py-3 font-medium">Smallest plans that fit</th>
+                  <th scope="col" className="px-4 py-3 font-medium">{t.games.detail.setup}</th>
+                  <th scope="col" className="px-4 py-3 font-medium">{t.games.detail.recommendedRam}</th>
+                  <th scope="col" className="px-4 py-3 font-medium">{t.games.detail.smallestPlans}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -161,13 +182,13 @@ export default async function GamePage({ params }: PageProps) {
                   <span className="shrink-0 text-sm whitespace-nowrap text-foreground/90">{row.ram}</span>
                 </p>
                 <p className="mt-1.5 text-sm text-muted-foreground tabular-nums">
-                  Fits: <PlansThatFit row={row} />
+                  {t.games.detail.fits} <PlansThatFit row={row} />
                 </p>
               </li>
             ))}
           </ul>
           <p className="mt-3 text-sm text-muted-foreground">
-            These are starting points, not hard limits. Every plan can be changed later as your server grows.
+            {t.games.detail.ramNote}
           </p>
         </section>
         </div>
@@ -192,12 +213,12 @@ export default async function GamePage({ params }: PageProps) {
             )}
             <Button asChild size="lg" className="mt-6 h-auto min-h-11 w-full py-2.5 text-center whitespace-normal">
               <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-                Order your {game.name} server
-                <span className="sr-only"> (opens in a new tab)</span>
+                {t.games.detail.order(game.name)}
+                <span className="sr-only">{t.header.newTab}</span>
               </a>
             </Button>
             <Button asChild size="lg" variant="outline" className="mt-2 w-full">
-              <a href="#plans">Compare plans</a>
+              <a href="#plans">{t.games.detail.comparePlans}</a>
             </Button>
             <ul className="mt-6 space-y-2 border-t pt-5 text-sm text-muted-foreground">
               {line.included.slice(0, 3).map((item) => (
@@ -230,7 +251,7 @@ export default async function GamePage({ params }: PageProps) {
           {game.popularFor.length > 0 && (
             <section aria-labelledby="popular-heading">
               <h2 id="popular-heading" className="text-lg font-semibold tracking-tight text-foreground">
-                Popular {game.name} setups
+                {t.games.detail.popular(game.name)}
               </h2>
               <ul className="mt-4 space-y-2.5 text-sm text-foreground/90">
                 {game.popularFor.map((item) => (
@@ -244,7 +265,7 @@ export default async function GamePage({ params }: PageProps) {
           )}
           <section aria-labelledby="included-heading">
             <h2 id="included-heading" className="text-lg font-semibold tracking-tight text-foreground">
-              Included with every game plan
+              {t.games.detail.included}
             </h2>
             <ul className="mt-4 space-y-2.5 text-sm text-foreground/90">
               {line.included.map((item) => (
@@ -260,7 +281,7 @@ export default async function GamePage({ params }: PageProps) {
         {faqs.length > 0 && (
           <section aria-labelledby="faq-heading" className="mt-16 max-w-4xl">
             <h2 id="faq-heading" className="text-2xl font-semibold tracking-tight text-foreground">
-              {game.name} hosting questions
+              {t.games.detail.questions(game.name)}
             </h2>
             <FaqList faqs={faqs} className="mt-4" />
           </section>
@@ -269,13 +290,13 @@ export default async function GamePage({ params }: PageProps) {
         {related.length > 0 && (
           <section aria-labelledby="related-heading" className="mt-16">
             <h2 id="related-heading" className="text-lg font-semibold tracking-tight text-foreground">
-              More {game.category.toLowerCase()} games
+              {t.games.detail.moreIn(game.category.toLowerCase())}
             </h2>
             <ul className="mt-4 flex flex-wrap gap-2">
               {related.map((g) => (
                 <li key={g.slug}>
                   <Link
-                    href={`/games/${g.slug}`}
+                    href={path(`/games/${g.slug}`)}
                     className="inline-block rounded-full border px-3.5 py-1.5 text-sm text-foreground/85 transition-colors hover:border-foreground/30 hover:text-foreground"
                   >
                     {g.name}
@@ -283,8 +304,8 @@ export default async function GamePage({ params }: PageProps) {
                 </li>
               ))}
               <li>
-                <Link href="/games" className="inline-block px-3.5 py-1.5 text-sm font-medium text-link hover:text-foreground">
-                  All games
+                <Link href={path('/games')} className="inline-block px-3.5 py-1.5 text-sm font-medium text-link hover:text-foreground">
+                  {t.games.detail.allGames}
                 </Link>
               </li>
             </ul>

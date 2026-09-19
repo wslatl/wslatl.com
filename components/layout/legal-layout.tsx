@@ -1,18 +1,22 @@
 import { Children, isValidElement, type ComponentType, type ReactElement, type ReactNode } from 'react'
 import Link from 'next/link'
 import { ChevronDown } from 'lucide-react'
-import { Header } from '@/components/layout/header'
+import { SiteHeader } from '@/components/layout/site-header'
 import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
-import { legalPages, type LegalPage } from '@/data/legal'
+import type { LegalPage } from '@/data/legal'
 import { legalEffectiveDate, siteConfig } from '@/config/site'
 import { pageMetadata } from '@/lib/metadata'
 import { cn, slugify } from '@/lib/utils'
 import { Main } from '@/components/layout/main'
 import { Email } from '@/components/ui/email'
+import { defaultLocale, localePath, type Locale } from '@/i18n/config'
+import { getLocale } from '@/i18n/locale'
+import { copy } from '@/i18n/copy'
+import { localizedLegalPages } from '@/i18n/content'
 
-export function legalMetadata(page: LegalPage) {
-  return pageMetadata({ title: page.title, description: page.metaDescription, path: page.href })
+export function legalMetadata(page: LegalPage, locale?: Locale) {
+  return pageMetadata({ title: page.title, description: page.metaDescription, path: page.href, locale })
 }
 
 interface SectionProps {
@@ -84,14 +88,15 @@ function TocList({ entries }: { entries: TocEntry[] }) {
 }
 
 function DocList({ current }: { current: string }) {
+  const locale = getLocale()
   return (
     <ul className="space-y-1.5 text-sm">
-      {legalPages.map((doc) => {
+      {localizedLegalPages().map((doc) => {
         const active = doc.href === current
         return (
           <li key={doc.href}>
             <Link
-              href={doc.href}
+              href={localePath(locale, doc.href)}
               aria-current={active ? 'page' : undefined}
               className={cn(
                 'block py-0.5 transition-colors',
@@ -126,6 +131,8 @@ interface LegalLayoutProps {
 }
 
 export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
+  const locale = getLocale()
+  const t = copy().legal
   // Content components are plain server components, so rendering one here
   // yields its element tree, which is where the table of contents comes from.
   const body = <Content />
@@ -133,7 +140,7 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
 
   return (
     <>
-      <Header />
+      <SiteHeader />
       <Main className="shell">
         <div className="lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-12 xl:grid-cols-[15rem_minmax(0,1fr)] xl:gap-16">
           {/* The offset lives on the aside, so once the sidebar sticks it sits
@@ -141,11 +148,11 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
           <aside className="hidden pt-16 lg:block print:hidden">
             <div className="scroll-quiet scroll-fade sticky top-16 max-h-[calc(100dvh-4rem)] space-y-10 overflow-y-auto pt-8 pb-10">
               <nav aria-label="On this page">
-                <p className="mb-3 text-sm font-semibold text-foreground">On this page</p>
+                <p className="mb-3 text-sm font-semibold text-foreground">{t.onThisPage}</p>
                 <TocList entries={toc} />
               </nav>
               <nav aria-label="Legal documents">
-                <p className="mb-3 text-sm font-semibold text-foreground">Legal documents</p>
+                <p className="mb-3 text-sm font-semibold text-foreground">{t.documents}</p>
                 <DocList current={page.href} />
               </nav>
             </div>
@@ -154,7 +161,7 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
           <div className="max-w-3xl">
             <PageHeader
               title={page.title}
-              breadcrumbs={[{ label: 'Legal', href: '/legal' }]}
+              breadcrumbs={[{ label: t.heading, href: '/legal' }]}
               crumbLabel={page.label}
               path={page.href}
             >
@@ -163,15 +170,15 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
 
             <dl className="-mt-4 mb-10 flex flex-wrap gap-x-8 gap-y-2 text-sm">
               <div className="flex gap-2">
-                <dt className="text-muted-foreground">Effective</dt>
+                <dt className="text-muted-foreground">{t.effective}</dt>
                 <dd className="font-medium text-foreground">{legalEffectiveDate(page.key)}</dd>
               </div>
               <div className="flex gap-2">
-                <dt className="text-muted-foreground">Jurisdiction</dt>
+                <dt className="text-muted-foreground">{t.jurisdiction}</dt>
                 <dd className="font-medium text-foreground">{siteConfig.jurisdiction}</dd>
               </div>
               <div className="flex gap-2">
-                <dt className="text-muted-foreground">Questions</dt>
+                <dt className="text-muted-foreground">{t.questions}</dt>
                 <dd>
                   <Email name="support" className="font-medium text-link hover:text-foreground" />
                 </dd>
@@ -179,17 +186,31 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
             </dl>
 
             <div className="mb-12 grid gap-3 sm:grid-cols-2 lg:hidden print:hidden">
-              <MobileDisclosure label="On this page">
+              <MobileDisclosure label={t.onThisPage}>
                 <nav aria-label="On this page">
                   <TocList entries={toc} />
                 </nav>
               </MobileDisclosure>
-              <MobileDisclosure label="Legal documents">
+              <MobileDisclosure label={t.documents}>
                 <nav aria-label="Legal documents">
                   <DocList current={page.href} />
                 </nav>
               </MobileDisclosure>
             </div>
+
+            {/* A translation is a courtesy; the English document is the one
+                that applies, and it is one click away. */}
+            {locale !== defaultLocale && (
+              <div role="note" className="legal-callout mb-10" data-tone="note">
+                <p>
+                  {t.translationNotice}{' '}
+                  <Link href={localePath(defaultLocale, page.href)} hrefLang={defaultLocale} lang={defaultLocale}>
+                    {t.readInEnglish}
+                  </Link>
+                  .
+                </p>
+              </div>
+            )}
 
             <div className="legal-body space-y-14 border-t pt-12">{body}</div>
 
@@ -198,10 +219,10 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
               className="mt-20 rounded-2xl border bg-card/30 p-6 sm:p-8 print:hidden"
             >
               <h2 id="legal-questions-heading" className="text-lg font-semibold text-foreground">
-                Questions about this document?
+                {t.questionsHeading}
               </h2>
               <p className="mt-1.5 text-sm text-muted-foreground">
-                We are a small team. You can actually talk to us.
+                {t.questionsBody}
               </p>
               <p className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
                 <Email name="support" className="text-link underline underline-offset-4 hover:text-foreground" />
@@ -211,7 +232,8 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
                   rel="noopener noreferrer"
                   className="text-link underline underline-offset-4 hover:text-foreground"
                 >
-                  Ask on Discord<span className="sr-only"> (opens in a new tab)</span>
+                  {t.askOnDiscord}
+                  <span className="sr-only">{copy().header.newTab}</span>
                 </a>
               </p>
             </aside>

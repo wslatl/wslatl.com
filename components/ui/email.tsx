@@ -1,6 +1,7 @@
 import { emails, type EmailName } from '@/config/emails'
 import { scrambleEmail } from '@/lib/email-cipher'
 import { EmailLink } from '@/components/ui/email-link'
+import { copy } from '@/i18n/copy'
 
 interface EmailProps {
   name: EmailName
@@ -14,5 +15,5 @@ interface EmailProps {
  * lib/presence.ts for what counts as a person.
  */
 export function Email({ name, className }: EmailProps) {
-  return <EmailLink code={scrambleEmail(emails[name])} className={className} />
+  return <EmailLink code={scrambleEmail(emails[name])} label={copy().email.reveal} className={className} />
 }
