@@ -105,6 +105,44 @@
   }
 }
 
+/* ----- Scrollbars: slim and dark, with the brand blue on hover ----- */
+/* Covers the page and every inner scroll area (legal sidebar, mobile menu,
+   Login dropdown). The thumb keeps 3.5:1 against the track so it stays easy
+   to find. */
+:root {
+  --scrollbar-track: var(--background);
+  --scrollbar-thumb: oklch(0.5 0.01 0);
+  --scrollbar-thumb-hover: var(--link);
+}
+/* Chrome, Edge, and Safari: rounded thumb with a hover state. */
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border: 3px solid var(--scrollbar-track);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:active {
+  background: var(--scrollbar-thumb-hover);
+}
+/* Firefox has no scrollbar pseudo-elements, so it gets the standard,
+   hover-less version. Other browsers keep the styles above. */
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+  * {
+    scrollbar-width: thin;
+  }
+}
+
 /* ----- Header: the hairline border fades in once the page scrolls ----- */
 /* Pure CSS, no scroll listener. Browsers without scroll timelines keep the border. */
 .site-header {
