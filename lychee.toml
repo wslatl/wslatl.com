@@ -15,3 +15,13 @@ include_mail = false
 
 # Nothing on this site should point at a private address.
 exclude_all_private = true
+
+exclude = [
+  # Trustpilot answers 403 to anything that is not a browser. The profile
+  # itself is fine; open wslatl.com/trustpilot to check it by hand.
+  '^https://www\.trustpilot\.com/',
+  # Cloudflare rewrites any mailto link it sees into one of these, and they
+  # only resolve in a browser. Pages built since September 2026 carry no
+  # mailto link at all, so these disappear as the site is deployed.
+  '/cdn-cgi/l/email-protection',
+]
