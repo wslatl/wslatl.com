@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
 import { UptimeTable } from '@/components/legal/uptime-table'
@@ -66,11 +67,11 @@ export default function TermsContent() {
           <p>
             What is included with each plan, how restores are requested, and what a restore
             involves are set out in our{' '}
-            <a href={siteConfig.paths.backups}>Backup Policy</a>{' '}
+            <Link href={siteConfig.paths.backups}>Backup Policy</Link>{' '}
             at{' '}
-            <a href={siteConfig.paths.backups}>
+            <Link href={siteConfig.paths.backups}>
               {siteConfig.siteUrl}{siteConfig.paths.backups}
-            </a>, which is incorporated into these Terms by reference.
+            </Link>, which is incorporated into these Terms by reference.
           </p>
         </LegalSubSection>
       </LegalSection>
@@ -126,7 +127,7 @@ export default function TermsContent() {
         <LegalSubSection title="4.4 Refund Policy">
           <p>
             Our refund policy is maintained as a separate document at{' '}
-            <a href={siteConfig.paths.refund}>{siteConfig.siteUrl}{siteConfig.paths.refund}</a>{' '}
+            <Link href={siteConfig.paths.refund}>{siteConfig.siteUrl}{siteConfig.paths.refund}</Link>{' '}
             and is incorporated into these Terms by reference. The Refund Policy is the
             authoritative source for all questions about refund eligibility, windows, eligible
             reasons, processing, and non-refundable items. The rules in the Refund Policy control
@@ -155,9 +156,9 @@ export default function TermsContent() {
       <LegalSection number="5" title="Service Level Agreement (SLA)">
         <p>
           Our Service Level Agreement is also published as a standalone document at{' '}
-          <a href={siteConfig.paths.sla}>
+          <Link href={siteConfig.paths.sla}>
             {siteConfig.siteUrl}{siteConfig.paths.sla}
-          </a>, which is easier to find and to cite. That page restates this section; it does not
+          </Link>, which is easier to find and to cite. That page restates this section; it does not
           add to or change it. The commitments below are reproduced there in full, and if the two
           ever differ, this section controls.
         </p>
@@ -198,7 +199,7 @@ export default function TermsContent() {
         <p>
           All use of WSLATL services is governed by our Acceptable Use Policy (AUP), which is
           incorporated into these Terms by reference and available at{' '}
-          <a href={siteConfig.paths.acceptableUse}>{siteConfig.siteUrl}{siteConfig.paths.acceptableUse}</a>.
+          <Link href={siteConfig.paths.acceptableUse}>{siteConfig.siteUrl}{siteConfig.paths.acceptableUse}</Link>.
           You agree to comply with the AUP at all times.
         </p>
         <p>
@@ -228,9 +229,9 @@ export default function TermsContent() {
         <p>
           WSLATL LLC complies with the Digital Millennium Copyright Act (DMCA), 17 U.S.C. &sect;&nbsp;512.
           Our full DMCA Policy is published at{' '}
-          <a href={siteConfig.paths.dmca}>
+          <Link href={siteConfig.paths.dmca}>
             {siteConfig.siteUrl}{siteConfig.paths.dmca}
-          </a>{' '}
+          </Link>{' '}
           and is incorporated into these Terms by reference. It sets out our designated agent, the
           counter-notice process, the statutory restoration timeline, and our repeat infringer
           policy. Read it before serving notice on us or disputing a removal.
@@ -256,7 +257,7 @@ export default function TermsContent() {
         <p className="mt-4">
           Counter-notices may be submitted to the same email address, and must meet the
           requirements set out in Section 4 of our{' '}
-          <a href={siteConfig.paths.dmca}>DMCA Policy</a>.
+          <Link href={siteConfig.paths.dmca}>DMCA Policy</Link>.
           We reserve the right to terminate the accounts of clients who are repeat copyright
           infringers, in accordance with the repeat infringer policy in Section 5 of that
           document.

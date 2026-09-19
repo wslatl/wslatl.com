@@ -33,7 +33,7 @@ describe('pricing data', () => {
     for (const line of productLines) {
       for (const group of line.groups) {
         const prices = group.plans.map((p) => p.price)
-        expect([...prices].sort((a, b) => a - b), group.id).toEqual(prices)
+        expect(prices.toSorted((a, b) => a - b), group.id).toEqual(prices)
         expect(group.plans.filter((p) => p.popular).length, group.id).toBeLessThanOrEqual(1)
       }
     }

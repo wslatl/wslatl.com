@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
 
@@ -16,7 +17,7 @@ export default function DmcaContent() {
           This policy is written to align with the Digital Millennium Copyright Act,
           17 U.S.C. &sect;&nbsp;512. It replaces and expands the summary previously contained in
           Section 8 of our{' '}
-          <a href={siteConfig.paths.terms}>Terms of Service</a>,
+          <Link href={siteConfig.paths.terms}>Terms of Service</Link>,
           and is incorporated into those Terms by reference.
         </p>
         <p>
@@ -198,7 +199,7 @@ export default function DmcaContent() {
             has already been deleted under our retention rules, and a counter-notice does not
             pause billing, suspension for non-payment, or any separate enforcement action taken
             under our{' '}
-            <a href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</a>.
+            <Link href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</Link>.
           </p>
         </LegalSubSection>
 
@@ -264,7 +265,7 @@ export default function DmcaContent() {
         */}
         <p className="mt-4">
           Termination under this section is a termination for cause. As set out in our{' '}
-          <a href={siteConfig.paths.refund}>Refund Policy</a>,
+          <Link href={siteConfig.paths.refund}>Refund Policy</Link>,
           services terminated for violations of our Terms or Acceptable Use Policy are not
           eligible for a refund.
         </p>
@@ -294,7 +295,7 @@ export default function DmcaContent() {
           </a>{' '}
           with a clear description of the material, its location, and the legal basis for your
           complaint. Those complaints are handled under our{' '}
-          <a href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</a>{' '}
+          <Link href={siteConfig.paths.acceptableUse}>Acceptable Use Policy</Link>{' '}
           rather than under the DMCA.
         </p>
       </LegalSection>
@@ -304,9 +305,9 @@ export default function DmcaContent() {
           We may update this DMCA Policy to reflect changes in our practices or in applicable
           law. When we make material changes, we will update the effective date at the top of
           this page and post the updated policy at{' '}
-          <a href={siteConfig.paths.dmca}>
+          <Link href={siteConfig.paths.dmca}>
             {siteConfig.siteUrl}{siteConfig.paths.dmca}
-          </a>.
+          </Link>.
         </p>
       </LegalSection>
 

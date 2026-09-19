@@ -94,10 +94,13 @@ Then open [http://localhost:3000](http://localhost:3000). Pass a port with `npm 
 | `npm run dev` | Development server with hot reload |
 | `npm run build` | Production build (also type-checks) |
 | `npm run start` | Serve the production build |
-| `npm run lint` | ESLint with the Next.js core-web-vitals and TypeScript rules |
+| `npm run lint` | Oxlint, then ESLint with the Next.js core-web-vitals and TypeScript rules |
+| `npm run lint:fix` | Same, applying the safe automatic fixes |
 | `npm test` | Vitest: pricing invariants, link integrity, redirects, legal data, and a no-em-dash check |
 | `npm run typecheck` | `tsc` (TypeScript 7) against the whole project; run after a build |
 | `npm run check` | All of the above, in the order CI runs them |
+
+Linting runs in two passes. [Oxlint](https://oxc.rs/docs/guide/usage/linter) goes first and does most of the work in well under a second (config in `.oxlintrc.json`: correctness rules fail the lint, suspicious patterns warn). ESLint then covers only what Oxlint cannot check yet, mainly the React Compiler hook rules and the rest of the Next.js set; `eslint-plugin-oxlint` switches off every ESLint rule Oxlint already runs, so nothing is reported twice. To silence a rule on one line, use an `oxlint-disable-next-line` comment with a reason.
 
 TypeScript 7 provides `tsc`. The `typescript` package is aliased to `@typescript/typescript6` because ESLint's TypeScript parser still needs the TypeScript 6 API. ESLint stays on 9.x until `eslint-plugin-react` supports 10.
 

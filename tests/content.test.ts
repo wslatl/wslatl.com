@@ -27,7 +27,7 @@ describe('house style', () => {
       )
     // Built from parts so this file does not match itself.
     const emDash = String.fromCharCode(0x2014)
-    const entity = '&' + 'mdash;'
+    const entity = ['&', 'mdash;'].join('')
     const offenders = files.filter((file) => {
       const text = readFileSync(file, 'utf8')
       return text.includes(emDash) || text.includes(entity)
@@ -59,7 +59,7 @@ describe('games', () => {
   it('lists RAM rows smallest first, since the first row sets the "from" price', () => {
     for (const game of games) {
       const needs = game.recommendedRam.map(ramNeedGb)
-      expect(needs, game.slug).toEqual([...needs].sort((a, b) => a - b))
+      expect(needs, game.slug).toEqual(needs.toSorted((a, b) => a - b))
     }
   })
 

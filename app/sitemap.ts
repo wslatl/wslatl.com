@@ -3,9 +3,10 @@ import { games } from '@/data/games'
 import { legalPages } from '@/data/legal'
 import { siteConfig } from '@/config/site'
 
+const url = (path: string) => (path === '/' ? siteConfig.siteUrl : `${siteConfig.siteUrl}${path}`)
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date()
-  const url = (path: string) => (path === '/' ? siteConfig.siteUrl : `${siteConfig.siteUrl}${path}`)
 
   const staticRoutes: MetadataRoute.Sitemap = [
     { url: url('/'), lastModified: now, changeFrequency: 'weekly', priority: 1 },

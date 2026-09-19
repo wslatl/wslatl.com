@@ -47,12 +47,14 @@ const routes = appRoutes()
 const sectionIds = homeSectionIds()
 const pricingAnchors = new Set(productLines.map((l) => l.anchor))
 
-function checkInternal(href: string) {
+/** Why an internal link is broken, or null when it resolves. */
+function brokenReason(href: string): string | null {
   const [path, hash] = href.split('#')
   const route = path === '' ? '/' : path
-  expect(routes.has(route), `no route for ${href}`).toBe(true)
-  if (hash && route === '/') expect(sectionIds.has(hash), `no #${hash} on the home page`).toBe(true)
-  if (hash && route === '/pricing') expect(pricingAnchors.has(hash), `no #${hash} on /pricing`).toBe(true)
+  if (!routes.has(route)) return `no route for ${href}`
+  if (hash && route === '/' && !sectionIds.has(hash)) return `no #${hash} on the home page`
+  if (hash && route === '/pricing' && !pricingAnchors.has(hash)) return `no #${hash} on /pricing`
+  return null
 }
 
 const allLinks = [
@@ -64,26 +66,26 @@ const allLinks = [
   ...reachOptions.map((o) => ({ label: o.title, href: o.href })),
 ]
 
+// Every check collects all failures and asserts once, so a broken link
+// reports every problem at the same time and no assertion is ever skipped.
 describe('links', () => {
   it('points every internal link at a real route and anchor', () => {
-    for (const link of allLinks) {
-      if (link.href.startsWith('/')) checkInternal(link.href)
-    }
+    const internal = allLinks.filter((link) => link.href.startsWith('/'))
+    expect(internal.length).toBeGreaterThan(0)
+    expect(internal.map((link) => brokenReason(link.href)).filter(Boolean)).toEqual([])
   })
 
   it('uses https for every external link', () => {
-    for (const link of allLinks) {
-      if (/^[a-z]+:/i.test(link.href) && !link.href.startsWith('mailto:')) {
-        expect(link.href, link.label).toMatch(/^https:\/\//)
-      }
-    }
+    const insecure = allLinks.filter(
+      (link) => /^[a-z]+:/i.test(link.href) && !link.href.startsWith('mailto:') && !link.href.startsWith('https://'),
+    )
+    expect(insecure).toEqual([])
   })
 
   it('redirects retired URLs to pages that exist', async () => {
     const redirects = await nextConfig.redirects()
-    for (const redirect of redirects) {
-      expect(routes.has(redirect.source), `${redirect.source} still exists`).toBe(false)
-      expect(routes.has(redirect.destination), `${redirect.destination} is missing`).toBe(true)
-    }
+    expect(redirects.length).toBeGreaterThan(0)
+    expect(redirects.filter((r) => routes.has(r.source)).map((r) => r.source)).toEqual([])
+    expect(redirects.filter((r) => !routes.has(r.destination)).map((r) => r.destination)).toEqual([])
   })
 })

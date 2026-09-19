@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
 
@@ -10,7 +11,7 @@ export default function SubprocessorsContent() {
           (&ldquo;WSLATL,&rdquo; &ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) so that
           we can operate our website, billing portal, hosting panels, and support channels. It
           supports Section 4.1 of our{' '}
-          <a href={siteConfig.paths.privacy}>Privacy Policy</a>,
+          <Link href={siteConfig.paths.privacy}>Privacy Policy</Link>,
           which describes these recipients only by category.
         </p>
         <p>
@@ -278,7 +279,7 @@ export default function SubprocessorsContent() {
           obligations of a controller under the GDPR or other applicable law fall on you. That
           includes having a lawful basis, providing notice to your own users, and maintaining your
           own record of processing. See Section 12 of our{' '}
-          <a href={siteConfig.paths.terms}>Terms of Service</a>{' '}
+          <Link href={siteConfig.paths.terms}>Terms of Service</Link>{' '}
           for the related indemnity.
         </p>
       </LegalSection>
@@ -288,9 +289,9 @@ export default function SubprocessorsContent() {
           We will keep this page current as our infrastructure changes. When a subprocessor is
           added or replaced, we will update the effective date at the top of this page and post
           the updated list at{' '}
-          <a href={siteConfig.paths.subprocessors}>
+          <Link href={siteConfig.paths.subprocessors}>
             {siteConfig.siteUrl}{siteConfig.paths.subprocessors}
-          </a>.
+          </Link>.
         </p>
       </LegalSection>
 

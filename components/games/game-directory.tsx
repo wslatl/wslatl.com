@@ -102,6 +102,7 @@ export function GameDirectory({ games, categories }: { games: GameListing[]; cat
         )}
       </div>
 
+      {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- an explicit status role is announced more reliably across screen readers than <output>'s implicit one */}
       <p role="status" className="sr-only">
         {q ? `${results.length} of ${games.length} games match` : ''}
       </p>

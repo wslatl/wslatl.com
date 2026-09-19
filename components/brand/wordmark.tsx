@@ -10,7 +10,7 @@ interface WordmarkProps {
 export function Wordmark({ className, textClassName }: WordmarkProps) {
   return (
     <span className={cn('inline-flex items-center gap-2.5', className)}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- tiny static SVG, nothing for next/image to optimize */}
+      {/* oxlint-disable-next-line nextjs/no-img-element -- tiny static SVG, nothing for next/image to optimize */}
       <img src="/favicon.svg" alt="" width={28} height={28} className="size-7" />
       <span className={cn('text-[15px] font-semibold tracking-[0.14em] text-foreground', textClassName)}>WSLATL</span>
     </span>

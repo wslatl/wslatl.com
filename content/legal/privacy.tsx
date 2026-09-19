@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
 
@@ -92,7 +93,7 @@ export default function PrivacyContent() {
             credits we issue, amounts applied to invoices, gifts sent or received, and the date,
             amount, and reason for each entry. This ledger is retained as part of your billing
             records. See our{' '}
-            <a href={siteConfig.paths.accountCredit}>Account Credit Terms</a>{' '}
+            <Link href={siteConfig.paths.accountCredit}>Account Credit Terms</Link>{' '}
             for how the balance itself works.
           </p>
         </LegalSubSection>
@@ -187,7 +188,7 @@ export default function PrivacyContent() {
           <p className="mt-3">
             We publish the individual providers, not just these categories. Each subprocessor is
             named on our{' '}
-            <a href={siteConfig.paths.subprocessors}>Subprocessors</a>{' '}
+            <Link href={siteConfig.paths.subprocessors}>Subprocessors</Link>{' '}
             page, together with what it is used for, what data categories it receives, and where
             it is located. That page is kept current as our infrastructure changes.
           </p>
@@ -239,7 +240,7 @@ export default function PrivacyContent() {
           <p>
             The mechanisms that apply to each recipient, and further detail on our transfer
             position, are set out on our{' '}
-            <a href={siteConfig.paths.subprocessors}>Subprocessors</a>{' '}
+            <Link href={siteConfig.paths.subprocessors}>Subprocessors</Link>{' '}
             page. If you need a data processing agreement or a copy of the clauses as we apply
             them, contact us at{' '}
             <a href={`mailto:${siteConfig.email.support}`}>

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
 import { UptimeTable } from '@/components/legal/uptime-table'
@@ -16,7 +17,7 @@ export default function SlaContent() {
           <div className="legal-callout border-primary/30 text-link">
             <strong>This is a restatement, not a new commitment</strong>
             This page reproduces Section 5 of our{' '}
-            <a href={siteConfig.paths.terms}>Terms of Service</a>{' '}
+            <Link href={siteConfig.paths.terms}>Terms of Service</Link>{' '}
             as a standalone document so it is easier to find and cite. The commitments here are
             the same commitments already in the Terms. Nothing has been added, removed, or
             changed. If the two documents ever conflict, the Terms of Service controls.
@@ -76,7 +77,7 @@ export default function SlaContent() {
             A service credit issued under this SLA is applied to your account balance as account
             credit. Once issued, it behaves like any other account credit: it is spendable on
             WSLATL invoices, it does not expire, and it is not redeemable for cash. See our{' '}
-            <a href={siteConfig.paths.accountCredit}>Account Credit Terms</a>{' '}
+            <Link href={siteConfig.paths.accountCredit}>Account Credit Terms</Link>{' '}
             for the full treatment.
           </p>
         </LegalSubSection>
@@ -84,7 +85,7 @@ export default function SlaContent() {
         <LegalSubSection title="4.2 Relationship to the Refund Policy">
           <p>
             A service credit under this SLA and a refund under our{' '}
-            <a href={siteConfig.paths.refund}>Refund Policy</a>{' '}
+            <Link href={siteConfig.paths.refund}>Refund Policy</Link>{' '}
             are separate remedies. As stated in Section 3.1 of the Refund Policy, an outage
             exceeding the applicable uptime target may also be a qualifying reason for a refund
             during the 14-day window, and that refund right is in addition to the 10% service
@@ -116,9 +117,9 @@ export default function SlaContent() {
           commitments here are made through the Terms and follow the notice process in Section 14
           of the Terms of Service. When the commitments change, we will update the effective date
           at the top of this page and post the updated SLA at{' '}
-          <a href={siteConfig.paths.sla}>
+          <Link href={siteConfig.paths.sla}>
             {siteConfig.siteUrl}{siteConfig.paths.sla}
-          </a>.
+          </Link>.
         </p>
       </LegalSection>
 

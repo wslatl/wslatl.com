@@ -31,9 +31,9 @@ export function Clients() {
 
       <div aria-hidden="true" className="marquee-viewport mt-7 overflow-hidden">
         <div className="marquee-track flex w-max">
-          {Array.from({ length: LOOP_COPIES }, (_, copy) => (
+          {Array.from({ length: LOOP_COPIES }, (_slot, copy) => (
             <div key={copy} className={cn('flex shrink-0 items-center', copy > 0 && 'marquee-dup')}>
-              {Array.from({ length: REPEATS_PER_COPY }, (_, repeat) =>
+              {Array.from({ length: REPEATS_PER_COPY }, (_set, repeat) =>
                 clients.map((client) => (
                   <div
                     key={`${repeat}-${client.name}`}

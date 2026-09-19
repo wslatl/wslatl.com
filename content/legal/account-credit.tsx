@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
 
@@ -12,9 +13,9 @@ export default function AccountCreditContent() {
         </p>
         <p>
           These terms are incorporated into and made part of our{' '}
-          <a href={siteConfig.paths.terms}>Terms of Service</a>{' '}
+          <Link href={siteConfig.paths.terms}>Terms of Service</Link>{' '}
           by reference. Where account credit is issued as the outcome of a refund request, our{' '}
-          <a href={siteConfig.paths.refund}>Refund Policy</a>{' '}
+          <Link href={siteConfig.paths.refund}>Refund Policy</Link>{' '}
           governs whether the refund is approved and these terms govern what the resulting credit
           balance is and how it behaves.
         </p>
@@ -22,7 +23,7 @@ export default function AccountCreditContent() {
         <ul className="list-disc pl-5 space-y-1.5 mt-2">
           <li>You purchase it directly as a top-up through the billing portal</li>
           <li>We issue it to you, for example as the outcome of an approved refund request or a service credit under our{' '}
-            <a href={siteConfig.paths.sla}>Service Level Agreement</a>
+            <Link href={siteConfig.paths.sla}>Service Level Agreement</Link>
           </li>
           <li>Another WSLATL client gifts it to you and you accept the gift (see Section 5)</li>
         </ul>
@@ -143,7 +144,7 @@ export default function AccountCreditContent() {
             credit rather than as a return to your original payment method. Refunds paid as credit
             are governed by these terms once issued: they are spendable on WSLATL invoices, they
             do not expire, and they are not withdrawable for cash. Our{' '}
-            <a href={siteConfig.paths.refund}>Refund Policy</a>{' '}
+            <Link href={siteConfig.paths.refund}>Refund Policy</Link>{' '}
             sets out when each outcome applies.
           </p>
         </LegalSubSection>
@@ -228,12 +229,12 @@ export default function AccountCreditContent() {
           Where we reverse credit, we will record the reversal in your transaction ledger with the
           reason. Accounts involved in credit fraud may also be suspended or terminated under
           Section 9.2 of our{' '}
-          <a href={siteConfig.paths.terms}>Terms of Service</a>.
+          <Link href={siteConfig.paths.terms}>Terms of Service</Link>.
         </p>
         <p className="mt-3">
           If you believe a charge on your account is wrong, contact us before filing a chargeback.
           We will investigate a billing error under Section 3.2 of our{' '}
-          <a href={siteConfig.paths.refund}>Refund Policy</a>{' '}
+          <Link href={siteConfig.paths.refund}>Refund Policy</Link>{' '}
           and it is faster than a dispute through your card issuer.
         </p>
       </LegalSection>
@@ -289,7 +290,7 @@ export default function AccountCreditContent() {
           Buying credit is not itself the purchase of a taxable service. Applicable taxes are
           assessed on the invoice for the service the credit is applied to, in line with Section
           4.6 of our{' '}
-          <a href={siteConfig.paths.terms}>Terms of Service</a>.
+          <Link href={siteConfig.paths.terms}>Terms of Service</Link>.
           You remain responsible for any taxes applicable to your use of our services.
         </p>
       </LegalSection>
@@ -300,9 +301,9 @@ export default function AccountCreditContent() {
           billing system, or applicable law. When we make material changes, we will update the
           effective date at the top of this page, notify active clients by email with a summary of
           what changed, and post the updated terms at{' '}
-          <a href={siteConfig.paths.accountCredit}>
+          <Link href={siteConfig.paths.accountCredit}>
             {siteConfig.siteUrl}{siteConfig.paths.accountCredit}
-          </a>.
+          </Link>.
         </p>
         <p>
           We will not introduce an expiry date, a dormancy fee, or any other deduction that
