@@ -63,7 +63,7 @@ export function CompanyContact({ children }: { children?: ReactNode }) {
     <InfoCard title={siteConfig.legal.companyName} subtitle={siteConfig.legal.mailingAddress}>
       {children ?? (
         <InfoRow label="Email">
-          <Email name="support" /> or <Email name="info" />
+          <Email name="support" /> or <Email name="hello" />
         </InfoRow>
       )}
       <InfoRow label="Discord">

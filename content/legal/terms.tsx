@@ -244,7 +244,7 @@ export default function TermsContent() {
         </p>
         <InfoCard>
           <InfoRow label="Email">
-            <Email name="support" />
+            <Email name="dmca" />
           </InfoRow>
           <InfoRow label="Subject line">
             DMCA Takedown Notice

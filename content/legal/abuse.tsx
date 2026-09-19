@@ -236,7 +236,7 @@ export default function AbuseContent() {
             <Email name="abuse" />
           </InfoRow>
           <InfoRow label="General">
-            <Email name="support" /> or <Email name="info" />
+            <Email name="support" /> or <Email name="hello" />
           </InfoRow>
         </CompanyContact>
       </LegalSection>

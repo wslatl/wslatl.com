@@ -10,9 +10,13 @@ import 'server-only'
  * file, since that would put every address in a JavaScript bundle as written.
  */
 export const emails = {
+  /** The main address. Everything else forwards here. */
   support: 'support@wslatl.com',
-  info: 'info@wslatl.com',
+  /** The friendlier general address, offered alongside support. */
+  hello: 'hello@wslatl.com',
+  /** Abuse reports, the address other network operators expect (RFC 2142). */
   abuse: 'abuse@wslatl.com',
+  /** Copyright notices, named in the DMCA Policy as the agent's address. */
   dmca: 'dmca@wslatl.com',
 } as const
 

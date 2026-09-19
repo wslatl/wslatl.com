@@ -34,7 +34,7 @@ async function get(path, redirect = 'manual') {
       return await fetch(url, { redirect, signal: AbortSignal.timeout(20_000) })
     } catch (error) {
       // One retry covers a dropped connection; a second failure is real.
-      if (attempt === 2) throw new Error(`${url.pathname}: ${error.cause?.code ?? error.message}`)
+      if (attempt === 2) throw new Error(`${url.pathname}: ${error.cause?.code ?? error.message}`, { cause: error })
     }
   }
 }

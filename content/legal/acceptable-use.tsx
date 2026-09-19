@@ -273,7 +273,7 @@ export default function AcceptableUseContent() {
         </p>
         <InfoCard title="Report abuse to">
           <InfoRow label="Email">
-            <Email name="support" /> (Subject: Abuse Report)
+            <Email name="abuse" /> (Subject: Abuse Report)
           </InfoRow>
           <InfoRow label="Discord">
             <ShortLink name="discord" />
