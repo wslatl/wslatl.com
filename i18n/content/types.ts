@@ -38,6 +38,8 @@ export interface ContentTranslation {
       popularFor: string[]
       /** The "who it is for" half of each RAM row, in the order data/games.ts has them. */
       setups: string[]
+      /** The game's own questions and answers, in the order data/games.ts has them. */
+      faqs: { q: string; a: string }[]
     }
   >
   /** Keyed by the English category name. */

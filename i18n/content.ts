@@ -104,6 +104,7 @@ export function localizedGames(): GameEntry[] {
         ...row,
         players: translated?.setups?.[i] ?? row.players,
       })),
+      faqs: game.faqs.map((faq, i) => translated?.faqs?.[i] ?? faq),
     }
   })
 }
