@@ -385,7 +385,7 @@ export default function TermsContent() {
         </p>
         <p>
           Before initiating formal legal proceedings, both parties agree to attempt to resolve
-          disputes informally. To initiate informal resolution, contact us at <Email name="support" />
+          disputes informally. To initiate informal resolution, contact us at <Email name="support" />{' '}
           with a written description of the dispute. If the dispute is not resolved within{' '}
           <strong>30 days</strong> of that notice, either party
           may pursue formal legal remedies.

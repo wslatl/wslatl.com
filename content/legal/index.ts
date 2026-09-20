@@ -11,10 +11,22 @@ import RefundContent from './refund'
 import SlaContent from './sla'
 import SubprocessorsContent from './subprocessors'
 import TermsContent from './terms'
+import EsAbuse from './es/abuse'
+import EsBackups from './es/backups'
 import EsSla from './es/sla'
+import EsSubprocessors from './es/subprocessors'
+import FrAbuse from './fr/abuse'
+import FrBackups from './fr/backups'
 import FrSla from './fr/sla'
+import FrSubprocessors from './fr/subprocessors'
+import DeAbuse from './de/abuse'
+import DeBackups from './de/backups'
 import DeSla from './de/sla'
+import DeSubprocessors from './de/subprocessors'
+import PtAbuse from './pt/abuse'
+import PtBackups from './pt/backups'
 import PtSla from './pt/sla'
+import PtSubprocessors from './pt/subprocessors'
 
 /** The English body of every document. A missing one is a type error. */
 const english: Record<LegalDocumentKey, ComponentType> = {
@@ -37,16 +49,28 @@ const english: Record<LegalDocumentKey, ComponentType> = {
  */
 const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, ComponentType>>>> = {
   es: {
+    abuse: EsAbuse,
+    backups: EsBackups,
     sla: EsSla,
+    subprocessors: EsSubprocessors,
   },
   fr: {
+    abuse: FrAbuse,
+    backups: FrBackups,
     sla: FrSla,
+    subprocessors: FrSubprocessors,
   },
   de: {
+    abuse: DeAbuse,
+    backups: DeBackups,
     sla: DeSla,
+    subprocessors: DeSubprocessors,
   },
   pt: {
+    abuse: PtAbuse,
+    backups: PtBackups,
     sla: PtSla,
+    subprocessors: PtSubprocessors,
   },
 }
 

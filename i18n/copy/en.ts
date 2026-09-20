@@ -300,6 +300,7 @@ export const en = {
     translationNotice:
       'This translation is provided so it can be read in your own language. The English version of this document is the one that applies.',
     readInEnglish: 'Read the English version',
+    notTranslated: "This document has not been translated yet, so it is shown in English. The English version is the one that applies in any case.",
     emailsJoin: "or",
     emailLabel: "Email",
     uptimeTable: {

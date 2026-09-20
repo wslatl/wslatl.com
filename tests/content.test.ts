@@ -56,6 +56,24 @@ describe('legal paths', () => {
   })
 })
 
+describe('legal documents render as sentences', () => {
+  it('never runs a component into the next word', () => {
+    // JSX drops the newline after <Email /> or <ShortLink />, so a line that
+    // ends with one and continues on the next needs {' '} or the page reads
+    // "contact us at support@wslatl.comand we will provide it."
+    const runTogether = /<(Email|ShortLink)\b[^>]*\/>\n\s+[\p{L}]/gu
+    const offenders = sourceFiles(join(root, 'content', 'legal'))
+      .filter((file) => file.endsWith('.tsx'))
+      .flatMap((file) => {
+        const text = readFileSync(file, 'utf8')
+        return [...text.matchAll(runTogether)].map(
+          (match) => `${relative(root, file)}:${text.slice(0, match.index).split('\n').length}`,
+        )
+      })
+    expect(offenders).toEqual([])
+  })
+})
+
 describe('email protection', () => {
   it('keeps every address in config/emails.ts, so pages can only render them through <Email>', () => {
     const address = /[a-z0-9._%+-]+@wslatl\.com/i

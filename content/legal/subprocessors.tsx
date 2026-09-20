@@ -129,7 +129,7 @@ export default function SubprocessorsContent() {
         <Callout tone="caution" title="Datacenter partner: to be published">
           The operator and location of the facilities housing our servers are being confirmed
           and will be named here. If you need this information before it is published, for
-          example to complete your own vendor review, contact us at <Email name="support" />
+          example to complete your own vendor review, contact us at <Email name="support" />{' '}
           and we will provide it.
         </Callout>
 

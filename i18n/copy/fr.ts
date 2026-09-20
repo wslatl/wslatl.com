@@ -291,6 +291,7 @@ export const fr: Copy = {
     translationNotice:
       "Cette traduction est fournie pour que vous puissiez lire ce document dans votre langue. C'est la version anglaise de ce document qui fait foi.",
     readInEnglish: "Lire la version anglaise",
+    notTranslated: "Ce document n'est pas encore traduit, il est donc affiché en anglais. C'est de toute façon la version anglaise qui fait foi.",
     emailsJoin: "ou",
     emailLabel: "E-mail",
     uptimeTable: {

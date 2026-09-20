@@ -11,6 +11,7 @@ import { pageMetadata } from '@/lib/metadata'
 import { cn, slugify } from '@/lib/utils'
 import { Main } from '@/components/layout/main'
 import { Email } from '@/components/ui/email'
+import { hasTranslation } from '@/content/legal'
 import { defaultLocale, localePath, type Locale } from '@/i18n/config'
 import { getLocale } from '@/i18n/locale'
 import { copy } from '@/i18n/copy'
@@ -200,11 +201,12 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
             </div>
 
             {/* A translation is a courtesy; the English document is the one
-                that applies, and it is one click away. */}
+                that applies, and it is one click away. A document with no
+                translation yet says so, rather than claiming to be one. */}
             {locale !== defaultLocale && (
               <div role="note" className="legal-callout mb-10" data-tone="note">
                 <p>
-                  {t.translationNotice}{' '}
+                  {hasTranslation(locale, page.key) ? t.translationNotice : t.notTranslated}{' '}
                   <Link href={localePath(defaultLocale, page.href)} hrefLang={defaultLocale} lang={defaultLocale}>
                     {t.readInEnglish}
                   </Link>

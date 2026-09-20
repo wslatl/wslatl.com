@@ -291,6 +291,7 @@ export const de: Copy = {
     translationNotice:
       'Diese Übersetzung gibt es, damit du das Dokument in deiner eigenen Sprache lesen kannst. Maßgeblich ist die englische Fassung dieses Dokuments.',
     readInEnglish: 'Englische Fassung lesen',
+    notTranslated: "Dieses Dokument ist noch nicht übersetzt und wird deshalb auf Englisch angezeigt. Maßgeblich ist ohnehin die englische Fassung.",
     emailsJoin: "oder",
     emailLabel: "E-Mail",
     uptimeTable: {
