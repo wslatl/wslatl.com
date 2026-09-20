@@ -29,8 +29,6 @@ function localizedGame(slug: string) {
   return localizedGames().find((game) => game.slug === slug)
 }
 
-export const dynamicParams = false
-
 /**
  * "GAME-1 ($3.60/mo) or P-GAME-1 ($12.00/mo)", or a way to ask when nothing is
  * big enough. Rows sized "per map" (clusters) name the plan for each map,

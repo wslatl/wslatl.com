@@ -92,7 +92,18 @@ export const metadata: Metadata = {
   },
 }
 
-export const dynamicParams = false
+/**
+ * This one setting covers every route below, which is why the pages do not
+ * repeat it: the framework reads it from the top of the tree. Left false, it
+ * rejects any address whose parameters were not built ahead of time (an
+ * unknown game, a mistyped document) before the page can run, answering with
+ * its own bare 404 page and logging an error for every bot that probes one.
+ * True lets the page run and call notFound(), which is what renders ours.
+ *
+ * Nothing renders under a made-up language, because proxy.ts gives every
+ * request a real one before it reaches a route (i18n/routing.ts).
+ */
+export const dynamicParams = true
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))

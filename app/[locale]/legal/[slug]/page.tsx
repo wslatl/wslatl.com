@@ -11,8 +11,6 @@ interface PageProps {
   params: Promise<{ locale: Locale; slug: string }>
 }
 
-export const dynamicParams = false
-
 /** URL slugs stay English in every language: /es/legal/privacy. */
 export function generateStaticParams() {
   return legalPages.map((page) => ({ slug: legalSlug(page) }))

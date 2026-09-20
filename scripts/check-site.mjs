@@ -8,7 +8,8 @@
 // What it checks:
 //   - robots.txt and the sitemap load, and every page in the sitemap
 //     answers 200 without a redirect
-//   - an unknown path is a real 404
+//   - an unknown path is a real 404, and every kind of wrong URL reaches
+//     our own 404 page in the right language rather than the built-in one
 //   - the security headers are there
 //   - every moved page (permanent redirect in next.config.mjs) still lands
 //     on a page that loads
@@ -70,6 +71,45 @@ async function checkPages() {
   record('Unknown paths are a real 404', missing.status === 404, `status ${missing.status}`)
 }
 
+/**
+ * A 404 has to be our own page, not the framework's bare one. Wrong URLs
+ * arrive by four different routes, and a status code alone does not tell
+ * them apart:
+ *   - a path matching no route at all
+ *   - an unknown slug inside a route that has a fixed list of them
+ *   - a path with a dot, which looks like a file rather than a page
+ *   - any of those in another language, which has to answer in that language
+ */
+async function checkNotFound() {
+  const stamp = Date.now()
+  // The heading each language answers with, mirroring notFound.heading in
+  // i18n/copy. The 404 page is sent as data for the browser to build, so
+  // there is no markup to read: these are matched against the response.
+  const heading = {
+    en: 'This page does not exist.',
+    es: 'Esta página no existe.',
+    de: 'Diese Seite gibt es nicht.',
+  }
+  const probes = [
+    ['an unknown path', `/no-such-page-${stamp}`, 'en'],
+    ['an unknown game', `/games/no-such-game-${stamp}`, 'en'],
+    ['an unknown legal document', `/legal/no-such-document-${stamp}`, 'en'],
+    ['a path with a dot', `/no-such-file-${stamp}.js`, 'en'],
+    ['an unknown path in Spanish', `/es/no-such-page-${stamp}`, 'es'],
+    ['an unknown game in German', `/de/games/no-such-game-${stamp}`, 'de'],
+  ]
+  const wrong = []
+  await eachLimited(probes, async ([label, path, lang]) => {
+    const res = await get(path)
+    const body = await res.text()
+    if (res.status !== 404) return wrong.push(`${label}: status ${res.status}`)
+    // One line covers both halves: the built-in page does not carry our
+    // heading, and the wrong language does not carry this one.
+    if (!body.includes(heading[lang])) wrong.push(`${label}: not our 404 page in ${lang}`)
+  })
+  record('Unknown paths reach our own 404 page', wrong.length === 0, wrong.join(', ') || `${probes.length} kinds of wrong URL`)
+}
+
 async function checkHeaders() {
   const res = await get('/')
   const h = res.headers
@@ -84,13 +124,19 @@ async function checkHeaders() {
   record('Security headers', problems.length === 0, problems.join(', ') || 'all present')
 }
 
+/**
+ * A redirect source can be a pattern rather than an address (/en/:path*), so
+ * the parameter is filled in with a page that exists before asking for it.
+ */
+const sample = (source) => source.replace(/\/:[^/]+$/, '/pricing')
+
 async function checkRedirects() {
   const redirects = await nextConfig.redirects()
 
   const moved = redirects.filter((r) => r.permanent)
   const lost = []
   await eachLimited(moved, async ({ source }) => {
-    const res = await get(source, 'follow')
+    const res = await get(sample(source), 'follow')
     if (res.status !== 200) lost.push(`${source} (${res.status})`)
     await res.body?.cancel()
   })
@@ -135,6 +181,7 @@ function checkCertificate() {
 
 for (const [name, run] of [
   ['Pages', checkPages],
+  ['Not found', checkNotFound],
   ['Headers', checkHeaders],
   ['Redirects', checkRedirects],
   ['Certificate', checkCertificate],

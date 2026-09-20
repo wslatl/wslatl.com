@@ -32,6 +32,9 @@ function appRoutes(): Set<string> {
         // language, which localePath() adds when a page renders.
         const full = '/' + relative(join(root, 'app'), dir).split(sep).join('/')
         const route = full.replace(/^\/\[locale\]/, '') || '/'
+        // A catch-all is not a destination: it is where an unknown address
+        // lands so that it gets our own 404 page, and nothing links to it.
+        if (route.includes('[...')) continue
         if (route.includes('[')) {
           const slugs = dynamicSlugs[route]
           if (!slugs) throw new Error(`Add ${route} to dynamicSlugs in tests/links.test.ts`)
