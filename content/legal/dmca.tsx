@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from '@/components/legal/doc-link'
 import { LegalSection, LegalSubSection } from '@/components/layout/legal-layout'
 import { siteConfig } from '@/config/site'
 import { Callout, CompanyContact, InfoCard, InfoRow } from '@/components/legal/blocks'

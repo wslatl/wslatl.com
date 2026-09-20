@@ -4,6 +4,7 @@ import { SiteHeader } from '@/components/layout/site-header'
 import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
 import { legalEffectiveDate } from '@/config/site'
+import { formatLegalDate } from '@/i18n/dates'
 import { pageMetadata } from '@/lib/metadata'
 import { Main } from '@/components/layout/main'
 import { localePath, type Locale } from '@/i18n/config'
@@ -45,7 +46,7 @@ export default async function LegalIndexPage({ params }: PageProps) {
                 <h2 className="font-semibold text-foreground group-hover:text-link">{doc.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{doc.intro}</p>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  {t.effective} {legalEffectiveDate(doc.key)}
+                  {t.effective} {formatLegalDate(legalEffectiveDate(doc.key))}
                 </p>
               </Link>
             </li>

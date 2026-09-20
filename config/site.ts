@@ -37,13 +37,14 @@ export const siteConfig = {
     mailingAddress: 'Missouri, United States',
 
     /**
-     * Fallback effective date. Only used if a document has no entry in
-     * `effectiveDates` below. Prefer adding an entry there instead.
+     * Fallback effective date, as YYYY-MM-DD. Only used if a document has
+     * no entry in `effectiveDates` below. Prefer adding an entry there.
      */
-    effectiveDate: 'September 19, 2026',
+    effectiveDate: '2026-09-19',
 
     /**
-     * Per-document effective dates.
+     * Per-document effective dates, as YYYY-MM-DD. They are written out in
+     * the reader's language by formatLegalDate (i18n/dates.ts).
      *
      * Each legal document carries its own date so that revising one policy
      * does not silently re-date the others. When you change the substance of
@@ -51,16 +52,16 @@ export const siteConfig = {
      * actually takes effect.
      */
     effectiveDates: {
-      privacy:        'September 19, 2026',
-      terms:          'September 19, 2026',
-      acceptableUse:  'September 19, 2026',
-      abuse:          'September 19, 2026',
-      refund:         'September 19, 2026',
-      sla:            'September 19, 2026',
-      dmca:           'September 19, 2026',
-      accountCredit:  'September 19, 2026',
-      subprocessors:  'September 19, 2026',
-      backups:        'September 19, 2026',
+      privacy:        '2026-09-19',
+      terms:          '2026-09-19',
+      acceptableUse:  '2026-09-19',
+      abuse:          '2026-09-19',
+      refund:         '2026-09-19',
+      sla:            '2026-09-19',
+      dmca:           '2026-09-19',
+      accountCredit:  '2026-09-19',
+      subprocessors:  '2026-09-19',
+      backups:        '2026-09-19',
     },
   },
 } as const

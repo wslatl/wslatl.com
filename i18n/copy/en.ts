@@ -300,6 +300,13 @@ export const en = {
     translationNotice:
       'This translation is provided so it can be read in your own language. The English version of this document is the one that applies.',
     readInEnglish: 'Read the English version',
+    emailsJoin: "or",
+    emailLabel: "Email",
+    uptimeTable: {
+      service: "Service",
+      target: "Monthly Uptime Target",
+      label: "Monthly uptime targets",
+    },
   },
   notFound: {
     metaTitle: 'Page not found',

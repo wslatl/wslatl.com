@@ -291,6 +291,13 @@ export const pt: Copy = {
     translationNotice:
       'Esta tradução existe para que você possa ler no seu próprio idioma. A versão em inglês deste documento é a que vale.',
     readInEnglish: 'Ler a versão em inglês',
+    emailsJoin: "ou",
+    emailLabel: "E-mail",
+    uptimeTable: {
+      service: "Serviço",
+      target: "Meta de uptime mensal",
+      label: "Metas de uptime mensal",
+    },
   },
   notFound: {
     metaTitle: 'Página não encontrada',

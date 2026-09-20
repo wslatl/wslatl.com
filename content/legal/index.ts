@@ -11,6 +11,10 @@ import RefundContent from './refund'
 import SlaContent from './sla'
 import SubprocessorsContent from './subprocessors'
 import TermsContent from './terms'
+import EsSla from './es/sla'
+import FrSla from './fr/sla'
+import DeSla from './de/sla'
+import PtSla from './pt/sla'
 
 /** The English body of every document. A missing one is a type error. */
 const english: Record<LegalDocumentKey, ComponentType> = {
@@ -31,7 +35,20 @@ const english: Record<LegalDocumentKey, ComponentType> = {
  * entry for a document shows the English one, which is the version that
  * applies in any case (see the notice on every translated legal page).
  */
-const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, ComponentType>>>> = {}
+const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, ComponentType>>>> = {
+  es: {
+    sla: EsSla,
+  },
+  fr: {
+    sla: FrSla,
+  },
+  de: {
+    sla: DeSla,
+  },
+  pt: {
+    sla: PtSla,
+  },
+}
 
 export function legalContent(locale: Locale, key: LegalDocumentKey): ComponentType {
   return translations[locale]?.[key] ?? english[key]

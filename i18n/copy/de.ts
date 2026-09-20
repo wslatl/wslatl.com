@@ -291,6 +291,13 @@ export const de: Copy = {
     translationNotice:
       'Diese Übersetzung gibt es, damit du das Dokument in deiner eigenen Sprache lesen kannst. Maßgeblich ist die englische Fassung dieses Dokuments.',
     readInEnglish: 'Englische Fassung lesen',
+    emailsJoin: "oder",
+    emailLabel: "E-Mail",
+    uptimeTable: {
+      service: "Dienst",
+      target: "Monatliches Uptime-Ziel",
+      label: "Monatliche Uptime-Ziele",
+    },
   },
   notFound: {
     metaTitle: 'Seite nicht gefunden',

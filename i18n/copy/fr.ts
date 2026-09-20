@@ -291,6 +291,13 @@ export const fr: Copy = {
     translationNotice:
       "Cette traduction est fournie pour que vous puissiez lire ce document dans votre langue. C'est la version anglaise de ce document qui fait foi.",
     readInEnglish: "Lire la version anglaise",
+    emailsJoin: "ou",
+    emailLabel: "E-mail",
+    uptimeTable: {
+      service: "Service",
+      target: "Objectif de disponibilité mensuelle",
+      label: "Objectifs de disponibilité mensuelle",
+    },
   },
   notFound: {
     metaTitle: "Page introuvable",

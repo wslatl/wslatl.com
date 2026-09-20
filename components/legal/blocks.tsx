@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { siteConfig } from '@/config/site'
+import { copy } from '@/i18n/copy'
 import { Email } from '@/components/ui/email'
 import { ShortLink } from '@/components/ui/short-link'
 
@@ -62,8 +63,8 @@ export function CompanyContact({ children }: { children?: ReactNode }) {
   return (
     <InfoCard title={siteConfig.legal.companyName} subtitle={siteConfig.legal.mailingAddress}>
       {children ?? (
-        <InfoRow label="Email">
-          <Email name="support" /> or <Email name="hello" />
+        <InfoRow label={copy().legal.emailLabel}>
+          <Email name="support" /> {copy().legal.emailsJoin} <Email name="hello" />
         </InfoRow>
       )}
       <InfoRow label="Discord">

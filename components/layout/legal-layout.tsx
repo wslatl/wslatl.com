@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
 import type { LegalPage } from '@/data/legal'
 import { legalEffectiveDate, siteConfig } from '@/config/site'
+import { formatLegalDate } from '@/i18n/dates'
 import { pageMetadata } from '@/lib/metadata'
 import { cn, slugify } from '@/lib/utils'
 import { Main } from '@/components/layout/main'
@@ -171,7 +172,7 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
             <dl className="-mt-4 mb-10 flex flex-wrap gap-x-8 gap-y-2 text-sm">
               <div className="flex gap-2">
                 <dt className="text-muted-foreground">{t.effective}</dt>
-                <dd className="font-medium text-foreground">{legalEffectiveDate(page.key)}</dd>
+                <dd className="font-medium text-foreground">{formatLegalDate(legalEffectiveDate(page.key))}</dd>
               </div>
               <div className="flex gap-2">
                 <dt className="text-muted-foreground">{t.jurisdiction}</dt>

@@ -130,7 +130,7 @@ describe('legal documents', () => {
     expect(new Set(keys).size).toBe(keys.length)
     expect(new Set(hrefs).size).toBe(hrefs.length)
     for (const page of legalPages) {
-      expect(siteConfig.legal.effectiveDates[page.key], page.key).toMatch(/^[A-Z][a-z]+ \d{1,2}, \d{4}$/)
+      expect(siteConfig.legal.effectiveDates[page.key], page.key).toMatch(/^\d{4}-\d{2}-\d{2}$/)
     }
   })
 })
