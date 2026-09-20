@@ -60,8 +60,9 @@ describe('legal documents render as sentences', () => {
   it('never runs a component into the next word', () => {
     // JSX drops the newline after <Email /> or <ShortLink />, so a line that
     // ends with one and continues on the next needs {' '} or the page reads
-    // "contact us at support@wslatl.comand we will provide it."
-    const runTogether = /<(Email|ShortLink)\b[^>]*\/>\n\s+[\p{L}]/gu
+    // "contact us at support@wslatl.comand we will provide it." The same
+    // happens without a newline, when the next word simply follows the tag.
+    const runTogether = /<(Email|ShortLink)\b[^>]*\/>(?:\n\s+)?[\p{L}]/gu
     const offenders = sourceFiles(join(root, 'content', 'legal'))
       .filter((file) => file.endsWith('.tsx'))
       .flatMap((file) => {

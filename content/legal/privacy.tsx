@@ -452,7 +452,7 @@ export default function PrivacyContent() {
           legal requirements, or services. When we make material changes, we will:
         </p>
         <ul>
-          <li>Update the &ldquo;Effective Date&rdquo; at the top of this page</li>
+          <li>Update the effective date shown at the top of this page</li>
           <li>Notify active clients via email with a summary of what changed</li>
           <li>Post the updated policy at {siteConfig.paths.privacy}</li>
         </ul>
