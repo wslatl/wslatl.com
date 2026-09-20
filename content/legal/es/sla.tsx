@@ -11,10 +11,11 @@ export default function SlaContent() {
     <>
       <LegalSection number="1" title="Descripción general y alcance">
         <p>
-          Este Acuerdo de Nivel de Servicio (&ldquo;SLA&rdquo;) establece los objetivos de uptime
-          que WSLATL LLC (&ldquo;WSLATL&rdquo;, &ldquo;nosotros&rdquo;, &ldquo;nuestro&rdquo; o
-          &ldquo;nos&rdquo;) se propone cumplir para cada tipo de servicio, cómo gestionamos el
-          mantenimiento y el crédito de servicio que puedes reclamar cuando no los cumplimos.
+          Este Acuerdo de Nivel de Servicio (&ldquo;SLA&rdquo;) establece los objetivos de
+          disponibilidad que WSLATL LLC (&ldquo;WSLATL&rdquo;, &ldquo;nosotros&rdquo;,
+          &ldquo;nuestro&rdquo; o &ldquo;nos&rdquo;) se propone cumplir para cada tipo de servicio,
+          cómo gestionamos el mantenimiento y el crédito de servicio que puedes reclamar cuando no
+          los cumplimos.
         </p>
         <Callout tone="note" title="Esto es una repetición, no un compromiso nuevo">
           Esta página reproduce la Sección 5 de nuestras{' '}
@@ -31,12 +32,12 @@ export default function SlaContent() {
         </p>
       </LegalSection>
 
-      <LegalSection number="2" title="Objetivos de uptime">
+      <LegalSection number="2" title="Objetivos de disponibilidad">
         <UptimeTable />
         <p>
-          El uptime se mide por mes natural y excluye las ventanas de mantenimiento programado y el
-          tiempo de inactividad causado por hechos ajenos a nuestro control razonable (véase la
-          Sección 15 de las Condiciones del servicio, Fuerza mayor).
+          La disponibilidad se mide por mes natural y excluye las ventanas de mantenimiento
+          programado y el tiempo de inactividad causado por hechos ajenos a nuestro control
+          razonable (véase la Sección 15 de las Condiciones del servicio, Fuerza mayor).
         </p>
       </LegalSection>
 
@@ -57,13 +58,13 @@ export default function SlaContent() {
 
       <LegalSection number="4" title="Créditos de servicio">
         <p>
-          Si no cumplimos el objetivo de uptime aplicable por causa imputable a nosotros, puedes
-          solicitar un crédito de servicio equivalente al{' '}
+          Si no cumplimos el objetivo de disponibilidad aplicable por causa imputable a nosotros,
+          puedes solicitar un crédito de servicio equivalente al{' '}
           <strong>10% del coste mensual del servicio afectado</strong> por
           cada incidente admisible. Los créditos se aplican al saldo de tu cuenta y no superarán el
           coste de un mes completo del servicio afectado. Los créditos de servicio son tu único y
-          exclusivo recurso ante los incumplimientos de uptime y no te dan derecho a un reembolso en
-          efectivo.
+          exclusivo recurso ante los incumplimientos de disponibilidad y no te dan derecho a un
+          reembolso en efectivo.
         </p>
         <p>
           Para solicitar un crédito, escríbenos en un plazo de 15 días desde el incidente a <Email name="support" /> con
@@ -86,18 +87,19 @@ export default function SlaContent() {
             Un crédito de servicio conforme a este SLA y un reembolso conforme a nuestra{' '}
             <Link href={siteConfig.paths.refund}>Política de reembolsos</Link>{' '}
             son recursos distintos. Como se indica en la Sección 3.1 de la Política de reembolsos,
-            una interrupción que supere el objetivo de uptime aplicable también puede ser un motivo
-            admitido para un reembolso dentro del plazo de 14 días, y ese derecho de reembolso se
-            suma al crédito de servicio del 10% en lugar de sustituirlo. La admisibilidad del
-            reembolso se decide conforme a la Política de reembolsos, no conforme a este SLA.
+            una interrupción que supere el objetivo de disponibilidad aplicable también puede ser
+            un motivo admitido para un reembolso dentro del plazo de 14 días, y ese derecho de
+            reembolso se suma al crédito de servicio del 10% en lugar de sustituirlo. La
+            admisibilidad del reembolso se decide conforme a la Política de reembolsos, no conforme
+            a este SLA.
           </p>
         </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="5" title="Exclusiones">
         <p>
-          En coherencia con la Sección 2 anterior, los objetivos de uptime de este SLA no cubren el
-          tiempo de inactividad atribuible a:
+          En coherencia con la Sección 2 anterior, los objetivos de disponibilidad de este SLA no
+          cubren el tiempo de inactividad atribuible a:
         </p>
         <ul>
           <li>Las ventanas de mantenimiento programado notificadas conforme a la Sección 3</li>

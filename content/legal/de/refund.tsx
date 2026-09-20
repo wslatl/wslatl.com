@@ -418,7 +418,7 @@ export default function RefundContent() {
           wesentlichen Änderungen werden wir:
         </p>
         <ul>
-          <li>Das Feld &bdquo;Gültig ab&ldquo; oben auf dieser Seite aktualisieren</li>
+          <li>Das oben auf dieser Seite angezeigte Datum des Inkrafttretens aktualisieren</li>
           <li>Aktive Kunden per E-Mail mit einer Zusammenfassung der Änderungen benachrichtigen</li>
           <li>Die aktualisierte Richtlinie unter {siteConfig.paths.refund} veröffentlichen</li>
         </ul>

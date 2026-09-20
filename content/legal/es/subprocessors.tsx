@@ -277,7 +277,7 @@ export default function SubprocessorsContent() {
         </ul>
         <p>
           Si alojas datos personales de otras personas en un servicio de WSLATL, las obligaciones
-          del responsable del tratamiento conforme al GDPR o a otra legislación aplicable recaen
+          del responsable del tratamiento conforme al RGPD o a otra legislación aplicable recaen
           sobre ti. Eso incluye tener una base jurídica, informar a tus propios usuarios y llevar tu
           propio registro de actividades de tratamiento. Consulta la Sección 12 de nuestras{' '}
           <Link href={siteConfig.paths.terms}>Condiciones del servicio</Link>{' '}

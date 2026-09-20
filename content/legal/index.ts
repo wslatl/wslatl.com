@@ -26,6 +26,7 @@ import FrRefund from './fr/refund'
 import FrSla from './fr/sla'
 import FrSubprocessors from './fr/subprocessors'
 import DeAbuse from './de/abuse'
+import DeAcceptableUse from './de/acceptable-use'
 import DeAccountCredit from './de/account-credit'
 import DeBackups from './de/backups'
 import DeDmca from './de/dmca'
@@ -33,6 +34,7 @@ import DeRefund from './de/refund'
 import DeSla from './de/sla'
 import DeSubprocessors from './de/subprocessors'
 import PtAbuse from './pt/abuse'
+import PtAcceptableUse from './pt/acceptable-use'
 import PtAccountCredit from './pt/account-credit'
 import PtBackups from './pt/backups'
 import PtDmca from './pt/dmca'
@@ -80,6 +82,7 @@ const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, Comp
   },
   de: {
     abuse: DeAbuse,
+    acceptableUse: DeAcceptableUse,
     accountCredit: DeAccountCredit,
     backups: DeBackups,
     dmca: DeDmca,
@@ -89,6 +92,7 @@ const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, Comp
   },
   pt: {
     abuse: PtAbuse,
+    acceptableUse: PtAcceptableUse,
     accountCredit: PtAccountCredit,
     backups: PtBackups,
     dmca: PtDmca,
