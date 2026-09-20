@@ -82,9 +82,21 @@
     @apply border-border;
   }
   html {
-    scroll-behavior: smooth;
     /* Anchor targets land below the sticky header instead of under it. */
     scroll-padding-top: 5rem;
+  }
+  /*
+   * Smooth scrolling only where it was wanted: jumping to a section from the
+   * table of contents. Set on html itself it also animates the scroll to the
+   * top that the router performs on every navigation, and that animation
+   * chases a target that keeps moving while the page streams in, so opening
+   * a long document left you part way down it instead of at the heading.
+   * A page opened without a fragment has no :target, so it jumps instantly.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    html:has(:target) {
+      scroll-behavior: smooth;
+    }
   }
   body {
     @apply bg-background text-foreground;
