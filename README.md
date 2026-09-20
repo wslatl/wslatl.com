@@ -10,6 +10,7 @@ The public website for WSLATL LLC. Private hosting based in Missouri: VPS hostin
 2. Publishes plan pricing for VPS and game servers on `/pricing`, with a page per supported game under `/games`.
 3. Routes visitors to the right panel (billing, game panel, VPS panel, dedicated portal, cPanel) through the header Login menu and the footer.
 4. Hosts the full legal library (ten policies) under `/legal`.
+5. Does all of that in English, Spanish, French, German and Portuguese.
 
 Every page is static. There is no CMS and no database: content lives in `data/*.ts` and `content/legal/*.tsx`, so copy is one PR away.
 
@@ -19,16 +20,19 @@ Every page is static. There is no CMS and no database: content lives in `data/*.
 
 ```
 app/
-  layout.tsx               Root layout: fonts, default metadata, Organization JSON-LD, skip link.
-  page.tsx                 Home page composition.
   globals.css              Tailwind v4 entry, design tokens, the few custom styles.
-  pricing/page.tsx         Pricing: line overviews, plan tables, what's included, how ordering works.
-  games/page.tsx           Game directory with search.
-  games/[slug]/page.tsx    One page per game, statically generated from data/games.ts.
-  legal/page.tsx           Index of every legal document.
-  legal/[slug]/page.tsx    Every policy, at /legal/privacy, /legal/terms, and so on.
-  not-found.tsx, error.tsx Branded 404 and error pages.
-  sitemap.ts, robots.ts    Generated from the same data the pages use.
+  sitemap.ts, robots.ts    Every page in every language, from the same data the pages use.
+  [locale]/                Every page, once, for all five languages (see Languages).
+    layout.tsx             Root layout: language, fonts, default metadata, Organization JSON-LD, skip link.
+    page.tsx               Home page composition.
+    pricing/page.tsx       Pricing: line overviews, plan tables, what's included, how ordering works.
+    games/page.tsx         Game directory with search.
+    games/[slug]/page.tsx  One page per game, statically generated from data/games.ts.
+    legal/page.tsx         Index of every legal document.
+    legal/[slug]/page.tsx  Every policy, at /legal/privacy, /legal/terms, and so on.
+    not-found.tsx, error.tsx  Branded 404 and error pages.
+
+proxy.ts                   Serves the English tree at the unprefixed URLs.
 
 components/
   ui/                      Primitives: button, dropdown-menu, section-header, site-link.
@@ -42,8 +46,9 @@ components/
 config/site.ts             Company details, paths, credits, legal metadata and effective dates.
 config/links.json          Where each short link (/billing, /discord, ...) sends people.
 config/emails.ts           Our email addresses. Server-only; rendered through <Email>.
-content/legal/             The text of each policy; index.ts maps each document to its text.
+content/legal/             The text of each policy; index.ts maps each document and language to its text.
 data/                      Everything else the pages render (see below).
+i18n/                      Languages: the current one, the dictionaries, the translations.
 lib/                       pricing helpers, pageMetadata(), cn() and slugify().
 scripts/                   Checks that need a build or a live site (see Automation).
 tests/                     Vitest suites for data, links, and house style.
@@ -93,6 +98,29 @@ These redirects are temporary (307) on purpose. Browsers cache permanent redirec
 Addresses live only in `config/emails.ts` and are rendered with `<Email name="support" />`. The page carries the address scrambled; the browser rebuilds it into a mailto link once a person moves the mouse, touches the screen, scrolls, or presses a key (`lib/presence.ts`). Anything that only reads the HTML, which is how address harvesters work, sees a "Show email address" button and no address. The button also reveals it, which is how screen reader users get to it. Structured data carries no email for the same reason.
 
 `config/emails.ts` imports `server-only`, so importing it from a Client Component fails the build instead of shipping every address in a script. A test fails if an address appears anywhere else in the source.
+
+---
+
+## Languages
+
+The site is published in English, Spanish, French, German and Portuguese. English keeps the plain URLs it has always had (`/pricing`, `/legal/terms`); the others sit under a prefix (`/es/pricing`). Every page lives under `app/[locale]`, `proxy.ts` rewrites an unprefixed path to the English tree without changing the URL, and `/en/...` redirects to the plain address so no page has two.
+
+| Where | What it holds |
+| --- | --- |
+| `i18n/config.ts` | The languages, their names, and `localePath()` |
+| `i18n/locale.ts` | The language of the page being rendered |
+| `i18n/copy/` | The words components render, one file per language |
+| `i18n/content/` | Translations of the text in `data/`, keyed by id |
+| `i18n/error-copy.ts` | The error boundary's words, kept small because it ships with every page |
+| `content/legal/<locale>/` | Translated legal documents, registered in `content/legal/index.ts` |
+
+Each language's copy file is typed against English, so a missing or extra key fails the build, and the tests fail if a language is mostly English, loses a `{placeholder}`, or is short an entry from `data/`. Anything without a translation falls back to English rather than rendering blank.
+
+To add a language: add it to `locales` in `i18n/config.ts`, add `i18n/copy/<locale>.ts` and `i18n/content/<locale>.ts`, add its entry to `i18n/error-copy.ts`, and translate the legal documents. Routing, the language picker, hreflang and the sitemap follow automatically.
+
+Prices, plan names, specs (vCPU, NVMe, GB), game titles, people's names and the slogan stay as they are in every language. A Server Component reads the language with `getLocale()`; a Client Component is handed plain strings, since it cannot read it (see `components/layout/site-header.tsx`).
+
+Legal documents in a translation carry a notice that the English version is the one that applies, with a link to it.
 
 ---
 

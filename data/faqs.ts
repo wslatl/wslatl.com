@@ -1,4 +1,4 @@
-import { entryPlan, formatPrice, startingPrice } from '@/lib/pricing'
+
 
 export interface Faq {
   /** Stable key for translations; see i18n/content/types.ts. */
@@ -6,8 +6,6 @@ export interface Faq {
   question: string
   answer: string
 }
-
-const budgetGame = entryPlan('game', 'budget')
 
 export const faqs: Faq[] = [
   {
@@ -31,7 +29,10 @@ export const faqs: Faq[] = [
   {
     id: 'game-server-cost',
     question: 'How much does game server hosting cost?',
-    answer: `Budget game servers start at ${formatPrice(budgetGame.price)} a month for ${budgetGame.ramGb} GB of RAM on SATA SSD, and premium NVMe plans start at ${formatPrice(startingPrice('game', 'premium'))} a month. VPS plans start at ${formatPrice(startingPrice('vps'))}. The pricing page has the full breakdown.`,
+    // {tokens} are filled from data/pricing.ts when the answer is rendered
+    // (fillPrices in lib/pricing.ts), in every language.
+    answer:
+      'Budget game servers start at {gamePrice} a month for {gameRam} GB of RAM on SATA SSD, and premium NVMe plans start at {gamePremiumPrice} a month. VPS plans start at {vpsPrice}. The pricing page has the full breakdown.',
   },
   {
     id: 'response-time',

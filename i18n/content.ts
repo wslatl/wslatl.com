@@ -10,6 +10,7 @@ import { uptimeTargets as englishUptime, type UptimeTarget } from '@/data/sla'
 import { games as englishGames, gameCategories as englishCategories, type GameEntry } from '@/data/games'
 import { productLines as englishLines, type ProductLine } from '@/data/pricing'
 import { legalPages as englishLegal, type LegalPage } from '@/data/legal'
+import { fillPrices } from '@/lib/pricing'
 import { es } from '@/i18n/content/es'
 import { fr } from '@/i18n/content/fr'
 import { de } from '@/i18n/content/de'
@@ -26,6 +27,11 @@ function current(): ContentTranslation | undefined {
   return translations[getLocale()]
 }
 
+/** One language's translations, for tests and tooling. */
+export function translationFor(locale: Locale): ContentTranslation | undefined {
+  return translations[locale]
+}
+
 export function localizedServices(): Service[] {
   const t = current()?.services
   if (!t) return englishServices
@@ -35,7 +41,11 @@ export function localizedServices(): Service[] {
 export function localizedCommitments(): Commitment[] {
   const t = current()?.commitments
   if (!t) return englishCommitments
-  return englishCommitments.map((item) => ({ ...item, label: t[item.id] ?? item.label }))
+  return englishCommitments.map((item) => ({
+    ...item,
+    label: t[item.id]?.label ?? item.label,
+    value: t[item.id]?.value ?? item.value,
+  }))
 }
 
 export function localizedLeadFeature(): Feature {
@@ -50,8 +60,10 @@ export function localizedFeatures(): Feature[] {
 
 export function localizedFaqs(): Faq[] {
   const t = current()?.faqs
-  if (!t) return englishFaqs
-  return englishFaqs.map((faq) => ({ ...faq, ...t[faq.id] }))
+  return englishFaqs.map((faq) => {
+    const translated = t?.[faq.id] ?? faq
+    return { ...faq, ...translated, answer: fillPrices(translated.answer) }
+  })
 }
 
 export function localizedTeam(): TeamMember[] {
@@ -69,7 +81,11 @@ export function localizedReviews() {
 export function localizedUptimeTargets(): UptimeTarget[] {
   const t = current()?.sla
   if (!t) return englishUptime
-  return englishUptime.map((row) => ({ ...row, label: t[row.service] ?? row.label }))
+  return englishUptime.map((row) => ({
+    ...row,
+    label: t[row.service]?.label ?? row.label,
+    target: t[row.service]?.target ?? row.target,
+  }))
 }
 
 export function localizedProductLines(): ProductLine[] {
@@ -91,7 +107,8 @@ export function localizedProductLine(id: ProductLine['id']): ProductLine {
 export function localizedGames(): GameEntry[] {
   const t = current()?.games
   const categories = current()?.gameCategories
-  if (!t && !categories) return englishGames
+  const ramLabels = current()?.ramLabels
+  if (!t && !categories && !ramLabels) return englishGames
   return englishGames.map((game) => {
     const translated = t?.[game.slug]
     return {
@@ -103,6 +120,7 @@ export function localizedGames(): GameEntry[] {
       recommendedRam: game.recommendedRam.map((row, i) => ({
         ...row,
         players: translated?.setups?.[i] ?? row.players,
+        ram: ramLabels?.[row.ram] ?? row.ram,
       })),
       faqs: game.faqs.map((faq, i) => translated?.faqs?.[i] ?? faq),
     }

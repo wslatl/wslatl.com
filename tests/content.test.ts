@@ -19,7 +19,7 @@ function sourceFiles(dir: string): string[] {
 
 describe('house style', () => {
   it('has no em dashes anywhere in the site source', () => {
-    const files = ['app', 'components', 'config', 'content', 'data', 'lib', 'scripts', 'tests', '.github']
+    const files = ['app', 'components', 'config', 'content', 'data', 'i18n', 'lib', 'scripts', 'tests', '.github']
       .flatMap((dir) => sourceFiles(join(root, dir)))
       .concat(
         [
