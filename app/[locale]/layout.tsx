@@ -110,7 +110,10 @@ export function generateStaticParams() {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#050505',
+  // The brand blue, matching --primary. Discord and Slack colour the strip
+  // down the side of a shared link with this, so near-black read as a fault
+  // rather than as a choice.
+  themeColor: '#0079ce',
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
