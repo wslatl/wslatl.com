@@ -12,16 +12,20 @@ import SlaContent from './sla'
 import SubprocessorsContent from './subprocessors'
 import TermsContent from './terms'
 import EsAbuse from './es/abuse'
+import EsAcceptableUse from './es/acceptable-use'
 import EsAccountCredit from './es/account-credit'
 import EsBackups from './es/backups'
 import EsDmca from './es/dmca'
+import EsPrivacy from './es/privacy'
 import EsRefund from './es/refund'
 import EsSla from './es/sla'
 import EsSubprocessors from './es/subprocessors'
 import FrAbuse from './fr/abuse'
+import FrAcceptableUse from './fr/acceptable-use'
 import FrAccountCredit from './fr/account-credit'
 import FrBackups from './fr/backups'
 import FrDmca from './fr/dmca'
+import FrPrivacy from './fr/privacy'
 import FrRefund from './fr/refund'
 import FrSla from './fr/sla'
 import FrSubprocessors from './fr/subprocessors'
@@ -30,17 +34,21 @@ import DeAcceptableUse from './de/acceptable-use'
 import DeAccountCredit from './de/account-credit'
 import DeBackups from './de/backups'
 import DeDmca from './de/dmca'
+import DePrivacy from './de/privacy'
 import DeRefund from './de/refund'
 import DeSla from './de/sla'
 import DeSubprocessors from './de/subprocessors'
+import DeTerms from './de/terms'
 import PtAbuse from './pt/abuse'
 import PtAcceptableUse from './pt/acceptable-use'
 import PtAccountCredit from './pt/account-credit'
 import PtBackups from './pt/backups'
 import PtDmca from './pt/dmca'
+import PtPrivacy from './pt/privacy'
 import PtRefund from './pt/refund'
 import PtSla from './pt/sla'
 import PtSubprocessors from './pt/subprocessors'
+import PtTerms from './pt/terms'
 
 /** The English body of every document. A missing one is a type error. */
 const english: Record<LegalDocumentKey, ComponentType> = {
@@ -64,18 +72,22 @@ const english: Record<LegalDocumentKey, ComponentType> = {
 const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, ComponentType>>>> = {
   es: {
     abuse: EsAbuse,
+    acceptableUse: EsAcceptableUse,
     accountCredit: EsAccountCredit,
     backups: EsBackups,
     dmca: EsDmca,
+    privacy: EsPrivacy,
     refund: EsRefund,
     sla: EsSla,
     subprocessors: EsSubprocessors,
   },
   fr: {
     abuse: FrAbuse,
+    acceptableUse: FrAcceptableUse,
     accountCredit: FrAccountCredit,
     backups: FrBackups,
     dmca: FrDmca,
+    privacy: FrPrivacy,
     refund: FrRefund,
     sla: FrSla,
     subprocessors: FrSubprocessors,
@@ -86,9 +98,11 @@ const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, Comp
     accountCredit: DeAccountCredit,
     backups: DeBackups,
     dmca: DeDmca,
+    privacy: DePrivacy,
     refund: DeRefund,
     sla: DeSla,
     subprocessors: DeSubprocessors,
+    terms: DeTerms,
   },
   pt: {
     abuse: PtAbuse,
@@ -96,9 +110,11 @@ const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, Comp
     accountCredit: PtAccountCredit,
     backups: PtBackups,
     dmca: PtDmca,
+    privacy: PtPrivacy,
     refund: PtRefund,
     sla: PtSla,
     subprocessors: PtSubprocessors,
+    terms: PtTerms,
   },
 }
 

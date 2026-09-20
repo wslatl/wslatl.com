@@ -137,7 +137,7 @@ export default function BackupsContent() {
           <li>Um backup sobreviva à perda da infraestrutura subjacente</li>
         </ul>
         <p>
-          Isso é consistente com as isenções de responsabilidade da Seção 10 e com a limitação de
+          Isso é consistente com as isenções de garantia da Seção 10 e com a limitação de
           responsabilidade da Seção 11 dos nossos Termos de Serviço. Nada nesta política cria uma
           garantia que essas seções excluem.
         </p>

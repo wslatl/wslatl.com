@@ -327,7 +327,7 @@ export default function RefundContent() {
             dentro do prazo de reembolso e, da mesma forma, não pode recuperar parte de um mês
             cancelando no meio de um período. Conforme indicado na Seção 9.1 dos nossos{' '}
             <Link href={siteConfig.paths.terms}>Termos de Serviço</Link>,
-            nenhum reembolso é emitido pelos dias restantes de um período de cobrança cancelado, a
+            nenhum reembolso é emitido pelos dias restantes de um período de faturamento cancelado, a
             menos que esta política se aplique.
           </p>
         </LegalSubSection>
@@ -358,7 +358,7 @@ export default function RefundContent() {
       <LegalSection number="9" title="Renovações e Cobrança Automática">
         <p>
           Os prazos de 14 dias desta política são contados a partir da data da compra inicial. Para
-          serviços em ciclos de cobrança recorrente, cada pagamento de renovação abre um novo prazo
+          serviços em ciclos de faturamento recorrente, cada pagamento de renovação abre um novo prazo
           de 14 dias contado a partir da data daquela renovação.
         </p>
         <p>
