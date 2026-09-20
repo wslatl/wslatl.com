@@ -20,6 +20,7 @@ import EsPrivacy from './es/privacy'
 import EsRefund from './es/refund'
 import EsSla from './es/sla'
 import EsSubprocessors from './es/subprocessors'
+import EsTerms from './es/terms'
 import FrAbuse from './fr/abuse'
 import FrAcceptableUse from './fr/acceptable-use'
 import FrAccountCredit from './fr/account-credit'
@@ -29,6 +30,7 @@ import FrPrivacy from './fr/privacy'
 import FrRefund from './fr/refund'
 import FrSla from './fr/sla'
 import FrSubprocessors from './fr/subprocessors'
+import FrTerms from './fr/terms'
 import DeAbuse from './de/abuse'
 import DeAcceptableUse from './de/acceptable-use'
 import DeAccountCredit from './de/account-credit'
@@ -80,6 +82,7 @@ const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, Comp
     refund: EsRefund,
     sla: EsSla,
     subprocessors: EsSubprocessors,
+    terms: EsTerms,
   },
   fr: {
     abuse: FrAbuse,
@@ -91,6 +94,7 @@ const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, Comp
     refund: FrRefund,
     sla: FrSla,
     subprocessors: FrSubprocessors,
+    terms: FrTerms,
   },
   de: {
     abuse: DeAbuse,

@@ -141,7 +141,7 @@ export default function BackupsContent() {
           <li>Una copia de seguridad sobreviva a la pérdida de la infraestructura subyacente</li>
         </ul>
         <p>
-          Esto es coherente con las exenciones de responsabilidad de la Sección 10 y con la
+          Esto es coherente con las exenciones de garantías de la Sección 10 y con la
           limitación de responsabilidad de la Sección 11 de nuestras Condiciones del servicio. Nada
           de lo que dice esta política crea una garantía que esas secciones excluyan.
         </p>
