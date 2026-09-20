@@ -62,7 +62,7 @@ export function PageHeader({ title, breadcrumbs, crumbLabel, path, children, cla
           />
         </>
       )}
-      <h1 className="font-serif text-5xl leading-[1.02] tracking-[-0.01em] text-balance text-foreground italic md:text-6xl">
+      <h1 className="font-serif text-5xl leading-[1.02] tracking-[-0.01em] text-balance break-words hyphens-auto text-foreground italic md:text-6xl">
         {title}
       </h1>
       {children && (

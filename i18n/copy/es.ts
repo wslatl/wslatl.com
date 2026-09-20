@@ -10,7 +10,7 @@ export const es: Copy = {
     openMenu: 'Menú',
     closeMenu: 'Cerrar el menú',
     newTab: ' (se abre en una pestaña nueva)',
-    login: 'Iniciar sesión',
+    login: "Acceder",
     clientPanels: 'Paneles de cliente',
     language: 'Idioma',
     chooseLanguage: 'Elige un idioma',

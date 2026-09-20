@@ -18,14 +18,24 @@ import { localeNames, locales, localePath, stripLocale, type Locale } from '@/i1
  * once the menu is open, and each is marked with its own lang so a screen
  * reader pronounces the language names properly.
  */
-export function LanguagePicker({ locale, label, heading }: { locale: Locale; label: string; heading: string }) {
+export function LanguagePicker({
+  locale,
+  label,
+  heading,
+  className,
+}: {
+  locale: Locale
+  label: string
+  heading: string
+  className?: string
+}) {
   const pathname = usePathname()
   const path = stripLocale(pathname)
 
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label={`${label}: ${localeNames[locale]}`}>
+        <Button variant="ghost" size="icon-sm" className={className} aria-label={`${label}: ${localeNames[locale]}`}>
           <Languages aria-hidden="true" className="size-[18px]" />
         </Button>
       </DropdownMenuTrigger>

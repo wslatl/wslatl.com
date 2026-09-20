@@ -33,7 +33,7 @@ export function LegalSection({ number, title, children }: SectionProps) {
     <section id={id} aria-labelledby={`${id}-heading`}>
       <h2
         id={`${id}-heading`}
-        className="flex items-baseline gap-3 border-b pb-3 text-xl font-semibold tracking-tight text-foreground md:text-2xl"
+        className="flex items-baseline gap-3 border-b pb-3 text-xl font-semibold tracking-tight break-words hyphens-auto text-foreground md:text-2xl"
       >
         <span className="font-serif text-2xl font-normal text-link italic tabular-nums">{number}</span>
         {title}

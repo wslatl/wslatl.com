@@ -1,5 +1,5 @@
-import { getLocale, type Locale } from '@/i18n/locale'
-import { openGraphLocales } from '@/i18n/config'
+import { getLocale } from '@/i18n/locale'
+import { openGraphLocales, type Locale } from '@/i18n/config'
 
 /** BCP 47 tags, from the region each language is written for. */
 const formats: Record<Locale, string> = Object.fromEntries(

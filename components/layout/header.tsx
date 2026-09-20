@@ -10,7 +10,7 @@ import { Wordmark } from '@/components/brand/wordmark'
 import { DiscordIcon } from '@/components/brand/icons'
 import { LoginMenu } from '@/components/layout/login-menu'
 import { LanguagePicker } from '@/components/layout/language-picker'
-import type { Locale } from '@/i18n/config'
+import { localeNames, localePath, locales, stripLocale, type Locale } from '@/i18n/config'
 import { cn } from '@/lib/utils'
 
 export interface HeaderLink {
@@ -103,7 +103,12 @@ export function Header({
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <LanguagePicker locale={locale} label={labels.language} heading={labels.chooseLanguage} />
+          <LanguagePicker
+            locale={locale}
+            label={labels.language}
+            heading={labels.chooseLanguage}
+            className="hidden sm:inline-flex"
+          />
           <Button asChild variant="ghost" size="icon-sm" className="hidden sm:inline-flex">
             <a href={discordHref} target="_blank" rel="noopener noreferrer" aria-label={labels.discord}>
               <DiscordIcon className="size-[18px]" />
@@ -185,6 +190,28 @@ export function Header({
             </a>
           </Button>
           <p className="mt-3 text-center text-sm text-muted-foreground">{labels.reviewNote}</p>
+
+          {/* The picker is hidden on the narrowest screens, so the languages
+              are here instead. Plain links: switching language is a fresh
+              page in another tree. */}
+          <div className="mt-6 border-t pt-4 sm:hidden">
+            <p className="text-sm font-semibold text-foreground">{labels.chooseLanguage}</p>
+            <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+              {locales.map((other) => (
+                <li key={other}>
+                  <a
+                    href={localePath(other, stripLocale(pathname))}
+                    lang={other}
+                    hrefLang={other}
+                    aria-current={other === locale ? 'true' : undefined}
+                    className="text-muted-foreground aria-[current]:font-medium aria-[current]:text-foreground hover:text-foreground"
+                  >
+                    {localeNames[other]}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
         </nav>
       </div>
     </header>

@@ -78,11 +78,11 @@ export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
           <thead className="bg-card/50 text-muted-foreground">
             <tr>
               <th scope="col" className="px-5 py-3 font-medium">{t.table.plan}</th>
-              <th scope="col" className="px-4 py-3 font-medium">{line.cpuUnit}</th>
-              <th scope="col" className="px-4 py-3 font-medium">{t.table.ram}</th>
-              <th scope="col" className="px-4 py-3 font-medium">{t.table.storage}</th>
-              {showTraffic && <th scope="col" className="px-4 py-3 font-medium">{t.table.traffic}</th>}
-              <th scope="col" className="px-4 py-3 text-right font-medium">{t.table.price}</th>
+              <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{line.cpuUnit}</th>
+              <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{t.table.ram}</th>
+              <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{t.table.storage}</th>
+              {showTraffic && <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{t.table.traffic}</th>}
+              <th scope="col" className="px-4 py-3 text-right font-medium break-words hyphens-auto">{t.table.price}</th>
               <th scope="col" className="px-5 py-3"><span className="sr-only">{t.table.order}</span></th>
             </tr>
           </thead>

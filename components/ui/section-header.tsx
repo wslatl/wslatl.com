@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils'
 
 /** The heading style for every home page section, so they all carry the same weight. */
 export const sectionHeadingClass =
-  'text-4xl leading-[1.05] font-bold tracking-[-0.03em] text-balance text-foreground md:text-5xl'
+  'text-4xl leading-[1.05] font-bold tracking-[-0.03em] text-balance break-words hyphens-auto text-foreground md:text-5xl'
 
 interface SectionHeaderProps {
   title: React.ReactNode
