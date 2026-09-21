@@ -38,3 +38,7 @@ lighthouse-reports/
 
 # local editor and agent tooling
 .claude/
+
+# Local archives
+*.rar
+*.zip
