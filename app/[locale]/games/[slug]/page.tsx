@@ -6,10 +6,12 @@ import { SiteHeader } from '@/components/layout/site-header'
 import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
 import { PlanGroupTable } from '@/components/pricing/plan-group'
+import { ComparisonList, comparisonLine } from '@/components/pricing/comparisons'
 import { FaqList } from '@/components/sections/faq'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Button } from '@/components/ui/button'
 import { games, ramNeedGb, type RamRow } from '@/data/games'
+import { gameComparisons } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
 import { cheapestPlanWithRam, formatPrice, smallestPlansWithRam } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
@@ -30,9 +32,9 @@ function localizedGame(slug: string) {
 }
 
 /**
- * "GAME-1 ($3.60/mo) or P-GAME-1 ($12.00/mo)", or a way to ask when nothing is
- * big enough. Rows sized "per map" (clusters) name the plan for each map,
- * since every map in a cluster runs as its own server.
+ * "P-GAME-8 ($17.50/mo)", one plan per plan group, or a way to ask when
+ * nothing is big enough. Rows sized "per map" (clusters) name the plan for
+ * each map, since every map in a cluster runs as its own server.
  */
 function PlansThatFit({ row }: { row: RamRow }) {
   const t = copy().games.detail
@@ -90,6 +92,9 @@ export default async function GamePage({ params }: PageProps) {
   const entry = cheapestPlanWithRam('game', ramNeedGb(game.recommendedRam[0]))
   const related = localizedGames().filter((g) => g.category === game.category && g.slug !== game.slug).slice(0, 8)
   const faqs = game.faqs.map((faq, i) => ({ id: `${game.slug}-faq-${i}`, question: faq.q, answer: faq.a }))
+  // Price comparisons for this game only; most games have none (data/pricing.ts).
+  const claims = gameComparisons[game.slug]
+  const tableClaim = claims?.table ? comparisonLine(claims.table) : null
 
   return (
     <>
@@ -170,6 +175,15 @@ export default async function GamePage({ params }: PageProps) {
                   </tr>
                 ))}
               </tbody>
+              {tableClaim && (
+                <tfoot className="border-t">
+                  <tr>
+                    <td colSpan={3} className="px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+                      {tableClaim}
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
           <ul className="mt-5 divide-y rounded-xl border @min-[36rem]:hidden">
@@ -184,6 +198,7 @@ export default async function GamePage({ params }: PageProps) {
                 </p>
               </li>
             ))}
+            {tableClaim && <li className="p-4 text-xs leading-relaxed text-muted-foreground">{tableClaim}</li>}
           </ul>
           <p className="mt-3 text-sm text-muted-foreground">
             {t.games.detail.ramNote}
@@ -235,12 +250,13 @@ export default async function GamePage({ params }: PageProps) {
             Game server plans
           </h2>
           <p className="mt-2 max-w-2xl text-muted-foreground">
-            The same plans run every game we host. Budget plans use SATA SSD; Premium plans add NVMe
-            and Ryzen 9 cores.
+            The same plans run every game we host, all on an AMD Ryzen 9 3900X with DDR4 memory and NVMe
+            storage.
           </p>
+          {claims?.plans && <ComparisonList ids={claims.plans} className="mt-6" />}
           <div className="mt-8 space-y-12">
             {line.groups.map((group) => (
-              <PlanGroupTable key={group.id} line={line} group={group} />
+              <PlanGroupTable key={group.id} line={line} group={group} showComparisons={false} />
             ))}
           </div>
         </section>

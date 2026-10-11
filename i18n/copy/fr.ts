@@ -201,8 +201,8 @@ export const fr: Copy = {
     },
     from: "à partir de",
     perMonth: "/mois",
-    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string }) =>
-      `${n.plans} offres. De ${n.ramMin} à ${n.ramMax} GB de RAM, de ${n.cpuMin} à ${n.cpuMax} ${n.cpuUnit}, SATA SSD ou NVMe.`,
+    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string; storage: string[] }) =>
+      `${n.plans} offres. De ${n.ramMin} à ${n.ramMax} GB de RAM, de ${n.cpuMin} à ${n.cpuMax} ${n.cpuUnit}, ${n.storage.join(' ou ')}.`,
     seePlans: (line: string) => `Voir les offres ${line}`,
     planTypes: "Types d'offres",
     included: "Inclus avec chaque offre",
@@ -228,7 +228,7 @@ export const fr: Copy = {
   games: {
     metaTitle: (more: number) => `Hébergement de serveurs de jeu\u00A0: Minecraft, Rust, ARK, FiveM et ${more}+ autres`,
     metaDescription: (price: string) =>
-      `Hébergement de serveurs de jeu protégés contre les DDoS à partir de ${price}/mois, sur matériel NVMe et SATA SSD. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld et des dizaines d'autres, tous sur le même panneau Pterodactyl.`,
+      `Hébergement de serveurs de jeu protégés contre les DDoS à partir de ${price}/mois, sur un AMD Ryzen 9 3900X avec stockage NVMe. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld et des dizaines d'autres, tous sur le même panneau Pterodactyl.`,
     heading: "Hébergement de serveurs de jeu",
     crumb: "Jeux",
     introPrefix:

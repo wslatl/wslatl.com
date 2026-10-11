@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { productLines } from '@/data/pricing'
+import { comparisons, gameComparisons, productLines } from '@/data/pricing'
+import { games } from '@/data/games'
 import {
   cheapestPlanWithRam,
   entryPlan,
@@ -21,7 +22,8 @@ describe('pricing data', () => {
   it('has sane numbers on every plan', () => {
     for (const plan of allPlans) {
       expect(plan.price, plan.name).toBeGreaterThan(0)
-      expect(Number.isInteger(plan.cpu), plan.name).toBe(true)
+      // Game plans sell quarter vCores (1.5, 2.25, 4.5).
+      expect(Number.isInteger(plan.cpu * 4), plan.name).toBe(true)
       expect(plan.ramGb, plan.name).toBeGreaterThan(0)
       expect(plan.storageGb, plan.name).toBeGreaterThan(0)
       // Prices are whole cents.
@@ -39,6 +41,14 @@ describe('pricing data', () => {
     }
   })
 
+  it('dates every comparison and only places ones that exist', () => {
+    for (const [id, comparison] of Object.entries(comparisons)) {
+      expect(`${comparison.text} ${comparison.note}`, id).toMatch(/checked 10 October 2026/)
+    }
+    const slugs = new Set(games.map((g) => g.slug))
+    for (const slug of Object.keys(gameComparisons)) expect(slugs.has(slug), slug).toBe(true)
+  })
+
   it('gives every line a unique anchor and group ids that do not collide', () => {
     const anchors = productLines.map((l) => l.anchor)
     const groupIds = productLines.flatMap((l) => l.groups.map((g) => g.id))
@@ -49,8 +59,8 @@ describe('pricing data', () => {
 
 describe('pricing helpers', () => {
   it('formats US dollars with cents', () => {
-    expect(formatPrice(5.4)).toBe('$5.40')
-    expect(formatPrice(27)).toBe('$27.00')
+    expect(formatPrice(6.5)).toBe('$6.50')
+    expect(formatPrice(35)).toBe('$35.00')
     expect(formatPrice(1234.5)).toBe('$1,234.50')
   })
 
@@ -59,7 +69,8 @@ describe('pricing helpers', () => {
       const min = Math.min(...line.groups.flatMap((g) => g.plans.map((p) => p.price)))
       expect(startingPrice(line.id)).toBe(min)
     }
-    expect(entryPlan('game', 'budget').price).toBe(startingPrice('game', 'budget'))
+    expect(entryPlan('game').price).toBe(startingPrice('game'))
+    expect(entryPlan('vps', 'budget').price).toBe(startingPrice('vps', 'budget'))
   })
 
   it('reports spec ranges that contain every plan', () => {

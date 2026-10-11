@@ -201,8 +201,8 @@ export const de: Copy = {
     },
     from: 'ab',
     perMonth: '/Monat',
-    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string }) =>
-      `${n.plans} Tarife. ${n.ramMin} bis ${n.ramMax} GB RAM, ${n.cpuMin} bis ${n.cpuMax} ${n.cpuUnit}, SATA SSD oder NVMe.`,
+    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string; storage: string[] }) =>
+      `${n.plans} Tarife. ${n.ramMin} bis ${n.ramMax} GB RAM, ${n.cpuMin} bis ${n.cpuMax} ${n.cpuUnit}, ${n.storage.join(' oder ')}.`,
     seePlans: (line: string) => `${line}-Tarife ansehen`,
     planTypes: 'Tarifarten',
     included: 'In jedem Tarif enthalten',
@@ -228,7 +228,7 @@ export const de: Copy = {
   games: {
     metaTitle: (more: number) => `Gameserver-Hosting: Minecraft, Rust, ARK, FiveM und ${more}+ weitere`,
     metaDescription: (price: string) =>
-      `DDoS-geschütztes Gameserver-Hosting ab ${price}/Monat auf NVMe- und SATA-SSD-Hardware. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld und dutzende mehr, alle auf demselben Pterodactyl-Panel.`,
+      `DDoS-geschütztes Gameserver-Hosting ab ${price}/Monat auf einem AMD Ryzen 9 3900X mit NVMe-Speicher. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld und dutzende mehr, alle auf demselben Pterodactyl-Panel.`,
     heading: 'Gameserver-Hosting',
     crumb: 'Spiele',
     introPrefix:

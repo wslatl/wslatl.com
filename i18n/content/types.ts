@@ -33,7 +33,13 @@ export interface ContentTranslation {
     /** cpuUnit (vCPU, vCores) is a spec, not a word, so it is not translated. */
     lines: Record<string, { label: string; intro: string; included: string[] }>
     /** Keyed by plan group id. */
-    groups: Record<string, { label: string; description: string; comparison?: string }>
+    groups: Record<string, { label: string; description: string }>
+    /**
+     * Keyed by comparison id (data/pricing.ts). These are agreed claims: say
+     * exactly what the English says, and keep competitor and product names,
+     * figures and the date as they are.
+     */
+    comparisons: Record<string, { text: string; note?: string }>
   }
   /** Keyed by game slug. Game names are not translated. */
   games?: Record<

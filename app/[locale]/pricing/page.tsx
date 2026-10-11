@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { HowItWorks } from '@/components/sections/how-it-works'
 import type { ProductLine } from '@/data/pricing'
 import { uptimeTarget } from '@/data/sla'
-import { formatPrice, specRanges, startingPrice } from '@/lib/pricing'
+import { formatPrice, specRanges, startingPrice, storageTypes } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
 import { Main } from '@/components/layout/main'
 import type { Metadata } from 'next'
@@ -65,6 +65,7 @@ function LineOverview({ line }: { line: ProductLine }) {
           cpuMin: ranges.cpu.min,
           cpuMax: ranges.cpu.max,
           cpuUnit: line.cpuUnit,
+          storage: storageTypes(line.id),
         })}
       </span>
       <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-link group-hover:text-foreground">

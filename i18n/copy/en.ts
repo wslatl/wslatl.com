@@ -210,8 +210,8 @@ export const en = {
     },
     from: 'from',
     perMonth: '/mo',
-    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string }) =>
-      `${n.plans} plans. ${n.ramMin} to ${n.ramMax} GB RAM, ${n.cpuMin} to ${n.cpuMax} ${n.cpuUnit}, SATA SSD or NVMe.`,
+    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string; storage: string[] }) =>
+      `${n.plans} plans. ${n.ramMin} to ${n.ramMax} GB RAM, ${n.cpuMin} to ${n.cpuMax} ${n.cpuUnit}, ${n.storage.join(' or ')}.`,
     seePlans: (line: string) => `See ${line} plans`,
     planTypes: 'Plan types',
     included: 'Included with every plan',
@@ -237,7 +237,7 @@ export const en = {
   games: {
     metaTitle: (more: number) => `Game Server Hosting: Minecraft, Rust, ARK, FiveM & ${more}+ More`,
     metaDescription: (price: string) =>
-      `DDoS-protected game server hosting from ${price}/mo on NVMe and SATA SSD hardware. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld and dozens more, all on the same Pterodactyl panel.`,
+      `DDoS-protected game server hosting from ${price}/mo on an AMD Ryzen 9 3900X with NVMe storage. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld and dozens more, all on the same Pterodactyl panel.`,
     heading: 'Game server hosting',
     crumb: 'Games',
     introPrefix:

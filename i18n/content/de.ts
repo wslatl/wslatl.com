@@ -74,7 +74,7 @@ export const de: ContentTranslation = {
     'game-server-cost': {
       question: 'Was kostet Gameserver-Hosting?',
       answer:
-        'Budget-Gameserver starten bei {gamePrice} im Monat für {gameRam} GB RAM auf SATA SSD, und Premium-Tarife auf NVMe starten bei {gamePremiumPrice} im Monat. VPS-Tarife starten bei {vpsPrice}. Auf der Preisseite steht die vollständige Aufschlüsselung.',
+        'Gameserver starten bei {gamePrice} im Monat für {gameRam} GB RAM, auf einem AMD Ryzen 9 3900X mit NVMe-Speicher. VPS-Tarife starten bei {vpsPrice}. Auf der Preisseite steht die vollständige Aufschlüsselung.',
     },
     'response-time': {
       question: 'Wie schnell antwortet ihr wirklich?',
@@ -131,7 +131,7 @@ export const de: ContentTranslation = {
       vps: {
         label: 'VPS',
         intro:
-          'Isolierte Ressourcen und voller root-Zugriff, mit dem Betriebssystem deiner Wahl. Budget-Tarife laufen auf SATA SSD, Premium-Tarife auf NVMe mit hoch getakteten Ryzen 9 Kernen.',
+          'Isolierte Ressourcen und voller root-Zugriff, mit dem Betriebssystem deiner Wahl. Premium-Tarife laufen auf einem AMD Ryzen 9 3900X mit NVMe in Los Angeles, Budget-Tarife auf einem Intel Core i7-6700K mit SATA SSD in New York City.',
         included: [
           'Voller root- und sudo-Zugriff',
           'Betriebssystem deiner Wahl',
@@ -153,25 +153,47 @@ export const de: ContentTranslation = {
       },
     },
     groups: {
-      'budget-vps': {
-        label: 'Budget VPS',
-        description: 'Solider SATA-SSD-Speicher zu ehrlichen Preisen.',
-        comparison: '10% unter Hosturly',
-      },
       'premium-vps': {
         label: 'Premium VPS',
-        description: 'NVMe-Laufwerke auf hoch getakteten Ryzen 9 Kernen. Leistung in der Praxis, nicht nur größere Zahlen.',
-        comparison: '10% unter DigitalOcean',
+        description: 'AMD Ryzen 9 3900X mit DDR4-Arbeitsspeicher und NVMe-Laufwerken im RAID 1, in Los Angeles.',
       },
-      'budget-game': {
-        label: 'Budget-Gameserver',
-        description: 'Gameserver auf SATA SSD. Meistens bist du noch am selben Tag online.',
-        comparison: '10% unter Sparked',
+      'budget-vps': {
+        label: 'Budget VPS',
+        description: 'Intel Core i7-6700K mit DDR4-Arbeitsspeicher und SATA-SSD-Laufwerken im RAID 1, in New York City.',
       },
       'premium-game': {
         label: 'Premium-Gameserver',
-        description: 'NVMe-Laufwerke und Ryzen 9 Kerne für den Fall, dass die Budget-Reihe nicht reicht.',
-        comparison: '25% unter Sparked',
+        description: 'AMD Ryzen 9 3900X mit DDR4-Arbeitsspeicher und NVMe-Laufwerken im RAID 1, in Los Angeles.',
+      },
+    },
+    comparisons: {
+      'sparked-minecraft': {
+        text: 'Minecraft-Server für 15% weniger als die Enterprise-Minecraft-Tarife von Sparked Host mit gleich viel RAM, in jeder Größe, die wir anbieten (4, 6, 8, 12 und 16 GB).',
+        note: 'Listenpreise von Sparked, geprüft am 10. Oktober 2026. Gutscheine wie FALL26 und FALLLEAVES2026 sind nicht berücksichtigt, und mit ihnen kann Sparked bis zu drei Monate lang weniger kosten. Unsere Gameserver laufen auf einem AMD Ryzen 9 3900X mit DDR4 und NVMe; Sparked Enterprise nutzt einen Ryzen 9 7900 (oder gleichwertig) mit DDR5.',
+      },
+      'apex-minecraft': {
+        text: '37% bis 42% weniger als die Minecraft-Tarife der Ryzen Series von Apex Hosting mit gleich viel RAM (4, 6 und 8 GB).',
+        note: 'Wiederkehrende Listenpreise von Apex, geprüft am 10. Oktober 2026.',
+      },
+      'bloom-minecraft': {
+        text: '27% weniger als Bloom.host Essentials bei 4 GB und 6 GB.',
+        note: 'Für Blooms Essentials-Tarife in Los Angeles ist dasselbe CPU-Modell angegeben wie für unsere, ein AMD Ryzen 9 3900X. Listenpreise von Bloom, geprüft am 10. Oktober 2026.',
+      },
+      'sparked-fivem': {
+        text: '8% weniger als Sparked Host FiveM mit gleich viel RAM.',
+        note: 'Listenpreise geprüft am 10. Oktober 2026; Gutscheine nicht berücksichtigt.',
+      },
+      'digitalocean-vps': {
+        text: 'Premium VPS für 45% bis 50% weniger als die Basic Regular Droplets von DigitalOcean mit gleich viel RAM und gleich vielen vCPUs: 2 GB $6.50 (DigitalOcean $12), 4 GB $12 ($24), 8 GB $24 ($48), 16 GB $48 ($96).',
+        note: 'Listenpreise von DigitalOcean, geprüft am 10. Oktober 2026. DigitalOcean nennt das CPU-Modell dieser Droplets nicht; unsere laufen auf einem AMD Ryzen 9 3900X mit NVMe.',
+      },
+      'vultr-vps': {
+        text: '35% bis 40% weniger als Vultr Cloud Compute Regular Performance mit gleich viel RAM und gleich vielen vCPUs (2, 4 und 8 GB).',
+        note: 'Listenpreise von Vultr, geprüft am 10. Oktober 2026.',
+      },
+      'hosturly-budget-vps': {
+        text: 'Budget VPS für 9% weniger als Hosturlys Budget VPS mit gleich viel RAM und doppelt so vielen vCPUs und doppelt so viel Speicherplatz (4 GB und 8 GB).',
+        note: 'Andere Hardware: unser Intel Core i7-6700K mit SATA SSD im RAID 1 in New York City, gegenüber Hosturlys AMD EPYC 7402P mit NVMe in Chicago. Listenpreise von Hosturly, geprüft am 10. Oktober 2026.',
       },
     },
   },
@@ -185,7 +207,7 @@ export const de: ContentTranslation = {
       faqs: [
         {
           q: 'Kann ich einen gemoddeten Server wie RLCraft oder ATM9 betreiben?',
-          a: 'Ja. Gemoddetes Minecraft ist speicherhungrig und profitiert vom NVMe-Speicher und den Ryzen 9 Kernen der Premium-Reihe, aber die Budget-Reihe stemmt leichte Modpacks problemlos.',
+          a: 'Ja. Gemoddetes Minecraft ist speicherhungrig, schwere Modpacks wie diese brauchen meist 12 bis 16 GB RAM. Alle Tarife laufen auf einem AMD Ryzen 9 3900X mit NVMe-Speicher.',
         },
         {
           q: 'Unterstützt ihr Bedrock-Spieler auf einem Java-Server?',
@@ -202,7 +224,7 @@ export const de: ContentTranslation = {
       faqs: [
         {
           q: 'Hält mein Server einen Wipe mit voller Population aus?',
-          a: 'Die Premium-NVMe-Reihe ist genau dafür gebaut. Kartengenerierung und der Login-Ansturm am Wipe-Tag hängen an Speicher und CPU, und NVMe plus Ryzen 9 Kerne fangen beides besser ab als SATA-Tarife.',
+          a: 'Kartengenerierung und der Login-Ansturm am Wipe-Tag hängen an Speicher und CPU, und alle Tarife laufen auf NVMe-Speicher und einem AMD Ryzen 9 3900X. Wähl den RAM nach deinem Spielerlimit und plan etwas Reserve für den Wipe-Tag ein.',
         },
         {
           q: 'Wird Oxide/uMod unterstützt?',
@@ -271,7 +293,7 @@ export const de: ContentTranslation = {
       faqs: [
         {
           q: 'Dauert die Weltgenerierung lange?',
-          a: 'Die Generierung beim ersten Start ist der schwerste Moment für dieses Spiel; die NVMe-Stufe verkürzt sie spürbar gegenüber SATA-Speicher.',
+          a: 'Die Generierung beim ersten Start ist der schwerste Moment für dieses Spiel; NVMe-Speicher, den jeder Tarif hat, verkürzt sie spürbar gegenüber SATA-Speicher.',
         },
       ],
     },
@@ -451,13 +473,13 @@ export const de: ContentTranslation = {
     factorio: {
       tagline: 'Automatisierung und Fabrikbau, berüchtigt CPU-lastig.',
       description:
-        'Ein Spiel über Fabrikautomatisierung, dessen Basen im späten Spiel bekanntlich die CPU fordern, je mehr Bänder und Maschinen dazukommen. Dieser Titel profitiert also mehr als die meisten von den schnelleren Ryzen 9 Kernen unserer Premium-Reihe.',
+        'Ein Spiel über Fabrikautomatisierung, dessen Basen im späten Spiel bekanntlich die CPU fordern, je mehr Bänder und Maschinen dazukommen. Die Leistung pro Kern zählt hier also mehr als bei den meisten Spielen. Alle Tarife laufen auf einem AMD Ryzen 9 3900X.',
       popularFor: ['langlebige Automatisierungsserver'],
       setups: ['2-8 Spieler, frühes Spiel', 'große Fabriken im späten Spiel'],
       faqs: [
         {
           q: 'Warum braucht Factorio schnellere Kerne mehr als RAM?',
-          a: 'Die Simulation von Factorio läuft in einem einzigen Thread und ist CPU-gebunden, je größer deine Fabrik wird. Ein Tarif mit starkem Takt pro Kern (unsere Ryzen 9 Premium-Reihe) hält die UPS also länger stabil, als es mehr RAM täte.',
+          a: 'Die Simulation von Factorio läuft in einem einzigen Thread und ist CPU-gebunden, je größer deine Fabrik wird. Die Leistung pro Kern hält die UPS also länger stabil, als es mehr RAM täte. Alle Tarife laufen auf demselben AMD Ryzen 9 3900X.',
         },
       ],
     },
@@ -480,7 +502,7 @@ export const de: ContentTranslation = {
     cs2: {
       tagline: 'Kompetitives und lockeres CS2, mit Platz für Community-Plugins.',
       description:
-        'Geringer Ressourcenverbrauch pro Spieler, die eigentliche Frage ist also die Tick-Stabilität unter Last. Unsere NVMe-Reihe hält die Tickrate für einen vollen Server mit 10-32 Spielern stabil, und Plugin-Stacks mit CounterStrikeSharp / MetaMod werden voll unterstützt.',
+        'Geringer Ressourcenverbrauch pro Spieler, die eigentliche Frage ist also die Tick-Stabilität unter Last. Unsere NVMe-Tarife halten die Tickrate für einen vollen Server mit 10-32 Spielern stabil, und Plugin-Stacks mit CounterStrikeSharp / MetaMod werden voll unterstützt.',
       popularFor: ['5v5-Server zum kompetitiven Üben', 'Community-Deathmatch/Surf/Retake', 'Plugin-Stacks mit CounterStrikeSharp'],
       setups: ['10-16 Spieler, reines Competitive', '24-32 Spieler, Community und Plugins'],
       faqs: [

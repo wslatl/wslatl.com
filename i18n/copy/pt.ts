@@ -201,8 +201,8 @@ export const pt: Copy = {
     },
     from: 'a partir de',
     perMonth: '/mês',
-    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string }) =>
-      `${n.plans} planos. De ${n.ramMin} a ${n.ramMax} GB de RAM, de ${n.cpuMin} a ${n.cpuMax} ${n.cpuUnit}, SATA SSD ou NVMe.`,
+    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string; storage: string[] }) =>
+      `${n.plans} planos. De ${n.ramMin} a ${n.ramMax} GB de RAM, de ${n.cpuMin} a ${n.cpuMax} ${n.cpuUnit}, ${n.storage.join(' ou ')}.`,
     seePlans: (line: string) => `Ver planos: ${line}`,
     planTypes: 'Tipos de plano',
     included: 'Incluído em todo plano',
@@ -228,7 +228,7 @@ export const pt: Copy = {
   games: {
     metaTitle: (more: number) => `Hospedagem de servidores de jogos: Minecraft, Rust, ARK, FiveM e +${more}`,
     metaDescription: (price: string) =>
-      `Hospedagem de servidores de jogos com proteção DDoS a partir de ${price}/mês, em hardware NVMe e SATA SSD. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld e dezenas de outros, todos no mesmo painel Pterodactyl.`,
+      `Hospedagem de servidores de jogos com proteção DDoS a partir de ${price}/mês, em um AMD Ryzen 9 3900X com armazenamento NVMe. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld e dezenas de outros, todos no mesmo painel Pterodactyl.`,
     heading: 'Hospedagem de servidores de jogos',
     crumb: 'Jogos',
     introPrefix:

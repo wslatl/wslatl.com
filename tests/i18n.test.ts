@@ -8,7 +8,7 @@ import { commitments, features } from '@/data/features'
 import { faqs } from '@/data/faqs'
 import { team } from '@/data/team'
 import { uptimeTargets } from '@/data/sla'
-import { productLines } from '@/data/pricing'
+import { comparisons, productLines } from '@/data/pricing'
 import { games, gameCategories } from '@/data/games'
 import { legalPages } from '@/data/legal'
 
@@ -129,6 +129,7 @@ describe('content translations', () => {
         productLines.flatMap((line) => line.groups.map((group) => group.id)),
         t?.pricing?.groups,
       )
+      cover(`${locale} price comparisons`, Object.keys(comparisons), t?.pricing?.comparisons)
       cover(`${locale} games`, games.map((game) => game.slug), t?.games)
       cover(`${locale} game categories`, [...gameCategories], t?.gameCategories)
       cover(`${locale} legal`, legalPages.map((page) => page.key), t?.legal)
