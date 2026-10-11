@@ -70,9 +70,10 @@ export default function PrivacyContent() {
           <ul>
             <li>Full name</li>
             <li>Email address</li>
-            <li>Billing address</li>
-            <li>Phone number (required at sign-up, and used for account recovery and to verify account ownership)</li>
-            <li>Date of birth (used to apply the age requirements in Section 9)</li>
+            <li>Country</li>
+            <li>Date of birth</li>
+            <li>Phone number</li>
+            <li>Billing address: street, city, postal code, and state or region where your country has them</li>
             <li>
               Tax identification number, where you provide one so that we can invoice you as a
               business or apply a tax exemption
@@ -86,6 +87,25 @@ export default function PrivacyContent() {
             </li>
             <li>Any information you voluntarily provide during the application or onboarding process</li>
           </ul>
+          <p>Here is why we ask for these details:</p>
+          <ul>
+            <li>
+              <strong>Phone number:</strong> to keep your account secure, and to check your
+              identity if your account is locked. We may send a code by text message to the number
+              on file to confirm it is you.
+            </li>
+            <li>
+              <strong>Billing address and country:</strong> for billing and invoices, to prevent
+              fraud, and to meet sanctions and tax rules.
+            </li>
+            <li>
+              <strong>Date of birth:</strong> to check the minimum age in Section 9.
+            </li>
+          </ul>
+          <p>
+            You can ask us to set up your account without a phone number, a street address, or
+            both. See Section 2.6.
+          </p>
           <p>
             We also maintain an{' '}
             <strong>account credit ledger</strong> for your
@@ -101,7 +121,9 @@ export default function PrivacyContent() {
         <LegalSubSection title="2.2 Billing & Payment Information">
           <p>
             Payments are processed through our billing portal using third-party payment processors that
-            are PCI-DSS compliant. We do not store your full card number or CVV. We retain:
+            are PCI-DSS compliant. Payment cards are handled by the payment provider, Stripe or
+            PayPal, which may ask for your card&rsquo;s postal code to check the card. We do not
+            store your full card number or CVV. We retain:
           </p>
           <ul>
             <li>Invoice history and billing records</li>
@@ -145,6 +167,28 @@ export default function PrivacyContent() {
             <li>Pages visited and time spent on the site</li>
             <li>Referring URL</li>
             <li>Session cookies (see Section 7)</li>
+          </ul>
+        </LegalSubSection>
+
+        <LegalSubSection title="2.6 Accounts Without a Phone Number or Street Address">
+          <p>
+            If you would rather not share a phone number, a street address, or both, ask us before
+            or during sign-up. Open a support ticket or email{' '}
+            <Email name="support" />. Our staff can then set up your account so that it does not
+            need them. This suits, for example, partners who prefer not to share these details. A
+            PO box is also accepted as an address.
+          </p>
+          <p>On an account set up this way:</p>
+          <ul>
+            <li>Country and date of birth are still required. Every account needs them.</li>
+            <li>
+              If sales tax or VAT applies to you later, we may ask for the state and postal code we
+              need to work out the tax. We never ask for your street for that.
+            </li>
+            <li>
+              Without a phone number on file, text-message recovery is not available. Account
+              recovery then uses your email address, two-factor sign-in, and a support ticket.
+            </li>
           </ul>
         </LegalSubSection>
       </LegalSection>

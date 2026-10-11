@@ -72,9 +72,10 @@ export default function PrivacyContent() {
           <ul>
             <li>Nome completo</li>
             <li>Endereço de e-mail</li>
-            <li>Endereço de cobrança</li>
-            <li>Número de telefone (obrigatório no cadastro, usado para recuperação de conta e para verificar a titularidade da conta)</li>
-            <li>Data de nascimento (usada para aplicar os requisitos de idade da Seção 9)</li>
+            <li>País</li>
+            <li>Data de nascimento</li>
+            <li>Número de telefone</li>
+            <li>Endereço de cobrança: rua, cidade, código postal e estado ou região, quando o seu país os tiver</li>
             <li>
               Número de identificação fiscal, quando você fornece um para que possamos faturar para
               você como empresa ou aplicar uma isenção fiscal
@@ -88,6 +89,25 @@ export default function PrivacyContent() {
             </li>
             <li>Qualquer informação que você forneça voluntariamente durante o processo de inscrição ou de entrada</li>
           </ul>
+          <p>Veja por que pedimos esses dados:</p>
+          <ul>
+            <li>
+              <strong>Número de telefone:</strong> para manter a sua conta segura e para confirmar
+              a sua identidade se a sua conta estiver bloqueada. Podemos enviar um código por
+              mensagem de texto para o número cadastrado para confirmar que é você.
+            </li>
+            <li>
+              <strong>Endereço de cobrança e país:</strong> para a cobrança e as faturas, para
+              prevenir fraudes e para cumprir as regras de sanções e as regras fiscais.
+            </li>
+            <li>
+              <strong>Data de nascimento:</strong> para verificar a idade mínima da Seção 9.
+            </li>
+          </ul>
+          <p>
+            Você pode nos pedir para configurar a sua conta sem número de telefone, sem a rua do
+            endereço ou sem nenhum dos dois. Veja a Seção 2.6.
+          </p>
           <p>
             Também mantemos um{' '}
             <strong>extrato de crédito na conta</strong>{' '}
@@ -103,7 +123,9 @@ export default function PrivacyContent() {
         <LegalSubSection title="2.2 Informações de Faturamento e Pagamento">
           <p>
             Os pagamentos são processados pelo nosso portal de faturamento usando processadores de
-            pagamento terceirizados em conformidade com o PCI-DSS. Não armazenamos o número completo
+            pagamento terceirizados em conformidade com o PCI-DSS. Os cartões de pagamento são
+            tratados pelo provedor de pagamento, Stripe ou PayPal, que pode pedir o código postal do
+            cartão para verificá-lo. Não armazenamos o número completo
             do seu cartão nem o CVV. Retemos:
           </p>
           <ul>
@@ -148,6 +170,31 @@ export default function PrivacyContent() {
             <li>Páginas visitadas e tempo passado no site</li>
             <li>URL de origem</li>
             <li>Cookies de sessão (veja a Seção 7)</li>
+          </ul>
+        </LegalSubSection>
+
+        <LegalSubSection title="2.6 Contas sem Número de Telefone ou sem Rua">
+          <p>
+            Se você preferir não informar o seu número de telefone, a rua do seu endereço ou os
+            dois, peça para nós antes ou durante o cadastro. Abra um ticket de suporte ou escreva
+            para{' '}
+            <Email name="support" />. A nossa equipe pode então configurar a sua conta para que ela
+            não precise desses dados. Isso serve, por exemplo, para parceiros que preferem não
+            compartilhar esses dados. Uma caixa postal também é aceita como endereço.
+          </p>
+          <p>Em uma conta configurada assim:</p>
+          <ul>
+            <li>O país e a data de nascimento continuam obrigatórios. Toda conta precisa deles.</li>
+            <li>
+              Se um imposto sobre vendas ou IVA passar a se aplicar a você, podemos pedir o estado
+              e o código postal de que precisamos para calcular o imposto. Nunca pedimos a rua para
+              isso.
+            </li>
+            <li>
+              Sem um número de telefone cadastrado, a recuperação por mensagem de texto não está
+              disponível. A recuperação da conta passa então a usar o seu endereço de e-mail, o
+              login em duas etapas e um ticket de suporte.
+            </li>
           </ul>
         </LegalSubSection>
       </LegalSection>
