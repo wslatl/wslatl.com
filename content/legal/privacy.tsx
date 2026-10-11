@@ -103,7 +103,7 @@ export default function PrivacyContent() {
             </li>
           </ul>
           <p>
-            You can ask us to set up your account without a phone number, a street address, or
+            You can ask us to set up your account without a phone number, a billing address, or
             both. See Section 2.6.
           </p>
           <p>
@@ -170,9 +170,9 @@ export default function PrivacyContent() {
           </ul>
         </LegalSubSection>
 
-        <LegalSubSection title="2.6 Accounts Without a Phone Number or Street Address">
+        <LegalSubSection title="2.6 Accounts Without a Phone Number or Billing Address">
           <p>
-            If you would rather not share a phone number, a street address, or both, ask us before
+            If you would rather not share a phone number, a billing address, or both, ask us before
             or during sign-up. Open a support ticket or email{' '}
             <Email name="support" />. Our staff can then set up your account so that it does not
             need them. This suits, for example, partners who prefer not to share these details. A
@@ -182,8 +182,8 @@ export default function PrivacyContent() {
           <ul>
             <li>Country and date of birth are still required. Every account needs them.</li>
             <li>
-              If sales tax or VAT applies to you later, we may ask for the state and postal code we
-              need to work out the tax. We never ask for your street for that.
+              If sales tax or VAT applies in your country, we may ask for the state and postal code we
+              need to work out the tax. We never ask for your street or city for that.
             </li>
             <li>
               Without a phone number on file, text-message recovery is not available. Account

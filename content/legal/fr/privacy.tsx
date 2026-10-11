@@ -112,8 +112,8 @@ export default function PrivacyContent() {
             </li>
           </ul>
           <p>
-            Vous pouvez nous demander de configurer votre compte sans numéro de téléphone, sans la
-            rue de votre adresse, ou sans les deux. Voir la section 2.6.
+            Vous pouvez nous demander de configurer votre compte sans numéro de téléphone, sans
+            adresse de facturation, ou sans les deux. Voir la section 2.6.
           </p>
           <p>
             Nous tenons également un{' '}
@@ -180,10 +180,10 @@ export default function PrivacyContent() {
           </ul>
         </LegalSubSection>
 
-        <LegalSubSection title="2.6 Comptes sans numéro de téléphone ou sans rue">
+        <LegalSubSection title="2.6 Comptes sans numéro de téléphone ou sans adresse de facturation">
           <p>
-            Si vous préférez ne pas communiquer votre numéro de téléphone, la rue de votre adresse,
-            ou les deux, dites-le-nous avant ou pendant l&rsquo;inscription. Ouvrez un ticket de
+            Si vous préférez ne pas communiquer votre numéro de téléphone, votre adresse de
+            facturation, ou les deux, dites-le-nous avant ou pendant l&rsquo;inscription. Ouvrez un ticket de
             support ou écrivez à{' '}
             <Email name="support" />. Notre équipe peut alors configurer votre compte pour
             qu&rsquo;il n&rsquo;en ait pas besoin. Cela convient par exemple aux partenaires qui
@@ -194,9 +194,9 @@ export default function PrivacyContent() {
           <ul>
             <li>Le pays et la date de naissance restent obligatoires. Tous les comptes en ont besoin.</li>
             <li>
-              Si une taxe sur les ventes ou la TVA s&rsquo;applique à vous plus tard, nous pouvons
+              Si une taxe sur les ventes ou la TVA s&rsquo;applique dans votre pays, nous pouvons
               vous demander l&rsquo;État et le code postal nécessaires pour calculer la taxe. Nous
-              ne vous demandons jamais la rue pour cela.
+              ne vous demandons jamais la rue ni la ville pour cela.
             </li>
             <li>
               Sans numéro de téléphone enregistré, la récupération par SMS n&rsquo;est pas

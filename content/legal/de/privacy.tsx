@@ -110,7 +110,7 @@ export default function PrivacyContent() {
             </li>
           </ul>
           <p>
-            Sie können uns bitten, Ihr Konto ohne Telefonnummer, ohne Straße oder ohne beides
+            Sie können uns bitten, Ihr Konto ohne Telefonnummer, ohne Rechnungsadresse oder ohne beides
             einzurichten. Siehe Abschnitt 2.6.
           </p>
           <p>
@@ -179,9 +179,9 @@ export default function PrivacyContent() {
           </ul>
         </LegalSubSection>
 
-        <LegalSubSection title="2.6 Konten ohne Telefonnummer oder Straße">
+        <LegalSubSection title="2.6 Konten ohne Telefonnummer oder Rechnungsadresse">
           <p>
-            Wenn Sie uns Ihre Telefonnummer, Ihre Straße oder beides lieber nicht geben möchten,
+            Wenn Sie uns Ihre Telefonnummer, Ihre Rechnungsadresse oder beides lieber nicht geben möchten,
             fragen Sie uns vor oder während der Anmeldung. Eröffnen Sie ein Supportticket oder
             schreiben Sie an{' '}
             <Email name="support" />. Unser Team kann Ihr Konto dann so einrichten, dass es diese
@@ -192,9 +192,9 @@ export default function PrivacyContent() {
           <ul>
             <li>Land und Geburtsdatum sind weiterhin erforderlich. Jedes Konto braucht sie.</li>
             <li>
-              Wenn für Sie später eine Verkaufssteuer (Sales Tax) oder Mehrwertsteuer anfällt,
+              Wenn in Ihrem Land eine Verkaufssteuer (Sales Tax) oder Mehrwertsteuer anfällt,
               können wir nach dem Bundesstaat und der Postleitzahl fragen, die wir zur Berechnung
-              der Steuer brauchen. Nach der Straße fragen wir dafür nie.
+              der Steuer brauchen. Nach Straße und Ort fragen wir dafür nie.
             </li>
             <li>
               Ohne hinterlegte Telefonnummer ist eine Wiederherstellung per SMS nicht möglich. Die

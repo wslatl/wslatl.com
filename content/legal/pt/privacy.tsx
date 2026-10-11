@@ -105,8 +105,8 @@ export default function PrivacyContent() {
             </li>
           </ul>
           <p>
-            Você pode nos pedir para configurar a sua conta sem número de telefone, sem a rua do
-            endereço ou sem nenhum dos dois. Veja a Seção 2.6.
+            Você pode nos pedir para configurar a sua conta sem número de telefone, sem o endereço
+            de cobrança ou sem nenhum dos dois. Veja a Seção 2.6.
           </p>
           <p>
             Também mantemos um{' '}
@@ -173,9 +173,9 @@ export default function PrivacyContent() {
           </ul>
         </LegalSubSection>
 
-        <LegalSubSection title="2.6 Contas sem Número de Telefone ou sem Rua">
+        <LegalSubSection title="2.6 Contas sem Número de Telefone ou sem Endereço de Cobrança">
           <p>
-            Se você preferir não informar o seu número de telefone, a rua do seu endereço ou os
+            Se você preferir não informar o seu número de telefone, o seu endereço de cobrança ou os
             dois, peça para nós antes ou durante o cadastro. Abra um ticket de suporte ou escreva
             para{' '}
             <Email name="support" />. A nossa equipe pode então configurar a sua conta para que ela
@@ -186,8 +186,8 @@ export default function PrivacyContent() {
           <ul>
             <li>O país e a data de nascimento continuam obrigatórios. Toda conta precisa deles.</li>
             <li>
-              Se um imposto sobre vendas ou IVA passar a se aplicar a você, podemos pedir o estado
-              e o código postal de que precisamos para calcular o imposto. Nunca pedimos a rua para
+              Se um imposto sobre vendas ou IVA se aplicar no seu país, podemos pedir o estado
+              e o código postal de que precisamos para calcular o imposto. Nunca pedimos a rua nem a cidade para
               isso.
             </li>
             <li>

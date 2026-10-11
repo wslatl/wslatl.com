@@ -106,8 +106,8 @@ export default function PrivacyContent() {
             </li>
           </ul>
           <p>
-            Puedes pedirnos que configuremos tu cuenta sin número de teléfono, sin la calle de tu
-            dirección o sin ninguno de los dos. Consulta la Sección 2.6.
+            Puedes pedirnos que configuremos tu cuenta sin número de teléfono, sin dirección de
+            facturación o sin ninguno de los dos. Consulta la Sección 2.6.
           </p>
           <p>
             También mantenemos un{' '}
@@ -173,9 +173,9 @@ export default function PrivacyContent() {
           </ul>
         </LegalSubSection>
 
-        <LegalSubSection title="2.6 Cuentas sin número de teléfono o sin calle">
+        <LegalSubSection title="2.6 Cuentas sin número de teléfono o sin dirección de facturación">
           <p>
-            Si prefieres no compartir tu número de teléfono, la calle de tu dirección o ambos,
+            Si prefieres no compartir tu número de teléfono, tu dirección de facturación o ambos,
             pídenoslo antes o durante el alta. Abre un ticket de soporte o escribe a{' '}
             <Email name="support" />. Nuestro equipo puede entonces configurar tu cuenta para que
             no los necesite. Esto sirve, por ejemplo, a socios que prefieren no compartir esos
@@ -185,9 +185,9 @@ export default function PrivacyContent() {
           <ul>
             <li>El país y la fecha de nacimiento siguen siendo obligatorios. Todas las cuentas los necesitan.</li>
             <li>
-              Si más adelante se te aplica un impuesto sobre las ventas o el IVA, podemos pedirte
+              Si en tu país se aplica un impuesto sobre las ventas o el IVA, podemos pedirte
               el estado y el código postal que necesitamos para calcular el impuesto. Nunca te
-              pedimos la calle para eso.
+              pedimos la calle ni la ciudad para eso.
             </li>
             <li>
               Sin un número de teléfono en la cuenta, no es posible recuperarla por mensaje de
