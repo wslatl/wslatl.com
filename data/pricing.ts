@@ -170,27 +170,27 @@ export interface Comparison {
 export const comparisons = {
   'sparked-minecraft': {
     text: "Premium Minecraft servers for 13% to 19% less than Sparked Host's Enterprise Minecraft plans with the same RAM (4, 6, 8, 12 and 16 GB).",
-    note: "Sparked list prices, checked 10 October 2026. Coupons such as FALL26 and FALLLEAVES2026 are not included, and with them Sparked can cost less for up to three months. Our Premium game servers run on an AMD Ryzen 9 3900X with DDR4 and NVMe; Sparked Enterprise uses a Ryzen 9 7900 (or equivalent) with DDR5. Sparked's Budget Minecraft plans cost less than our Budget and Premium plans.",
+    note: "Sparked list prices, checked 10 October 2026. Coupons such as FALL26 and FALLLEAVES2026 are not included, and with them Sparked can cost less for up to three months. Our Premium game servers run on an AMD Ryzen 9 3900X with DDR4 and NVMe; Sparked Enterprise uses a Ryzen 9 7900 (or equivalent) with DDR5. Sparked includes 3 vCPU and 100 GB of disk at every size, more than our 4 GB and 6 GB plans. Sparked's Budget Minecraft plans cost less than our Budget and Premium plans.",
   },
   'apex-minecraft': {
     text: "Premium plans for 37% to 42% less than Apex Hosting's Ryzen Series Minecraft plans with the same RAM (4, 6 and 8 GB).",
-    note: 'Apex recurring list prices, checked 10 October 2026.',
+    note: 'Apex recurring list prices, checked 10 October 2026. Apex lists a Ryzen 9 7950X with DDR5 at most of its US and EU locations; our Premium plans run on an AMD Ryzen 9 3900X with DDR4.',
   },
   'bloom-minecraft': {
     text: 'Premium plans for 25% to 27% less than Bloom.host Essentials at 4 GB and 6 GB.',
-    note: "Bloom's Los Angeles Essentials plans list the same CPU model as ours, an AMD Ryzen 9 3900X. Bloom list prices, checked 10 October 2026.",
+    note: "Bloom's Los Angeles Essentials plans list the same CPU model as ours, an AMD Ryzen 9 3900X, and include more disk: 60 GB and 100 GB of NVMe, against our 50 GB and 75 GB. Bloom list prices, checked 10 October 2026.",
   },
   'sparked-fivem': {
     text: 'Premium plans for 5% to 12% less than Sparked Host FiveM with the same RAM (4 to 16 GB).',
-    note: 'List prices checked 10 October 2026; coupons not included. Sparked FiveM uses a Ryzen 9 7950X (or equivalent) with DDR5, and our Premium plans an AMD Ryzen 9 3900X with DDR4.',
+    note: 'List prices checked 10 October 2026; coupons not included. Sparked FiveM uses a Ryzen 9 7950X (or equivalent) with DDR5, and our Premium plans an AMD Ryzen 9 3900X with DDR4. Sparked includes more disk at every size, and more vCPU at 4, 6 and 8 GB.',
   },
   'digitalocean-vps': {
     text: "Premium VPS for 45% to 63% less than DigitalOcean's Basic Regular Droplets with the same RAM and the same number of vCPUs: 2 GB $6.50 (DigitalOcean $12), 4 GB $11 ($24), 8 GB $18.50 ($48), 16 GB $35 ($96).",
-    note: 'DigitalOcean list prices, checked 10 October 2026. DigitalOcean does not name the CPU model for these Droplets; ours run on an AMD Ryzen 9 3900X with NVMe.',
+    note: 'DigitalOcean list prices, checked 10 October 2026. DigitalOcean does not name the CPU model for these Droplets; ours run on an AMD Ryzen 9 3900X with NVMe. DigitalOcean includes more disk: 50, 80, 160 and 320 GiB, against our 30, 60, 120 and 240 GB.',
   },
   'vultr-vps': {
     text: '35% to 53% less than Vultr Cloud Compute Regular Performance with the same RAM and the same number of vCPUs (2, 4 and 8 GB).',
-    note: 'Vultr list prices, checked 10 October 2026.',
+    note: 'Vultr list prices, checked 10 October 2026. Vultr says Regular Performance runs on previous generation Intel CPUs and regular SSD; ours run on an AMD Ryzen 9 3900X with NVMe. Vultr includes more disk: 55, 80 and 160 GB, against our 30, 60 and 120 GB.',
   },
   'hosturly-budget-vps': {
     text: "Budget VPS for 16% to 29% less than Hosturly's Budget VPS with the same RAM, and twice the vCPU and disk (4 GB and 8 GB).",
@@ -211,6 +211,12 @@ export interface ComparedPrices {
    * claims that say so, the same number of vCPUs.
    */
   prices: Record<number, number>
+  /**
+   * The competitor's disk in GB (DigitalOcean's in GiB) at the same sizes.
+   * Recorded for every claim whose note says the competitor includes more
+   * disk, so the tests can check that it really does at every size.
+   */
+  storageGb?: Record<number, number>
 }
 
 /**
@@ -220,15 +226,27 @@ export interface ComparedPrices {
  * claim untrue fails the tests until the claim is fixed.
  */
 export const comparedPrices: Record<ComparisonId, ComparedPrices> = {
-  // Enterprise: Mercury, Venus, Neptune, Sun and Milky Way.
+  // Enterprise: Mercury, Venus, Neptune, Sun and Milky Way, each with 3 vCPU and 100 GB.
   'sparked-minecraft': { line: 'game', tier: 'premium', prices: { 4: 10.36, 6: 15.54, 8: 20.72, 12: 31.08, 16: 41.44 } },
+  // Apex does not publish a disk size for these plans.
   'apex-minecraft': { line: 'game', tier: 'premium', prices: { 4: 14.99, 6: 22.49, 8: 27.99 } },
-  'bloom-minecraft': { line: 'game', tier: 'premium', prices: { 4: 12, 6: 18 } },
-  'sparked-fivem': { line: 'game', tier: 'premium', prices: { 4: 9.56, 6: 14.34, 8: 19.12, 12: 28.68, 16: 38.24 } },
+  'bloom-minecraft': { line: 'game', tier: 'premium', prices: { 4: 12, 6: 18 }, storageGb: { 4: 60, 6: 100 } },
+  // 3, 3.25, 3.5, 4 and 4 vCPU.
+  'sparked-fivem': {
+    line: 'game',
+    tier: 'premium',
+    prices: { 4: 9.56, 6: 14.34, 8: 19.12, 12: 28.68, 16: 38.24 },
+    storageGb: { 4: 75, 6: 100, 8: 150, 12: 200, 16: 250 },
+  },
   // Basic Regular with 1, 2, 4 and 8 vCPUs.
-  'digitalocean-vps': { line: 'vps', tier: 'premium', prices: { 2: 12, 4: 24, 8: 48, 16: 96 } },
+  'digitalocean-vps': {
+    line: 'vps',
+    tier: 'premium',
+    prices: { 2: 12, 4: 24, 8: 48, 16: 96 },
+    storageGb: { 2: 50, 4: 80, 8: 160, 16: 320 },
+  },
   // Regular Performance with 1, 2 and 4 vCPUs. Vultr's 16 GB plan has 6 vCPUs, so it is left out.
-  'vultr-vps': { line: 'vps', tier: 'premium', prices: { 2: 10, 4: 20, 8: 40 } },
+  'vultr-vps': { line: 'vps', tier: 'premium', prices: { 2: 10, 4: 20, 8: 40 }, storageGb: { 2: 55, 4: 80, 8: 160 } },
   // B-LX-4 (1 vCPU, 30 GB) and B-LX-8 (2 vCPU, 60 GB).
   'hosturly-budget-vps': { line: 'vps', tier: 'budget', prices: { 4: 12, 8: 24 } },
 }

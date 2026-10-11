@@ -271,6 +271,12 @@ export const pt: Copy = {
       questions: (game: string) => `Dúvidas sobre hospedagem de ${game}`,
       moreIn: (category: string) => `Mais jogos de ${category}`,
       allGames: 'Todos os jogos',
+      plansHeading: 'Planos de servidores de jogos',
+      plansIntro:
+        'Os mesmos planos rodam todos os jogos que hospedamos. O Premium roda em um AMD Ryzen 9 3900X com armazenamento NVMe, e o Budget em um Intel Core i7-6700K mais antigo com SATA SSD.',
+      atAGlance: (game: string) => `Hospedagem de ${game} em resumo`,
+      hosting: (game: string) => `Hospedagem de ${game}`,
+      budgetNote: 'Os planos Budget rodam em uma CPU mais antiga e mais ocupada, então podem ficar mais lentos nos horários de pico.',
     },
   },
   legal: {

@@ -280,6 +280,12 @@ export const en = {
       questions: (game: string) => `${game} hosting questions`,
       moreIn: (category: string) => `More ${category} games`,
       allGames: 'All games',
+      plansHeading: 'Game server plans',
+      plansIntro:
+        'The same plans run every game we host. Premium runs on an AMD Ryzen 9 3900X with NVMe storage, and Budget on an older Intel Core i7-6700K with SATA SSD.',
+      atAGlance: (game: string) => `${game} hosting at a glance`,
+      hosting: (game: string) => `${game} hosting`,
+      budgetNote: 'Budget plans run on an older, busier CPU, so they can be slower at busy times.',
     },
   },
   legal: {

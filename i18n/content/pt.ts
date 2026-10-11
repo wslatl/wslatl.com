@@ -53,7 +53,7 @@ export const pt: ContentTranslation = {
     hardware: {
       title: 'Hardware que aguenta',
       description:
-        'SSDs NVMe, CPUs de alta frequência, caminhos de rede redundantes e roteamento de baixa latência. Feito para rodar pesado sem cortar caminho.',
+        'SSDs NVMe no Premium e SATA SSD no Budget, CPUs de alta frequência, caminhos de rede redundantes e roteamento de baixa latência. Feito para rodar pesado sem cortar caminho.',
     },
     uptime: {
       title: 'No ar quando importa',
@@ -85,7 +85,7 @@ export const pt: ContentTranslation = {
     'game-server-cost': {
       question: 'Quanto custa a hospedagem de servidor de jogos?',
       answer:
-        'Os servidores de jogos Budget começam em {gamePrice} por mês para {gameRam} GB de RAM, em um Intel Core i7-6700K com SATA SSD. Os servidores de jogos Premium começam em {gamePremiumPrice}, em um AMD Ryzen 9 3900X com NVMe. Os planos de VPS começam em {vpsPrice}. A página de preços tem o detalhamento completo.',
+        'Os servidores de jogos Budget começam em {gamePrice} por mês para {gameRam} GB de RAM, e os Premium em {gamePremiumPrice}. Os planos de VPS Budget começam em {vpsPrice}, e os de VPS Premium em {vpsPremiumPrice}. O Premium roda em um AMD Ryzen 9 3900X com NVMe. O Budget tem as mesmas especificações em um Intel Core i7-6700K mais antigo e mais ocupado, com SATA SSD, então o servidor pode ficar mais lento nos horários de pico. A página de preços tem o detalhamento completo.',
     },
     'response-time': {
       question: 'Em quanto tempo vocês respondem de verdade?',
@@ -186,27 +186,27 @@ export const pt: ContentTranslation = {
     comparisons: {
       'sparked-minecraft': {
         text: 'Servidores de Minecraft Premium por 13% a 19% menos que os planos Enterprise Minecraft da Sparked Host com a mesma RAM (4, 6, 8, 12 e 16 GB).',
-        note: 'Preços de tabela da Sparked, conferidos em 10 de outubro de 2026. Cupons como FALL26 e FALLLEAVES2026 não estão incluídos, e com eles a Sparked pode custar menos por até três meses. Nossos servidores de jogos Premium rodam em um AMD Ryzen 9 3900X com DDR4 e NVMe; o Sparked Enterprise usa um Ryzen 9 7900 (ou equivalente) com DDR5. Os planos Budget Minecraft da Sparked custam menos que os nossos planos Budget e Premium.',
+        note: 'Preços de tabela da Sparked, conferidos em 10 de outubro de 2026. Cupons como FALL26 e FALLLEAVES2026 não estão incluídos, e com eles a Sparked pode custar menos por até três meses. Nossos servidores de jogos Premium rodam em um AMD Ryzen 9 3900X com DDR4 e NVMe; o Sparked Enterprise usa um Ryzen 9 7900 (ou equivalente) com DDR5. A Sparked inclui 3 vCPU e 100 GB de disco em todos os tamanhos, mais que os nossos planos de 4 GB e 6 GB. Os planos Budget Minecraft da Sparked custam menos que os nossos planos Budget e Premium.',
       },
       'apex-minecraft': {
         text: 'Planos Premium por 37% a 42% menos que os planos de Minecraft Ryzen Series da Apex Hosting com a mesma RAM (4, 6 e 8 GB).',
-        note: 'Preços de tabela recorrentes da Apex, conferidos em 10 de outubro de 2026.',
+        note: 'Preços de tabela recorrentes da Apex, conferidos em 10 de outubro de 2026. A Apex informa um Ryzen 9 7950X com DDR5 na maioria dos seus locais nos EUA e na Europa; os nossos planos Premium rodam em um AMD Ryzen 9 3900X com DDR4.',
       },
       'bloom-minecraft': {
         text: 'Planos Premium por 25% a 27% menos que o Bloom.host Essentials com 4 GB e 6 GB.',
-        note: 'Os planos Essentials da Bloom em Los Angeles informam o mesmo modelo de CPU que os nossos, um AMD Ryzen 9 3900X. Preços de tabela da Bloom, conferidos em 10 de outubro de 2026.',
+        note: 'Os planos Essentials da Bloom em Los Angeles informam o mesmo modelo de CPU que os nossos, um AMD Ryzen 9 3900X, e incluem mais disco: 60 GB e 100 GB de NVMe, contra os nossos 50 GB e 75 GB. Preços de tabela da Bloom, conferidos em 10 de outubro de 2026.',
       },
       'sparked-fivem': {
         text: 'Planos Premium por 5% a 12% menos que o Sparked Host FiveM com a mesma RAM (de 4 a 16 GB).',
-        note: 'Preços de tabela conferidos em 10 de outubro de 2026; cupons não incluídos. O Sparked FiveM usa um Ryzen 9 7950X (ou equivalente) com DDR5, e os nossos planos Premium um AMD Ryzen 9 3900X com DDR4.',
+        note: 'Preços de tabela conferidos em 10 de outubro de 2026; cupons não incluídos. O Sparked FiveM usa um Ryzen 9 7950X (ou equivalente) com DDR5, e os nossos planos Premium um AMD Ryzen 9 3900X com DDR4. A Sparked inclui mais disco em todos os tamanhos, e mais vCPU com 4, 6 e 8 GB.',
       },
       'digitalocean-vps': {
         text: 'VPS Premium por 45% a 63% menos que os Basic Regular Droplets da DigitalOcean com a mesma RAM e o mesmo número de vCPUs: 2 GB $6.50 (DigitalOcean $12), 4 GB $11 ($24), 8 GB $18.50 ($48), 16 GB $35 ($96).',
-        note: 'Preços de tabela da DigitalOcean, conferidos em 10 de outubro de 2026. A DigitalOcean não informa o modelo de CPU desses Droplets; os nossos rodam em um AMD Ryzen 9 3900X com NVMe.',
+        note: 'Preços de tabela da DigitalOcean, conferidos em 10 de outubro de 2026. A DigitalOcean não informa o modelo de CPU desses Droplets; os nossos rodam em um AMD Ryzen 9 3900X com NVMe. A DigitalOcean inclui mais disco: 50, 80, 160 e 320 GiB, contra os nossos 30, 60, 120 e 240 GB.',
       },
       'vultr-vps': {
         text: 'De 35% a 53% menos que o Vultr Cloud Compute Regular Performance com a mesma RAM e o mesmo número de vCPUs (2, 4 e 8 GB).',
-        note: 'Preços de tabela da Vultr, conferidos em 10 de outubro de 2026.',
+        note: 'Preços de tabela da Vultr, conferidos em 10 de outubro de 2026. Segundo a Vultr, o Regular Performance roda em CPUs Intel da geração anterior com SSD comum; os nossos rodam em um AMD Ryzen 9 3900X com NVMe. A Vultr inclui mais disco: 55, 80 e 160 GB, contra os nossos 30, 60 e 120 GB.',
       },
       'hosturly-budget-vps': {
         text: 'VPS Budget por 16% a 29% menos que o Budget VPS da Hosturly com a mesma RAM, e o dobro de vCPU e de disco (4 GB e 8 GB).',

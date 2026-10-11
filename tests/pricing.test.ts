@@ -4,6 +4,7 @@ import {
   comparisons,
   gameComparisons,
   productLines,
+  type Comparison,
   type ComparisonId,
   type Plan,
   type PlanGroup,
@@ -108,6 +109,19 @@ describe('pricing data', () => {
     }
   })
 
+  it('says a competitor includes more disk only where it does at every size', () => {
+    for (const id of Object.keys(comparisons) as ComparisonId[]) {
+      const { line, tier, storageGb } = comparedPrices[id]
+      const note = (comparisons[id] as Comparison).note ?? ''
+      expect(note.includes('more disk'), `${id}: record storageGb for a "more disk" note`).toBe(storageGb !== undefined)
+      for (const [ram, theirs] of Object.entries(storageGb ?? {})) {
+        const plan = plansIn(line, tier).find((p) => p.ramGb === Number(ram))
+        expect(plan, `${id}: we sell no ${tier} ${line} plan with ${ram} GB`).toBeDefined()
+        expect(theirs, `${id} at ${ram} GB`).toBeGreaterThan(plan?.storageGb ?? Infinity)
+      }
+    }
+  })
+
   it('shows each comparison only with the plans it is about', () => {
     for (const line of productLines) {
       for (const group of line.groups) {
@@ -150,12 +164,13 @@ describe('pricing helpers', () => {
 
   it('fills every price token the FAQ answers use', () => {
     for (const faq of faqs) expect(fillPrices(faq.answer), faq.id).not.toMatch(/\{\w+\}/)
-    expect(fillPrices('{gamePrice} {gameRam} {gamePremiumPrice} {vpsPrice}')).toBe(
+    expect(fillPrices('{gamePrice} {gameRam} {gamePremiumPrice} {vpsPrice} {vpsPremiumPrice}')).toBe(
       [
         formatPrice(startingPrice('game', 'budget')),
         String(entryPlan('game', 'budget').ramGb),
         formatPrice(startingPrice('game', 'premium')),
-        formatPrice(startingPrice('vps')),
+        formatPrice(startingPrice('vps', 'budget')),
+        formatPrice(startingPrice('vps', 'premium')),
       ].join(' '),
     )
   })

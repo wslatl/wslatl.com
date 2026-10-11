@@ -63,7 +63,7 @@ Some facts appear on many pages. Each one is defined exactly once, and everythin
 | Fact | Defined in | Used by |
 | --- | --- | --- |
 | Plan names, specs, prices | `data/pricing.ts` | Pricing page, home page, game pages, FAQ answer, meta descriptions |
-| Price comparisons with competitors | `data/pricing.ts` (`comparisons`, dated when checked, and the competitor prices behind them in `comparedPrices`, which the tests check every claim against) | Pricing page plan groups, the Minecraft and FiveM pages |
+| Price comparisons with competitors | `data/pricing.ts` (`comparisons`, dated when checked, and the competitor prices and disk sizes behind them in `comparedPrices`, which the tests check every claim against) | Pricing page plan groups, the Minecraft and FiveM pages |
 | Uptime targets | `data/sla.ts` | Terms of Service, SLA, Refund Policy, home page commitments, pricing page |
 | Legal document titles and dates | `data/legal.ts` and `config/site.ts` | Legal pages, `/legal`, footer, sitemap |
 | Games | `data/games.ts` | `/games`, game pages, sitemap |

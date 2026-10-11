@@ -271,6 +271,12 @@ export const de: Copy = {
       questions: (game: string) => `Fragen zu ${game} Hosting`,
       moreIn: (category: string) => `Mehr Spiele aus ${category}`,
       allGames: 'Alle Spiele',
+      plansHeading: 'Gameserver-Tarife',
+      plansIntro:
+        'Dieselben Tarife laufen für jedes Spiel, das wir hosten. Premium läuft auf einem AMD Ryzen 9 3900X mit NVMe-Speicher, Budget auf einem älteren Intel Core i7-6700K mit SATA SSD.',
+      atAGlance: (game: string) => `${game} Hosting auf einen Blick`,
+      hosting: (game: string) => `${game} Hosting`,
+      budgetNote: 'Budget-Tarife laufen auf einer älteren, stärker ausgelasteten CPU, deshalb können sie zu Stoßzeiten langsamer sein.',
     },
   },
   legal: {

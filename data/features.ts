@@ -39,7 +39,7 @@ export const features: Feature[] = [
     title: 'Hardware that holds up',
     icon: Cpu,
     description:
-      'NVMe SSDs, high frequency CPUs, redundant network paths, and low latency routing. Built to run hard without cutting corners.',
+      'NVMe SSDs on Premium and SATA SSDs on Budget, high frequency CPUs, redundant network paths, and low latency routing. Built to run hard without cutting corners.',
   },
   {
     id: 'uptime',

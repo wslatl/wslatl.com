@@ -42,7 +42,7 @@ export const de: ContentTranslation = {
     hardware: {
       title: 'Hardware, die durchhält',
       description:
-        'NVMe-SSDs, hoch getaktete CPUs, redundante Netzwerkwege und Routing mit niedriger Latenz. Gebaut, um hart zu laufen, ohne an der falschen Stelle zu sparen.',
+        'NVMe-SSDs bei Premium und SATA-SSDs bei Budget, hoch getaktete CPUs, redundante Netzwerkwege und Routing mit niedriger Latenz. Gebaut, um hart zu laufen, ohne an der falschen Stelle zu sparen.',
     },
     uptime: {
       title: 'Online, wenn es darauf ankommt',
@@ -74,7 +74,7 @@ export const de: ContentTranslation = {
     'game-server-cost': {
       question: 'Was kostet Gameserver-Hosting?',
       answer:
-        'Budget-Gameserver starten bei {gamePrice} im Monat für {gameRam} GB RAM, auf einem Intel Core i7-6700K mit SATA SSD. Premium-Gameserver starten bei {gamePremiumPrice}, auf einem AMD Ryzen 9 3900X mit NVMe. VPS-Tarife starten bei {vpsPrice}. Auf der Preisseite steht die vollständige Aufschlüsselung.',
+        'Budget-Gameserver starten bei {gamePrice} im Monat für {gameRam} GB RAM, Premium-Gameserver bei {gamePremiumPrice}. Budget VPS starten bei {vpsPrice}, Premium VPS bei {vpsPremiumPrice}. Premium läuft auf einem AMD Ryzen 9 3900X mit NVMe. Budget hat dieselbe Ausstattung auf einem älteren, stärker ausgelasteten Intel Core i7-6700K mit SATA SSD, deshalb kann ein Budget-Server zu Stoßzeiten langsamer sein. Auf der Preisseite steht die vollständige Aufschlüsselung.',
     },
     'response-time': {
       question: 'Wie schnell antwortet ihr wirklich?',
@@ -175,27 +175,27 @@ export const de: ContentTranslation = {
     comparisons: {
       'sparked-minecraft': {
         text: 'Premium-Minecraft-Server für 13% bis 19% weniger als die Enterprise-Minecraft-Tarife von Sparked Host mit gleich viel RAM (4, 6, 8, 12 und 16 GB).',
-        note: 'Listenpreise von Sparked, geprüft am 10. Oktober 2026. Gutscheine wie FALL26 und FALLLEAVES2026 sind nicht berücksichtigt, und mit ihnen kann Sparked bis zu drei Monate lang weniger kosten. Unsere Premium-Gameserver laufen auf einem AMD Ryzen 9 3900X mit DDR4 und NVMe; Sparked Enterprise nutzt einen Ryzen 9 7900 (oder gleichwertig) mit DDR5. Die Budget-Minecraft-Tarife von Sparked kosten weniger als unsere Budget- und Premium-Tarife.',
+        note: 'Listenpreise von Sparked, geprüft am 10. Oktober 2026. Gutscheine wie FALL26 und FALLLEAVES2026 sind nicht berücksichtigt, und mit ihnen kann Sparked bis zu drei Monate lang weniger kosten. Unsere Premium-Gameserver laufen auf einem AMD Ryzen 9 3900X mit DDR4 und NVMe; Sparked Enterprise nutzt einen Ryzen 9 7900 (oder gleichwertig) mit DDR5. Sparked bietet in jeder Größe 3 vCPU und 100 GB Speicherplatz, mehr als unsere Tarife mit 4 GB und 6 GB. Die Budget-Minecraft-Tarife von Sparked kosten weniger als unsere Budget- und Premium-Tarife.',
       },
       'apex-minecraft': {
         text: 'Premium-Tarife für 37% bis 42% weniger als die Minecraft-Tarife der Ryzen Series von Apex Hosting mit gleich viel RAM (4, 6 und 8 GB).',
-        note: 'Wiederkehrende Listenpreise von Apex, geprüft am 10. Oktober 2026.',
+        note: 'Wiederkehrende Listenpreise von Apex, geprüft am 10. Oktober 2026. Apex gibt für die meisten Standorte in den USA und Europa einen Ryzen 9 7950X mit DDR5 an; unsere Premium-Tarife laufen auf einem AMD Ryzen 9 3900X mit DDR4.',
       },
       'bloom-minecraft': {
         text: 'Premium-Tarife für 25% bis 27% weniger als Bloom.host Essentials bei 4 GB und 6 GB.',
-        note: 'Für Blooms Essentials-Tarife in Los Angeles ist dasselbe CPU-Modell angegeben wie für unsere, ein AMD Ryzen 9 3900X. Listenpreise von Bloom, geprüft am 10. Oktober 2026.',
+        note: 'Für Blooms Essentials-Tarife in Los Angeles ist dasselbe CPU-Modell angegeben wie für unsere, ein AMD Ryzen 9 3900X, und sie bieten mehr Speicherplatz: 60 GB und 100 GB NVMe gegenüber unseren 50 GB und 75 GB. Listenpreise von Bloom, geprüft am 10. Oktober 2026.',
       },
       'sparked-fivem': {
         text: 'Premium-Tarife für 5% bis 12% weniger als Sparked Host FiveM mit gleich viel RAM (4 bis 16 GB).',
-        note: 'Listenpreise geprüft am 10. Oktober 2026; Gutscheine nicht berücksichtigt. Sparked FiveM nutzt einen Ryzen 9 7950X (oder gleichwertig) mit DDR5, unsere Premium-Tarife einen AMD Ryzen 9 3900X mit DDR4.',
+        note: 'Listenpreise geprüft am 10. Oktober 2026; Gutscheine nicht berücksichtigt. Sparked FiveM nutzt einen Ryzen 9 7950X (oder gleichwertig) mit DDR5, unsere Premium-Tarife einen AMD Ryzen 9 3900X mit DDR4. Sparked bietet in jeder Größe mehr Speicherplatz und bei 4, 6 und 8 GB mehr vCPUs.',
       },
       'digitalocean-vps': {
         text: 'Premium VPS für 45% bis 63% weniger als die Basic Regular Droplets von DigitalOcean mit gleich viel RAM und gleich vielen vCPUs: 2 GB $6.50 (DigitalOcean $12), 4 GB $11 ($24), 8 GB $18.50 ($48), 16 GB $35 ($96).',
-        note: 'Listenpreise von DigitalOcean, geprüft am 10. Oktober 2026. DigitalOcean nennt das CPU-Modell dieser Droplets nicht; unsere laufen auf einem AMD Ryzen 9 3900X mit NVMe.',
+        note: 'Listenpreise von DigitalOcean, geprüft am 10. Oktober 2026. DigitalOcean nennt das CPU-Modell dieser Droplets nicht; unsere laufen auf einem AMD Ryzen 9 3900X mit NVMe. DigitalOcean bietet mehr Speicherplatz: 50, 80, 160 und 320 GiB gegenüber unseren 30, 60, 120 und 240 GB.',
       },
       'vultr-vps': {
         text: '35% bis 53% weniger als Vultr Cloud Compute Regular Performance mit gleich viel RAM und gleich vielen vCPUs (2, 4 und 8 GB).',
-        note: 'Listenpreise von Vultr, geprüft am 10. Oktober 2026.',
+        note: 'Listenpreise von Vultr, geprüft am 10. Oktober 2026. Laut Vultr läuft Regular Performance auf Intel-CPUs der vorigen Generation mit normalen SSDs; unsere laufen auf einem AMD Ryzen 9 3900X mit NVMe. Vultr bietet mehr Speicherplatz: 55, 80 und 160 GB gegenüber unseren 30, 60 und 120 GB.',
       },
       'hosturly-budget-vps': {
         text: 'Budget VPS für 16% bis 29% weniger als Hosturlys Budget VPS mit gleich viel RAM und doppelt so vielen vCPUs und doppelt so viel Speicherplatz (4 GB und 8 GB).',

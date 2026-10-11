@@ -39,6 +39,7 @@ function localizedGame(slug: string) {
  */
 function PlansThatFit({ row }: { row: RamRow }) {
   const t = copy().games.detail
+  const perMonth = copy().pricing.perMonth
   const fits = smallestPlansWithRam('game', ramNeedGb(row))
   const perMap = /per map/i.test(row.ram)
   if (fits.length === 0) {
@@ -56,7 +57,7 @@ function PlansThatFit({ row }: { row: RamRow }) {
       {i === 0 && perMap && t.perMap}
       {i > 0 && t.or}
       <span className="whitespace-nowrap">
-        <span className="font-medium text-foreground">{plan.name}</span> ({formatPrice(plan.price)}/mo)
+        <span className="font-medium text-foreground">{plan.name}</span> ({formatPrice(plan.price)}{perMonth})
       </span>
     </span>
   ))
@@ -207,22 +208,25 @@ export default async function GamePage({ params }: PageProps) {
         </section>
         </div>
 
-        <aside aria-label={`${game.name} hosting at a glance`} className="hidden lg:block">
+        <aside aria-label={t.games.detail.atAGlance(game.name)} className="hidden lg:block">
           <div className="sticky top-24 mt-24 rounded-2xl border bg-card/30 p-6">
             {entry && (
               <>
-                <p className="text-sm font-medium text-muted-foreground">{game.name} hosting</p>
+                <p className="text-sm font-medium text-muted-foreground">{t.games.detail.hosting(game.name)}</p>
                 <p className="mt-2 text-sm text-muted-foreground tabular-nums">
-                  from{' '}
+                  {t.pricing.from}{' '}
                   <span className="text-4xl font-bold tracking-[-0.03em] text-foreground">
                     {formatPrice(entry.plan.price)}
                   </span>
-                  /mo
+                  {t.pricing.perMonth}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground tabular-nums">
                   {entry.plan.name}: {entry.plan.cpu} {line.cpuUnit}, {entry.plan.ramGb} GB RAM,{' '}
                   {entry.plan.storageGb} GB {entry.group.storageType}
                 </p>
+                {entry.group.tier === 'budget' && (
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t.games.detail.budgetNote}</p>
+                )}
               </>
             )}
             <Button asChild size="lg" className="mt-6 h-auto min-h-11 w-full py-2.5 text-center whitespace-normal">
@@ -248,12 +252,9 @@ export default async function GamePage({ params }: PageProps) {
 
         <section id="plans" aria-labelledby="plans-heading" className="mt-16">
           <h2 id="plans-heading" className="text-2xl font-semibold tracking-tight text-foreground">
-            Game server plans
+            {t.games.detail.plansHeading}
           </h2>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            The same plans run every game we host. Premium runs on an AMD Ryzen 9 3900X with NVMe storage, and
-            Budget on an older Intel Core i7-6700K with SATA SSD.
-          </p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">{t.games.detail.plansIntro}</p>
           {claims?.plans && <ComparisonList ids={claims.plans} className="mt-6" />}
           <div className="mt-8 space-y-12">
             {line.groups.map((group) => (

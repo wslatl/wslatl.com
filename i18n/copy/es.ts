@@ -271,6 +271,12 @@ export const es: Copy = {
       questions: (game: string) => `Preguntas sobre el hosting de ${game}`,
       moreIn: (category: string) => `Más juegos de ${category}`,
       allGames: 'Todos los juegos',
+      plansHeading: 'Planes de servidores de juego',
+      plansIntro:
+        'Los mismos planes sirven para todos los juegos que alojamos. Premium funciona con un AMD Ryzen 9 3900X con almacenamiento NVMe, y los económicos con un Intel Core i7-6700K más antiguo con SATA SSD.',
+      atAGlance: (game: string) => `Hosting de ${game} de un vistazo`,
+      hosting: (game: string) => `Hosting de ${game}`,
+      budgetNote: 'Los planes económicos funcionan con una CPU más antigua y más cargada, así que pueden ir más lentos en las horas de más uso.',
     },
   },
   legal: {
