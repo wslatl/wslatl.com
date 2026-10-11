@@ -228,7 +228,7 @@ export const pt: Copy = {
   games: {
     metaTitle: (more: number) => `Hospedagem de servidores de jogos: Minecraft, Rust, ARK, FiveM e +${more}`,
     metaDescription: (price: string) =>
-      `Hospedagem de servidores de jogos com proteção DDoS a partir de ${price}/mês, em um AMD Ryzen 9 3900X com armazenamento NVMe. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld e dezenas de outros, todos no mesmo painel Pterodactyl.`,
+      `Hospedagem de servidores de jogos com proteção DDoS a partir de ${price}/mês, em hardware NVMe e SATA SSD. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld e dezenas de outros, todos no mesmo painel Pterodactyl.`,
     heading: 'Hospedagem de servidores de jogos',
     crumb: 'Jogos',
     introPrefix:

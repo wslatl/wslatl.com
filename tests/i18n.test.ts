@@ -22,6 +22,9 @@ function cover(name: string, ids: string[], entries: Record<string, unknown> | u
   expect(ids.filter((id) => !entries?.[id]), name).toEqual([])
 }
 
+/** The {price} tokens in a written answer, sorted. */
+const tokens = (text = '') => [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).toSorted()
+
 /** Every string in a dictionary, as "path: value" pairs. Functions are skipped. */
 function strings(value: unknown, path = ''): [string, string][] {
   if (typeof value === 'string') return [[path, value]]
@@ -135,6 +138,15 @@ describe('content translations', () => {
       cover(`${locale} legal`, legalPages.map((page) => page.key), t?.legal)
       expect(t?.leadFeature?.title, `${locale} lead feature`).toBeTruthy()
       expect(t?.reviews?.title, `${locale} reviews`).toBeTruthy()
+    }
+  })
+
+  it('keeps the price tokens of every FAQ answer', () => {
+    for (const locale of others) {
+      const t = translationFor(locale)
+      for (const faq of faqs) {
+        expect(tokens(t?.faqs?.[faq.id]?.answer), `${locale} ${faq.id}`).toEqual(tokens(faq.answer))
+      }
     }
   })
 

@@ -32,9 +32,10 @@ function localizedGame(slug: string) {
 }
 
 /**
- * "P-GAME-8 ($17.50/mo)", one plan per plan group, or a way to ask when
- * nothing is big enough. Rows sized "per map" (clusters) name the plan for
- * each map, since every map in a cluster runs as its own server.
+ * "P-GAME-8 ($17.50/mo) or B-GAME-8 ($15.91/mo)", one plan per plan group,
+ * or a way to ask when nothing is big enough. Rows sized "per map" (clusters)
+ * name the plan for each map, since every map in a cluster runs as its own
+ * server.
  */
 function PlansThatFit({ row }: { row: RamRow }) {
   const t = copy().games.detail
@@ -250,8 +251,8 @@ export default async function GamePage({ params }: PageProps) {
             Game server plans
           </h2>
           <p className="mt-2 max-w-2xl text-muted-foreground">
-            The same plans run every game we host, all on an AMD Ryzen 9 3900X with DDR4 memory and NVMe
-            storage.
+            The same plans run every game we host. Premium runs on an AMD Ryzen 9 3900X with NVMe storage, and
+            Budget on an older Intel Core i7-6700K with SATA SSD.
           </p>
           {claims?.plans && <ComparisonList ids={claims.plans} className="mt-6" />}
           <div className="mt-8 space-y-12">

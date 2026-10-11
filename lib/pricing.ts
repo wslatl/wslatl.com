@@ -102,14 +102,15 @@ export function smallestPlansWithRam(id: ProductLineId, ramGb: number): PlanMatc
 
 /**
  * Fills the price tokens a written answer can carry, so the same sentence
- * shows today's prices in every language: {gamePrice}, {gameRam} and
- * {vpsPrice} all come from data/pricing.ts.
+ * shows today's prices in every language: {gamePrice}, {gameRam},
+ * {gamePremiumPrice} and {vpsPrice} all come from data/pricing.ts.
  */
 export function fillPrices(text: string): string {
-  const game = entryPlan('game')
+  const budgetGame = entryPlan('game', 'budget')
   const values: Record<string, string> = {
-    gamePrice: formatPrice(game.price),
-    gameRam: String(game.ramGb),
+    gamePrice: formatPrice(budgetGame.price),
+    gameRam: String(budgetGame.ramGb),
+    gamePremiumPrice: formatPrice(startingPrice('game', 'premium')),
     vpsPrice: formatPrice(startingPrice('vps')),
   }
   return text.replace(/\{(\w+)\}/g, (whole, key) => values[key] ?? whole)

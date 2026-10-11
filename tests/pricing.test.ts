@@ -1,9 +1,20 @@
 import { describe, expect, it } from 'vitest'
-import { comparisons, gameComparisons, productLines } from '@/data/pricing'
+import {
+  comparedPrices,
+  comparisons,
+  gameComparisons,
+  productLines,
+  type ComparisonId,
+  type Plan,
+  type PlanGroup,
+  type ProductLineId,
+} from '@/data/pricing'
+import { faqs } from '@/data/faqs'
 import { games } from '@/data/games'
 import {
   cheapestPlanWithRam,
   entryPlan,
+  fillPrices,
   formatPrice,
   pricingHref,
   smallestPlansWithRam,
@@ -12,6 +23,31 @@ import {
 } from '@/lib/pricing'
 
 const allPlans = productLines.flatMap((line) => line.groups.flatMap((group) => group.plans))
+
+function plansIn(line: ProductLineId, tier: PlanGroup['tier']): Plan[] {
+  return productLines
+    .filter((l) => l.id === line)
+    .flatMap((l) => l.groups.filter((g) => g.tier === tier).flatMap((g) => g.plans))
+}
+
+const cents = (usd: number) => Math.round(usd * 100)
+
+/** What a plan gives, without its name or price. */
+const spec = ({ cpu, ramGb, storageGb }: Plan) => ({ cpu, ramGb, storageGb })
+
+/**
+ * How much less we charge than the competitor at each recorded size, in
+ * whole percent rounded down, worked out in cents so no float rounds a
+ * claim up.
+ */
+function gaps(id: ComparisonId): number[] {
+  const { line, tier, prices } = comparedPrices[id]
+  return Object.entries(prices).map(([ram, theirs]) => {
+    const plan = plansIn(line, tier).find((p) => p.ramGb === Number(ram))
+    if (!plan) throw new Error(`${id}: we sell no ${tier} ${line} plan with ${ram} GB`)
+    return Math.floor(((cents(theirs) - cents(plan.price)) * 100) / cents(theirs))
+  })
+}
 
 describe('pricing data', () => {
   it('uses every plan name exactly once', () => {
@@ -22,8 +58,8 @@ describe('pricing data', () => {
   it('has sane numbers on every plan', () => {
     for (const plan of allPlans) {
       expect(plan.price, plan.name).toBeGreaterThan(0)
-      // Game plans sell quarter vCores (1.5, 2.25, 4.5).
-      expect(Number.isInteger(plan.cpu * 4), plan.name).toBe(true)
+      // Game plans sell half vCores (1.5, 2.5, 4.5).
+      expect(Number.isInteger(plan.cpu * 2), plan.name).toBe(true)
       expect(plan.ramGb, plan.name).toBeGreaterThan(0)
       expect(plan.storageGb, plan.name).toBeGreaterThan(0)
       // Prices are whole cents.
@@ -41,12 +77,50 @@ describe('pricing data', () => {
     }
   })
 
+  it('sells the same plans on both tiers, with Premium at 10% more', () => {
+    for (const line of productLines) {
+      const budget = plansIn(line.id, 'budget')
+      const premium = plansIn(line.id, 'premium')
+      expect(premium.map(spec), line.id).toEqual(budget.map(spec))
+      // The billing panel adds 10% to the Budget price and rounds half up to the cent.
+      for (const [i, plan] of budget.entries()) {
+        expect(cents(premium[i].price), premium[i].name).toBe(Math.round((cents(plan.price) * 110) / 100))
+      }
+    }
+  })
+
   it('dates every comparison and only places ones that exist', () => {
     for (const [id, comparison] of Object.entries(comparisons)) {
       expect(`${comparison.text} ${comparison.note}`, id).toMatch(/checked 10 October 2026/)
     }
     const slugs = new Set(games.map((g) => g.slug))
     for (const slug of Object.keys(gameComparisons)) expect(slugs.has(slug), slug).toBe(true)
+  })
+
+  it('claims only what the recorded competitor prices give, rounded down', () => {
+    for (const id of Object.keys(comparisons) as ComparisonId[]) {
+      const found = gaps(id)
+      const low = Math.min(...found)
+      const high = Math.max(...found)
+      const range = low === high ? `${low}%` : `${low}% to ${high}%`
+      // A leading space, so "13% to 19%" cannot pass as "3% to 19%".
+      expect(` ${comparisons[id].text}`, id).toContain(` ${range} less`)
+    }
+  })
+
+  it('shows each comparison only with the plans it is about', () => {
+    for (const line of productLines) {
+      for (const group of line.groups) {
+        for (const id of group.comparisons ?? []) {
+          expect(comparedPrices[id], `${group.id}: ${id}`).toMatchObject({ line: line.id, tier: group.tier })
+        }
+      }
+    }
+    for (const [slug, placed] of Object.entries(gameComparisons)) {
+      for (const id of [...(placed.plans ?? []), ...(placed.table ? [placed.table] : [])]) {
+        expect(comparedPrices[id].line, `${slug}: ${id}`).toBe('game')
+      }
+    }
   })
 
   it('gives every line a unique anchor and group ids that do not collide', () => {
@@ -70,7 +144,20 @@ describe('pricing helpers', () => {
       expect(startingPrice(line.id)).toBe(min)
     }
     expect(entryPlan('game').price).toBe(startingPrice('game'))
+    expect(entryPlan('game', 'premium').price).toBe(startingPrice('game', 'premium'))
     expect(entryPlan('vps', 'budget').price).toBe(startingPrice('vps', 'budget'))
+  })
+
+  it('fills every price token the FAQ answers use', () => {
+    for (const faq of faqs) expect(fillPrices(faq.answer), faq.id).not.toMatch(/\{\w+\}/)
+    expect(fillPrices('{gamePrice} {gameRam} {gamePremiumPrice} {vpsPrice}')).toBe(
+      [
+        formatPrice(startingPrice('game', 'budget')),
+        String(entryPlan('game', 'budget').ramGb),
+        formatPrice(startingPrice('game', 'premium')),
+        formatPrice(startingPrice('vps')),
+      ].join(' '),
+    )
   })
 
   it('reports spec ranges that contain every plan', () => {

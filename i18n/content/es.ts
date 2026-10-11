@@ -75,7 +75,7 @@ export const es: ContentTranslation = {
     'game-server-cost': {
       question: '¿Cuánto cuesta el hosting de servidores de juego?',
       answer:
-        'Los servidores de juego empiezan en {gamePrice} al mes por {gameRam} GB de RAM, en un AMD Ryzen 9 3900X con almacenamiento NVMe. Los planes VPS empiezan en {vpsPrice}. La página de precios tiene el desglose completo.',
+        'Los servidores de juego económicos empiezan en {gamePrice} al mes por {gameRam} GB de RAM, en un Intel Core i7-6700K con SATA SSD. Los servidores de juego Premium empiezan en {gamePremiumPrice}, en un AMD Ryzen 9 3900X con NVMe. Los planes VPS empiezan en {vpsPrice}. La página de precios tiene el desglose completo.',
     },
     'response-time': {
       question: '¿Cuánto se tarda de verdad en recibir respuesta?',
@@ -163,40 +163,46 @@ export const es: ContentTranslation = {
       },
       'budget-vps': {
         label: 'VPS económicos',
-        description: 'Intel Core i7-6700K con memoria DDR4 y discos SATA SSD en RAID 1, en Nueva York.',
+        description:
+          'Intel Core i7-6700K con memoria DDR4 y discos SATA SSD en RAID 1, en Nueva York. Las mismas especificaciones que Premium en una CPU más antigua y más cargada, así que tu servidor puede ir más lento en las horas de más uso.',
       },
       'premium-game': {
         label: 'Servidores de juego Premium',
         description: 'AMD Ryzen 9 3900X con memoria DDR4 y discos NVMe en RAID 1, en Los Ángeles.',
       },
+      'budget-game': {
+        label: 'Servidores de juego económicos',
+        description:
+          'Intel Core i7-6700K con memoria DDR4 y discos SATA SSD en RAID 1, en Nueva York. Las mismas especificaciones que Premium en una CPU más antigua y más cargada, así que tu servidor puede ir más lento en las horas de más uso.',
+      },
     },
     comparisons: {
       'sparked-minecraft': {
-        text: 'Servidores de Minecraft por un 15% menos que los planes Enterprise Minecraft de Sparked Host con la misma RAM, en todos los tamaños que vendemos (4, 6, 8, 12 y 16 GB).',
-        note: 'Precios de lista de Sparked, consultados el 10 de octubre de 2026. No incluyen cupones como FALL26 y FALLLEAVES2026, y con ellos Sparked puede costar menos durante hasta tres meses. Nuestros servidores de juego funcionan con un AMD Ryzen 9 3900X con DDR4 y NVMe; Sparked Enterprise usa un Ryzen 9 7900 (o equivalente) con DDR5.',
+        text: 'Servidores de Minecraft Premium por entre un 13% y un 19% menos que los planes Enterprise Minecraft de Sparked Host con la misma RAM (4, 6, 8, 12 y 16 GB).',
+        note: 'Precios de lista de Sparked, consultados el 10 de octubre de 2026. No incluyen cupones como FALL26 y FALLLEAVES2026, y con ellos Sparked puede costar menos durante hasta tres meses. Nuestros servidores de juego Premium funcionan con un AMD Ryzen 9 3900X con DDR4 y NVMe; Sparked Enterprise usa un Ryzen 9 7900 (o equivalente) con DDR5. Los planes Budget Minecraft de Sparked cuestan menos que nuestros planes económicos y Premium.',
       },
       'apex-minecraft': {
-        text: 'Entre un 37% y un 42% menos que los planes de Minecraft Ryzen Series de Apex Hosting con la misma RAM (4, 6 y 8 GB).',
+        text: 'Planes Premium por entre un 37% y un 42% menos que los planes de Minecraft Ryzen Series de Apex Hosting con la misma RAM (4, 6 y 8 GB).',
         note: 'Precios de lista recurrentes de Apex, consultados el 10 de octubre de 2026.',
       },
       'bloom-minecraft': {
-        text: 'Un 27% menos que Bloom.host Essentials con 4 GB y 6 GB.',
+        text: 'Planes Premium por entre un 25% y un 27% menos que Bloom.host Essentials con 4 GB y 6 GB.',
         note: 'Los planes Essentials de Bloom en Los Ángeles indican el mismo modelo de CPU que los nuestros, un AMD Ryzen 9 3900X. Precios de lista de Bloom, consultados el 10 de octubre de 2026.',
       },
       'sparked-fivem': {
-        text: 'Un 8% menos que Sparked Host FiveM con la misma RAM.',
-        note: 'Precios de lista consultados el 10 de octubre de 2026; no incluyen cupones.',
+        text: 'Planes Premium por entre un 5% y un 12% menos que Sparked Host FiveM con la misma RAM (de 4 a 16 GB).',
+        note: 'Precios de lista consultados el 10 de octubre de 2026; no incluyen cupones. Sparked FiveM usa un Ryzen 9 7950X (o equivalente) con DDR5, y nuestros planes Premium un AMD Ryzen 9 3900X con DDR4.',
       },
       'digitalocean-vps': {
-        text: 'VPS Premium por entre un 45% y un 50% menos que los Basic Regular Droplets de DigitalOcean con la misma RAM y el mismo número de vCPU: 2 GB $6.50 (DigitalOcean $12), 4 GB $12 ($24), 8 GB $24 ($48), 16 GB $48 ($96).',
+        text: 'VPS Premium por entre un 45% y un 63% menos que los Basic Regular Droplets de DigitalOcean con la misma RAM y el mismo número de vCPU: 2 GB $6.50 (DigitalOcean $12), 4 GB $11 ($24), 8 GB $18.50 ($48), 16 GB $35 ($96).',
         note: 'Precios de lista de DigitalOcean, consultados el 10 de octubre de 2026. DigitalOcean no indica el modelo de CPU de estos Droplets; los nuestros funcionan con un AMD Ryzen 9 3900X con NVMe.',
       },
       'vultr-vps': {
-        text: 'Entre un 35% y un 40% menos que Vultr Cloud Compute Regular Performance con la misma RAM y el mismo número de vCPU (2, 4 y 8 GB).',
+        text: 'Entre un 35% y un 53% menos que Vultr Cloud Compute Regular Performance con la misma RAM y el mismo número de vCPU (2, 4 y 8 GB).',
         note: 'Precios de lista de Vultr, consultados el 10 de octubre de 2026.',
       },
       'hosturly-budget-vps': {
-        text: 'VPS económicos por un 9% menos que el Budget VPS de Hosturly con la misma RAM, y el doble de vCPU y de disco (4 GB y 8 GB).',
+        text: 'VPS económicos por entre un 16% y un 29% menos que el Budget VPS de Hosturly con la misma RAM, y el doble de vCPU y de disco (4 GB y 8 GB).',
         note: 'Hardware distinto: nuestro Intel Core i7-6700K con SATA SSD en RAID 1 en Nueva York, frente al AMD EPYC 7402P con NVMe de Hosturly en Chicago. Precios de lista de Hosturly, consultados el 10 de octubre de 2026.',
       },
     },
@@ -209,7 +215,7 @@ export const es: ContentTranslation = {
       popularFor: ['survival con Paper y plugins', 'modpacks ATM9 y RLCraft', 'servidores con juego cruzado con Bedrock', 'servidores de construcción en creativo'],
       setups: ['1-5 en vanilla', '5-15 con Paper/Spigot y plugins', '10-20 con pocos mods', 'Modpacks pesados (RLCraft, ATM9)'],
       faqs: [
-        { q: '¿Puedo montar un servidor con mods como RLCraft o ATM9?', a: 'Sí. Minecraft con mods consume mucha memoria, así que paquetes pesados como estos suelen pedir de 12 a 16 GB de RAM. Todos los planes funcionan con un AMD Ryzen 9 3900X y almacenamiento NVMe.' },
+        { q: '¿Puedo montar un servidor con mods como RLCraft o ATM9?', a: 'Sí. Minecraft con mods consume mucha memoria, así que paquetes pesados como estos suelen pedir de 12 a 16 GB de RAM. Van mejor en Premium, que tiene un AMD Ryzen 9 3900X y almacenamiento NVMe.' },
         { q: '¿Se pueden conectar jugadores de Bedrock a un servidor de Java?', a: 'Sí, con un egg compatible con Geyser/Floodgate, de forma que los jugadores de Java y los de Bedrock o consola comparten un mismo mundo.' },
       ],
     },
@@ -220,7 +226,7 @@ export const es: ContentTranslation = {
       popularFor: ['servidores con plugins Oxide/uMod', 'wipes con mods 2x/5x/10x', 'personalización de monumentos y mapas'],
       setups: ['Límite de 25, con mods', 'Límite de 50, vanilla o con pocos mods', 'Límite de 100+, con plugins de Oxide'],
       faqs: [
-        { q: '¿Aguantará mi servidor un wipe a plena población?', a: 'La generación del mapa y el pico de conexiones del día del wipe dependen del almacenamiento y de la CPU, y todos los planes funcionan con almacenamiento NVMe y un AMD Ryzen 9 3900X. Elige la RAM según el límite de jugadores y deja algo de margen para el día del wipe.' },
+        { q: '¿Aguantará mi servidor un wipe a plena población?', a: 'La generación del mapa y el pico de conexiones del día del wipe dependen del almacenamiento y de la CPU, así que para un servidor lleno elige Premium, con almacenamiento NVMe y un AMD Ryzen 9 3900X. Elige la RAM según el límite de jugadores y deja algo de margen para el día del wipe.' },
         { q: '¿Se admite Oxide/uMod?', a: 'Sí, se instala igual que en cualquier servidor de Rust; la máquina es tuya para configurarla.' },
       ],
     },
@@ -269,7 +275,7 @@ export const es: ContentTranslation = {
       description: 'Un juego de supervivencia con voxels en el que la amenaza real es la noche de horda programada, no los zombis que deambulan. La generación del mundo exige CPU y almacenamiento en el primer arranque, así que el NVMe recorta bastante esa espera.',
       popularFor: ['servidores PvE de noches de horda', 'packs de mods que rehacen el juego'],
       setups: ['4-8 jugadores', '8-16 jugadores, con mods'],
-      faqs: [{ q: '¿Tarda mucho la generación del mundo?', a: 'La generación del primer arranque es el momento más exigente de este juego; el almacenamiento NVMe, que tienen todos los planes, la acorta de forma notable frente al almacenamiento SATA.' }],
+      faqs: [{ q: '¿Tarda mucho la generación del mundo?', a: 'La generación del primer arranque es el momento más exigente de este juego; el almacenamiento NVMe de los planes Premium la acorta de forma notable frente al almacenamiento SATA.' }],
     },
     'project-zomboid': {
       tagline: 'Supervivencia zombi isométrica, dura a propósito.',
@@ -420,10 +426,10 @@ export const es: ContentTranslation = {
     },
     factorio: {
       tagline: 'Automatización y construcción de fábricas, famoso por depender de la CPU.',
-      description: 'Un juego de automatización de fábricas cuyas bases avanzadas son conocidas por exigir mucha CPU según se multiplican cintas y máquinas, así que aquí la velocidad por núcleo importa más que en la mayoría de juegos. Todos los planes funcionan con un AMD Ryzen 9 3900X.',
+      description: 'Un juego de automatización de fábricas cuyas bases avanzadas son conocidas por exigir mucha CPU según se multiplican cintas y máquinas, así que aquí la velocidad por núcleo importa más que en la mayoría de juegos. Los planes Premium funcionan con un AMD Ryzen 9 3900X.',
       popularFor: ['servidores de automatización de larga duración'],
       setups: ['2-8 jugadores, principio de partida', 'fábricas grandes de partida avanzada'],
-      faqs: [{ q: '¿Por qué Factorio necesita núcleos rápidos más que RAM?', a: 'La simulación de Factorio es de un solo hilo y depende de la CPU según crece tu fábrica, así que la velocidad por núcleo mantiene estables los UPS durante más tiempo que simplemente añadir RAM. Todos los planes funcionan con el mismo AMD Ryzen 9 3900X.' }],
+      faqs: [{ q: '¿Por qué Factorio necesita núcleos rápidos más que RAM?', a: 'La simulación de Factorio es de un solo hilo y depende de la CPU según crece tu fábrica, así que la velocidad por núcleo mantiene estables los UPS durante más tiempo que simplemente añadir RAM. Para una fábrica grande, elige Premium (AMD Ryzen 9 3900X) en vez de los planes económicos, que funcionan con una CPU más antigua y más cargada.' }],
     },
     muck: {
       tagline: 'Supervivencia roguelike en cooperativo, rápida y caótica.',
