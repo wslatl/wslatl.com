@@ -109,6 +109,18 @@ export default function SubprocessorsContent() {
                 <td>Le texte d&rsquo;adresse partiel que vous saisissez dans un champ d&rsquo;adresse</td>
                 <td>Europe</td>
               </tr>
+              <tr>
+                <td className="font-medium text-foreground">Fournisseur d&rsquo;IA (actuellement MiniMax)</td>
+                <td>Aide par IA&nbsp;: Ask Ava, le chat d&rsquo;aide de l&rsquo;espace client, ainsi que l&rsquo;assistant et la rédaction de réponses aux tickets utilisés par notre équipe</td>
+                <td>Votre prénom, vos questions à Ask Ava et les informations de votre compte qu&rsquo;il consulte pour vous&nbsp;; les dossiers clients et les messages de tickets que notre équipe traite avec lui (voir la section 3.5)</td>
+                <td>Voir la section 3.5</td>
+              </tr>
+              <tr>
+                <td className="font-medium text-foreground">Telnyx</td>
+                <td>SMS contenant un code à usage unique qui confirme à qui appartient un compte, par exemple lors de sa récupération</td>
+                <td>Le numéro de téléphone de votre compte et le texte du message, qui contient le code</td>
+                <td>États-Unis</td>
+              </tr>
             </tbody>
           </table>
         </ScrollTable>
@@ -190,6 +202,58 @@ export default function SubprocessorsContent() {
             résoudre le problème.
           </p>
         </LegalSubSection>
+
+        <LegalSubSection title="3.5 Fournisseur d’IA">
+          <p>
+            Nos fonctionnalités d&rsquo;IA utilisent un seul fournisseur d&rsquo;IA, actuellement
+            MiniMax. Nous pouvons changer de fournisseur et, le cas échéant, nous mettrons cette
+            page à jour. Selon la fonctionnalité, le fournisseur reçoit&nbsp;:
+          </p>
+          <ul>
+            <li>
+              <strong>Ask Ava, le chat d&rsquo;aide de l&rsquo;espace client.</strong> Votre
+              prénom, les questions que vous posez et les informations de votre compte qu&rsquo;il
+              consulte pour y répondre, comme vos services, factures, tickets et crédit. Il ne
+              peut lire que ce que vous pourriez voir vous-même dans l&rsquo;espace client, et il
+              ne peut rien modifier.
+            </li>
+            <li>
+              <strong>L&rsquo;assistant de notre équipe dans notre panneau d&rsquo;administration.</strong>{' '}
+              Ce que notre équipe lui demande, y compris les captures d&rsquo;écran jointes, et les
+              dossiers qu&rsquo;il consulte pour elle, comme les noms des clients, les adresses
+              e-mail, les services, les factures et les tickets.
+            </li>
+            <li>
+              <strong>La rédaction de réponses aux tickets pour notre équipe.</strong>{' '}
+              L&rsquo;objet, le département, le statut et les messages du ticket, le prénom du
+              client et ses données de facturation&nbsp;: ses services avec leurs prix, cycles de
+              facturation, dates de renouvellement, éventuels changements prévus et l&rsquo;éventuel
+              avis de changement de prix que nous lui avons envoyé, ses factures récentes et son
+              solde de crédit. Lorsque notre équipe lui demande d&rsquo;améliorer son propre texte,
+              ce texte est envoyé tel quel, et lorsqu&rsquo;elle améliore une note interne, les
+              notes internes du ticket sont également incluses. Les adresses e-mail, numéros de
+              téléphone et adresses IP que nous pouvons reconnaître dans les messages du ticket
+              sont masqués au préalable.
+            </li>
+          </ul>
+          <p>
+            Nos consultations n&rsquo;envoient jamais au fournisseur votre mot de passe ni les
+            données de votre carte de paiement, mais tout ce que vous saisissez dans Ask Ava ou
+            dans un ticket peut lui parvenir&nbsp;; ne les y saisissez donc jamais. Avant
+            qu&rsquo;un message de ticket ne parvienne au fournisseur, nous masquons tout mot de
+            passe ou toute clé que nous pouvons y reconnaître. L&rsquo;IA ne répond jamais seule à
+            un ticket&nbsp;: un membre de notre équipe approuve chaque réponse qu&rsquo;elle rédige
+            avant son envoi.
+          </p>
+          <p>
+            Le fournisseur traite ces données pour produire chaque réponse, selon ses propres
+            conditions. Nous n&rsquo;avons pas encore confirmé où il traite les requêtes,
+            c&rsquo;est pourquoi aucune localisation n&rsquo;est indiquée ci-dessus. Si vous avez
+            besoin de cette information pour votre propre évaluation de fournisseurs,
+            contactez-nous à <Email name="support" />{' '}
+            et nous l&rsquo;examinerons avec vous.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="4" title="Transferts internationaux">
@@ -229,6 +293,12 @@ export default function SubprocessorsContent() {
             documentation de confidentialité du prestataire lui-même pour le détail.
           </li>
         </ul>
+        <p>
+          Cela ne couvre pas encore notre fournisseur d&rsquo;IA. Nous n&rsquo;avons pas confirmé
+          où il traite les requêtes ni quel mécanisme de transfert s&rsquo;applique à lui&nbsp;;
+          les données qu&rsquo;il reçoit peuvent donc être traitées dans un autre pays que les
+          États-Unis. Voir la section 3.5.
+        </p>
 
         {/*
           OWNER DECISION NEEDED: EEA/UK compliance posture.

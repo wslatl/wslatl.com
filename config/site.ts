@@ -52,7 +52,7 @@ export const siteConfig = {
      * actually takes effect.
      */
     effectiveDates: {
-      privacy:        '2026-09-19',
+      privacy:        '2026-10-12',
       terms:          '2026-09-19',
       acceptableUse:  '2026-09-19',
       abuse:          '2026-09-19',
@@ -60,7 +60,7 @@ export const siteConfig = {
       sla:            '2026-09-19',
       dmca:           '2026-09-19',
       accountCredit:  '2026-09-19',
-      subprocessors:  '2026-09-19',
+      subprocessors:  '2026-10-12',
       backups:        '2026-09-19',
     },
   },

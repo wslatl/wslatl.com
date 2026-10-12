@@ -108,6 +108,18 @@ export default function SubprocessorsContent() {
                 <td>Der Teiltext der Adresse, den Sie in ein Adressfeld eingeben</td>
                 <td>Europa</td>
               </tr>
+              <tr>
+                <td className="font-medium text-foreground">KI-Anbieter (derzeit MiniMax)</td>
+                <td>KI-Hilfe: Ask Ava, der Hilfe-Chat im Kundenbereich, sowie der Assistent und die Entwürfe für Ticketantworten, die unsere Mitarbeiter nutzen</td>
+                <td>Ihr Vorname, Ihre Fragen an Ask Ava und die Kontodaten, die der Chat für Sie nachschlägt; Kundendatensätze und Ticketnachrichten, die unsere Mitarbeiter damit bearbeiten (siehe Abschnitt 3.5)</td>
+                <td>Siehe Abschnitt 3.5</td>
+              </tr>
+              <tr>
+                <td className="font-medium text-foreground">Telnyx</td>
+                <td>SMS mit einem Einmalcode, der bestätigt, wem ein Konto gehört, etwa bei der Kontowiederherstellung</td>
+                <td>Die Telefonnummer in Ihrem Konto und der Nachrichtentext, der den Code enthält</td>
+                <td>Vereinigte Staaten</td>
+              </tr>
             </tbody>
           </table>
         </ScrollTable>
@@ -186,6 +198,56 @@ export default function SubprocessorsContent() {
             auf das beschränkt, was zur Lösung des Problems nötig ist.
           </p>
         </LegalSubSection>
+
+        <LegalSubSection title="3.5 KI-Anbieter">
+          <p>
+            Unsere KI-Funktionen nutzen einen KI-Anbieter, derzeit MiniMax. Wir können den
+            Anbieter wechseln; in diesem Fall aktualisieren wir diese Seite. Je nach Funktion
+            erhält der Anbieter:
+          </p>
+          <ul>
+            <li>
+              <strong>Ask Ava, der Hilfe-Chat im Kundenbereich.</strong> Ihren Vornamen, Ihre
+              Fragen und die Angaben zu Ihrem Konto, die der Chat nachschlägt, um sie zu
+              beantworten, etwa Ihre Services, Rechnungen, Tickets und Ihr Guthaben. Er kann nur
+              lesen, was Sie im Kundenbereich auch selbst sehen könnten, und kann nichts ändern.
+            </li>
+            <li>
+              <strong>Der Assistent für Mitarbeiter in unserem Admin-Panel.</strong> Was unsere
+              Mitarbeiter ihn fragen, einschließlich angehängter Screenshots, und die Datensätze,
+              die er für sie nachschlägt, etwa Kundennamen, E-Mail-Adressen, Services, Rechnungen
+              und Tickets.
+            </li>
+            <li>
+              <strong>Entwürfe für Ticketantworten.</strong> Betreff, Abteilung, Status und
+              Nachrichten des Tickets, den Vornamen des Kunden und seine Abrechnungsdaten: seine
+              Services mit Preisen, Abrechnungszeiträumen, Verlängerungsterminen, geplanten
+              Änderungen und etwaigen Mitteilungen über Preisänderungen, die wir ihm gesendet
+              haben, seine letzten Rechnungen und sein Guthaben. Wenn Mitarbeiter ihren eigenen
+              Text verbessern lassen, wird dieser Text unverändert gesendet, und wenn sie eine
+              interne Notiz verbessern lassen, sind auch die internen Notizen des Tickets
+              enthalten. E-Mail-Adressen, Telefonnummern und IP-Adressen in den Ticketnachrichten,
+              die wir erkennen können, werden vorher unkenntlich gemacht.
+            </li>
+          </ul>
+          <p>
+            Bei unseren Abfragen senden wir dem Anbieter nie Ihr Passwort oder Ihre
+            Zahlungskartendaten, aber alles, was Sie in Ask Ava oder in ein Ticket eingeben, kann
+            ihn erreichen; bitte geben Sie diese Daten dort daher nie ein. Bevor eine
+            Ticketnachricht an den Anbieter geht, schwärzen wir darin jedes Passwort und jeden
+            Schlüssel, den wir erkennen können. Die KI beantwortet nie selbstständig ein Ticket:
+            Ein Mitglied unseres Teams gibt jede Antwort, die sie schreibt, frei, bevor sie
+            gesendet wird.
+          </p>
+          <p>
+            Der Anbieter verarbeitet diese Daten nach seinen eigenen Bedingungen, um jede Antwort
+            zu erstellen. Wo er Anfragen verarbeitet, haben wir noch nicht bestätigt, daher ist
+            oben kein Standort angegeben. Wenn Sie diese Information für Ihre eigene
+            Lieferantenprüfung benötigen, wenden Sie sich an uns unter{' '}
+            <Email name="support" />,
+            und wir klären das gemeinsam mit Ihnen.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="4" title="Internationale Übermittlungen">
@@ -225,6 +287,12 @@ export default function SubprocessorsContent() {
             Datenschutzdokumentation des Anbieters heranziehen.
           </li>
         </ul>
+        <p>
+          Für unseren KI-Anbieter gilt dies noch nicht. Wo er Anfragen verarbeitet und welcher
+          Übermittlungsmechanismus für ihn gilt, haben wir noch nicht bestätigt; Daten, die er
+          erhält, können daher in einem anderen Land als den Vereinigten Staaten verarbeitet
+          werden. Siehe Abschnitt 3.5.
+        </p>
 
         {/*
           OWNER DECISION NEEDED: EEA/UK compliance posture.

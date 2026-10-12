@@ -133,6 +133,10 @@ export default function PrivacyContent() {
             <li>Comunicações no Discord (mensagens no nosso servidor ou DMs com a nossa equipe)</li>
             <li>Correspondência por e-mail</li>
             <li>Arquivos, capturas de tela ou logs que você compartilha ao buscar suporte</li>
+            <li>
+              As suas conversas com o Ask Ava, o chat de ajuda da área do cliente, incluindo a
+              cópia anexada a um ticket quando você pede para falar com uma pessoa
+            </li>
           </ul>
         </LegalSubSection>
 
@@ -177,8 +181,9 @@ export default function PrivacyContent() {
         <LegalSubSection title="4.1 Prestadores de Serviço">
           <p>
             Trabalhamos com fornecedores terceirizados que nos ajudam a entregar os nossos serviços.
-            Esses fornecedores recebem apenas os dados necessários para desempenhar a sua função e
-            são contratualmente obrigados a proteger esses dados. Isso inclui:
+            Esses fornecedores recebem apenas os dados necessários para desempenhar a sua função e,
+            exceto o provedor de IA descrito abaixo, são contratualmente obrigados a proteger esses
+            dados. Isso inclui:
           </p>
           <ul>
             <li>Processadores de pagamento (para lidar com as transações de faturamento)</li>
@@ -187,6 +192,8 @@ export default function PrivacyContent() {
             <li>Entrega de e-mail para mensagens transacionais como faturas e avisos de conta</li>
             <li>Preenchimento automático de endereço e geocodificação para os formulários de endereço</li>
             <li>Serviços de monitoramento de status (por exemplo, status.wslatl.com)</li>
+            <li>Um provedor de IA para o nosso chat de ajuda e as ferramentas de suporte usadas pela nossa equipe</li>
+            <li>Envio de mensagens de texto com códigos de verificação de identidade de uso único</li>
           </ul>
           <p>
             Publicamos os fornecedores individualmente, não apenas estas categorias. Cada
@@ -194,6 +201,26 @@ export default function PrivacyContent() {
             <Link href={siteConfig.paths.subprocessors}>Subprocessadores</Link>,
             junto com para que ele é usado, quais categorias de dados recebe e onde está
             localizado. Essa página é mantida atualizada conforme a nossa infraestrutura muda.
+          </p>
+          <p>
+            Usamos um provedor de IA, atualmente MiniMax, para o Ask Ava, o chat de ajuda da área
+            do cliente, e para as ferramentas com que a nossa equipe consulta registros e redige
+            respostas a tickets. Ele recebe o que cada resposta exige, como as suas perguntas, as
+            suas mensagens de ticket e os dados de conta e de faturamento consultados para você.
+            Ele os trata para produzir a resposta conforme os termos do próprio provedor; ainda
+            não confirmamos o que esses termos exigem dele nem onde ele processa as solicitações
+            (veja a Seção 4.5). As respostas do Ask Ava são escritas pela IA, não por uma
+            pessoa, e você pode desativar o Ask Ava no seu perfil, em
+            &ldquo;Data and privacy&rdquo;. A IA nunca responde a um ticket por conta própria: um
+            membro da nossa equipe aprova cada resposta que ela escreve antes de ser enviada. As
+            nossas consultas nunca enviam ao provedor de IA a sua senha nem os dados do seu cartão
+            de pagamento, mas tudo o que você digitar no Ask Ava ou em um ticket pode chegar a
+            ele, por isso nunca os digite ali. Quando
+            precisamos confirmar quem é o titular de uma conta, por exemplo para recuperá-la ou
+            remover um bloqueio, podemos enviar por mensagem de texto, via Telnyx, um código de
+            uso único para o número de telefone da sua conta. A página de{' '}
+            <Link href={siteConfig.paths.subprocessors}>Subprocessadores</Link>{' '}
+            mostra o que cada um deles recebe.
           </p>
         </LegalSubSection>
 
@@ -240,6 +267,13 @@ export default function PrivacyContent() {
             apoiamo-nos no fato de a transferência ser necessária para executar o contrato que você
             nos pediu para executar e nas Standard Contractual Clauses da Comissão Europeia, junto
             com o UK International Data Transfer Addendum, quando um subprocessador as oferece.
+          </p>
+          <p>
+            Isso ainda não abrange o nosso provedor de IA. Não confirmamos onde ele processa as
+            solicitações nem qual mecanismo de transferência se aplica a ele, por isso os dados que
+            ele recebe podem ser processados em um país diferente dos Estados Unidos. Veja a Seção
+            3.5 da nossa página de{' '}
+            <Link href={siteConfig.paths.subprocessors}>Subprocessadores</Link>.
           </p>
           <p>
             Os mecanismos que se aplicam a cada destinatário, e mais detalhes sobre a nossa posição
