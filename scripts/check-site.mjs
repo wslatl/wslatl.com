@@ -28,6 +28,9 @@ function record(check, ok, detail = '') {
   results.push({ check, ok, detail })
 }
 
+// Compared as parsed URLs: a bare origin comes back with a trailing slash.
+const same = (a, b) => Boolean(a && b) && new URL(a, base).href === new URL(b).href
+
 async function get(path, redirect = 'manual') {
   const url = new URL(path, base)
   for (let attempt = 1; ; attempt++) {
@@ -153,8 +156,6 @@ async function checkRedirects() {
     record('Short links', true, 'not deployed here yet, so not checked')
     return
   }
-  // Compared as parsed URLs: a bare origin comes back with a trailing slash.
-  const same = (a, b) => Boolean(a && b) && new URL(a, base).href === new URL(b).href
   const wrong = answers
     .filter((a) => ![302, 307].includes(a.status) || !same(a.location, a.url))
     .map((a) => `${a.path} (${a.status}${a.location ? ` to ${a.location}` : ''})`)

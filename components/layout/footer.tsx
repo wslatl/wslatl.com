@@ -9,6 +9,10 @@ import { getLocale } from '@/i18n/locale'
 import { localePath } from '@/i18n/config'
 import { localizedLegalPages } from '@/i18n/content'
 
+// Every page is static, so this is the year the site was built. Read here
+// rather than while rendering, which keeps the render itself free of the clock.
+const copyrightYear = new Date().getFullYear()
+
 export function Footer() {
   const locale = getLocale()
   const t = copy()
@@ -54,7 +58,7 @@ export function Footer() {
 
       <div className="border-t">
         <div className="shell flex flex-col gap-2 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>{t.footer.rights(new Date().getFullYear(), siteConfig.legal.companyName)}</p>
+          <p>{t.footer.rights(copyrightYear, siteConfig.legal.companyName)}</p>
           <p>
             <SiteLink href={siteConfig.links.credits} className="transition-colors hover:text-foreground">
               {siteConfig.credits.label}

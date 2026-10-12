@@ -8,7 +8,7 @@ import { games } from '@/data/games'
 import { productLines } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
 import { en } from '@/i18n/copy/en'
-import { defaultLocale } from '@/i18n/config'
+import { defaultLocale, localePath, locales } from '@/i18n/config'
 import { isShortLink, shortLinks } from '@/config/links'
 import nextConfig from '../next.config.mjs'
 
@@ -171,5 +171,33 @@ describe('links', () => {
       .map((page) => ({ from: `/${legalSlug(page)}`, to: page.href }))
       .filter(({ from, to }) => !redirects.some((r) => r.source === from && r.destination === to && r.permanent))
     expect(missing).toEqual([])
+  })
+})
+
+// lychee.toml tells the weekly Broken links run what to skip. A pattern wide
+// enough to match our own pages would hide real breakage, so the only address
+// of ours it may skip is the short link to a profile that blocks link checkers.
+const ours = (path: string) => `${siteConfig.siteUrl}${path}`
+
+describe('link checker settings', () => {
+  const settings = readFileSync(join(root, 'lychee.toml'), 'utf8')
+  const excludes = [...settings.matchAll(/^\s*'([^'\n]+)',\s*$/gm)].map((match) => new RegExp(match[1]))
+
+  it('reads the exclusions it checks', () => {
+    expect(excludes.length).toBeGreaterThan(0)
+  })
+
+  it('skips no page of ours, in any language', () => {
+    const pages = [siteConfig.siteUrl, ...locales.flatMap((locale) => [...routes].map((route) => ours(localePath(locale, route))))]
+    expect(pages.filter((url) => excludes.some((exclude) => exclude.test(url)))).toEqual([])
+  })
+
+  it('skips only the Trustpilot short link among our short links', () => {
+    // That address redirects to a site that answers 403 to anything but a
+    // browser, and the checker judges a redirect by where it ends up.
+    const skipped = Object.entries(shortLinks)
+      .filter(([, link]) => excludes.some((exclude) => exclude.test(ours(link.path))))
+      .map(([name]) => name)
+    expect(skipped).toEqual(['trustpilot'])
   })
 })
