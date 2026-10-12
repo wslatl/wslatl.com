@@ -138,6 +138,11 @@ export default function PrivacyContent() {
             <li>Discord-Kommunikation (Nachrichten in unserem Server oder Direktnachrichten mit unserem Team)</li>
             <li>E-Mail-Korrespondenz</li>
             <li>Dateien, Screenshots oder Logs, die Sie bei einer Supportanfrage teilen</li>
+            <li>
+              Ihre Unterhaltungen mit Ask Ava, dem Hilfe-Chat im Kundenbereich, einschließlich der
+              Kopie, die einem Ticket beigefügt wird, wenn Sie darum bitten, mit einem Menschen zu
+              sprechen
+            </li>
           </ul>
         </LegalSubSection>
 
@@ -183,7 +188,8 @@ export default function PrivacyContent() {
           <p>
             Wir arbeiten mit Anbietern Dritter zusammen, die uns helfen, unsere Services zu
             erbringen. Diese Anbieter erhalten nur die Daten, die für ihre Funktion erforderlich
-            sind, und sind vertraglich verpflichtet, diese Daten zu schützen. Dazu gehören:
+            sind, und sind, mit Ausnahme des unten beschriebenen KI-Anbieters, vertraglich
+            verpflichtet, diese Daten zu schützen. Dazu gehören:
           </p>
           <ul>
             <li>Zahlungsdienstleister (zur Abwicklung von Abrechnungstransaktionen)</li>
@@ -192,6 +198,8 @@ export default function PrivacyContent() {
             <li>E-Mail-Zustellung für transaktionale Nachrichten wie Rechnungen und Kontomitteilungen</li>
             <li>Adressvervollständigung und Geocoding für Formulare zur Adresseingabe</li>
             <li>Dienste zur Statusüberwachung (z.&nbsp;B. status.wslatl.com)</li>
+            <li>Ein KI-Anbieter für unseren Hilfe-Chat und die Support-Werkzeuge unserer Mitarbeiter</li>
+            <li>SMS-Zustellung für Einmalcodes zur Identitätsprüfung</li>
           </ul>
           <p>
             Wir veröffentlichen die einzelnen Anbieter, nicht nur diese Kategorien. Jeder
@@ -200,6 +208,26 @@ export default function PrivacyContent() {
             namentlich genannt, zusammen damit, wofür er genutzt wird, welche Datenkategorien er
             erhält und wo er sich befindet. Diese Seite wird aktuell gehalten, wenn sich unsere
             Infrastruktur ändert.
+          </p>
+          <p>
+            Für Ask Ava, den Hilfe-Chat im Kundenbereich, und für Werkzeuge, mit denen unsere
+            Mitarbeiter Datensätze nachschlagen und Ticketantworten entwerfen, nutzen wir einen
+            KI-Anbieter, derzeit MiniMax. Er erhält, was die jeweilige Antwort braucht, etwa Ihre
+            Fragen, Ihre Ticketnachrichten und die für Sie nachgeschlagenen Konto- und
+            Abrechnungsdaten. Er verarbeitet sie nach seinen eigenen Bedingungen, um die Antwort
+            zu erstellen; was diese Bedingungen von ihm verlangen und wo er Anfragen verarbeitet,
+            haben wir noch nicht bestätigt (siehe Abschnitt 4.5). Die Antworten von Ask Ava
+            schreibt die KI, nicht ein Mensch, und Sie können Ask Ava in Ihrem Profil unter
+            &bdquo;Data and privacy&ldquo; ausschalten. Die KI beantwortet nie selbstständig ein
+            Ticket: Ein Mitglied unseres Teams gibt jede Antwort, die sie schreibt, frei, bevor
+            sie gesendet wird. Bei unseren Abfragen senden wir dem KI-Anbieter nie Ihr Passwort
+            oder Ihre Zahlungskartendaten, aber alles, was Sie in Ask Ava oder in ein Ticket
+            eingeben, kann ihn erreichen; bitte geben Sie diese Daten dort daher nie ein. Wenn
+            wir bestätigen müssen, wem ein Konto gehört, etwa um es wiederherzustellen
+            oder eine Sperre aufzuheben, können wir über Telnyx einen Einmalcode per SMS an die
+            Telefonnummer in Ihrem Konto senden. Auf der Seite{' '}
+            <Link href={siteConfig.paths.subprocessors}>Unterauftragsverarbeiter</Link>{' '}
+            steht, was jeder dieser Anbieter erhält.
           </p>
         </LegalSubSection>
 
@@ -250,6 +278,13 @@ export default function PrivacyContent() {
             verlangt haben, sowie auf die Standardvertragsklauseln der Europäischen Kommission
             zusammen mit dem UK International Data Transfer Addendum, wo ein
             Unterauftragsverarbeiter sie anbietet.
+          </p>
+          <p>
+            Für unseren KI-Anbieter gilt dies noch nicht. Wo er Anfragen verarbeitet und welcher
+            Übermittlungsmechanismus für ihn gilt, haben wir noch nicht bestätigt; Daten, die er
+            erhält, können daher in einem anderen Land als den Vereinigten Staaten verarbeitet
+            werden. Siehe Abschnitt 3.5 auf unserer Seite{' '}
+            <Link href={siteConfig.paths.subprocessors}>Unterauftragsverarbeiter</Link>.
           </p>
           <p>
             Die Mechanismen, die für den jeweiligen Empfänger gelten, und weitere Einzelheiten

@@ -130,6 +130,10 @@ export default function PrivacyContent() {
             <li>Discord communications (messages in our server or direct messages with our team)</li>
             <li>Email correspondence</li>
             <li>Files, screenshots, or logs you share when seeking support</li>
+            <li>
+              Your conversations with Ask Ava, the help chat in the client area, including the
+              copy added to a ticket when you ask to talk to a person
+            </li>
           </ul>
         </LegalSubSection>
 
@@ -174,8 +178,8 @@ export default function PrivacyContent() {
         <LegalSubSection title="4.1 Service Providers">
           <p>
             We work with third-party vendors that help us deliver our services. These providers receive
-            only the data necessary to perform their function and are contractually required to protect
-            that data. This includes:
+            only the data necessary to perform their function and, except for the AI provider
+            described below, are contractually required to protect that data. This includes:
           </p>
           <ul>
             <li>Payment processors (to handle billing transactions)</li>
@@ -184,6 +188,8 @@ export default function PrivacyContent() {
             <li>Email delivery for transactional messages such as invoices and account notices</li>
             <li>Address autocomplete and geocoding for address entry forms</li>
             <li>Status monitoring services (e.g., status.wslatl.com)</li>
+            <li>An AI provider for our help chat and the support tools our staff use</li>
+            <li>Text message delivery for one-time identity verification codes</li>
           </ul>
           <p>
             We publish the individual providers, not just these categories. Each subprocessor is
@@ -191,6 +197,23 @@ export default function PrivacyContent() {
             <Link href={siteConfig.paths.subprocessors}>Subprocessors</Link>{' '}
             page, together with what it is used for, what data categories it receives, and where
             it is located. That page is kept current as our infrastructure changes.
+          </p>
+          <p>
+            We use an AI provider, currently MiniMax, for Ask Ava, the help chat in the client
+            area, and for tools our staff use to look up records and draft ticket replies. It
+            receives what each answer needs, such as your questions, your ticket messages, and the
+            account and billing details looked up for you. It processes them to produce the answer
+            under its own terms; we have not yet confirmed what those terms require of it or where
+            it processes requests (see Section 4.5). Ask Ava&rsquo;s answers are written by the
+            AI, not by a person, and you can turn Ask Ava off in your profile under Data and
+            privacy. The AI never answers a ticket by itself: a member of our team approves every
+            reply it writes before it is sent. Our look-ups never send the AI provider your
+            password or payment card details, but anything you type into Ask Ava or a ticket can
+            reach it, so please never type them there. When we need to confirm who owns an
+            account, for example to recover it or lift a freeze, we can text a one-time code to
+            the phone number on your account through Telnyx. The{' '}
+            <Link href={siteConfig.paths.subprocessors}>Subprocessors</Link>{' '}
+            page lists what each of them receives.
           </p>
         </LegalSubSection>
 
@@ -236,6 +259,13 @@ export default function PrivacyContent() {
             transfer being necessary to perform the contract you have asked us to perform, and on
             the European Commission&rsquo;s Standard Contractual Clauses together with the UK
             International Data Transfer Addendum where a subprocessor offers them.
+          </p>
+          <p>
+            This does not cover our AI provider yet. We have not confirmed where it processes
+            requests or which transfer mechanism applies to it, so data it receives may be
+            processed in a country other than the United States. See Section 3.5 of our{' '}
+            <Link href={siteConfig.paths.subprocessors}>Subprocessors</Link>{' '}
+            page.
           </p>
           <p>
             The mechanisms that apply to each recipient, and further detail on our transfer

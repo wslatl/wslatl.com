@@ -106,6 +106,18 @@ export default function SubprocessorsContent() {
                 <td>The partial address text you type into an address field</td>
                 <td>Europe</td>
               </tr>
+              <tr>
+                <td className="font-medium text-foreground">AI provider (currently MiniMax)</td>
+                <td>AI help: Ask Ava, the help chat in the client area, and the assistant and ticket reply drafting our staff use</td>
+                <td>Your first name, your questions to Ask Ava and the account details it looks up for you; client records and ticket messages our staff work on with it (see Section 3.5)</td>
+                <td>See Section 3.5</td>
+              </tr>
+              <tr>
+                <td className="font-medium text-foreground">Telnyx</td>
+                <td>Text messages with a one-time code that confirms who owns an account, for example during account recovery</td>
+                <td>The phone number on your account and the message text, which contains the code</td>
+                <td>United States</td>
+              </tr>
             </tbody>
           </table>
         </ScrollTable>
@@ -179,6 +191,59 @@ export default function SubprocessorsContent() {
             that happens, the access is limited to what is needed to resolve the issue.
           </p>
         </LegalSubSection>
+
+        {/*
+          The AI provider's processing location is not stated on purpose. Its published
+          policies could not be read to confirm where API requests are processed, so no
+          country is claimed. Once the region and the contracting entity are confirmed (from
+          the base URL saved under Integrations > AI assistant in the billing panel, and from
+          the provider account), fill in the Location cell and this note, and replace the
+          AI provider paragraph in Section 4 here and in Privacy Policy Section 4.5.
+        */}
+        <LegalSubSection title="3.5 AI Provider">
+          <p>
+            Our AI features use one AI provider, currently MiniMax. We can change the provider,
+            and if we do, we will update this page. Depending on the feature, the provider
+            receives:
+          </p>
+          <ul>
+            <li>
+              <strong>Ask Ava, the help chat in the client area.</strong> Your first name, the
+              questions you ask, and the details of your account that it looks up to answer
+              them, such as your services, invoices, tickets, and credit. It can only read what
+              you could see in the client area yourself, and it cannot change anything.
+            </li>
+            <li>
+              <strong>The staff assistant in our admin panel.</strong> What our staff ask it,
+              including any screenshots they attach, and the records it looks up for them, such
+              as client names, email addresses, services, invoices, and tickets.
+            </li>
+            <li>
+              <strong>Ticket reply drafting for staff.</strong> The ticket&rsquo;s subject,
+              department, status, and messages, the client&rsquo;s first name, and the
+              client&rsquo;s billing details: their services with prices, billing cycles,
+              renewal dates, any scheduled changes, and any price change notice we sent, their
+              recent invoices, and their account credit balance. When staff ask it to improve
+              their own text, that text is sent as written, and when they improve an internal
+              note, the ticket&rsquo;s internal notes are included too. Email addresses, phone
+              numbers, and IP addresses we can recognize in the ticket messages are masked first.
+            </li>
+          </ul>
+          <p>
+            Our look-ups never send the provider your password or payment card details, but
+            anything you type into Ask Ava or a ticket can reach it, so please never type them
+            there. Before a ticket message reaches the provider, we blank out any password or key
+            in it that we can recognize. The AI never answers a ticket by itself: a member of our
+            team approves every reply it writes before it is sent.
+          </p>
+          <p>
+            The provider processes this data to produce each answer, under its own terms. We
+            have not yet confirmed where it processes requests, so no location is listed above.
+            If you need this for your own vendor review, contact us at{' '}
+            <Email name="support" />{' '}
+            and we will work through it with you.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="4" title="International Transfers">
@@ -215,6 +280,11 @@ export default function SubprocessorsContent() {
             and you should consult the provider&rsquo;s own privacy documentation for detail.
           </li>
         </ul>
+        <p>
+          This does not cover our AI provider yet. We have not confirmed where it processes
+          requests or which transfer mechanism applies to it, so data it receives may be
+          processed in a country other than the United States. See Section 3.5.
+        </p>
 
         {/*
           OWNER DECISION NEEDED: EEA/UK compliance posture.

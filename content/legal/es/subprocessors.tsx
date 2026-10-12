@@ -106,6 +106,18 @@ export default function SubprocessorsContent() {
                 <td>El texto parcial de la dirección que escribes en un campo de dirección</td>
                 <td>Europa</td>
               </tr>
+              <tr>
+                <td className="font-medium text-foreground">Proveedor de IA (actualmente MiniMax)</td>
+                <td>Ayuda con IA: Ask Ava, el chat de ayuda del área de clientes, y el asistente y la redacción de respuestas a tickets que usa nuestro personal</td>
+                <td>Tu nombre de pila, tus preguntas a Ask Ava y los datos de tu cuenta que consulta para ti; registros de clientes y mensajes de tickets con los que trabaja nuestro personal (véase la Sección 3.5)</td>
+                <td>Véase la Sección 3.5</td>
+              </tr>
+              <tr>
+                <td className="font-medium text-foreground">Telnyx</td>
+                <td>Mensajes de texto con un código de un solo uso que confirma quién es el titular de una cuenta, por ejemplo al recuperarla</td>
+                <td>El número de teléfono de tu cuenta y el texto del mensaje, que contiene el código</td>
+                <td>Estados Unidos</td>
+              </tr>
             </tbody>
           </table>
         </ScrollTable>
@@ -184,6 +196,55 @@ export default function SubprocessorsContent() {
             resolver el problema.
           </p>
         </LegalSubSection>
+
+        <LegalSubSection title="3.5 Proveedor de IA">
+          <p>
+            Nuestras funciones de IA usan un único proveedor de IA, actualmente MiniMax. Podemos
+            cambiar de proveedor y, si lo hacemos, actualizaremos esta página. Según la función,
+            el proveedor recibe:
+          </p>
+          <ul>
+            <li>
+              <strong>Ask Ava, el chat de ayuda del área de clientes.</strong> Tu nombre de pila,
+              las preguntas que haces y los datos de tu cuenta que consulta para responderlas,
+              como tus servicios, facturas, tickets y crédito. Solo puede leer lo que tú mismo
+              podrías ver en el área de clientes y no puede cambiar nada.
+            </li>
+            <li>
+              <strong>El asistente del personal en nuestro panel de administración.</strong> Lo
+              que nuestro personal le pregunta, incluidas las capturas de pantalla que adjunte, y
+              los registros que consulta para ellos, como nombres de clientes, direcciones de
+              correo electrónico, servicios, facturas y tickets.
+            </li>
+            <li>
+              <strong>La redacción de respuestas a tickets para el personal.</strong> El asunto,
+              el departamento, el estado y los mensajes del ticket, el nombre de pila del cliente
+              y sus datos de facturación: sus servicios con precios, ciclos de facturación, fechas
+              de renovación, cualquier cambio programado y cualquier aviso de cambio de precio que
+              le hayamos enviado, sus facturas recientes y su saldo de crédito. Cuando el personal
+              le pide mejorar su propio texto, ese texto se envía tal cual, y cuando mejora una
+              nota interna, también se incluyen las notas internas del ticket. Las direcciones de
+              correo electrónico, los números de teléfono y las direcciones IP que podamos
+              reconocer en los mensajes del ticket se ocultan antes.
+            </li>
+          </ul>
+          <p>
+            Nuestras consultas nunca envían al proveedor tu contraseña ni los datos de tu tarjeta
+            de pago, pero todo lo que escribas en Ask Ava o en un ticket puede llegarle, así que
+            nunca los escribas ahí. Antes de que un mensaje de un ticket llegue al proveedor,
+            ocultamos cualquier contraseña o clave que podamos reconocer en él. La IA nunca
+            responde a un ticket por su cuenta: un miembro de nuestro equipo aprueba cada
+            respuesta que escribe antes de que se envíe.
+          </p>
+          <p>
+            El proveedor trata estos datos para producir cada respuesta, conforme a sus propias
+            condiciones. Aún no hemos confirmado dónde procesa las solicitudes, por lo que arriba
+            no figura ninguna ubicación. Si necesitas esta información para tu propia revisión de
+            proveedores, escríbenos a{' '}
+            <Email name="support" />{' '}
+            y lo veremos contigo.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="4" title="Transferencias internacionales">
@@ -220,6 +281,11 @@ export default function SubprocessorsContent() {
             propio proveedor.
           </li>
         </ul>
+        <p>
+          Esto aún no cubre a nuestro proveedor de IA. No hemos confirmado dónde procesa las
+          solicitudes ni qué mecanismo de transferencia se le aplica, por lo que los datos que
+          recibe pueden tratarse en un país distinto de Estados Unidos. Véase la Sección 3.5.
+        </p>
 
         {/*
           OWNER DECISION NEEDED: EEA/UK compliance posture.

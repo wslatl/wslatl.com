@@ -138,6 +138,10 @@ export default function PrivacyContent() {
             <li>Des communications Discord (messages sur notre serveur ou messages privés avec notre équipe)</li>
             <li>De la correspondance par e-mail</li>
             <li>Des fichiers, captures d&rsquo;écran ou logs que vous partagez lorsque vous demandez de l&rsquo;aide</li>
+            <li>
+              De vos conversations avec Ask Ava, le chat d&rsquo;aide de l&rsquo;espace client, y
+              compris la copie ajoutée à un ticket lorsque vous demandez à parler à une personne
+            </li>
           </ul>
         </LegalSubSection>
 
@@ -182,8 +186,8 @@ export default function PrivacyContent() {
         <LegalSubSection title="4.1 Prestataires de services">
           <p>
             Nous travaillons avec des fournisseurs tiers qui nous aident à fournir nos services. Ces prestataires ne reçoivent
-            que les données nécessaires à l&rsquo;exercice de leur fonction et sont contractuellement tenus de protéger
-            ces données. Cela comprend&nbsp;:
+            que les données nécessaires à l&rsquo;exercice de leur fonction et, à l&rsquo;exception du fournisseur
+            d&rsquo;IA décrit ci-dessous, sont contractuellement tenus de protéger ces données. Cela comprend&nbsp;:
           </p>
           <ul>
             <li>Les prestataires de paiement (pour traiter les transactions de facturation)</li>
@@ -192,6 +196,8 @@ export default function PrivacyContent() {
             <li>L&rsquo;acheminement des e-mails pour les messages transactionnels tels que les factures et les avis de compte</li>
             <li>La saisie automatique d&rsquo;adresse et le géocodage pour les formulaires de saisie d&rsquo;adresse</li>
             <li>Les services de supervision d&rsquo;état (par exemple status.wslatl.com)</li>
+            <li>Un fournisseur d&rsquo;IA pour notre chat d&rsquo;aide et les outils de support utilisés par notre équipe</li>
+            <li>L&rsquo;envoi de SMS pour les codes de vérification d&rsquo;identité à usage unique</li>
           </ul>
           <p>
             Nous publions les prestataires individuellement, et pas seulement ces catégories.
@@ -199,6 +205,27 @@ export default function PrivacyContent() {
             <Link href={siteConfig.paths.subprocessors}>Sous-traitants</Link>,
             avec l&rsquo;usage qui en est fait, les catégories de données qu&rsquo;il reçoit et sa
             localisation. Cette page est tenue à jour à mesure que notre infrastructure évolue.
+          </p>
+          <p>
+            Nous utilisons un fournisseur d&rsquo;IA, actuellement MiniMax, pour Ask Ava, le chat
+            d&rsquo;aide de l&rsquo;espace client, et pour les outils avec lesquels notre équipe
+            consulte des dossiers et rédige des réponses aux tickets. Il reçoit ce dont chaque
+            réponse a besoin, comme vos questions, vos messages de ticket et les informations de
+            compte et de facturation consultées pour vous. Il les traite pour produire la réponse
+            selon ses propres conditions&nbsp;; nous n&rsquo;avons pas encore confirmé ce que ces
+            conditions lui imposent ni où il traite les requêtes (voir la section 4.5). Les
+            réponses d&rsquo;Ask Ava sont rédigées par l&rsquo;IA, pas par une personne, et vous
+            pouvez désactiver Ask Ava dans votre profil, sous
+            &laquo;&nbsp;Data and privacy&nbsp;&raquo;. L&rsquo;IA ne répond jamais seule à un
+            ticket&nbsp;: un membre de notre équipe approuve chaque réponse qu&rsquo;elle rédige
+            avant son envoi. Nos consultations n&rsquo;envoient jamais au fournisseur d&rsquo;IA
+            votre mot de passe ni les données de votre carte de paiement, mais tout ce que vous
+            saisissez dans Ask Ava ou dans un ticket peut lui parvenir&nbsp;; ne les y saisissez
+            donc jamais. Lorsque nous devons confirmer à qui appartient un compte, par
+            exemple pour le récupérer ou lever un blocage, nous pouvons envoyer par SMS, via
+            Telnyx, un code à usage unique au numéro de téléphone de votre compte. La page{' '}
+            <Link href={siteConfig.paths.subprocessors}>Sous-traitants</Link>{' '}
+            indique ce que chacun d&rsquo;eux reçoit.
           </p>
         </LegalSubSection>
 
@@ -247,6 +274,13 @@ export default function PrivacyContent() {
             l&rsquo;exécution, ainsi que sur les clauses contractuelles types de la Commission
             européenne conjuguées à l&rsquo;UK International Data Transfer Addendum lorsqu&rsquo;un
             sous-traitant ultérieur les propose.
+          </p>
+          <p>
+            Cela ne couvre pas encore notre fournisseur d&rsquo;IA. Nous n&rsquo;avons pas confirmé
+            où il traite les requêtes ni quel mécanisme de transfert s&rsquo;applique à lui&nbsp;;
+            les données qu&rsquo;il reçoit peuvent donc être traitées dans un autre pays que les
+            États-Unis. Voir la section 3.5 de notre page{' '}
+            <Link href={siteConfig.paths.subprocessors}>Sous-traitants</Link>.
           </p>
           <p>
             Les mécanismes applicables à chaque destinataire, ainsi que des précisions sur notre
