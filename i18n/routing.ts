@@ -7,8 +7,9 @@ import { defaultLocale, locales } from '@/i18n/config'
  * rather than the framework rejecting an unknown first segment and serving
  * its own bare 404 page.
  *
- * tests/routing.test.ts keeps this in step with public/, so adding a file
- * there and forgetting it here fails the tests rather than the site.
+ * tests/routing.test.ts keeps this in step with public/ and with the
+ * app/<name>.<ext>/route.ts handlers, so adding a file there and forgetting
+ * it here fails the tests rather than the site.
  */
 export const rootFiles: readonly string[] = [
   // public/
@@ -17,10 +18,12 @@ export const rootFiles: readonly string[] = [
   '/favicon.svg',
   '/logo.png',
   '/og-image.png',
-  // Generated from app/: robots.ts, sitemap.ts and apple-icon.png.
+  // Generated from app/: robots.ts, sitemap.ts, apple-icon.png and the
+  // company.json route (the company profile for the billing panel).
   '/robots.txt',
   '/sitemap.xml',
   '/apple-icon.png',
+  '/company.json',
 ]
 
 /** Directories under public/, served exactly as they are. */
