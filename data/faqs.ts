@@ -32,7 +32,7 @@ export const faqs: Faq[] = [
     // {tokens} are filled from data/pricing.ts when the answer is rendered
     // (fillPrices in lib/pricing.ts), in every language.
     answer:
-      'Budget game servers start at {gamePrice} a month for {gameRam} GB of RAM on SATA SSD, and premium NVMe plans start at {gamePremiumPrice} a month. VPS plans start at {vpsPrice}. The pricing page has the full breakdown.',
+      'Budget game servers start at {gamePrice} a month for {gameRam} GB of RAM, and Premium game servers at {gamePremiumPrice}. Budget VPS plans start at {vpsPrice}, and Premium VPS plans at {vpsPremiumPrice}. Premium runs on an AMD Ryzen 9 3900X with NVMe. Budget has the same specs on an older, busier Intel Core i7-6700K with SATA SSD, so it can be slower at busy times. The pricing page has the full breakdown.',
   },
   {
     id: 'response-time',

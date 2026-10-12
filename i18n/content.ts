@@ -8,7 +8,13 @@ import { team as englishTeam, type TeamMember } from '@/data/team'
 import { reviewsSection as englishReviews } from '@/data/reviews'
 import { uptimeTargets as englishUptime, type UptimeTarget } from '@/data/sla'
 import { games as englishGames, gameCategories as englishCategories, type GameEntry } from '@/data/games'
-import { productLines as englishLines, type ProductLine } from '@/data/pricing'
+import {
+  comparisons as englishComparisons,
+  productLines as englishLines,
+  type Comparison,
+  type ComparisonId,
+  type ProductLine,
+} from '@/data/pricing'
 import { legalPages as englishLegal, type LegalPage } from '@/data/legal'
 import { fillPrices } from '@/lib/pricing'
 import { es } from '@/i18n/content/es'
@@ -102,6 +108,11 @@ export function localizedProductLine(id: ProductLine['id']): ProductLine {
   const line = localizedProductLines().find((entry) => entry.id === id)
   if (!line) throw new Error(`No product line ${id}`)
   return line
+}
+
+/** One price comparison in the language of the page, falling back to the English wording. */
+export function localizedComparison(id: ComparisonId): Comparison {
+  return current()?.pricing?.comparisons?.[id] ?? englishComparisons[id]
 }
 
 export function localizedGames(): GameEntry[] {

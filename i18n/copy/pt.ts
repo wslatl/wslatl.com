@@ -201,8 +201,8 @@ export const pt: Copy = {
     },
     from: 'a partir de',
     perMonth: '/mês',
-    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string }) =>
-      `${n.plans} planos. De ${n.ramMin} a ${n.ramMax} GB de RAM, de ${n.cpuMin} a ${n.cpuMax} ${n.cpuUnit}, SATA SSD ou NVMe.`,
+    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string; storage: string[] }) =>
+      `${n.plans} planos. De ${n.ramMin} a ${n.ramMax} GB de RAM, de ${n.cpuMin} a ${n.cpuMax} ${n.cpuUnit}, ${n.storage.join(' ou ')}.`,
     seePlans: (line: string) => `Ver planos: ${line}`,
     planTypes: 'Tipos de plano',
     included: 'Incluído em todo plano',
@@ -271,6 +271,12 @@ export const pt: Copy = {
       questions: (game: string) => `Dúvidas sobre hospedagem de ${game}`,
       moreIn: (category: string) => `Mais jogos de ${category}`,
       allGames: 'Todos os jogos',
+      plansHeading: 'Planos de servidores de jogos',
+      plansIntro:
+        'Os mesmos planos rodam todos os jogos que hospedamos. O Premium roda em um AMD Ryzen 9 3900X com armazenamento NVMe, e o Budget em um Intel Core i7-6700K mais antigo com SATA SSD.',
+      atAGlance: (game: string) => `Hospedagem de ${game} em resumo`,
+      hosting: (game: string) => `Hospedagem de ${game}`,
+      budgetNote: 'Os planos Budget rodam em uma CPU mais antiga e mais ocupada, então podem ficar mais lentos nos horários de pico.',
     },
   },
   legal: {

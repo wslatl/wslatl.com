@@ -201,8 +201,8 @@ export const fr: Copy = {
     },
     from: "à partir de",
     perMonth: "/mois",
-    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string }) =>
-      `${n.plans} offres. De ${n.ramMin} à ${n.ramMax} GB de RAM, de ${n.cpuMin} à ${n.cpuMax} ${n.cpuUnit}, SATA SSD ou NVMe.`,
+    lineSummary: (n: { plans: number; ramMin: number; ramMax: number; cpuMin: number; cpuMax: number; cpuUnit: string; storage: string[] }) =>
+      `${n.plans} offres. De ${n.ramMin} à ${n.ramMax} GB de RAM, de ${n.cpuMin} à ${n.cpuMax} ${n.cpuUnit}, ${n.storage.join(' ou ')}.`,
     seePlans: (line: string) => `Voir les offres ${line}`,
     planTypes: "Types d'offres",
     included: "Inclus avec chaque offre",
@@ -271,6 +271,12 @@ export const fr: Copy = {
       questions: (game: string) => `Questions sur l'hébergement ${game}`,
       moreIn: (category: string) => `Plus de jeux dans ${category}`,
       allGames: "Tous les jeux",
+      plansHeading: "Offres de serveurs de jeu",
+      plansIntro:
+        "Les mêmes offres font tourner tous les jeux que nous hébergeons. Premium tourne sur un AMD Ryzen 9 3900X avec stockage NVMe, et Budget sur un Intel Core i7-6700K plus ancien avec SATA SSD.",
+      atAGlance: (game: string) => `Hébergement ${game} en bref`,
+      hosting: (game: string) => `Hébergement ${game}`,
+      budgetNote: "Les offres Budget tournent sur un CPU plus ancien et plus chargé, donc elles peuvent être plus lentes aux heures de pointe.",
     },
   },
   legal: {

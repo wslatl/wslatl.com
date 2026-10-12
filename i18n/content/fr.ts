@@ -43,7 +43,7 @@ export const fr: ContentTranslation = {
     hardware: {
       title: "Du matériel qui tient la route",
       description:
-        "SSD NVMe, CPU à haute fréquence, chemins réseau redondants et routage à faible latence. Conçu pour encaisser sans faire de compromis.",
+        "SSD NVMe en Premium et SATA SSD en Budget, CPU à haute fréquence, chemins réseau redondants et routage à faible latence. Conçu pour encaisser sans faire de compromis.",
     },
     uptime: {
       title: "En ligne quand ça compte",
@@ -75,7 +75,7 @@ export const fr: ContentTranslation = {
     'game-server-cost': {
       question: "Combien coûte l'hébergement d'un serveur de jeu ?",
       answer:
-        "Les serveurs de jeu Budget démarrent à {gamePrice} par mois pour {gameRam} GB de RAM sur SATA SSD, et les offres premium en NVMe démarrent à {gamePremiumPrice} par mois. Les offres VPS démarrent à {vpsPrice}. La page des tarifs contient le détail complet.",
+        "Les serveurs de jeu Budget démarrent à {gamePrice} par mois pour {gameRam} GB de RAM, et les serveurs de jeu Premium à {gamePremiumPrice}. Les VPS Budget démarrent à {vpsPrice}, et les VPS Premium à {vpsPremiumPrice}. Premium tourne sur un AMD Ryzen 9 3900X avec NVMe. Budget offre les mêmes caractéristiques sur un Intel Core i7-6700K plus ancien et plus chargé, avec SATA SSD, donc un serveur Budget peut être plus lent aux heures de pointe. La page des tarifs contient le détail complet.",
     },
     'response-time': {
       question: "En combien de temps répondez-vous vraiment ?",
@@ -135,7 +135,7 @@ export const fr: ContentTranslation = {
       vps: {
         label: "VPS",
         intro:
-          "Des ressources isolées et un accès root complet, avec l'OS de votre choix. Les offres Budget tournent sur SATA SSD, les offres Premium sur NVMe avec des cœurs Ryzen 9 à haute fréquence.",
+          "Des ressources isolées et un accès root complet, avec l'OS de votre choix. Les offres Premium tournent sur un AMD Ryzen 9 3900X avec NVMe à Los Angeles, et les offres Budget sur un Intel Core i7-6700K avec SATA SSD à New York.",
         included: [
           "Accès root et sudo complet",
           "L'OS de votre choix",
@@ -157,26 +157,53 @@ export const fr: ContentTranslation = {
       },
     },
     groups: {
-      'budget-vps': {
-        label: "VPS Budget",
-        description: "Du stockage SATA SSD solide à des prix honnêtes.",
-        comparison: "10 % moins cher que Hosturly",
-      },
       'premium-vps': {
         label: "VPS Premium",
-        description:
-          "Des disques NVMe sur des cœurs Ryzen 9 à haute fréquence. De la performance réelle, pas juste des chiffres plus gros.",
-        comparison: "10 % moins cher que DigitalOcean",
+        description: "AMD Ryzen 9 3900X avec mémoire DDR4 et disques NVMe en RAID 1, à Los Angeles.",
       },
-      'budget-game': {
-        label: "Serveurs de jeu Budget",
-        description: "Des serveurs de jeu sur SATA SSD. En général, vous êtes en ligne le jour même.",
-        comparison: "10 % moins cher que Sparked",
+      'budget-vps': {
+        label: "VPS Budget",
+        description:
+          "Intel Core i7-6700K avec mémoire DDR4 et disques SATA SSD en RAID 1, à New York. Les mêmes caractéristiques que Premium sur un CPU plus ancien et plus chargé, donc votre serveur peut être plus lent aux heures de pointe.",
       },
       'premium-game': {
         label: "Serveurs de jeu Premium",
-        description: "Des disques NVMe et des cœurs Ryzen 9 pour quand la gamme Budget ne suffit plus.",
-        comparison: "25 % moins cher que Sparked",
+        description: "AMD Ryzen 9 3900X avec mémoire DDR4 et disques NVMe en RAID 1, à Los Angeles.",
+      },
+      'budget-game': {
+        label: "Serveurs de jeu Budget",
+        description:
+          "Intel Core i7-6700K avec mémoire DDR4 et disques SATA SSD en RAID 1, à New York. Les mêmes caractéristiques que Premium sur un CPU plus ancien et plus chargé, donc votre serveur peut être plus lent aux heures de pointe.",
+      },
+    },
+    comparisons: {
+      'sparked-minecraft': {
+        text: "Des serveurs Minecraft Premium de 13 % à 19 % moins chers que les offres Enterprise Minecraft de Sparked Host avec la même quantité de RAM (4, 6, 8, 12 et 16 GB).",
+        note: "Prix catalogue de Sparked, relevés le 10 octobre 2026. Les codes promo comme FALL26 et FALLLEAVES2026 ne sont pas pris en compte, et avec eux Sparked peut coûter moins cher pendant jusqu'à trois mois. Nos serveurs de jeu Premium tournent sur un AMD Ryzen 9 3900X avec DDR4 et NVMe ; Sparked Enterprise utilise un Ryzen 9 7900 (ou équivalent) avec DDR5. Sparked inclut 3 vCPU et 100 GB de disque à chaque taille, plus que nos offres de 4 GB et 6 GB. Les offres Budget Minecraft de Sparked coûtent moins cher que nos offres Budget et Premium.",
+      },
+      'apex-minecraft': {
+        text: "Des offres Premium de 37 % à 42 % moins chères que les offres Minecraft Ryzen Series d'Apex Hosting avec la même quantité de RAM (4, 6 et 8 GB).",
+        note: "Prix catalogue récurrents d'Apex, relevés le 10 octobre 2026. Apex annonce un Ryzen 9 7950X avec DDR5 dans la plupart de ses sites aux États-Unis et en Europe ; nos offres Premium tournent sur un AMD Ryzen 9 3900X avec DDR4.",
+      },
+      'bloom-minecraft': {
+        text: "Des offres Premium de 25 % à 27 % moins chères que Bloom.host Essentials à 4 GB et 6 GB.",
+        note: "Les offres Essentials de Bloom à Los Angeles annoncent le même modèle de CPU que les nôtres, un AMD Ryzen 9 3900X, et incluent plus de disque : 60 GB et 100 GB de NVMe, contre nos 50 GB et 75 GB. Prix catalogue de Bloom, relevés le 10 octobre 2026.",
+      },
+      'sparked-fivem': {
+        text: "Des offres Premium de 5 % à 12 % moins chères que Sparked Host FiveM avec la même quantité de RAM (de 4 à 16 GB).",
+        note: "Prix catalogue relevés le 10 octobre 2026 ; codes promo non compris. Sparked FiveM utilise un Ryzen 9 7950X (ou équivalent) avec DDR5, et nos offres Premium un AMD Ryzen 9 3900X avec DDR4. Sparked inclut plus de disque à chaque taille, et plus de vCPU à 4, 6 et 8 GB.",
+      },
+      'digitalocean-vps': {
+        text: "Des VPS Premium de 45 % à 63 % moins chers que les Basic Regular Droplets de DigitalOcean avec la même quantité de RAM et le même nombre de vCPU : 2 GB $6.50 (DigitalOcean $12), 4 GB $11 ($24), 8 GB $18.50 ($48), 16 GB $35 ($96).",
+        note: "Prix catalogue de DigitalOcean, relevés le 10 octobre 2026. DigitalOcean n'indique pas le modèle de CPU de ces Droplets ; les nôtres tournent sur un AMD Ryzen 9 3900X avec NVMe. DigitalOcean inclut plus de disque : 50, 80, 160 et 320 GiB, contre nos 30, 60, 120 et 240 GB.",
+      },
+      'vultr-vps': {
+        text: "De 35 % à 53 % moins cher que Vultr Cloud Compute Regular Performance avec la même quantité de RAM et le même nombre de vCPU (2, 4 et 8 GB).",
+        note: "Prix catalogue de Vultr, relevés le 10 octobre 2026. Selon Vultr, Regular Performance tourne sur des CPU Intel de génération précédente avec des SSD classiques ; les nôtres tournent sur un AMD Ryzen 9 3900X avec NVMe. Vultr inclut plus de disque : 55, 80 et 160 GB, contre nos 30, 60 et 120 GB.",
+      },
+      'hosturly-budget-vps': {
+        text: "Des VPS Budget de 16 % à 29 % moins chers que le Budget VPS de Hosturly avec la même quantité de RAM, et deux fois plus de vCPU et de disque (4 GB et 8 GB).",
+        note: "Matériel différent : notre Intel Core i7-6700K avec SATA SSD en RAID 1 à New York, face à l'AMD EPYC 7402P avec NVMe de Hosturly à Chicago. Prix catalogue de Hosturly, relevés le 10 octobre 2026.",
       },
     },
   },
@@ -190,7 +217,7 @@ export const fr: ContentTranslation = {
       faqs: [
         {
           q: "Puis-je faire tourner un serveur moddé comme RLCraft ou ATM9 ?",
-          a: "Oui. Minecraft moddé est gourmand en mémoire et profite du stockage NVMe et des cœurs Ryzen 9 de la gamme Premium, mais la gamme Budget fait très bien tourner les modpacks légers.",
+          a: "Oui. Minecraft moddé est gourmand en mémoire : des modpacks lourds comme ceux-ci demandent en général 12 à 16 GB de RAM. Ils tournent mieux sur Premium, qui dispose d'un AMD Ryzen 9 3900X et d'un stockage NVMe.",
         },
         {
           q: "Prenez-vous en charge les joueurs Bedrock sur un serveur Java ?",
@@ -207,7 +234,7 @@ export const fr: ContentTranslation = {
       faqs: [
         {
           q: "Mon serveur tiendra-t-il un wipe à pleine population ?",
-          a: "La gamme Premium NVMe est faite pour ça. La génération de carte et le pic de connexions du jour de wipe dépendent du stockage et du CPU, et le NVMe associé aux cœurs Ryzen 9 absorbe les deux mieux que les offres SATA.",
+          a: "La génération de carte et le pic de connexions du jour de wipe dépendent du stockage et du CPU : pour un serveur plein, choisissez Premium, avec stockage NVMe et un AMD Ryzen 9 3900X. Choisissez la RAM selon votre limite de joueurs, avec un peu de marge pour le jour du wipe.",
         },
         {
           q: "Oxide/uMod est-il pris en charge ?",
@@ -276,7 +303,7 @@ export const fr: ContentTranslation = {
       faqs: [
         {
           q: "La génération du monde prend-elle longtemps ?",
-          a: "La génération au premier démarrage est le moment le plus lourd pour ce jeu ; la gamme NVMe la raccourcit nettement par rapport au stockage SATA.",
+          a: "La génération au premier démarrage est le moment le plus lourd pour ce jeu ; le stockage NVMe des offres Premium la raccourcit nettement par rapport au stockage SATA.",
         },
       ],
     },
@@ -456,13 +483,13 @@ export const fr: ContentTranslation = {
     factorio: {
       tagline: "Automatisation et construction d'usines, célèbre pour sa dépendance au CPU.",
       description:
-        "Un jeu d'automatisation d'usine dont les bases de fin de partie sont réputées très gourmandes en CPU à mesure que les convoyeurs et les machines se multiplient : celui-ci profite plus que les autres des cœurs Ryzen 9 rapides de notre gamme Premium.",
+        "Un jeu d'automatisation d'usine dont les bases de fin de partie sont réputées très gourmandes en CPU à mesure que les convoyeurs et les machines se multiplient : la vitesse par cœur compte ici plus que pour la plupart des jeux. Les offres Premium tournent sur un AMD Ryzen 9 3900X.",
       popularFor: ["serveurs d'automatisation au long cours"],
       setups: ["2-8 joueurs, début de partie", "grandes usines de fin de partie"],
       faqs: [
         {
           q: "Pourquoi Factorio a-t-il plus besoin de cœurs rapides que de RAM ?",
-          a: "La simulation de Factorio est mono-thread et limitée par le CPU à mesure que votre usine grandit : une offre avec de bonnes fréquences par cœur (notre gamme Premium Ryzen 9) maintient les UPS stables plus longtemps que le simple ajout de RAM.",
+          a: "La simulation de Factorio est mono-thread et limitée par le CPU à mesure que votre usine grandit : la vitesse par cœur maintient les UPS stables plus longtemps que le simple ajout de RAM. Pour une grande usine, choisissez Premium (AMD Ryzen 9 3900X) plutôt que Budget, qui tourne sur un CPU plus ancien et plus chargé.",
         },
       ],
     },
@@ -485,7 +512,7 @@ export const fr: ContentTranslation = {
     cs2: {
       tagline: "CS2 compétitif et détente, avec de la place pour les plugins communautaires.",
       description:
-        "Peu de ressources par joueur : la vraie question est la stabilité des ticks sous charge. Notre gamme NVMe garde un tick rate stable sur un serveur complet de 10 à 32 joueurs, et les piles de plugins CounterStrikeSharp / MetaMod sont entièrement prises en charge.",
+        "Peu de ressources par joueur : la vraie question est la stabilité des ticks sous charge. Nos offres NVMe gardent un tick rate stable sur un serveur complet de 10 à 32 joueurs, et les piles de plugins CounterStrikeSharp / MetaMod sont entièrement prises en charge.",
       popularFor: ["serveurs d'entraînement compétitif 5v5", "deathmatch/surf/retake communautaires", "piles de plugins CounterStrikeSharp"],
       setups: ["10-16 joueurs, compétitif classique", "24-32 joueurs, communautaire + plugins"],
       faqs: [

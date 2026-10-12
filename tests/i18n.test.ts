@@ -8,7 +8,7 @@ import { commitments, features } from '@/data/features'
 import { faqs } from '@/data/faqs'
 import { team } from '@/data/team'
 import { uptimeTargets } from '@/data/sla'
-import { productLines } from '@/data/pricing'
+import { comparisons, productLines } from '@/data/pricing'
 import { games, gameCategories } from '@/data/games'
 import { legalPages } from '@/data/legal'
 
@@ -21,6 +21,9 @@ const wordy = (text: string) => /[a-z]{3,}/i.test(text.replace(/GB/gi, ''))
 function cover(name: string, ids: string[], entries: Record<string, unknown> | undefined) {
   expect(ids.filter((id) => !entries?.[id]), name).toEqual([])
 }
+
+/** The {price} tokens in a written answer, sorted. */
+const tokens = (text = '') => [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).toSorted()
 
 /** Every string in a dictionary, as "path: value" pairs. Functions are skipped. */
 function strings(value: unknown, path = ''): [string, string][] {
@@ -129,11 +132,21 @@ describe('content translations', () => {
         productLines.flatMap((line) => line.groups.map((group) => group.id)),
         t?.pricing?.groups,
       )
+      cover(`${locale} price comparisons`, Object.keys(comparisons), t?.pricing?.comparisons)
       cover(`${locale} games`, games.map((game) => game.slug), t?.games)
       cover(`${locale} game categories`, [...gameCategories], t?.gameCategories)
       cover(`${locale} legal`, legalPages.map((page) => page.key), t?.legal)
       expect(t?.leadFeature?.title, `${locale} lead feature`).toBeTruthy()
       expect(t?.reviews?.title, `${locale} reviews`).toBeTruthy()
+    }
+  })
+
+  it('keeps the price tokens of every FAQ answer', () => {
+    for (const locale of others) {
+      const t = translationFor(locale)
+      for (const faq of faqs) {
+        expect(tokens(t?.faqs?.[faq.id]?.answer), `${locale} ${faq.id}`).toEqual(tokens(faq.answer))
+      }
     }
   })
 

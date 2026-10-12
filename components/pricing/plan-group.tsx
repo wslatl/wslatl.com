@@ -1,5 +1,5 @@
-import { TrendingDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ComparisonList } from '@/components/pricing/comparisons'
 import type { PlanGroup, ProductLine } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
 import { formatGb, formatPrice, formatTraffic } from '@/lib/pricing'
@@ -9,6 +9,8 @@ import { copy } from '@/i18n/copy'
 interface PlanGroupTableProps {
   line: ProductLine
   group: PlanGroup
+  /** Game pages turn this off and place their own comparisons (data/pricing.ts). */
+  showComparisons?: boolean
 }
 
 function OrderButton({ planName, emphasis, className }: { planName: string; emphasis: boolean; className?: string }) {
@@ -36,7 +38,7 @@ function PopularTag() {
  * as a stacked list when it does not. Only one of the two is ever displayed, so
  * assistive tech sees a single copy.
  */
-export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
+export function PlanGroupTable({ line, group, showComparisons = true }: PlanGroupTableProps) {
   const t = copy().pricing
   const showTraffic = group.plans.some((p) => p.trafficTb !== undefined)
   const headingId = `${group.id}-heading`
@@ -50,14 +52,9 @@ export function PlanGroupTable({ line, group }: PlanGroupTableProps) {
         <span className="text-sm text-muted-foreground">
           {group.storageType} {t.storageSuffix}
         </span>
-        {group.comparison && (
-          <span className="inline-flex items-center gap-1 text-sm text-link">
-            <TrendingDown aria-hidden="true" className="size-3.5" />
-            {group.comparison}
-          </span>
-        )}
       </div>
       <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{group.description}</p>
+      {showComparisons && group.comparisons && <ComparisonList ids={group.comparisons} className="mt-4" />}
 
       {/* Wide containers (in rem, so large text counts): comparison table */}
       <div className="mt-5 hidden overflow-hidden rounded-xl border @min-[44rem]:block">

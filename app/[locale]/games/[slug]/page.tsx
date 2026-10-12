@@ -6,10 +6,12 @@ import { SiteHeader } from '@/components/layout/site-header'
 import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
 import { PlanGroupTable } from '@/components/pricing/plan-group'
+import { ComparisonList, comparisonLine } from '@/components/pricing/comparisons'
 import { FaqList } from '@/components/sections/faq'
 import { JsonLd } from '@/components/seo/json-ld'
 import { Button } from '@/components/ui/button'
 import { games, ramNeedGb, type RamRow } from '@/data/games'
+import { gameComparisons } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
 import { cheapestPlanWithRam, formatPrice, smallestPlansWithRam } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
@@ -30,12 +32,14 @@ function localizedGame(slug: string) {
 }
 
 /**
- * "GAME-1 ($3.60/mo) or P-GAME-1 ($12.00/mo)", or a way to ask when nothing is
- * big enough. Rows sized "per map" (clusters) name the plan for each map,
- * since every map in a cluster runs as its own server.
+ * "P-GAME-8 ($17.50/mo) or B-GAME-8 ($15.91/mo)", one plan per plan group,
+ * or a way to ask when nothing is big enough. Rows sized "per map" (clusters)
+ * name the plan for each map, since every map in a cluster runs as its own
+ * server.
  */
 function PlansThatFit({ row }: { row: RamRow }) {
   const t = copy().games.detail
+  const perMonth = copy().pricing.perMonth
   const fits = smallestPlansWithRam('game', ramNeedGb(row))
   const perMap = /per map/i.test(row.ram)
   if (fits.length === 0) {
@@ -53,7 +57,7 @@ function PlansThatFit({ row }: { row: RamRow }) {
       {i === 0 && perMap && t.perMap}
       {i > 0 && t.or}
       <span className="whitespace-nowrap">
-        <span className="font-medium text-foreground">{plan.name}</span> ({formatPrice(plan.price)}/mo)
+        <span className="font-medium text-foreground">{plan.name}</span> ({formatPrice(plan.price)}{perMonth})
       </span>
     </span>
   ))
@@ -90,6 +94,9 @@ export default async function GamePage({ params }: PageProps) {
   const entry = cheapestPlanWithRam('game', ramNeedGb(game.recommendedRam[0]))
   const related = localizedGames().filter((g) => g.category === game.category && g.slug !== game.slug).slice(0, 8)
   const faqs = game.faqs.map((faq, i) => ({ id: `${game.slug}-faq-${i}`, question: faq.q, answer: faq.a }))
+  // Price comparisons for this game only; most games have none (data/pricing.ts).
+  const claims = gameComparisons[game.slug]
+  const tableClaim = claims?.table ? comparisonLine(claims.table) : null
 
   return (
     <>
@@ -170,6 +177,15 @@ export default async function GamePage({ params }: PageProps) {
                   </tr>
                 ))}
               </tbody>
+              {tableClaim && (
+                <tfoot className="border-t">
+                  <tr>
+                    <td colSpan={3} className="px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+                      {tableClaim}
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
           <ul className="mt-5 divide-y rounded-xl border @min-[36rem]:hidden">
@@ -184,6 +200,7 @@ export default async function GamePage({ params }: PageProps) {
                 </p>
               </li>
             ))}
+            {tableClaim && <li className="p-4 text-xs leading-relaxed text-muted-foreground">{tableClaim}</li>}
           </ul>
           <p className="mt-3 text-sm text-muted-foreground">
             {t.games.detail.ramNote}
@@ -191,22 +208,25 @@ export default async function GamePage({ params }: PageProps) {
         </section>
         </div>
 
-        <aside aria-label={`${game.name} hosting at a glance`} className="hidden lg:block">
+        <aside aria-label={t.games.detail.atAGlance(game.name)} className="hidden lg:block">
           <div className="sticky top-24 mt-24 rounded-2xl border bg-card/30 p-6">
             {entry && (
               <>
-                <p className="text-sm font-medium text-muted-foreground">{game.name} hosting</p>
+                <p className="text-sm font-medium text-muted-foreground">{t.games.detail.hosting(game.name)}</p>
                 <p className="mt-2 text-sm text-muted-foreground tabular-nums">
-                  from{' '}
+                  {t.pricing.from}{' '}
                   <span className="text-4xl font-bold tracking-[-0.03em] text-foreground">
                     {formatPrice(entry.plan.price)}
                   </span>
-                  /mo
+                  {t.pricing.perMonth}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground tabular-nums">
                   {entry.plan.name}: {entry.plan.cpu} {line.cpuUnit}, {entry.plan.ramGb} GB RAM,{' '}
                   {entry.plan.storageGb} GB {entry.group.storageType}
                 </p>
+                {entry.group.tier === 'budget' && (
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t.games.detail.budgetNote}</p>
+                )}
               </>
             )}
             <Button asChild size="lg" className="mt-6 h-auto min-h-11 w-full py-2.5 text-center whitespace-normal">
@@ -232,15 +252,13 @@ export default async function GamePage({ params }: PageProps) {
 
         <section id="plans" aria-labelledby="plans-heading" className="mt-16">
           <h2 id="plans-heading" className="text-2xl font-semibold tracking-tight text-foreground">
-            Game server plans
+            {t.games.detail.plansHeading}
           </h2>
-          <p className="mt-2 max-w-2xl text-muted-foreground">
-            The same plans run every game we host. Budget plans use SATA SSD; Premium plans add NVMe
-            and Ryzen 9 cores.
-          </p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">{t.games.detail.plansIntro}</p>
+          {claims?.plans && <ComparisonList ids={claims.plans} className="mt-6" />}
           <div className="mt-8 space-y-12">
             {line.groups.map((group) => (
-              <PlanGroupTable key={group.id} line={line} group={group} />
+              <PlanGroupTable key={group.id} line={line} group={group} showComparisons={false} />
             ))}
           </div>
         </section>

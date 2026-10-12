@@ -4,11 +4,12 @@ import {
   type PlanGroup,
   type ProductLine,
   type ProductLineId,
+  type StorageType,
 } from '@/data/pricing'
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
-/** `5.4` -> `$5.40`. The only price formatter on the site. */
+/** `6.5` -> `$6.50`. The only price formatter on the site. */
 export function formatPrice(amount: number): string {
   return usd.format(amount)
 }
@@ -42,8 +43,8 @@ export function startingPrice(id: ProductLineId, tier?: PlanGroup['tier']): numb
   return Math.min(...plansOf(id, tier).map((p) => p.price))
 }
 
-/** The smallest plan in a tier, i.e. the one that sets the starting price. */
-export function entryPlan(id: ProductLineId, tier: PlanGroup['tier']): Plan {
+/** The smallest plan on a line or in one tier, i.e. the one that sets the starting price. */
+export function entryPlan(id: ProductLineId, tier?: PlanGroup['tier']): Plan {
   const plans = plansOf(id, tier)
   return plans.reduce((min, p) => (p.price < min.price ? p : min), plans[0])
 }
@@ -65,6 +66,11 @@ export function specRanges(id: ProductLineId) {
     ramGb: range(plans.map((p) => p.ramGb)),
     storageGb: range(plans.map((p) => p.storageGb)),
   }
+}
+
+/** The storage types a line is sold on, in the order its groups are listed. */
+export function storageTypes(id: ProductLineId): StorageType[] {
+  return [...new Set(productLine(id).groups.map((g) => g.storageType))]
 }
 
 export interface PlanMatch {
@@ -96,8 +102,9 @@ export function smallestPlansWithRam(id: ProductLineId, ramGb: number): PlanMatc
 
 /**
  * Fills the price tokens a written answer can carry, so the same sentence
- * shows today's prices in every language: {gamePrice}, {gameRam},
- * {gamePremiumPrice} and {vpsPrice} all come from data/pricing.ts.
+ * shows today's prices in every language: {gamePrice}, {gameRam} and
+ * {vpsPrice} are the Budget starting points, {gamePremiumPrice} and
+ * {vpsPremiumPrice} the Premium ones, all from data/pricing.ts.
  */
 export function fillPrices(text: string): string {
   const budgetGame = entryPlan('game', 'budget')
@@ -105,7 +112,8 @@ export function fillPrices(text: string): string {
     gamePrice: formatPrice(budgetGame.price),
     gameRam: String(budgetGame.ramGb),
     gamePremiumPrice: formatPrice(startingPrice('game', 'premium')),
-    vpsPrice: formatPrice(startingPrice('vps')),
+    vpsPrice: formatPrice(startingPrice('vps', 'budget')),
+    vpsPremiumPrice: formatPrice(startingPrice('vps', 'premium')),
   }
   return text.replace(/\{(\w+)\}/g, (whole, key) => values[key] ?? whole)
 }
