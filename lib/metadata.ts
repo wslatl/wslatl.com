@@ -27,6 +27,11 @@ interface PageMetadataInput {
   absoluteTitle?: boolean
   /** Defaults to the language of the page being rendered. */
   locale?: Locale
+  /**
+   * A share picture of the page's own (a partner's banner), in place of the
+   * site's. A path under public/ is fine: the layout sets metadataBase.
+   */
+  image?: { url: string; alt: string; width?: number; height?: number }
 }
 
 /**
@@ -38,8 +43,9 @@ interface PageMetadataInput {
  * can offer a reader the version in their own language (hreflang), with the
  * English one as the fallback for everyone else (x-default).
  */
-export function pageMetadata({ title, description, path, absoluteTitle = false, locale }: PageMetadataInput): Metadata {
+export function pageMetadata({ title, description, path, absoluteTitle = false, locale, image }: PageMetadataInput): Metadata {
   const language = locale ?? getLocale()
+  const shareImage = image ?? ogImage
   const url = pageUrl(language, path)
   const fullTitle = absoluteTitle ? title : `${title} | ${siteConfig.name}`
 
@@ -61,13 +67,13 @@ export function pageMetadata({ title, description, path, absoluteTitle = false, 
       url,
       title: fullTitle,
       description,
-      images: [ogImage],
+      images: [shareImage],
     },
     twitter: {
       card: 'summary_large_image',
       title: fullTitle,
       description,
-      images: [ogImage.url],
+      images: [shareImage.url],
     },
   }
 }

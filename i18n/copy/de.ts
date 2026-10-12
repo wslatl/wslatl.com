@@ -21,6 +21,7 @@ export const de: Copy = {
     games: 'Gameserver',
     services: 'Leistungen',
     about: 'Über uns',
+    partners: 'Partner',
     contact: 'Kontakt',
     status: 'Status',
   },
@@ -47,6 +48,7 @@ export const de: Copy = {
       dedicated: 'Dedicated Server',
       web: 'Webhosting',
       about: 'Über uns',
+      partners: 'Partner',
       howItWorks: 'So läuft eine Bestellung',
       contact: 'Kontakt',
       reviews: 'Bewertungen auf Trustpilot',
@@ -304,6 +306,82 @@ export const de: Copy = {
       service: "Dienst",
       target: "Monatliches Uptime-Ziel",
       label: "Monatliche Uptime-Ziele",
+    },
+  },
+  partners: {
+    metaTitle: 'Offizielle Partner',
+    metaDescription: (percent: string) =>
+      `Creator und Communities, mit denen wir zusammenarbeiten, jeweils mit eigenem Empfehlungscode. Melde dich mit einem davon an und erhalte auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt.`,
+    emptyMetaDescription:
+      'Wir wählen gerade unsere ersten offiziellen Partner aus. Du machst Videos, streamst oder leitest eine Community? Erfahre, wie unser Partnerprogramm funktioniert und wie du mitmachst.',
+    heading: 'Offizielle Partner',
+    crumb: 'Partner',
+    intro: (percent: string) =>
+      `Creator und Communities, die unser Team freigegeben hat. Melde dich mit einem ihrer Empfehlungscodes an und du erhältst auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt.`,
+    emptyIntro:
+      'Wir wählen gerade unsere ersten offiziellen Partner aus. Du machst Videos, streamst oder leitest eine Community? Diese Seite könnte mit dir beginnen.',
+    featured: 'Hervorgehoben',
+    officialPartner: 'Offizieller Partner',
+    since: (month: string) => `Partner seit ${month}`,
+    referralCode: 'Empfehlungscode',
+    copy: 'Kopieren',
+    copied: 'Kopiert',
+    copyFailed: 'Der Code ist markiert. Kopiere ihn über die Tastatur oder das Menü.',
+    viewProfile: 'Profil ansehen',
+    onPlatform: (name: string, platform: string) => `${name} auf ${platform}`,
+    website: 'Webseite',
+    ghost: {
+      title: 'Das könntest du sein',
+      body:
+        'Du machst Videos, streamst oder leitest eine Community? Werde offizieller Partner und bekomme hier ein eigenes Profil.',
+      cta: 'Partner werden',
+    },
+    program: {
+      heading: 'Partner werden',
+      intro: 'Unsere Partner sind Creator und Communities, die unser Team einzeln freigibt. So funktioniert es.',
+      approved: {
+        title: 'Von unserem Team freigegeben',
+        body: 'Erzähl uns, wer du bist und wo deine Community zu Hause ist. Unser Team prüft jede Anfrage.',
+      },
+      code: {
+        title: 'Dein eigener Empfehlungscode',
+        body:
+          'Neue Kunden geben deinen Code bei der Anmeldung im Abrechnungsportal ein oder folgen deinem Link, der ihn für sie einträgt.',
+      },
+      discount: {
+        title: (percent: string) => `${percent} Rabatt für alle, die du wirbst`,
+        body: (percent: string) =>
+          `Wer sich mit deinem Code anmeldet, erhält auf jeder Rechnung ${percent} Rabatt auf sein Hosting, außer bei Dedicated Servern, solange du im Programm bleibst. Er wird nicht mit einem Gutscheincode kombiniert: Es gilt der höhere Rabatt.`,
+      },
+      credit: {
+        title: 'Guthaben für dich',
+        body:
+          'Du erhältst einen Anteil dessen, was jede geworbene Person für ihre erste Rechnung zahlt, als Guthaben auf deinem Konto.',
+      },
+      profile: {
+        title: 'Ein Profil auf dieser Seite',
+        body: 'Mit deinem Einverständnis zeigen wir dich hier mit Banner, Bild, Links und Code.',
+      },
+      discordCta: 'Frag uns auf Discord',
+      ticketCta: 'Ticket öffnen',
+      ticketNote:
+        'Schon Kunde? Öffne ein Ticket im Abrechnungsportal und erzähl uns von deinem Kanal oder deiner Community.',
+      creditLink: 'So funktioniert Guthaben',
+    },
+    profile: {
+      metaTitle: (name: string) => `${name}, offizieller Partner`,
+      metaDescription: (code: string, percent: string) =>
+        `Melde dich mit dem Code ${code} an und erhalte auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt.`,
+      about: (name: string) => `Über ${name}`,
+      links: (name: string) => `${name} im Netz`,
+      games: 'Gespielte Spiele',
+      referral: (name: string) => `Empfehlungscode von ${name}`,
+      signUp: 'Mit diesem Code anmelden',
+      discount: (percent: string) =>
+        `Mit diesem Code erhältst du auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt. Er wird nicht mit einem Gutscheincode kombiniert: Es gilt der höhere Rabatt.`,
+      avatarAlt: (name: string) => `Profilbild von ${name}`,
+      bannerAlt: (name: string) => `Banner von ${name}`,
+      allPartners: 'Alle Partner',
     },
   },
   notFound: {

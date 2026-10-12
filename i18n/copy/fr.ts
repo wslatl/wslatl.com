@@ -21,8 +21,9 @@ export const fr: Copy = {
     games: "Serveurs de jeu",
     services: "Services",
     about: "À propos",
+    partners: 'Partenaires',
     contact: "Contact",
-    status: "État des services",
+    status: "Statut",
   },
   portals: {
     billing: { label: "Portail de facturation", description: "Factures, commandes et tickets de support" },
@@ -47,6 +48,7 @@ export const fr: Copy = {
       dedicated: "Serveurs dédiés",
       web: "Hébergement web",
       about: "À propos de nous",
+      partners: 'Partenaires',
       howItWorks: "Comment se passe une commande",
       contact: "Contact",
       reviews: "Avis sur Trustpilot",
@@ -304,6 +306,83 @@ export const fr: Copy = {
       service: "Service",
       target: "Objectif de disponibilité mensuelle",
       label: "Objectifs de disponibilité mensuelle",
+    },
+  },
+  partners: {
+    metaTitle: 'Partenaires officiels',
+    metaDescription: (percent: string) =>
+      `Les créateurs et les communautés avec qui nous travaillons, chacun avec son propre code de parrainage. Inscrivez-vous avec l'un d'eux et obtenez ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme.`,
+    emptyMetaDescription:
+      'Nous choisissons nos premiers partenaires officiels. Vous faites des vidéos, du streaming ou vous animez une communauté ? Découvrez comment fonctionne notre programme partenaire et comment le rejoindre.',
+    heading: 'Partenaires officiels',
+    crumb: 'Partenaires',
+    intro: (percent: string) =>
+      `Des créateurs et des communautés approuvés par notre équipe. Inscrivez-vous avec l'un de leurs codes de parrainage et obtenez ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme.`,
+    emptyIntro:
+      'Nous choisissons nos premiers partenaires officiels. Vous faites des vidéos, du streaming ou vous animez une communauté ? Cette page pourrait commencer avec vous.',
+    featured: 'À la une',
+    officialPartner: 'Partenaire officiel',
+    since: (month: string) => `Partenaire depuis ${month}`,
+    referralCode: 'Code de parrainage',
+    copy: 'Copier',
+    copied: 'Copié',
+    copyFailed: 'Le code est sélectionné. Copiez-le avec le clavier ou le menu.',
+    viewProfile: 'Voir le profil',
+    onPlatform: (name: string, platform: string) => `${name} sur ${platform}`,
+    website: 'Site web',
+    ghost: {
+      title: 'Ça pourrait être vous',
+      body:
+        'Vous faites des vidéos, du streaming ou vous animez une communauté ? Devenez partenaire officiel et ayez votre profil ici.',
+      cta: 'Devenir partenaire',
+    },
+    program: {
+      heading: 'Devenir partenaire',
+      intro:
+        'Nos partenaires sont des créateurs et des communautés que notre équipe approuve un par un. Voici comment ça marche.',
+      approved: {
+        title: 'Approuvé par notre équipe',
+        body: 'Dites-nous qui vous êtes et où se trouve votre communauté. Notre équipe examine chaque demande.',
+      },
+      code: {
+        title: 'Votre propre code de parrainage',
+        body:
+          "Les gens saisissent votre code en s'inscrivant sur le portail de facturation, ou suivent votre lien, qui le remplit pour eux.",
+      },
+      discount: {
+        title: (percent: string) => `${percent} de réduction pour vos filleuls`,
+        body: (percent: string) =>
+          `Toute personne qui s'inscrit avec votre code obtient ${percent} de réduction sur son hébergement à chaque facture, sauf sur les serveurs dédiés, tant que vous restez dans le programme. Elle ne se cumule pas avec un code promo : la réduction la plus élevée s'applique.`,
+      },
+      credit: {
+        title: 'Un avoir pour vous',
+        body:
+          "Vous recevez une part de ce que chaque filleul paie sur sa première facture, sous forme d'avoir sur votre compte.",
+      },
+      profile: {
+        title: 'Un profil sur cette page',
+        body: 'Avec votre accord, nous vous présentons ici avec votre bannière, votre photo, vos liens et votre code.',
+      },
+      discordCta: 'Écrivez-nous sur Discord',
+      ticketCta: 'Ouvrir un ticket',
+      ticketNote:
+        'Déjà client ? Ouvrez un ticket dans le portail de facturation et parlez-nous de votre chaîne ou de votre communauté.',
+      creditLink: "Comment fonctionne l'avoir de compte",
+    },
+    profile: {
+      metaTitle: (name: string) => `${name}, partenaire officiel`,
+      metaDescription: (code: string, percent: string) =>
+        `Inscrivez-vous avec le code ${code} pour obtenir ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme.`,
+      about: (name: string) => `À propos de ${name}`,
+      links: (name: string) => `Retrouver ${name} en ligne`,
+      games: 'Ses jeux',
+      referral: (name: string) => `Code de parrainage de ${name}`,
+      signUp: "S'inscrire avec ce code",
+      discount: (percent: string) =>
+        `En vous inscrivant avec ce code, vous obtenez ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme. Elle ne se cumule pas avec un code promo : la réduction la plus élevée s'applique.`,
+      avatarAlt: (name: string) => `Photo de profil de ${name}`,
+      bannerAlt: (name: string) => `Bannière de ${name}`,
+      allPartners: 'Tous les partenaires',
     },
   },
   notFound: {

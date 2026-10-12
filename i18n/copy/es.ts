@@ -21,6 +21,7 @@ export const es: Copy = {
     games: 'Servidores de juego',
     services: 'Servicios',
     about: 'Nosotros',
+    partners: 'Socios',
     contact: 'Contacto',
     status: 'Estado',
   },
@@ -47,6 +48,7 @@ export const es: Copy = {
       dedicated: 'Servidores dedicados',
       web: 'Hosting web',
       about: 'Sobre nosotros',
+      partners: 'Socios',
       howItWorks: 'Cómo funciona el pedido',
       contact: 'Contacto',
       reviews: 'Opiniones en Trustpilot',
@@ -304,6 +306,80 @@ export const es: Copy = {
       service: "Servicio",
       target: "Objetivo de disponibilidad mensual",
       label: "Objetivos de disponibilidad mensual",
+    },
+  },
+  partners: {
+    metaTitle: 'Socios oficiales',
+    metaDescription: (percent: string) =>
+      `Creadores y comunidades con los que trabajamos, cada uno con su propio código de referido. Regístrate con uno y obtén un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras ese socio siga en el programa.`,
+    emptyMetaDescription:
+      'Estamos eligiendo a nuestros primeros socios oficiales. ¿Haces vídeos, directos o llevas una comunidad? Descubre cómo funciona nuestro programa de socios y cómo unirte.',
+    heading: 'Socios oficiales',
+    crumb: 'Socios',
+    intro: (percent: string) =>
+      `Creadores y comunidades que nuestro equipo ha aprobado. Regístrate con uno de sus códigos de referido y tendrás un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras ese socio siga en el programa.`,
+    emptyIntro:
+      'Estamos eligiendo a nuestros primeros socios oficiales. ¿Haces vídeos, directos o llevas una comunidad? Esta página podría empezar contigo.',
+    featured: 'Destacado',
+    officialPartner: 'Socio oficial',
+    since: (month: string) => `Socio desde ${month}`,
+    referralCode: 'Código de referido',
+    copy: 'Copiar',
+    copied: 'Copiado',
+    copyFailed: 'El código está seleccionado. Cópialo con el teclado o el menú.',
+    viewProfile: 'Ver perfil',
+    onPlatform: (name: string, platform: string) => `${name} en ${platform}`,
+    website: 'Sitio web',
+    ghost: {
+      title: 'Este podrías ser tú',
+      body: '¿Haces vídeos, directos o llevas una comunidad? Hazte socio oficial y ten tu propio perfil aquí.',
+      cta: 'Hazte socio',
+    },
+    program: {
+      heading: 'Hazte socio',
+      intro: 'Nuestros socios son creadores y comunidades que nuestro equipo aprueba uno a uno. Así funciona.',
+      approved: {
+        title: 'Aprobado por nuestro equipo',
+        body: 'Cuéntanos quién eres y dónde está tu comunidad. Nuestro equipo revisa cada solicitud.',
+      },
+      code: {
+        title: 'Tu propio código de referido',
+        body:
+          'La gente introduce tu código al registrarse en el portal de facturación, o sigue tu enlace, que lo rellena por ella.',
+      },
+      discount: {
+        title: (percent: string) => `Un ${percent} de descuento para quienes refieras`,
+        body: (percent: string) =>
+          `Quien se registre con tu código obtiene un ${percent} de descuento en su hosting en cada factura, salvo en servidores dedicados, mientras sigas en el programa. No se suma a un código promocional: se aplica el descuento mayor.`,
+      },
+      credit: {
+        title: 'Crédito de cuenta para ti',
+        body: 'Recibes una parte de lo que cada persona referida paga en su primera factura, como crédito de cuenta.',
+      },
+      profile: {
+        title: 'Un perfil en esta página',
+        body: 'Con tu permiso, te mostramos aquí con tu banner, tu foto, tus enlaces y tu código.',
+      },
+      discordCta: 'Pregúntanos en Discord',
+      ticketCta: 'Abrir un ticket',
+      ticketNote:
+        '¿Ya eres cliente? Abre un ticket en el portal de facturación y cuéntanos sobre tu canal o tu comunidad.',
+      creditLink: 'Cómo funciona el crédito de cuenta',
+    },
+    profile: {
+      metaTitle: (name: string) => `${name}, socio oficial`,
+      metaDescription: (code: string, percent: string) =>
+        `Regístrate con el código ${code} y obtén un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras este socio siga en el programa.`,
+      about: (name: string) => `Sobre ${name}`,
+      links: (name: string) => `Encuentra a ${name} en internet`,
+      games: 'Juegos a los que juega',
+      referral: (name: string) => `Código de referido de ${name}`,
+      signUp: 'Regístrate con este código',
+      discount: (percent: string) =>
+        `Al registrarte con este código obtienes un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras este socio siga en el programa. No se suma a un código promocional: se aplica el descuento mayor.`,
+      avatarAlt: (name: string) => `Foto de perfil de ${name}`,
+      bannerAlt: (name: string) => `Banner de ${name}`,
+      allPartners: 'Todos los socios',
     },
   },
   notFound: {

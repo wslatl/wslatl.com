@@ -16,6 +16,8 @@ import { cn } from '@/lib/utils'
 export interface HeaderLink {
   label: string
   href: string
+  /** Only in the desktop bar from 72rem up (see data/nav.ts). */
+  wideOnly?: boolean
 }
 
 export interface PortalEntry extends HeaderLink {
@@ -77,11 +79,15 @@ export function Header({
         </Link>
 
         <nav aria-label="Main" className="hidden lg:block">
-          <ul className="flex items-center gap-1">
+          {/* The bar stops growing at 72rem, where all seven links show. The
+              spacing is sized so they fit on one line there in every language
+              (the French one with the least room), so from 72rem a label never
+              wraps; below it, where only six show, a long label may. */}
+          <ul className="flex items-center">
             {nav.map((link) => {
               const current = isCurrent(pathname, link.href)
               return (
-                <li key={link.href}>
+                <li key={link.href} className={cn(link.wideOnly && 'hidden min-[72rem]:block')}>
                   <SiteLink
                     href={link.href}
                     aria-current={current ? 'page' : undefined}
@@ -89,7 +95,7 @@ export function Header({
                     // current-page mark can legitimately differ on the client.
                     suppressHydrationWarning
                     className={cn(
-                      'inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                      'inline-flex items-center gap-1 rounded-md px-2.5 py-2 text-sm font-medium transition-colors min-[72rem]:whitespace-nowrap',
                       current ? 'text-foreground' : 'text-muted-foreground hover:text-foreground',
                     )}
                   >

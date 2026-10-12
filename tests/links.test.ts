@@ -5,6 +5,7 @@ import { mainNav, portalLinks, requestAccessLink } from '@/data/nav'
 import { footerColumns } from '@/data/footer'
 import { legalPages, legalSlug } from '@/data/legal'
 import { games } from '@/data/games'
+import { partners } from '@/data/partners'
 import { productLines } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
 import { en } from '@/i18n/copy/en'
@@ -18,6 +19,7 @@ const root = join(__dirname, '..')
 const dynamicSlugs: Record<string, string[]> = {
   '/games/[slug]': games.map((game) => game.slug),
   '/legal/[slug]': legalPages.map(legalSlug),
+  '/partners/[slug]': partners.map((partner) => partner.slug),
 }
 
 /** Every route the app serves, read from the app directory. */

@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { games } from '@/data/games'
 import { legalPages } from '@/data/legal'
+import { partners } from '@/data/partners'
 import { defaultLocale, locales } from '@/i18n/config'
 import { pageUrl } from '@/lib/metadata'
 
@@ -16,8 +17,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/', changeFrequency: 'weekly', priority: 1 },
     { path: '/pricing', changeFrequency: 'weekly', priority: 0.9 },
     { path: '/games', changeFrequency: 'weekly', priority: 0.9 },
+    { path: '/partners', changeFrequency: 'weekly', priority: 0.6 },
     { path: '/legal', changeFrequency: 'yearly', priority: 0.3 },
     ...games.map((game) => ({ path: `/games/${game.slug}`, changeFrequency: 'monthly' as const, priority: 0.7 })),
+    ...partners.map((partner) => ({
+      path: `/partners/${partner.slug}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.5,
+    })),
     ...legalPages.map((page) => ({ path: page.href, changeFrequency: 'yearly' as const, priority: 0.3 })),
   ]
 
