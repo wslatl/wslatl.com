@@ -97,6 +97,7 @@ async function checkNotFound() {
     ['an unknown path', `/no-such-page-${stamp}`, 'en'],
     ['an unknown game', `/games/no-such-game-${stamp}`, 'en'],
     ['an unknown legal document', `/legal/no-such-document-${stamp}`, 'en'],
+    ['an unknown partner', `/partners/no-such-partner-${stamp}`, 'en'],
     ['a path with a dot', `/no-such-file-${stamp}.js`, 'en'],
     ['an unknown path in Spanish', `/es/no-such-page-${stamp}`, 'es'],
     ['an unknown game in German', `/de/games/no-such-game-${stamp}`, 'de'],

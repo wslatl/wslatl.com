@@ -5,6 +5,12 @@ import type { Copy } from '@/i18n/copy/en'
 export interface NavLink {
   label: string
   href: string
+  /**
+   * Left out of the desktop header bar until the screen is wide enough for
+   * it in every language (72rem). The mobile menu and the footer always
+   * carry it.
+   */
+  wideOnly?: boolean
 }
 
 export interface PortalLink extends NavLink {
@@ -19,6 +25,10 @@ export function mainNav(t: Copy, locale: Locale): NavLink[] {
     { label: t.nav.games, href: path('/games') },
     { label: t.nav.services, href: path('/#services') },
     { label: t.nav.about, href: path('/#about') },
+    // Seven links do not fit the 1024px bar in French or Spanish. From 72rem
+    // they do, with the room components/layout/header.tsx leaves; a longer
+    // label in any language needs that measured again.
+    { label: t.nav.partners, href: path('/partners'), wideOnly: true },
     { label: t.nav.contact, href: path('/#contact') },
     { label: t.nav.status, href: siteConfig.links.status },
   ]

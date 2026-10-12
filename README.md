@@ -10,7 +10,8 @@ The public website for WSLATL LLC. Private hosting based in Missouri: VPS hostin
 2. Publishes plan pricing for VPS and game servers on `/pricing`, with a page per supported game under `/games`.
 3. Routes visitors to the right panel (billing, game panel, VPS panel, dedicated portal, cPanel) through the header Login menu and the footer.
 4. Hosts the full legal library (ten policies) under `/legal`.
-5. Does all of that in English, Spanish, French, German and Portuguese.
+5. Shows our official referral partners on `/partners`, each with a profile page and their referral code.
+6. Does all of that in English, Spanish, French, German and Portuguese.
 
 Every page is static. There is no CMS and no database: content lives in `data/*.ts` and `content/legal/*.tsx`, so copy is one PR away.
 
@@ -31,6 +32,8 @@ app/
     games/[slug]/page.tsx  One page per game, statically generated from data/games.ts.
     legal/page.tsx         Index of every legal document.
     legal/[slug]/page.tsx  Every policy, at /legal/privacy, /legal/terms, and so on.
+    partners/page.tsx      Official partners: their cards, the "This could be you" card, the partner program.
+    partners/[slug]/page.tsx  One profile per partner, statically generated from data/partners.ts.
     not-found.tsx, error.tsx  Branded 404 and error pages.
 
 proxy.ts                   Serves the English tree at the unprefixed URLs.
@@ -42,11 +45,13 @@ components/
   pricing/                 Plan tables and the sticky section switcher.
   games/                   Game directory (the only client-side search on the site).
   legal/                   The blocks every legal document is built from, and the SLA uptime table.
+  partners/                Partner cards, the copy-code button, platform icons, the partner program section.
   seo/json-ld.tsx          Structured data.
 
 config/site.ts             Company details, paths, credits, legal metadata and effective dates.
 config/links.json          Where each short link (/billing, /discord, ...) sends people.
 config/emails.ts           Our email addresses. Server-only; rendered through <Email>.
+config/referral.ts         The referral discount percent, which must match the billing panel.
 content/legal/             The text of each policy; index.ts maps each document and language to its text.
 data/                      Everything else the pages render (see below).
 i18n/                      Languages: the current one, the dictionaries, the translations.
@@ -68,6 +73,8 @@ Some facts appear on many pages. Each one is defined exactly once, and everythin
 | Uptime targets | `data/sla.ts` | Terms of Service, SLA, Refund Policy, home page commitments, pricing page |
 | Legal document titles and dates | `data/legal.ts` and `config/site.ts` | Legal pages, `/legal`, footer, sitemap |
 | Games | `data/games.ts` | `/games`, game pages, sitemap |
+| Official partners | `data/partners.ts`, with their pictures in `public/partners/<slug>/` | `/partners`, partner profiles, sitemap |
+| Referral discount, and what the partner program may promise | `config/referral.ts` (the percent must match the billing panel) | `/partners`, partner profiles |
 | Panel, portal, and profile URLs | `config/links.json` | Every button and link (through short links), redirects, structured data |
 | Email addresses | `config/emails.ts` | Every address on the site, through `<Email>` |
 | Company profile (owners, story, links, questions) | `lib/company-profile.ts`, built from the files above | `/company.json`, read by the billing panel. Its shape is versioned, so change it with care |
@@ -133,9 +140,53 @@ Documents are built from a handful of blocks in `components/legal/blocks.tsx`, s
 
 ---
 
+## Partners
+
+`/partners` shows our official referral partners. Each one has a profile at `/partners/<slug>` with their banner, picture, description, links, the games they play, and their referral code with a "Sign up with this code" button that opens the billing panel's sign-up page with the code filled in. The list lives in `data/partners.ts` and starts empty: with no partners, the page leads with a "This could be you" card beside the partner program, and once there are partners that card stays as the last one in the grid.
+
+The program text only says what the billing panel actually does. Those facts, and the discount percent, are in `config/referral.ts`. The percent must match the referral discount in the billing panel (Settings, Orders), so change both on the same day.
+
+### How to add a partner
+
+Only with the partner's written OK to be shown here. Keep that message (a ticket or a Discord message) in case they ask later.
+
+Taking someone down is two steps on the same day: delete their entry and their folder here, and revoke them as a referrer in the billing panel. Revoking is what ends the discount on new invoices for the people they referred, which is what the site tells those people ("for as long as that partner stays in the program").
+
+1. Get from them: their name, a one-line tagline (80 characters at most), a short description (600 at most), a square picture, a wide banner, the links they want shown, the games they play, and their referral code from the billing panel.
+2. Export the picture as a square WebP, 512px (at least 256px), and the banner as a WebP about 3:1, ideally 1500x500 (at least 1200px wide). PNG and JPEG work too; nothing else is served from `public/partners/` (no SVG, which can carry script). Two things to tell them about the banner:
+   - On their profile, their picture sits over the bottom-left corner of the banner, so nothing important should be there.
+   - The banner is also the picture a shared link to their profile shows. Many link previews (Facebook, LinkedIn, X) are made for pictures of about 2:1 and crop the left and right ends off a 3:1 banner, so names and logos belong in the middle.
+3. Put both in `public/partners/<slug>/`, for example `public/partners/pixel-forge/avatar.webp` and `banner.webp`. The slug and the file names are lowercase letters, digits and hyphens, and the slug becomes the address of their profile.
+4. Add their entry to `partners` in `data/partners.ts`:
+
+   ```ts
+   {
+     slug: 'pixel-forge',
+     name: 'Pixel Forge',
+     tagline: 'Modded Minecraft builds and a friendly survival community.',
+     description: 'Who they are, in their own words.\n\nA second paragraph.',
+     avatar: '/partners/pixel-forge/avatar.webp',
+     banner: '/partners/pixel-forge/banner.webp',
+     referralCode: 'PIXELFORGE',
+     since: '2026-10',
+     games: ['minecraft', 'terraria'],
+     socials: {
+       discord: 'https://discord.gg/<invite>',
+       youtube: 'https://www.youtube.com/@<handle>',
+     },
+   },
+   ```
+
+   `\n\n` in the description starts a new paragraph. `since` is the month they became a partner. `games` are slugs from `data/games.ts`, and each links to that game's page. `socials` takes any of `discord`, `youtube`, `tiktok`, `twitch`, `kick`, `x`, `instagram`, `steam`, `github` and `website`, as full https links. Add `featured: true` to show someone first. To give the tagline or description in other languages, use an object instead of a string, `{ en: '...', es: '...' }`; a language left out shows the English.
+5. Run `npm test`. It checks every entry: each link is a plain https:// address on that platform's own site, slugs and codes are unique, codes are A to Z and 0 to 9 and at most 32 characters (as the billing panel stores them), the lengths, the month, the games, and that both pictures are WebP, PNG or JPEG files directly in their folder, in the right shapes. The profile page, its sitemap entry and its share picture all follow from the entry.
+
+`public/partners/` shares its name with the pages, so `i18n/routing.ts` serves only WebP, PNG and JPEG pictures from it as files (`sharedDirectories` and `partnerImageTypes`); every other path under `/partners/` is a page and gets a language like any other. A test fails if anything else is put in that folder.
+
+---
+
 ## Images
 
-`images.unoptimized` is on, so every file in `public/` is served as-is. Export images at twice their display size before adding them: client logos are trimmed WebP at 96px tall, team photos are 192px square WebP. `public/og-image.png` (1200x630) is rendered from the site's own fonts and logo; re-export it if the slogan or branding changes.
+`images.unoptimized` is on, so every file in `public/` is served as-is. Export images at twice their display size before adding them: client logos are trimmed WebP at 96px tall, team photos are 192px square WebP. Partner pictures go in `public/partners/<slug>/` (see Partners). `public/og-image.png` (1200x630) is rendered from the site's own fonts and logo; re-export it if the slogan or branding changes.
 
 ---
 

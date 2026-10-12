@@ -30,6 +30,7 @@ export const en = {
     games: 'Game servers',
     services: 'Services',
     about: 'About',
+    partners: 'Partners',
     contact: 'Contact',
     status: 'Status',
   },
@@ -56,6 +57,7 @@ export const en = {
       dedicated: 'Dedicated servers',
       web: 'Web hosting',
       about: 'About us',
+      partners: 'Partners',
       howItWorks: 'How ordering works',
       contact: 'Contact',
       reviews: 'Reviews on Trustpilot',
@@ -313,6 +315,79 @@ export const en = {
       service: "Service",
       target: "Monthly Uptime Target",
       label: "Monthly uptime targets",
+    },
+  },
+  partners: {
+    metaTitle: 'Official partners',
+    metaDescription: (percent: string) =>
+      `Creators and communities we work with, each with their own referral code. Sign up with one to get ${percent} off your hosting on every invoice, except dedicated servers, for as long as that partner stays in the program.`,
+    emptyMetaDescription:
+      'We are choosing our first official partners. Make videos, stream, or run a community? See how our partner program works and how to join.',
+    heading: 'Official partners',
+    crumb: 'Partners',
+    intro: (percent: string) =>
+      `Creators and communities our team has approved. Sign up with one of their referral codes and you get ${percent} off your hosting on every invoice, except dedicated servers, for as long as that partner stays in the program.`,
+    emptyIntro:
+      'We are choosing our first official partners. Make videos, stream, or run a community? This page could start with you.',
+    featured: 'Featured',
+    officialPartner: 'Official partner',
+    since: (month: string) => `Partner since ${month}`,
+    referralCode: 'Referral code',
+    copy: 'Copy',
+    copied: 'Copied',
+    copyFailed: 'The code is selected. Copy it with your keyboard or menu.',
+    viewProfile: 'View profile',
+    onPlatform: (name: string, platform: string) => `${name} on ${platform}`,
+    website: 'Website',
+    ghost: {
+      title: 'This could be you',
+      body: 'Make videos, stream, or run a community? Become an official partner and get a profile here.',
+      cta: 'Become a partner',
+    },
+    program: {
+      heading: 'Become a partner',
+      intro: 'Partners are creators and communities our team approves by hand. This is how it works.',
+      approved: {
+        title: 'Approved by our team',
+        body: 'Tell us who you are and where your community is. Our team reviews every request.',
+      },
+      code: {
+        title: 'Your own referral code',
+        body:
+          'People enter your code when they sign up in the billing portal, or follow your link, which fills it in for them.',
+      },
+      discount: {
+        title: (percent: string) => `${percent} off for the people you refer`,
+        body: (percent: string) =>
+          `Anyone who signs up with your code gets ${percent} off their hosting on every invoice, except dedicated servers, for as long as you stay in the program. It does not stack with a promo code: the larger discount applies.`,
+      },
+      credit: {
+        title: 'Account credit for you',
+        body: 'You earn a share of what each person you refer pays on their first invoice, as account credit.',
+      },
+      profile: {
+        title: 'A profile on this page',
+        body: 'With your OK, we show you here with your banner, picture, links and code.',
+      },
+      discordCta: 'Ask us on Discord',
+      ticketCta: 'Open a ticket',
+      ticketNote: 'Already a client? Open a ticket in the billing portal and tell us about your channel or community.',
+      creditLink: 'How account credit works',
+    },
+    profile: {
+      metaTitle: (name: string) => `${name}, official partner`,
+      metaDescription: (code: string, percent: string) =>
+        `Sign up with code ${code} to get ${percent} off your hosting on every invoice, except dedicated servers, for as long as this partner stays in the program.`,
+      about: (name: string) => `About ${name}`,
+      links: (name: string) => `Find ${name} online`,
+      games: 'Games they play',
+      referral: (name: string) => `${name}'s referral code`,
+      signUp: 'Sign up with this code',
+      discount: (percent: string) =>
+        `Signing up with this code gets you ${percent} off your hosting on every invoice, except dedicated servers, for as long as this partner stays in the program. It does not stack with a promo code: the larger discount applies.`,
+      avatarAlt: (name: string) => `Profile picture of ${name}`,
+      bannerAlt: (name: string) => `Banner of ${name}`,
+      allPartners: 'All partners',
     },
   },
   notFound: {

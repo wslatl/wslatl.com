@@ -29,8 +29,31 @@ export const rootFiles: readonly string[] = [
 /** Directories under public/, served exactly as they are. */
 export const rootDirectories: readonly string[] = ['/clients/', '/owners/']
 
+/**
+ * Directories under public/ that share their name with pages. /partners and
+ * /partners/<slug> are pages, while each partner's pictures sit beside them
+ * at /partners/<slug>/avatar.webp. In here only a picture of one of the
+ * types below is a file; every other path is a page and is given a language
+ * like any other.
+ */
+export const sharedDirectories: readonly string[] = ['/partners/']
+
+/**
+ * The picture types a partner's folder may hold, and so the only files
+ * served from it. lib/partners.ts checks partner pictures against this same
+ * list. SVG stays out on purpose: an SVG can carry script, and one opened
+ * directly would run it on our own address.
+ */
+export const partnerImageTypes = ['webp', 'png', 'jpg', 'jpeg'] as const
+
+const sharedFile = new RegExp(`\\.(${partnerImageTypes.join('|')})$`)
+
 export function isRootFile(pathname: string): boolean {
-  return rootFiles.includes(pathname) || rootDirectories.some((dir) => pathname.startsWith(dir))
+  return (
+    rootFiles.includes(pathname) ||
+    rootDirectories.some((dir) => pathname.startsWith(dir)) ||
+    sharedDirectories.some((dir) => pathname.startsWith(dir) && sharedFile.test(pathname))
+  )
 }
 
 /**

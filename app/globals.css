@@ -270,6 +270,27 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
   }
 }
 
+/* ----- Partner placeholders: the "This could be you" card's banner ----- */
+/* A wash of the brand blue over faint stripes, so the empty seat reads as
+   waiting for someone rather than as a picture that failed to load. It
+   brightens when the card is pointed at or focused. */
+.partner-placeholder {
+  background-color: transparent;
+  background-image:
+    radial-gradient(90% 140% at 50% 0%, color-mix(in oklch, var(--primary) 30%, transparent), transparent 75%),
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 12px,
+      color-mix(in oklch, var(--foreground) 5%, transparent) 12px 24px
+    );
+  transition: background-color 150ms ease;
+}
+
+.group:hover > .partner-placeholder,
+.group:focus-visible > .partner-placeholder {
+  background-color: color-mix(in oklch, var(--primary) 12%, transparent);
+}
+
 /* ----- Client logo marquee ----- */
 .marquee-viewport {
   mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);

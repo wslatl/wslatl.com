@@ -21,6 +21,7 @@ export const pt: Copy = {
     games: 'Servidores de jogos',
     services: 'Serviços',
     about: 'Sobre',
+    partners: 'Parceiros',
     contact: 'Contato',
     status: 'Status',
   },
@@ -47,6 +48,7 @@ export const pt: Copy = {
       dedicated: 'Servidores dedicados',
       web: 'Hospedagem de sites',
       about: 'Sobre nós',
+      partners: 'Parceiros',
       howItWorks: 'Como funciona o pedido',
       contact: 'Contato',
       reviews: 'Avaliações no Trustpilot',
@@ -304,6 +306,80 @@ export const pt: Copy = {
       service: "Serviço",
       target: "Meta de uptime mensal",
       label: "Metas de uptime mensal",
+    },
+  },
+  partners: {
+    metaTitle: 'Parceiros oficiais',
+    metaDescription: (percent: string) =>
+      `Criadores e comunidades com quem trabalhamos, cada um com seu próprio código de indicação. Cadastre-se com um deles e ganhe ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto esse parceiro continuar no programa.`,
+    emptyMetaDescription:
+      'Estamos escolhendo nossos primeiros parceiros oficiais. Faz vídeos, lives ou cuida de uma comunidade? Veja como funciona nosso programa de parceiros e como participar.',
+    heading: 'Parceiros oficiais',
+    crumb: 'Parceiros',
+    intro: (percent: string) =>
+      `Criadores e comunidades aprovados pela nossa equipe. Cadastre-se com um dos códigos de indicação deles e ganhe ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto esse parceiro continuar no programa.`,
+    emptyIntro:
+      'Estamos escolhendo nossos primeiros parceiros oficiais. Faz vídeos, lives ou cuida de uma comunidade? Esta página pode começar com você.',
+    featured: 'Destaque',
+    officialPartner: 'Parceiro oficial',
+    since: (month: string) => `Parceiro desde ${month}`,
+    referralCode: 'Código de indicação',
+    copy: 'Copiar',
+    copied: 'Copiado',
+    copyFailed: 'O código está selecionado. Copie pelo teclado ou pelo menu.',
+    viewProfile: 'Ver perfil',
+    onPlatform: (name: string, platform: string) => `${platform} de ${name}`,
+    website: 'Site',
+    ghost: {
+      title: 'Pode ser você',
+      body: 'Faz vídeos, lives ou cuida de uma comunidade? Torne-se parceiro oficial e tenha seu perfil aqui.',
+      cta: 'Seja parceiro',
+    },
+    program: {
+      heading: 'Seja parceiro',
+      intro: 'Nossos parceiros são criadores e comunidades que nossa equipe aprova um a um. Veja como funciona.',
+      approved: {
+        title: 'Aprovado pela nossa equipe',
+        body: 'Conte quem você é e onde fica a sua comunidade. Nossa equipe analisa cada pedido.',
+      },
+      code: {
+        title: 'Seu próprio código de indicação',
+        body:
+          'As pessoas digitam seu código ao se cadastrar no portal de faturamento, ou usam seu link, que já preenche o código para elas.',
+      },
+      discount: {
+        title: (percent: string) => `${percent} de desconto para quem você indicar`,
+        body: (percent: string) =>
+          `Quem se cadastrar com seu código ganha ${percent} de desconto na hospedagem em todas as faturas, exceto em servidores dedicados, enquanto você continuar no programa. Não se soma a um código promocional: vale o maior desconto.`,
+      },
+      credit: {
+        title: 'Crédito na conta para você',
+        body: 'Você recebe uma parte do que cada pessoa indicada paga na primeira fatura, como crédito na sua conta.',
+      },
+      profile: {
+        title: 'Um perfil nesta página',
+        body: 'Com a sua autorização, mostramos você aqui com seu banner, sua foto, seus links e seu código.',
+      },
+      discordCta: 'Fale com a gente no Discord',
+      ticketCta: 'Abrir um ticket',
+      ticketNote:
+        'Já é cliente? Abra um ticket no portal de faturamento e conte sobre o seu canal ou a sua comunidade.',
+      creditLink: 'Como funciona o crédito na conta',
+    },
+    profile: {
+      metaTitle: (name: string) => `${name}, parceiro oficial`,
+      metaDescription: (code: string, percent: string) =>
+        `Cadastre-se com o código ${code} e ganhe ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto este parceiro continuar no programa.`,
+      about: (name: string) => `Sobre ${name}`,
+      links: (name: string) => `Encontre ${name} na internet`,
+      games: 'Jogos que joga',
+      referral: (name: string) => `Código de indicação de ${name}`,
+      signUp: 'Cadastre-se com este código',
+      discount: (percent: string) =>
+        `Ao se cadastrar com este código, você ganha ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto este parceiro continuar no programa. Não se soma a um código promocional: vale o maior desconto.`,
+      avatarAlt: (name: string) => `Foto de perfil de ${name}`,
+      bannerAlt: (name: string) => `Banner de ${name}`,
+      allPartners: 'Todos os parceiros',
     },
   },
   notFound: {
