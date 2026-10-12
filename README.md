@@ -22,6 +22,7 @@ Every page is static. There is no CMS and no database: content lives in `data/*.
 app/
   globals.css              Tailwind v4 entry, design tokens, the few custom styles.
   sitemap.ts, robots.ts    Every page in every language, from the same data the pages use.
+  company.json/route.ts    /company.json: the company profile for the billing panel, written at build time.
   [locale]/                Every page, once, for all five languages (see Languages).
     layout.tsx             Root layout: language, fonts, default metadata, Organization JSON-LD, skip link.
     page.tsx               Home page composition.
@@ -69,6 +70,7 @@ Some facts appear on many pages. Each one is defined exactly once, and everythin
 | Games | `data/games.ts` | `/games`, game pages, sitemap |
 | Panel, portal, and profile URLs | `config/links.json` | Every button and link (through short links), redirects, structured data |
 | Email addresses | `config/emails.ts` | Every address on the site, through `<Email>` |
+| Company profile (owners, story, links, questions) | `lib/company-profile.ts`, built from the files above | `/company.json`, read by the billing panel. Its shape is versioned, so change it with care |
 
 Never type a price, a plan spec, or an uptime figure anywhere else. Format prices with `formatPrice()` from `lib/pricing.ts`.
 

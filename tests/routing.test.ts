@@ -18,7 +18,18 @@ describe('the files served from the site root', () => {
   it('recognises a file at the root, and anything inside a directory we serve', () => {
     expect(isRootFile('/favicon.ico')).toBe(true)
     expect(isRootFile('/sitemap.xml')).toBe(true)
+    expect(isRootFile('/company.json')).toBe(true)
     expect(isRootFile('/clients/example.png')).toBe(true)
+  })
+
+  it('lists every file the app generates at the root', () => {
+    // app/company.json/route.ts is served at /company.json. Added there and
+    // forgotten in rootFiles, it would be given a language and answer 404.
+    const generated = readdirSync(join(root, 'app')).filter(
+      (name) => name.includes('.') && statSync(join(root, 'app', name)).isDirectory(),
+    )
+    expect(generated.length).toBeGreaterThan(0)
+    for (const name of generated) expect(rootFiles, `/${name}`).toContain(`/${name}`)
   })
 })
 
