@@ -76,9 +76,10 @@ export default function PrivacyContent() {
           <ul>
             <li>Le nom complet</li>
             <li>L&rsquo;adresse e-mail</li>
-            <li>L&rsquo;adresse de facturation</li>
-            <li>Le numéro de téléphone (obligatoire à l&rsquo;inscription, utilisé pour la récupération de compte et pour vérifier la propriété du compte)</li>
-            <li>La date de naissance (utilisée pour appliquer les conditions d&rsquo;âge de la section 9)</li>
+            <li>Le pays</li>
+            <li>La date de naissance</li>
+            <li>Le numéro de téléphone</li>
+            <li>L&rsquo;adresse de facturation&nbsp;: rue, ville, code postal, et État ou région lorsque votre pays en a</li>
             <li>
               Le numéro d&rsquo;identification fiscale, lorsque vous en fournissez un afin que nous
               puissions vous facturer en tant qu&rsquo;entreprise ou appliquer une exonération de taxe
@@ -93,6 +94,27 @@ export default function PrivacyContent() {
             </li>
             <li>Toute information que vous fournissez volontairement pendant le processus de candidature ou de mise en route</li>
           </ul>
+          <p>Voici pourquoi nous demandons ces informations&nbsp;:</p>
+          <ul>
+            <li>
+              <strong>Le numéro de téléphone&nbsp;:</strong> pour sécuriser votre compte et pour
+              vérifier votre identité si votre compte est verrouillé. Nous pouvons envoyer un code
+              par SMS au numéro enregistré pour confirmer qu&rsquo;il s&rsquo;agit bien de vous.
+            </li>
+            <li>
+              <strong>L&rsquo;adresse de facturation et le pays&nbsp;:</strong> pour la
+              facturation et les factures, pour prévenir la fraude et pour respecter les règles en
+              matière de sanctions et de fiscalité.
+            </li>
+            <li>
+              <strong>La date de naissance&nbsp;:</strong> pour vérifier l&rsquo;âge minimum prévu
+              à la section 9.
+            </li>
+          </ul>
+          <p>
+            Vous pouvez nous demander de configurer votre compte sans numéro de téléphone, sans
+            adresse de facturation, ou sans les deux. Voir la section 2.6.
+          </p>
           <p>
             Nous tenons également un{' '}
             <strong>registre des avoirs de compte</strong> pour votre
@@ -109,7 +131,9 @@ export default function PrivacyContent() {
         <LegalSubSection title="2.2 Informations de facturation et de paiement">
           <p>
             Les paiements sont traités via notre portail de facturation à l&rsquo;aide de prestataires de paiement tiers
-            conformes à la norme PCI-DSS. Nous ne stockons ni votre numéro de carte complet ni votre CVV. Nous conservons&nbsp;:
+            conformes à la norme PCI-DSS. Les cartes de paiement sont gérées par le prestataire de
+            paiement, Stripe ou PayPal, qui peut vous demander le code postal de la carte pour la
+            vérifier. Nous ne stockons ni votre numéro de carte complet ni votre CVV. Nous conservons&nbsp;:
           </p>
           <ul>
             <li>L&rsquo;historique des factures et les enregistrements de facturation</li>
@@ -153,6 +177,32 @@ export default function PrivacyContent() {
             <li>Les pages visitées et le temps passé sur le site</li>
             <li>L&rsquo;URL de provenance</li>
             <li>Les cookies de session (voir la section 7)</li>
+          </ul>
+        </LegalSubSection>
+
+        <LegalSubSection title="2.6 Comptes sans numéro de téléphone ou sans adresse de facturation">
+          <p>
+            Si vous préférez ne pas communiquer votre numéro de téléphone, votre adresse de
+            facturation, ou les deux, dites-le-nous avant ou pendant l&rsquo;inscription. Ouvrez un ticket de
+            support ou écrivez à{' '}
+            <Email name="support" />. Notre équipe peut alors configurer votre compte pour
+            qu&rsquo;il n&rsquo;en ait pas besoin. Cela convient par exemple aux partenaires qui
+            préfèrent ne pas communiquer ces informations. Une boîte postale est aussi acceptée
+            comme adresse.
+          </p>
+          <p>Sur un compte configuré ainsi&nbsp;:</p>
+          <ul>
+            <li>Le pays et la date de naissance restent obligatoires. Tous les comptes en ont besoin.</li>
+            <li>
+              Si une taxe sur les ventes ou la TVA s&rsquo;applique dans votre pays, nous pouvons
+              vous demander l&rsquo;État et le code postal nécessaires pour calculer la taxe. Nous
+              ne vous demandons jamais la rue ni la ville pour cela.
+            </li>
+            <li>
+              Sans numéro de téléphone enregistré, la récupération par SMS n&rsquo;est pas
+              disponible. La récupération du compte passe alors par votre adresse e-mail, la
+              connexion à deux facteurs et un ticket de support.
+            </li>
           </ul>
         </LegalSubSection>
       </LegalSection>

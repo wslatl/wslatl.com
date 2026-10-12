@@ -77,9 +77,10 @@ export default function PrivacyContent() {
           <ul>
             <li>Vollständigen Namen</li>
             <li>E-Mail-Adresse</li>
-            <li>Rechnungsadresse</li>
-            <li>Telefonnummer (bei der Anmeldung erforderlich, genutzt zur Kontowiederherstellung und zur Bestätigung der Kontoinhaberschaft)</li>
-            <li>Geburtsdatum (genutzt, um die Altersanforderungen in Abschnitt 9 anzuwenden)</li>
+            <li>Land</li>
+            <li>Geburtsdatum</li>
+            <li>Telefonnummer</li>
+            <li>Rechnungsadresse: Straße, Ort, Postleitzahl sowie Bundesstaat oder Region, wo Ihr Land diese hat</li>
             <li>
               Steuernummer, sofern Sie eine angeben, damit wir Ihnen als Unternehmen eine
               Rechnung stellen oder eine Steuerbefreiung anwenden können
@@ -93,6 +94,25 @@ export default function PrivacyContent() {
             </li>
             <li>Alle Informationen, die Sie im Bewerbungs- oder Einrichtungsprozess freiwillig angeben</li>
           </ul>
+          <p>Darum fragen wir nach diesen Angaben:</p>
+          <ul>
+            <li>
+              <strong>Telefonnummer:</strong> zur Sicherheit Ihres Kontos und um Ihre Identität zu
+              prüfen, wenn Ihr Konto gesperrt ist. Wir können dazu einen Code per SMS an die
+              hinterlegte Nummer senden, um zu bestätigen, dass Sie es sind.
+            </li>
+            <li>
+              <strong>Rechnungsadresse und Land:</strong> für die Abrechnung und die Rechnungen,
+              zur Vorbeugung gegen Betrug und um Sanktions- und Steuervorschriften einzuhalten.
+            </li>
+            <li>
+              <strong>Geburtsdatum:</strong> um das Mindestalter nach Abschnitt 9 zu prüfen.
+            </li>
+          </ul>
+          <p>
+            Sie können uns bitten, Ihr Konto ohne Telefonnummer, ohne Rechnungsadresse oder ohne beides
+            einzurichten. Siehe Abschnitt 2.6.
+          </p>
           <p>
             Wir führen außerdem einen{' '}
             <strong>Guthabenverlauf</strong> für Ihr Konto, in dem
@@ -108,7 +128,9 @@ export default function PrivacyContent() {
         <LegalSubSection title="2.2 Abrechnungs- & Zahlungsinformationen">
           <p>
             Zahlungen werden über unser Abrechnungsportal mit PCI-DSS-konformen
-            Zahlungsdienstleistern Dritter abgewickelt. Wir speichern weder Ihre vollständige
+            Zahlungsdienstleistern Dritter abgewickelt. Zahlungskarten verarbeitet der
+            Zahlungsanbieter, Stripe oder PayPal. Er kann nach der Postleitzahl Ihrer Karte fragen,
+            um die Karte zu prüfen. Wir speichern weder Ihre vollständige
             Kartennummer noch die Prüfziffer (CVV). Wir bewahren auf:
           </p>
           <ul>
@@ -154,6 +176,31 @@ export default function PrivacyContent() {
             <li>Besuchte Seiten und auf der Website verbrachte Zeit</li>
             <li>Verweisende URL</li>
             <li>Sitzungscookies (siehe Abschnitt 7)</li>
+          </ul>
+        </LegalSubSection>
+
+        <LegalSubSection title="2.6 Konten ohne Telefonnummer oder Rechnungsadresse">
+          <p>
+            Wenn Sie uns Ihre Telefonnummer, Ihre Rechnungsadresse oder beides lieber nicht geben möchten,
+            fragen Sie uns vor oder während der Anmeldung. Eröffnen Sie ein Supportticket oder
+            schreiben Sie an{' '}
+            <Email name="support" />. Unser Team kann Ihr Konto dann so einrichten, dass es diese
+            Angaben nicht braucht. Das eignet sich zum Beispiel für Partner, die diese Angaben
+            lieber nicht teilen. Ein Postfach wird ebenfalls als Adresse akzeptiert.
+          </p>
+          <p>Bei einem so eingerichteten Konto gilt:</p>
+          <ul>
+            <li>Land und Geburtsdatum sind weiterhin erforderlich. Jedes Konto braucht sie.</li>
+            <li>
+              Wenn in Ihrem Land eine Verkaufssteuer (Sales Tax) oder Mehrwertsteuer anfällt,
+              können wir nach dem Bundesstaat und der Postleitzahl fragen, die wir zur Berechnung
+              der Steuer brauchen. Nach Straße und Ort fragen wir dafür nie.
+            </li>
+            <li>
+              Ohne hinterlegte Telefonnummer ist eine Wiederherstellung per SMS nicht möglich. Die
+              Kontowiederherstellung läuft dann über Ihre E-Mail-Adresse, die Zwei-Faktor-Anmeldung
+              und ein Supportticket.
+            </li>
           </ul>
         </LegalSubSection>
       </LegalSection>

@@ -71,9 +71,10 @@ export default function PrivacyContent() {
           <ul>
             <li>Nombre completo</li>
             <li>Dirección de correo electrónico</li>
-            <li>Dirección de facturación</li>
-            <li>Número de teléfono (obligatorio al darse de alta, y usado para recuperar la cuenta y verificar su titularidad)</li>
-            <li>Fecha de nacimiento (usada para aplicar los requisitos de edad de la Sección 9)</li>
+            <li>País</li>
+            <li>Fecha de nacimiento</li>
+            <li>Número de teléfono</li>
+            <li>Dirección de facturación: calle, ciudad, código postal y estado o región cuando tu país los tiene</li>
             <li>
               Número de identificación fiscal, cuando facilitas uno para que podamos facturarte como
               empresa o aplicar una exención fiscal
@@ -88,6 +89,26 @@ export default function PrivacyContent() {
             </li>
             <li>Cualquier información que facilites voluntariamente durante el proceso de solicitud o de alta</li>
           </ul>
+          <p>Te explicamos por qué pedimos estos datos:</p>
+          <ul>
+            <li>
+              <strong>Número de teléfono:</strong> para mantener segura tu cuenta y para comprobar
+              tu identidad si tu cuenta está bloqueada. Podemos enviar un código por mensaje de
+              texto al número que consta en la cuenta para confirmar que eres tú.
+            </li>
+            <li>
+              <strong>Dirección de facturación y país:</strong> para la facturación y las
+              facturas, para prevenir el fraude y para cumplir las normas sobre sanciones y las
+              normas fiscales.
+            </li>
+            <li>
+              <strong>Fecha de nacimiento:</strong> para comprobar la edad mínima de la Sección 9.
+            </li>
+          </ul>
+          <p>
+            Puedes pedirnos que configuremos tu cuenta sin número de teléfono, sin dirección de
+            facturación o sin ninguno de los dos. Consulta la Sección 2.6.
+          </p>
           <p>
             También mantenemos un{' '}
             <strong>registro de movimientos del crédito de cuenta</strong> para tu
@@ -103,7 +124,9 @@ export default function PrivacyContent() {
         <LegalSubSection title="2.2 Información de facturación y de pago">
           <p>
             Los pagos se tramitan a través de nuestro portal de facturación mediante procesadores de pago de
-            terceros que cumplen PCI-DSS. No almacenamos el número completo de tu tarjeta ni el CVV. Conservamos:
+            terceros que cumplen PCI-DSS. Las tarjetas de pago las gestiona el proveedor de pagos,
+            Stripe o PayPal, que puede pedirte el código postal de la tarjeta para comprobarla. No
+            almacenamos el número completo de tu tarjeta ni el CVV. Conservamos:
           </p>
           <ul>
             <li>El historial de facturas y los registros de facturación</li>
@@ -147,6 +170,30 @@ export default function PrivacyContent() {
             <li>Las páginas visitadas y el tiempo en el sitio</li>
             <li>La URL de procedencia</li>
             <li>Las cookies de sesión (véase la Sección 7)</li>
+          </ul>
+        </LegalSubSection>
+
+        <LegalSubSection title="2.6 Cuentas sin número de teléfono o sin dirección de facturación">
+          <p>
+            Si prefieres no compartir tu número de teléfono, tu dirección de facturación o ambos,
+            pídenoslo antes o durante el alta. Abre un ticket de soporte o escribe a{' '}
+            <Email name="support" />. Nuestro equipo puede entonces configurar tu cuenta para que
+            no los necesite. Esto sirve, por ejemplo, a socios que prefieren no compartir esos
+            datos. También aceptamos un apartado de correos como dirección.
+          </p>
+          <p>En una cuenta configurada así:</p>
+          <ul>
+            <li>El país y la fecha de nacimiento siguen siendo obligatorios. Todas las cuentas los necesitan.</li>
+            <li>
+              Si en tu país se aplica un impuesto sobre las ventas o el IVA, podemos pedirte
+              el estado y el código postal que necesitamos para calcular el impuesto. Nunca te
+              pedimos la calle ni la ciudad para eso.
+            </li>
+            <li>
+              Sin un número de teléfono en la cuenta, no es posible recuperarla por mensaje de
+              texto. En ese caso, la cuenta se recupera con tu dirección de correo electrónico, el
+              inicio de sesión en dos pasos y un ticket de soporte.
+            </li>
           </ul>
         </LegalSubSection>
       </LegalSection>
