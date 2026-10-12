@@ -113,7 +113,7 @@ export const viewport: Viewport = {
   // The brand blue, matching --primary. Discord and Slack colour the strip
   // down the side of a shared link with this, so near-black read as a fault
   // rather than as a choice.
-  themeColor: '#0079ce',
+  themeColor: '#0073c7',
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
