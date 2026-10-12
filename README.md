@@ -167,6 +167,8 @@ Linting runs in two passes. [Oxlint](https://oxc.rs/docs/guide/usage/linter) goe
 
 TypeScript 7 provides `tsc`. The `typescript` package is aliased to `@typescript/typescript6` because ESLint's TypeScript parser still needs the TypeScript 6 API. ESLint stays on 9.x until `eslint-plugin-react` supports 10.
 
+`package.json` carries two `overrides`, both for the Security audit. `sharp` needs 0.35.5 or newer, which fixes an advisory in the image library Next.js bundles. `@next/eslint-plugin-next` (the lint rules inside `eslint-config-next`) gets `tinyglobby` in place of its `fast-glob`: `fast-glob` pulls in `braces`, which has a high-severity advisory and no fixed release, and the plugin only calls `globSync` with one option, which `tinyglobby` also has (Vitest already installs it). Remove that override once `eslint-config-next` stops depending on `fast-glob`, then run `npm audit` to confirm the tree is still clean.
+
 The Node.js version lives in `.nvmrc`; every workflow reads it from there.
 
 ---
@@ -181,7 +183,7 @@ The Node.js version lives in `.nvmrc`; every workflow reads it from there.
 | CodeQL | Push, pull request, weekly | Static analysis of the site code and these workflows. Findings appear under Security. |
 | Dependency review | Pull requests | Blocks a pull request that would add a vulnerable package. |
 | Lighthouse | Push and pull request | Accessibility, best practices, and SEO must stay at 100, with page weight and layout shift budgets (`lighthouserc.json`). Reports are kept as an artifact. |
-| Broken links | Mondays | Opens every page in the live sitemap and follows every link (`lychee.toml`). Broken ones go in one issue. |
+| Broken links | Mondays | Opens every page in the live sitemap and follows every link (`lychee.toml`, which skips only Trustpilot and our `/trustpilot` short link, because Trustpilot refuses link checkers). Broken ones go in one issue. |
 | Site health | Every six hours | Checks production with `scripts/check-site.mjs`. A failure opens one issue that closes itself when the site recovers. Run it by hand against any URL to check a deploy. |
 | Workflow lint | Changes under `.github` | actionlint, including shellcheck on every `run` step. |
 

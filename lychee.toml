@@ -20,6 +20,13 @@ exclude = [
   # Trustpilot answers 403 to anything that is not a browser. The profile
   # itself is fine; open wslatl.com/trustpilot to check it by hand.
   '^https://www\.trustpilot\.com/',
+  # Our own short link to that profile. The link checker follows it to
+  # Trustpilot and judges it by the final answer, which is the same 403, and
+  # the pattern above only covers a link that points there directly. This
+  # matches that one address and nothing else on this site. The redirect
+  # itself is still checked by scripts/check-site.mjs (the Site health run),
+  # which confirms /trustpilot goes to the address in config/links.json.
+  '^https://wslatl\.com/trustpilot/?$',
   # Cloudflare rewrites any mailto link it sees into one of these, and they
   # only resolve in a browser. Pages built since September 2026 carry no
   # mailto link at all, so these disappear as the site is deployed.
