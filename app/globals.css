@@ -15,9 +15,10 @@
   --card-foreground: oklch(0.95 0.005 0);
   --popover: oklch(0.15 0.01 0);
   --popover-foreground: oklch(0.95 0.005 0);
-  /* Fills (buttons, badges). Dark text on it is 4.6:1. */
-  --primary: oklch(0.55 0.18 240);
-  --primary-foreground: oklch(0.08 0 0);
+  /* Fills (buttons, badges), with white text on them: 4.9:1. A shade
+     darker than the old 0.55 so white clears 4.5:1 with room to spare. */
+  --primary: oklch(0.53 0.18 240);
+  --primary-foreground: oklch(1 0 0);
   /* The primary blue lifted for text: links and small labels, 7.9:1. */
   --link: oklch(0.7 0.15 240);
   --secondary: oklch(0.2 0.01 0);
