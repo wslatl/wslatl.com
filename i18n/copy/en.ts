@@ -321,12 +321,15 @@ export const en = {
     metaTitle: 'Official partners',
     metaDescription: (percent: string) =>
       `Creators and communities we work with, each with their own referral code. Sign up with one to get ${percent} off your hosting on every invoice, except dedicated servers, for as long as that partner stays in the program.`,
+    metaDescriptionNoCodes:
+      'Creators and communities we work with, approved by our team. See who they are and where to find them online.',
     emptyMetaDescription:
       'We are choosing our first official partners. Make videos, stream, or run a community? See how our partner program works and how to join.',
     heading: 'Official partners',
     crumb: 'Partners',
     intro: (percent: string) =>
       `Creators and communities our team has approved. Sign up with one of their referral codes and you get ${percent} off your hosting on every invoice, except dedicated servers, for as long as that partner stays in the program.`,
+    introNoCodes: 'Creators and communities our team has approved.',
     emptyIntro:
       'We are choosing our first official partners. Make videos, stream, or run a community? This page could start with you.',
     featured: 'Featured',
@@ -378,6 +381,7 @@ export const en = {
       metaTitle: (name: string) => `${name}, official partner`,
       metaDescription: (code: string, percent: string) =>
         `Sign up with code ${code} to get ${percent} off your hosting on every invoice, except dedicated servers, for as long as this partner stays in the program.`,
+      metaDescriptionNoCode: (name: string) => `${name} is an official partner of WSLATL LLC.`,
       about: (name: string) => `About ${name}`,
       links: (name: string) => `Find ${name} online`,
       games: 'Games they play',

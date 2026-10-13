@@ -312,12 +312,15 @@ export const de: Copy = {
     metaTitle: 'Offizielle Partner',
     metaDescription: (percent: string) =>
       `Creator und Communities, mit denen wir zusammenarbeiten, jeweils mit eigenem Empfehlungscode. Melde dich mit einem davon an und erhalte auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt.`,
+    metaDescriptionNoCodes:
+      'Creator und Communities, mit denen wir zusammenarbeiten, von unserem Team freigegeben. Sieh, wer sie sind und wo du sie online findest.',
     emptyMetaDescription:
       'Wir wählen gerade unsere ersten offiziellen Partner aus. Du machst Videos, streamst oder leitest eine Community? Erfahre, wie unser Partnerprogramm funktioniert und wie du mitmachst.',
     heading: 'Offizielle Partner',
     crumb: 'Partner',
     intro: (percent: string) =>
       `Creator und Communities, die unser Team freigegeben hat. Melde dich mit einem ihrer Empfehlungscodes an und du erhältst auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt.`,
+    introNoCodes: 'Creator und Communities, die unser Team freigegeben hat.',
     emptyIntro:
       'Wir wählen gerade unsere ersten offiziellen Partner aus. Du machst Videos, streamst oder leitest eine Community? Diese Seite könnte mit dir beginnen.',
     featured: 'Hervorgehoben',
@@ -372,6 +375,7 @@ export const de: Copy = {
       metaTitle: (name: string) => `${name}, offizieller Partner`,
       metaDescription: (code: string, percent: string) =>
         `Melde dich mit dem Code ${code} an und erhalte auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt.`,
+      metaDescriptionNoCode: (name: string) => `${name} ist offizieller Partner von WSLATL LLC.`,
       about: (name: string) => `Über ${name}`,
       links: (name: string) => `${name} im Netz`,
       games: 'Gespielte Spiele',

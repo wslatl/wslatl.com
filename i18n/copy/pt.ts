@@ -312,12 +312,15 @@ export const pt: Copy = {
     metaTitle: 'Parceiros oficiais',
     metaDescription: (percent: string) =>
       `Criadores e comunidades com quem trabalhamos, cada um com seu próprio código de indicação. Cadastre-se com um deles e ganhe ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto esse parceiro continuar no programa.`,
+    metaDescriptionNoCodes:
+      'Criadores e comunidades com quem trabalhamos, aprovados pela nossa equipe. Veja quem são e onde encontrá-los na internet.',
     emptyMetaDescription:
       'Estamos escolhendo nossos primeiros parceiros oficiais. Faz vídeos, lives ou cuida de uma comunidade? Veja como funciona nosso programa de parceiros e como participar.',
     heading: 'Parceiros oficiais',
     crumb: 'Parceiros',
     intro: (percent: string) =>
       `Criadores e comunidades aprovados pela nossa equipe. Cadastre-se com um dos códigos de indicação deles e ganhe ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto esse parceiro continuar no programa.`,
+    introNoCodes: 'Criadores e comunidades aprovados pela nossa equipe.',
     emptyIntro:
       'Estamos escolhendo nossos primeiros parceiros oficiais. Faz vídeos, lives ou cuida de uma comunidade? Esta página pode começar com você.',
     featured: 'Destaque',
@@ -370,6 +373,7 @@ export const pt: Copy = {
       metaTitle: (name: string) => `${name}, parceiro oficial`,
       metaDescription: (code: string, percent: string) =>
         `Cadastre-se com o código ${code} e ganhe ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto este parceiro continuar no programa.`,
+      metaDescriptionNoCode: (name: string) => `${name} é parceiro oficial da WSLATL LLC.`,
       about: (name: string) => `Sobre ${name}`,
       links: (name: string) => `Encontre ${name} na internet`,
       games: 'Jogos que joga',

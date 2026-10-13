@@ -312,12 +312,15 @@ export const es: Copy = {
     metaTitle: 'Socios oficiales',
     metaDescription: (percent: string) =>
       `Creadores y comunidades con los que trabajamos, cada uno con su propio código de referido. Regístrate con uno y obtén un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras ese socio siga en el programa.`,
+    metaDescriptionNoCodes:
+      'Creadores y comunidades con los que trabajamos, aprobados por nuestro equipo. Descubre quiénes son y dónde encontrarlos en internet.',
     emptyMetaDescription:
       'Estamos eligiendo a nuestros primeros socios oficiales. ¿Haces vídeos, directos o llevas una comunidad? Descubre cómo funciona nuestro programa de socios y cómo unirte.',
     heading: 'Socios oficiales',
     crumb: 'Socios',
     intro: (percent: string) =>
       `Creadores y comunidades que nuestro equipo ha aprobado. Regístrate con uno de sus códigos de referido y tendrás un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras ese socio siga en el programa.`,
+    introNoCodes: 'Creadores y comunidades que nuestro equipo ha aprobado.',
     emptyIntro:
       'Estamos eligiendo a nuestros primeros socios oficiales. ¿Haces vídeos, directos o llevas una comunidad? Esta página podría empezar contigo.',
     featured: 'Destacado',
@@ -370,6 +373,7 @@ export const es: Copy = {
       metaTitle: (name: string) => `${name}, socio oficial`,
       metaDescription: (code: string, percent: string) =>
         `Regístrate con el código ${code} y obtén un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras este socio siga en el programa.`,
+      metaDescriptionNoCode: (name: string) => `${name} es socio oficial de WSLATL LLC.`,
       about: (name: string) => `Sobre ${name}`,
       links: (name: string) => `Encuentra a ${name} en internet`,
       games: 'Juegos a los que juega',

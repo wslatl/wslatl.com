@@ -35,15 +35,42 @@ export function referralDiscount(locale: Locale): string {
   )
 }
 
+/** True when the partner shows a referral code: the box on their card and the sign-up button on their profile. */
+export function hasReferralCode(partner: Partner): partner is Partner & { referralCode: string } {
+  return partner.referralCode !== undefined
+}
+
 /**
  * What /partners says about itself, in its intro and in search results and
  * link previews. Both come from here, so they cannot disagree: with no
  * partners yet it is the invitation, never a list that is not there.
+ *
+ * `codeCount` is how many of the partners show a code (all of them unless
+ * said otherwise). When none do, the page must not offer a discount that
+ * nobody listed can give.
  */
-export function partnersPageText(t: Copy['partners'], partnerCount: number, locale: Locale) {
+export function partnersPageText(
+  t: Copy['partners'],
+  partnerCount: number,
+  locale: Locale,
+  codeCount: number = partnerCount,
+) {
   if (partnerCount === 0) return { intro: t.emptyIntro, description: t.emptyMetaDescription }
+  if (codeCount === 0) return { intro: t.introNoCodes, description: t.metaDescriptionNoCodes }
   const percent = referralDiscount(locale)
   return { intro: t.intro(percent), description: t.metaDescription(percent) }
+}
+
+/**
+ * A partner's profile in search results and link previews: their tagline,
+ * then either the sign-up offer with their code or, for a partner with no
+ * code, a plain line that says nothing about a code or a discount.
+ */
+export function partnerMetaDescription(partner: Partner, t: Copy['partners']['profile'], locale: Locale): string {
+  const about = hasReferralCode(partner)
+    ? t.metaDescription(partner.referralCode, referralDiscount(locale))
+    : t.metaDescriptionNoCode(partner.name)
+  return `${partnerText(partner.tagline, locale)} ${about}`
 }
 
 /** A partner's own words in one language, or the English when they gave none. */
@@ -224,11 +251,15 @@ export function partnerProblems(list: readonly Partner[], context: PartnerCheckC
 
     if (!partner.name.trim() || partner.name !== partner.name.trim()) at('name is empty or has spaces around it')
 
-    if (!referralCodePattern.test(partner.referralCode)) {
-      at(`referral code ${partner.referralCode} must be 1 to 32 characters, A to Z and 0 to 9`)
+    // The code is optional. When it is there it has to be a real one; an
+    // empty string is a slip, not "no code", so it fails the pattern.
+    if (partner.referralCode !== undefined) {
+      if (!referralCodePattern.test(partner.referralCode)) {
+        at(`referral code "${partner.referralCode}" must be 1 to 32 characters, A to Z and 0 to 9 (or left out)`)
+      }
+      if (seen.codes.has(partner.referralCode)) at(`referral code ${partner.referralCode} is used twice`)
+      seen.codes.add(partner.referralCode)
     }
-    if (seen.codes.has(partner.referralCode)) at(`referral code ${partner.referralCode} is used twice`)
-    seen.codes.add(partner.referralCode)
 
     for (const field of ['tagline', 'description'] as const) {
       const entries = partnerTextEntries(partner[field])

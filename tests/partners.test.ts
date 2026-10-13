@@ -5,7 +5,7 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { generateMetadata as partnersPageMetadata } from '@/app/[locale]/partners/page'
 import sitemap from '@/app/sitemap'
-import { ghostAloneAt, ghostItemClass } from '@/components/partners/partner-card'
+import { PartnerCard, ghostAloneAt, ghostItemClass } from '@/components/partners/partner-card'
 import { PartnerProfile } from '@/components/partners/partner-profile'
 import { PartnerShowcase } from '@/components/partners/partner-showcase'
 import { isShortLink, shortLinks } from '@/config/links'
@@ -20,7 +20,9 @@ import { defaultLocale, locales } from '@/i18n/config'
 import { copyFor } from '@/i18n/copy'
 import { en } from '@/i18n/copy/en'
 import {
+  hasReferralCode,
   orderedPartners,
+  partnerMetaDescription,
   partnerProblems,
   partnersPageText,
   partnerText,
@@ -31,7 +33,7 @@ import {
   socialLinks,
   type PartnerCheckContext,
 } from '@/lib/partners'
-import { examplePartner, exampleImages } from './fixtures/partners'
+import { examplePartner, exampleImages, partnerWithoutCode } from './fixtures/partners'
 import { imageSize } from './image-size'
 
 // The /partners page module is imported for its metadata. Its header and
@@ -96,6 +98,28 @@ describe('the partner checks', () => {
   it('reject the same code on two partners', () => {
     const problems = partnerProblems([examplePartner, { ...examplePartner, slug: 'someone-else' }], exampleContext)
     expect(problems.join('\n')).toMatch(/EXAMPLE10 is used twice/)
+  })
+
+  it('accept a partner with no referral code, since the code is optional', () => {
+    expect('referralCode' in partnerWithoutCode).toBe(false)
+    expect(partnerProblems([partnerWithoutCode], exampleContext)).toEqual([])
+    // Naming the field and leaving it undefined is the same as leaving it out.
+    expect(problemsWith({ referralCode: undefined })).toEqual([])
+  })
+
+  it('do not count partners with no code as sharing one', () => {
+    const second = { ...partnerWithoutCode, slug: 'someone-else' }
+    const problems = partnerProblems([partnerWithoutCode, second], exampleContext)
+    expect(problems.filter((problem) => /referral code/.test(problem))).toEqual([])
+    // A code still has to be unique among the partners that have one.
+    const twice = partnerProblems([examplePartner, partnerWithoutCode, { ...examplePartner, slug: 'third' }], exampleContext)
+    expect(twice.join('\n')).toMatch(/EXAMPLE10 is used twice/)
+  })
+
+  it('still reject an empty referral code, which is a mistake rather than no code', () => {
+    for (const referralCode of ['', ' ', '\n']) {
+      expect(problemsWith({ referralCode }).join('\n'), JSON.stringify(referralCode)).toMatch(/must be 1 to 32 characters/)
+    }
   })
 
   it('hold the tagline to 80 characters and the description to 600, in every language', () => {
@@ -272,6 +296,50 @@ describe('signing up with a referral code', () => {
   })
 })
 
+describe('a partner with no referral code', () => {
+  it('is told apart from one with a code', () => {
+    expect(hasReferralCode(examplePartner)).toBe(true)
+    expect(hasReferralCode(partnerWithoutCode)).toBe(false)
+  })
+
+  it('has a profile description with no code and no discount, in every language', () => {
+    for (const locale of locales) {
+      const t = copyFor(locale).partners.profile
+      const description = partnerMetaDescription(partnerWithoutCode, t, locale)
+      const tagline = partnerText(partnerWithoutCode.tagline, locale)
+      expect(description, locale).toBe(`${tagline} ${t.metaDescriptionNoCode(partnerWithoutCode.name)}`)
+      expect(description, locale).toContain(partnerWithoutCode.name)
+      expect(description, locale).not.toContain(examplePartner.referralCode ?? '')
+      expect(description, locale).not.toContain(referralDiscount(locale))
+      expect(description, locale).not.toContain(String(referralDiscountPercent))
+    }
+  })
+
+  it('keeps the code and the discount in the description of a partner who has one', () => {
+    for (const locale of locales) {
+      const t = copyFor(locale).partners.profile
+      const description = partnerMetaDescription(examplePartner, t, locale)
+      expect(description, locale).toContain(examplePartner.referralCode ?? '')
+      expect(description, locale).toContain(referralDiscount(locale))
+    }
+  })
+
+  it('does not let the partners page promise a discount when no listed partner has a code', () => {
+    for (const locale of locales) {
+      const t = copyFor(locale).partners
+      const plain = partnersPageText(t, 2, locale, 0)
+      expect(plain, locale).toEqual({ intro: t.introNoCodes, description: t.metaDescriptionNoCodes })
+      expect(plain.intro, locale).not.toContain(referralDiscount(locale))
+      expect(plain.description, locale).not.toContain(referralDiscount(locale))
+      // One code anywhere in the list, or no count at all, keeps the offer.
+      expect(partnersPageText(t, 2, locale, 1).intro, locale).toBe(t.intro(referralDiscount(locale)))
+      expect(partnersPageText(t, 2, locale).intro, locale).toBe(t.intro(referralDiscount(locale)))
+      // And an empty list is still the invitation.
+      expect(partnersPageText(t, 0, locale, 0).intro, locale).toBe(t.emptyIntro)
+    }
+  })
+})
+
 describe('partner text', () => {
   it('falls back to English for a language the partner did not write', () => {
     expect(partnerText({ en: 'Hello', es: 'Hola' }, 'es')).toBe('Hola')
@@ -301,6 +369,8 @@ describe('partner text', () => {
 const render = (list: Partner[]) => renderToStaticMarkup(createElement(PartnerShowcase, { partners: list }))
 /** A partner's profile between the site header and footer, as the server sends it. */
 const renderProfile = (partner: Partner) => renderToStaticMarkup(createElement(PartnerProfile, { partner }))
+/** One partner's card on /partners, as the server sends it. */
+const renderCard = (partner: Partner) => renderToStaticMarkup(createElement(PartnerCard, { partner }))
 const count = (html: string, text: string) => html.split(text).length - 1
 /** Every opening <a> tag in some markup, with its href as written (HTML escaping undone for &). */
 const anchors = (html: string) =>
@@ -371,7 +441,7 @@ describe('the partners page', () => {
     for (const link of socialLinks(examplePartner)) {
       expect(hrefs.filter((href) => href === link.href), link.href).toHaveLength(2)
     }
-    expect(hrefs).toContain(referralSignupUrl(examplePartner.referralCode))
+    expect(hrefs).toContain(referralSignupUrl(examplePartner.referralCode ?? ''))
     expect(hrefs).toContain(siteConfig.links.discord)
     expect(hrefs).toContain(siteConfig.links.billing)
 
@@ -385,9 +455,81 @@ describe('the partners page', () => {
   it('shows a profile with its code, sign-up button, links and games', () => {
     const html = renderProfile(examplePartner)
     expect(html).toContain(`>${examplePartner.name}</h1>`)
-    expect(html).toContain(examplePartner.referralCode)
+    expect(html).toContain(examplePartner.referralCode ?? '')
     expect(html).toContain(en.partners.profile.discount(referralDiscount('en')))
     for (const game of examplePartner.games ?? []) expect(html, game).toContain(`href="/games/${game}"`)
+  })
+
+  it('shows a card with its code and the way to the profile', () => {
+    const html = renderCard(examplePartner)
+    expect(html).toContain(en.partners.referralCode)
+    expect(html).toContain(`>${examplePartner.referralCode}</code>`)
+    expect(count(html, '<code')).toBe(1)
+    expect(html).toContain(`>${en.partners.copy}<`)
+    expect(html).toContain(`href="/partners/${examplePartner.slug}"`)
+  })
+
+  it('shows a card with no code box, label or copy button, and keeps the rest', () => {
+    const html = renderCard({ ...partnerWithoutCode, featured: true })
+    expect(html).not.toContain(en.partners.referralCode)
+    expect(html).not.toContain('<code')
+    expect(html).not.toContain(`>${en.partners.copy}<`)
+    // Nothing is left of the box that held the code.
+    expect(html).not.toContain('bg-background/50')
+    expect(html).toContain(`>${partnerWithoutCode.name}</h2>`)
+    expect(html).toContain(partnerText(partnerWithoutCode.tagline, 'en'))
+    expect(html).toContain(encodeURIComponent(partnerWithoutCode.banner))
+    expect(html).toContain(encodeURIComponent(partnerWithoutCode.avatar))
+    expect(html).toContain(en.partners.featured)
+    expect(html).toContain(`href="/partners/${partnerWithoutCode.slug}"`)
+    for (const link of socialLinks(partnerWithoutCode)) expect(html, link.platform).toContain(`href="${link.href}"`)
+  })
+
+  it('lists a partner with no code beside one that has a code', () => {
+    const other = { ...partnerWithoutCode, slug: 'no-code-creator', name: 'No Code Creator' }
+    const html = render([examplePartner, other])
+    expect(html).toContain('id="partner-example-creator"')
+    expect(html).toContain('id="partner-no-code-creator"')
+    // Only the partner with a code has a code on their card.
+    expect(count(html, '<code')).toBe(1)
+    expect(count(html, 'data-ghost-card')).toBe(1)
+    // And a page of partners with no codes lists them all the same.
+    const alone = render([other])
+    expect(alone).toContain('id="partner-no-code-creator"')
+    expect(count(alone, '<code')).toBe(0)
+  })
+
+  it('shows a profile with no code box, sign-up button or discount line, and keeps the rest', () => {
+    const html = renderProfile(partnerWithoutCode)
+    expect(html).toContain(`>${partnerWithoutCode.name}</h1>`)
+    expect(html).toContain(partnerText(partnerWithoutCode.tagline, 'en'))
+    expect(html).toContain('A made-up partner used by the tests.')
+    expect(html).toContain(en.partners.officialPartner)
+    expect(html).toContain(encodeURIComponent(partnerWithoutCode.banner))
+    expect(html).toContain(encodeURIComponent(partnerWithoutCode.avatar))
+    for (const link of socialLinks(partnerWithoutCode)) expect(html, link.platform).toContain(`href="${link.href}"`)
+    for (const game of partnerWithoutCode.games ?? []) expect(html, game).toContain(`href="/games/${game}"`)
+
+    expect(html).not.toContain('<code')
+    expect(html).not.toContain('referral-heading')
+    expect(html).not.toContain(en.partners.profile.referral(partnerWithoutCode.name))
+    expect(html).not.toContain(en.partners.profile.signUp)
+    expect(html).not.toContain(en.partners.profile.discount(referralDiscount('en')))
+    expect(html).not.toContain(`>${en.partners.copy}<`)
+    // No empty column is held open for the side box.
+    expect(html).not.toContain('22rem')
+
+    // No link goes to the billing panel's sign-up page.
+    const hrefs = anchors(html).map(({ href }) => href)
+    expect(hrefs.filter((href) => href.startsWith(shortLinks.register.url))).toEqual([])
+    expect(hrefs.filter((href) => href.includes('ref='))).toEqual([])
+  })
+
+  it('shows a profile with a code in a column beside the rest', () => {
+    const html = renderProfile(examplePartner)
+    expect(html).toContain('referral-heading')
+    expect(html).toContain('22rem')
+    expect(anchors(html).map(({ href }) => href)).toContain(referralSignupUrl(examplePartner.referralCode ?? ''))
   })
 
   it('is linked from the header and the footer in every language', () => {

@@ -312,12 +312,15 @@ export const fr: Copy = {
     metaTitle: 'Partenaires officiels',
     metaDescription: (percent: string) =>
       `Les créateurs et les communautés avec qui nous travaillons, chacun avec son propre code de parrainage. Inscrivez-vous avec l'un d'eux et obtenez ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme.`,
+    metaDescriptionNoCodes:
+      'Les créateurs et les communautés avec qui nous travaillons, approuvés par notre équipe. Découvrez qui ils sont et où les retrouver en ligne.',
     emptyMetaDescription:
       'Nous choisissons nos premiers partenaires officiels. Vous faites des vidéos, du streaming ou vous animez une communauté ? Découvrez comment fonctionne notre programme partenaire et comment le rejoindre.',
     heading: 'Partenaires officiels',
     crumb: 'Partenaires',
     intro: (percent: string) =>
       `Des créateurs et des communautés approuvés par notre équipe. Inscrivez-vous avec l'un de leurs codes de parrainage et obtenez ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme.`,
+    introNoCodes: 'Des créateurs et des communautés approuvés par notre équipe.',
     emptyIntro:
       'Nous choisissons nos premiers partenaires officiels. Vous faites des vidéos, du streaming ou vous animez une communauté ? Cette page pourrait commencer avec vous.',
     featured: 'À la une',
@@ -373,6 +376,7 @@ export const fr: Copy = {
       metaTitle: (name: string) => `${name}, partenaire officiel`,
       metaDescription: (code: string, percent: string) =>
         `Inscrivez-vous avec le code ${code} pour obtenir ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme.`,
+      metaDescriptionNoCode: (name: string) => `${name} est partenaire officiel de WSLATL LLC.`,
       about: (name: string) => `À propos de ${name}`,
       links: (name: string) => `Retrouver ${name} en ligne`,
       games: 'Ses jeux',
