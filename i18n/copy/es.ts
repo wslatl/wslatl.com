@@ -311,7 +311,7 @@ export const es: Copy = {
   partners: {
     metaTitle: 'Socios oficiales',
     metaDescription: (percent: string) =>
-      `Creadores y comunidades con los que trabajamos, cada uno con su propio código de referido. Regístrate con uno y obtén un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras ese socio siga en el programa.`,
+      `Creadores y comunidades con los que trabajamos, cada uno con su propio código de referido. Regístrate con uno y obtén un ${percent} de descuento en la primera factura de tu hosting, salvo en servidores dedicados.`,
     metaDescriptionNoCodes:
       'Creadores y comunidades con los que trabajamos, aprobados por nuestro equipo. Descubre quiénes son y dónde encontrarlos en internet.',
     emptyMetaDescription:
@@ -319,7 +319,7 @@ export const es: Copy = {
     heading: 'Socios oficiales',
     crumb: 'Socios',
     intro: (percent: string) =>
-      `Creadores y comunidades que nuestro equipo ha aprobado. Regístrate con uno de sus códigos de referido y tendrás un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras ese socio siga en el programa.`,
+      `Creadores y comunidades que nuestro equipo ha aprobado. Regístrate con uno de sus códigos de referido y tendrás un ${percent} de descuento en la primera factura de tu hosting, salvo en servidores dedicados.`,
     introNoCodes: 'Creadores y comunidades que nuestro equipo ha aprobado.',
     emptyIntro:
       'Estamos eligiendo a nuestros primeros socios oficiales. ¿Haces vídeos, directos o llevas una comunidad? Esta página podría empezar contigo.',
@@ -351,17 +351,17 @@ export const es: Copy = {
           'La gente introduce tu código al registrarse en el portal de facturación, o sigue tu enlace, que lo rellena por ella.',
       },
       discount: {
-        title: (percent: string) => `Un ${percent} de descuento para quienes refieras`,
+        title: (percent: string) => `Un ${percent} de descuento en su primera factura`,
         body: (percent: string) =>
-          `Quien se registre con tu código obtiene un ${percent} de descuento en su hosting en cada factura, salvo en servidores dedicados, mientras sigas en el programa. No se suma a un código promocional: se aplica el descuento mayor.`,
+          `Quien se registre con tu código obtiene un ${percent} de descuento en la primera factura de su hosting, salvo en servidores dedicados. Se aplica una sola vez, solo a esa primera factura. No se suma a un código promocional: se aplica el descuento mayor.`,
       },
       credit: {
         title: 'Crédito de cuenta para ti',
-        body: 'Recibes una parte de lo que cada persona referida paga en su primera factura, como crédito de cuenta.',
+        body: 'Cuando una persona referida paga su primera factura, recibes una sola vez una parte de ese pago, como crédito de cuenta.',
       },
       profile: {
         title: 'Un perfil en esta página',
-        body: 'Con tu permiso, te mostramos aquí con tu banner, tu foto, tus enlaces y tu código.',
+        body: 'Con tu permiso, te mostramos aquí con tu banner, tu foto y tus enlaces, y con tu código si quieres que se muestre.',
       },
       discordCta: 'Pregúntanos en Discord',
       ticketCta: 'Abrir un ticket',
@@ -372,7 +372,7 @@ export const es: Copy = {
     profile: {
       metaTitle: (name: string) => `${name}, socio oficial`,
       metaDescription: (code: string, percent: string) =>
-        `Regístrate con el código ${code} y obtén un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras este socio siga en el programa.`,
+        `Regístrate con el código ${code} y obtén un ${percent} de descuento en la primera factura de tu hosting, salvo en servidores dedicados.`,
       metaDescriptionNoCode: (name: string) => `${name} es socio oficial de WSLATL LLC.`,
       about: (name: string) => `Sobre ${name}`,
       links: (name: string) => `Encuentra a ${name} en internet`,
@@ -380,7 +380,7 @@ export const es: Copy = {
       referral: (name: string) => `Código de referido de ${name}`,
       signUp: 'Regístrate con este código',
       discount: (percent: string) =>
-        `Al registrarte con este código obtienes un ${percent} de descuento en tu hosting en cada factura, salvo en servidores dedicados, mientras este socio siga en el programa. No se suma a un código promocional: se aplica el descuento mayor.`,
+        `Al registrarte con este código obtienes un ${percent} de descuento en la primera factura de tu hosting, salvo en servidores dedicados. Se aplica una sola vez, solo a esa primera factura. No se suma a un código promocional: se aplica el descuento mayor.`,
       avatarAlt: (name: string) => `Foto de perfil de ${name}`,
       bannerAlt: (name: string) => `Banner de ${name}`,
       allPartners: 'Todos los socios',

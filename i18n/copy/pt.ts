@@ -311,7 +311,7 @@ export const pt: Copy = {
   partners: {
     metaTitle: 'Parceiros oficiais',
     metaDescription: (percent: string) =>
-      `Criadores e comunidades com quem trabalhamos, cada um com seu próprio código de indicação. Cadastre-se com um deles e ganhe ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto esse parceiro continuar no programa.`,
+      `Criadores e comunidades com quem trabalhamos, cada um com seu próprio código de indicação. Cadastre-se com um deles e ganhe ${percent} de desconto na primeira fatura da sua hospedagem, exceto em servidores dedicados.`,
     metaDescriptionNoCodes:
       'Criadores e comunidades com quem trabalhamos, aprovados pela nossa equipe. Veja quem são e onde encontrá-los na internet.',
     emptyMetaDescription:
@@ -319,7 +319,7 @@ export const pt: Copy = {
     heading: 'Parceiros oficiais',
     crumb: 'Parceiros',
     intro: (percent: string) =>
-      `Criadores e comunidades aprovados pela nossa equipe. Cadastre-se com um dos códigos de indicação deles e ganhe ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto esse parceiro continuar no programa.`,
+      `Criadores e comunidades aprovados pela nossa equipe. Cadastre-se com um dos códigos de indicação deles e ganhe ${percent} de desconto na primeira fatura da sua hospedagem, exceto em servidores dedicados.`,
     introNoCodes: 'Criadores e comunidades aprovados pela nossa equipe.',
     emptyIntro:
       'Estamos escolhendo nossos primeiros parceiros oficiais. Faz vídeos, lives ou cuida de uma comunidade? Esta página pode começar com você.',
@@ -351,17 +351,17 @@ export const pt: Copy = {
           'As pessoas digitam seu código ao se cadastrar no portal de faturamento, ou usam seu link, que já preenche o código para elas.',
       },
       discount: {
-        title: (percent: string) => `${percent} de desconto para quem você indicar`,
+        title: (percent: string) => `${percent} de desconto na primeira fatura de quem você indicar`,
         body: (percent: string) =>
-          `Quem se cadastrar com seu código ganha ${percent} de desconto na hospedagem em todas as faturas, exceto em servidores dedicados, enquanto você continuar no programa. Não se soma a um código promocional: vale o maior desconto.`,
+          `Quem se cadastrar com seu código ganha ${percent} de desconto na primeira fatura da hospedagem, exceto em servidores dedicados. O desconto vale uma única vez, só para essa primeira fatura. Não se soma a um código promocional: vale o maior desconto.`,
       },
       credit: {
         title: 'Crédito na conta para você',
-        body: 'Você recebe uma parte do que cada pessoa indicada paga na primeira fatura, como crédito na sua conta.',
+        body: 'Quando uma pessoa indicada paga a primeira fatura, você recebe uma única vez uma parte desse pagamento, como crédito na sua conta.',
       },
       profile: {
         title: 'Um perfil nesta página',
-        body: 'Com a sua autorização, mostramos você aqui com seu banner, sua foto, seus links e seu código.',
+        body: 'Com a sua autorização, mostramos você aqui com seu banner, sua foto e seus links, e com seu código se você quiser.',
       },
       discordCta: 'Fale com a gente no Discord',
       ticketCta: 'Abrir um ticket',
@@ -372,7 +372,7 @@ export const pt: Copy = {
     profile: {
       metaTitle: (name: string) => `${name}, parceiro oficial`,
       metaDescription: (code: string, percent: string) =>
-        `Cadastre-se com o código ${code} e ganhe ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto este parceiro continuar no programa.`,
+        `Cadastre-se com o código ${code} e ganhe ${percent} de desconto na primeira fatura da sua hospedagem, exceto em servidores dedicados.`,
       metaDescriptionNoCode: (name: string) => `${name} é parceiro oficial da WSLATL LLC.`,
       about: (name: string) => `Sobre ${name}`,
       links: (name: string) => `Encontre ${name} na internet`,
@@ -380,7 +380,7 @@ export const pt: Copy = {
       referral: (name: string) => `Código de indicação de ${name}`,
       signUp: 'Cadastre-se com este código',
       discount: (percent: string) =>
-        `Ao se cadastrar com este código, você ganha ${percent} de desconto na sua hospedagem em todas as faturas, exceto em servidores dedicados, enquanto este parceiro continuar no programa. Não se soma a um código promocional: vale o maior desconto.`,
+        `Ao se cadastrar com este código, você ganha ${percent} de desconto na primeira fatura da sua hospedagem, exceto em servidores dedicados. O desconto vale uma única vez, só para essa primeira fatura. Não se soma a um código promocional: vale o maior desconto.`,
       avatarAlt: (name: string) => `Foto de perfil de ${name}`,
       bannerAlt: (name: string) => `Banner de ${name}`,
       allPartners: 'Todos os parceiros',

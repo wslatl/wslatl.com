@@ -10,7 +10,7 @@ The public website for WSLATL LLC. Private hosting based in Missouri: VPS hostin
 2. Publishes plan pricing for VPS and game servers on `/pricing`, with a page per supported game under `/games`.
 3. Routes visitors to the right panel (billing, game panel, VPS panel, dedicated portal, cPanel) through the header Login menu and the footer.
 4. Hosts the full legal library (ten policies) under `/legal`.
-5. Shows our official referral partners on `/partners`, each with a profile page and their referral code.
+5. Shows our official referral partners on `/partners`, each with a profile page and, if they have one, their referral code.
 6. Does all of that in English, Spanish, French, German and Portuguese.
 
 Every page is static. There is no CMS and no database: content lives in `data/*.ts` and `content/legal/*.tsx`, so copy is one PR away.
@@ -51,7 +51,7 @@ components/
 config/site.ts             Company details, paths, credits, legal metadata and effective dates.
 config/links.json          Where each short link (/billing, /discord, ...) sends people.
 config/emails.ts           Our email addresses. Server-only; rendered through <Email>.
-config/referral.ts         The referral discount percent, which must match the billing panel.
+config/referral.ts         The referral discount percent (first invoice only), which must match the billing panel.
 content/legal/             The text of each policy; index.ts maps each document and language to its text.
 data/                      Everything else the pages render (see below).
 i18n/                      Languages: the current one, the dictionaries, the translations.
@@ -146,11 +146,13 @@ Documents are built from a handful of blocks in `components/legal/blocks.tsx`, s
 
 The program text only says what the billing panel actually does. Those facts, and the discount percent, are in `config/referral.ts`. The percent must match the referral discount in the billing panel (Settings, Orders), so change both on the same day.
 
+The referral deal, as the site words it: the person who signs up with a code gets the percent off their first invoice for hosting (not dedicated servers) and nothing after that; the person who referred them gets a one-time account credit once that first invoice is paid. Do not write that the discount lasts, applies to every invoice or renewal, or depends on the partner staying in the program. `tests/referral-copy.test.ts` fails if any language says so.
+
 ### How to add a partner
 
 Only with the partner's written OK to be shown here. Keep that message (a ticket or a Discord message) in case they ask later.
 
-Taking someone down is two steps on the same day: delete their entry and their folder here, and revoke them as a referrer in the billing panel. Revoking is what ends the discount on new invoices for the people they referred, which is what the site tells those people ("for as long as that partner stays in the program").
+Taking someone down is two steps on the same day: delete their entry and their folder here, and revoke them as a referrer in the billing panel. Revoking is what stops their code from giving the first-invoice discount and the referral credit from then on. The site does not promise the discount for as long as a partner stays, so no page text changes when someone is taken down.
 
 1. Get from them: their name, a one-line tagline (80 characters at most), a short description (600 at most), a square picture, a wide banner, the links they want shown, the games they play, and their referral code from the billing panel. The code is optional: skip it for a partner who is not in the referral program or does not want one shown.
 2. Export the picture as a square WebP, 512px (at least 256px), and the banner as a WebP about 3:1, ideally 1500x500 (at least 1200px wide). PNG and JPEG work too; nothing else is served from `public/partners/` (no SVG, which can carry script). Two things to tell them about the banner:
