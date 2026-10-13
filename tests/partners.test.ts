@@ -397,7 +397,8 @@ describe('the partners page', () => {
 
     // And the page itself, with the list as it ships.
     const metadata = await partnersPageMetadata({ params: Promise.resolve({ locale: 'en' }) })
-    const expected = partnersPageText(en.partners, partners.length, 'en').description
+    const codeCount = partners.filter(hasReferralCode).length
+    const expected = partnersPageText(en.partners, partners.length, 'en', codeCount).description
     expect(metadata.description).toBe(expected)
     expect(metadata.openGraph?.description).toBe(expected)
     expect(metadata.twitter?.description).toBe(expected)
