@@ -84,7 +84,6 @@ export const partners: Partner[] = [
       'VulnRadar scans any website for security issues: 905+ checks across headers, TLS, cookies, DNS and exposed secrets, with no agent to install.\n\nEvery finding comes with the evidence behind it and a config fix you can paste into Nginx, Caddy, Express or Next.js. The whole engine is open source under GPL-3.0.',
     avatar: '/partners/vulnradar/avatar.webp',
     banner: '/partners/vulnradar/banner.webp',
-    referralCode: 'VULNRADAR',
     since: '2026-10',
     socials: {
       discord: 'https://discord.com/invite/Y7R6hdGbNe',
