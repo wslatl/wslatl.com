@@ -75,4 +75,25 @@ export const referralCodePattern = /^[A-Z0-9]{1,32}$/
  * partner" in README.md has the steps. The tests check every entry: the
  * links, the pictures, the code and the lengths.
  */
-export const partners: Partner[] = []
+export const partners: Partner[] = [
+  {
+    slug: 'vulnradar',
+    name: 'VulnRadar',
+    tagline: 'Paste a URL, get a website security report in under 3 seconds.',
+    description:
+      'VulnRadar scans any website for security issues: 905+ checks across headers, TLS, cookies, DNS and exposed secrets, with no agent to install.\n\nEvery finding comes with the evidence behind it and a config fix you can paste into Nginx, Caddy, Express or Next.js. The whole engine is open source under GPL-3.0.',
+    avatar: '/partners/vulnradar/avatar.webp',
+    banner: '/partners/vulnradar/banner.webp',
+    since: '2026-10',
+    socials: {
+      discord: 'https://discord.com/invite/Y7R6hdGbNe',
+      youtube: 'https://www.youtube.com/@VulnRadar',
+      tiktok: 'https://www.tiktok.com/@vulnradar',
+      instagram: 'https://www.instagram.com/vulnradar/',
+      x: 'https://x.com/vulnradardev',
+      github: 'https://github.com/VulnRadar',
+      website: 'https://vulnradar.dev',
+    },
+    featured: true,
+  },
+]
