@@ -12,12 +12,20 @@ import { localizedGames } from '@/i18n/content'
 import { copy } from '@/i18n/copy'
 import { formatMonth } from '@/i18n/dates'
 import { getLocale } from '@/i18n/locale'
-import { partnerText, partnerTextLang, referralDiscount, referralSignupUrl, socialLinks } from '@/lib/partners'
+import {
+  hasReferralCode,
+  partnerText,
+  partnerTextLang,
+  referralDiscount,
+  referralSignupUrl,
+  socialLinks,
+} from '@/lib/partners'
+import { cn } from '@/lib/utils'
 
 /**
  * A partner's profile, everything between the site header and footer on
- * /partners/<slug>: banner, picture, name, their code and the sign-up button,
- * their description, links and games.
+ * /partners/<slug>: banner, picture, name, their code and the sign-up button
+ * (only for a partner who shows a code), their description, links and games.
  */
 export function PartnerProfile({ partner }: { partner: Partner }) {
   const locale = getLocale()
@@ -82,25 +90,28 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
         </p>
       </div>
 
-      <div className="mt-12 grid gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16">
+      {/* With no code there is no side box, so the page is one column rather than a column and an empty gap. */}
+      <div className={cn('mt-12 grid gap-12', hasReferralCode(partner) && 'lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16')}>
         {/* First in reading order on a phone, where the code is what most visitors came for. */}
-        <aside aria-labelledby="referral-heading" className="lg:order-last">
-          <div className="rounded-2xl border border-primary/30 bg-card/30 p-6 lg:sticky lg:top-24">
-            <h2 id="referral-heading" className="text-sm font-medium text-muted-foreground">
-              {words.profile.referral(partner.name)}
-            </h2>
-            <CopyCode code={partner.referralCode} labels={copyLabels(t)} size="lg" className="mt-3" />
-            <Button asChild size="lg" className="mt-6 h-auto min-h-11 w-full py-2.5 text-center whitespace-normal">
-              <a href={referralSignupUrl(partner.referralCode)} target="_blank" rel="noopener noreferrer">
-                {words.profile.signUp}
-                <span className="sr-only">{t.header.newTab}</span>
-              </a>
-            </Button>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              {words.profile.discount(referralDiscount(locale))}
-            </p>
-          </div>
-        </aside>
+        {hasReferralCode(partner) && (
+          <aside aria-labelledby="referral-heading" className="lg:order-last">
+            <div className="rounded-2xl border border-primary/30 bg-card/30 p-6 lg:sticky lg:top-24">
+              <h2 id="referral-heading" className="text-sm font-medium text-muted-foreground">
+                {words.profile.referral(partner.name)}
+              </h2>
+              <CopyCode code={partner.referralCode} labels={copyLabels(t)} size="lg" className="mt-3" />
+              <Button asChild size="lg" className="mt-6 h-auto min-h-11 w-full py-2.5 text-center whitespace-normal">
+                <a href={referralSignupUrl(partner.referralCode)} target="_blank" rel="noopener noreferrer">
+                  {words.profile.signUp}
+                  <span className="sr-only">{t.header.newTab}</span>
+                </a>
+              </Button>
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+                {words.profile.discount(referralDiscount(locale))}
+              </p>
+            </div>
+          </aside>
+        )}
 
         <div className="min-w-0 space-y-14">
           <section aria-labelledby="about-heading">

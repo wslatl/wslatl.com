@@ -320,13 +320,16 @@ export const en = {
   partners: {
     metaTitle: 'Official partners',
     metaDescription: (percent: string) =>
-      `Creators and communities we work with, each with their own referral code. Sign up with one to get ${percent} off your hosting on every invoice, except dedicated servers, for as long as that partner stays in the program.`,
+      `Creators and communities we work with, each with their own referral code. Sign up with one to get ${percent} off the first invoice for your hosting, except dedicated servers.`,
+    metaDescriptionNoCodes:
+      'Creators and communities we work with, approved by our team. See who they are and where to find them online.',
     emptyMetaDescription:
       'We are choosing our first official partners. Make videos, stream, or run a community? See how our partner program works and how to join.',
     heading: 'Official partners',
     crumb: 'Partners',
     intro: (percent: string) =>
-      `Creators and communities our team has approved. Sign up with one of their referral codes and you get ${percent} off your hosting on every invoice, except dedicated servers, for as long as that partner stays in the program.`,
+      `Creators and communities our team has approved. Sign up with one of their referral codes and you get ${percent} off the first invoice for your hosting, except dedicated servers.`,
+    introNoCodes: 'Creators and communities our team has approved.',
     emptyIntro:
       'We are choosing our first official partners. Make videos, stream, or run a community? This page could start with you.',
     featured: 'Featured',
@@ -357,17 +360,17 @@ export const en = {
           'People enter your code when they sign up in the billing portal, or follow your link, which fills it in for them.',
       },
       discount: {
-        title: (percent: string) => `${percent} off for the people you refer`,
+        title: (percent: string) => `${percent} off their first invoice`,
         body: (percent: string) =>
-          `Anyone who signs up with your code gets ${percent} off their hosting on every invoice, except dedicated servers, for as long as you stay in the program. It does not stack with a promo code: the larger discount applies.`,
+          `Anyone who signs up with your code gets ${percent} off the first invoice for their hosting, except dedicated servers. It applies once, to that first invoice only. It does not stack with a promo code: the larger discount applies.`,
       },
       credit: {
         title: 'Account credit for you',
-        body: 'You earn a share of what each person you refer pays on their first invoice, as account credit.',
+        body: 'Once a person you refer has paid their first invoice, you get a one-time share of it as account credit.',
       },
       profile: {
         title: 'A profile on this page',
-        body: 'With your OK, we show you here with your banner, picture, links and code.',
+        body: 'With your OK, we show you here with your banner, picture and links, and with your code if you want it shown.',
       },
       discordCta: 'Ask us on Discord',
       ticketCta: 'Open a ticket',
@@ -377,14 +380,15 @@ export const en = {
     profile: {
       metaTitle: (name: string) => `${name}, official partner`,
       metaDescription: (code: string, percent: string) =>
-        `Sign up with code ${code} to get ${percent} off your hosting on every invoice, except dedicated servers, for as long as this partner stays in the program.`,
+        `Sign up with code ${code} to get ${percent} off the first invoice for your hosting, except dedicated servers.`,
+      metaDescriptionNoCode: (name: string) => `${name} is an official partner of WSLATL LLC.`,
       about: (name: string) => `About ${name}`,
       links: (name: string) => `Find ${name} online`,
       games: 'Games they play',
       referral: (name: string) => `${name}'s referral code`,
       signUp: 'Sign up with this code',
       discount: (percent: string) =>
-        `Signing up with this code gets you ${percent} off your hosting on every invoice, except dedicated servers, for as long as this partner stays in the program. It does not stack with a promo code: the larger discount applies.`,
+        `Signing up with this code gets you ${percent} off the first invoice for your hosting, except dedicated servers. It applies once, to that first invoice only. It does not stack with a promo code: the larger discount applies.`,
       avatarAlt: (name: string) => `Profile picture of ${name}`,
       bannerAlt: (name: string) => `Banner of ${name}`,
       allPartners: 'All partners',

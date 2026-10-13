@@ -8,7 +8,7 @@ import { localePath } from '@/i18n/config'
 import { copy } from '@/i18n/copy'
 import type { Copy } from '@/i18n/copy/en'
 import { getLocale } from '@/i18n/locale'
-import { partnerText, partnerTextLang, socialLinks, socialPlatforms } from '@/lib/partners'
+import { hasReferralCode, partnerText, partnerTextLang, socialLinks, socialPlatforms } from '@/lib/partners'
 import { cn } from '@/lib/utils'
 
 /** Where the "This could be you" card leads: the program, on /partners. */
@@ -24,7 +24,7 @@ export function copyLabels(t: Copy) {
   return { copy: t.partners.copy, copied: t.partners.copied, copyFailed: t.partners.copyFailed }
 }
 
-/** One partner on /partners: banner, picture, name, links, code, and the way to their profile. */
+/** One partner on /partners: banner, picture, name, links, their code if they show one, and the way to their profile. */
 export function PartnerCard({ partner }: { partner: Partner }) {
   const locale = getLocale()
   const t = copy()
@@ -93,13 +93,19 @@ export function PartnerCard({ partner }: { partner: Partner }) {
         )}
 
         <div className="mt-auto pt-5">
-          <div className="rounded-lg border bg-background/50 px-3 py-2.5">
-            <p className="text-xs text-muted-foreground">{t.partners.referralCode}</p>
-            <CopyCode code={partner.referralCode} labels={copyLabels(t)} className="mt-1" />
-          </div>
+          {/* A partner with no code gets no box, so nothing empty sits above the link. */}
+          {hasReferralCode(partner) && (
+            <div className="rounded-lg border bg-background/50 px-3 py-2.5">
+              <p className="text-xs text-muted-foreground">{t.partners.referralCode}</p>
+              <CopyCode code={partner.referralCode} labels={copyLabels(t)} className="mt-1" />
+            </div>
+          )}
           <Link
             href={localePath(locale, `/partners/${partner.slug}`)}
-            className="group mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-link transition-colors hover:text-foreground"
+            className={cn(
+              'group inline-flex items-center gap-1.5 text-sm font-medium text-link transition-colors hover:text-foreground',
+              hasReferralCode(partner) && 'mt-4',
+            )}
           >
             {t.partners.viewProfile}
             <span className="sr-only">: {partner.name}</span>

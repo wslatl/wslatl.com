@@ -32,6 +32,17 @@ export const examplePartner: Partner = {
   },
 }
 
+/**
+ * The same made-up partner with no referral code: not in the referral program,
+ * or one who does not want a code shown. The key is absent, as it is in
+ * data/partners.ts for such a partner.
+ */
+export const partnerWithoutCode: Partner = (() => {
+  const partner: Partner = { ...examplePartner }
+  delete partner.referralCode
+  return partner
+})()
+
 /** The sizes of the example's pictures, standing in for files in public/. */
 export const exampleImages: Record<string, { width: number; height: number }> = {
   '/partners/example-creator/avatar.webp': { width: 512, height: 512 },

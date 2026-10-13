@@ -38,8 +38,14 @@ export interface Partner {
    * It is also the picture shown when someone shares the profile.
    */
   banner: string
-  /** Their code on the billing panel, as it stores it: A to Z and 0 to 9, up to 32 characters. */
-  referralCode: string
+  /**
+   * Their code on the billing panel, as it stores it: A to Z and 0 to 9, up to
+   * 32 characters. Leave it out for a partner who is not in the referral
+   * program or does not want a code shown: they are listed without one, and
+   * their profile has no sign-up button or discount line. An empty string is
+   * a mistake, not "no code", and fails the checks.
+   */
+  referralCode?: string
   /** The month they became a partner, as YYYY-MM. */
   since: string
   /** Games they play, as slugs from data/games.ts. Each links to its page. */

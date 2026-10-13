@@ -311,13 +311,16 @@ export const fr: Copy = {
   partners: {
     metaTitle: 'Partenaires officiels',
     metaDescription: (percent: string) =>
-      `Les créateurs et les communautés avec qui nous travaillons, chacun avec son propre code de parrainage. Inscrivez-vous avec l'un d'eux et obtenez ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme.`,
+      `Les créateurs et les communautés avec qui nous travaillons, chacun avec son propre code de parrainage. Inscrivez-vous avec l'un d'eux et obtenez ${percent} de réduction sur la première facture de votre hébergement, sauf sur les serveurs dédiés.`,
+    metaDescriptionNoCodes:
+      'Les créateurs et les communautés avec qui nous travaillons, approuvés par notre équipe. Découvrez qui ils sont et où les retrouver en ligne.',
     emptyMetaDescription:
       'Nous choisissons nos premiers partenaires officiels. Vous faites des vidéos, du streaming ou vous animez une communauté ? Découvrez comment fonctionne notre programme partenaire et comment le rejoindre.',
     heading: 'Partenaires officiels',
     crumb: 'Partenaires',
     intro: (percent: string) =>
-      `Des créateurs et des communautés approuvés par notre équipe. Inscrivez-vous avec l'un de leurs codes de parrainage et obtenez ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme.`,
+      `Des créateurs et des communautés approuvés par notre équipe. Inscrivez-vous avec l'un de leurs codes de parrainage et obtenez ${percent} de réduction sur la première facture de votre hébergement, sauf sur les serveurs dédiés.`,
+    introNoCodes: 'Des créateurs et des communautés approuvés par notre équipe.',
     emptyIntro:
       'Nous choisissons nos premiers partenaires officiels. Vous faites des vidéos, du streaming ou vous animez une communauté ? Cette page pourrait commencer avec vous.',
     featured: 'À la une',
@@ -350,18 +353,18 @@ export const fr: Copy = {
           "Les gens saisissent votre code en s'inscrivant sur le portail de facturation, ou suivent votre lien, qui le remplit pour eux.",
       },
       discount: {
-        title: (percent: string) => `${percent} de réduction pour vos filleuls`,
+        title: (percent: string) => `${percent} de réduction sur leur première facture`,
         body: (percent: string) =>
-          `Toute personne qui s'inscrit avec votre code obtient ${percent} de réduction sur son hébergement à chaque facture, sauf sur les serveurs dédiés, tant que vous restez dans le programme. Elle ne se cumule pas avec un code promo : la réduction la plus élevée s'applique.`,
+          `Toute personne qui s'inscrit avec votre code obtient ${percent} de réduction sur la première facture de son hébergement, sauf sur les serveurs dédiés. La réduction s'applique une seule fois, à cette première facture uniquement. Elle ne se cumule pas avec un code promo : la réduction la plus élevée s'applique.`,
       },
       credit: {
         title: 'Un avoir pour vous',
         body:
-          "Vous recevez une part de ce que chaque filleul paie sur sa première facture, sous forme d'avoir sur votre compte.",
+          "Dès qu'un filleul a payé sa première facture, vous recevez une seule fois une part de ce paiement, sous forme d'avoir sur votre compte.",
       },
       profile: {
         title: 'Un profil sur cette page',
-        body: 'Avec votre accord, nous vous présentons ici avec votre bannière, votre photo, vos liens et votre code.',
+        body: 'Avec votre accord, nous vous présentons ici avec votre bannière, votre photo et vos liens, et avec votre code si vous le souhaitez.',
       },
       discordCta: 'Écrivez-nous sur Discord',
       ticketCta: 'Ouvrir un ticket',
@@ -372,14 +375,15 @@ export const fr: Copy = {
     profile: {
       metaTitle: (name: string) => `${name}, partenaire officiel`,
       metaDescription: (code: string, percent: string) =>
-        `Inscrivez-vous avec le code ${code} pour obtenir ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme.`,
+        `Inscrivez-vous avec le code ${code} pour obtenir ${percent} de réduction sur la première facture de votre hébergement, sauf sur les serveurs dédiés.`,
+      metaDescriptionNoCode: (name: string) => `${name} est partenaire officiel de WSLATL LLC.`,
       about: (name: string) => `À propos de ${name}`,
       links: (name: string) => `Retrouver ${name} en ligne`,
       games: 'Ses jeux',
       referral: (name: string) => `Code de parrainage de ${name}`,
       signUp: "S'inscrire avec ce code",
       discount: (percent: string) =>
-        `En vous inscrivant avec ce code, vous obtenez ${percent} de réduction sur votre hébergement à chaque facture, sauf sur les serveurs dédiés, tant que ce partenaire reste dans le programme. Elle ne se cumule pas avec un code promo : la réduction la plus élevée s'applique.`,
+        `En vous inscrivant avec ce code, vous obtenez ${percent} de réduction sur la première facture de votre hébergement, sauf sur les serveurs dédiés. La réduction s'applique une seule fois, à cette première facture uniquement. Elle ne se cumule pas avec un code promo : la réduction la plus élevée s'applique.`,
       avatarAlt: (name: string) => `Photo de profil de ${name}`,
       bannerAlt: (name: string) => `Bannière de ${name}`,
       allPartners: 'Tous les partenaires',

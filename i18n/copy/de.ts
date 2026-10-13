@@ -311,13 +311,16 @@ export const de: Copy = {
   partners: {
     metaTitle: 'Offizielle Partner',
     metaDescription: (percent: string) =>
-      `Creator und Communities, mit denen wir zusammenarbeiten, jeweils mit eigenem Empfehlungscode. Melde dich mit einem davon an und erhalte auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt.`,
+      `Creator und Communities, mit denen wir zusammenarbeiten, jeweils mit eigenem Empfehlungscode. Melde dich mit einem davon an und erhalte ${percent} Rabatt auf die erste Rechnung für dein Hosting, außer bei Dedicated Servern.`,
+    metaDescriptionNoCodes:
+      'Creator und Communities, mit denen wir zusammenarbeiten, von unserem Team freigegeben. Sieh, wer sie sind und wo du sie online findest.',
     emptyMetaDescription:
       'Wir wählen gerade unsere ersten offiziellen Partner aus. Du machst Videos, streamst oder leitest eine Community? Erfahre, wie unser Partnerprogramm funktioniert und wie du mitmachst.',
     heading: 'Offizielle Partner',
     crumb: 'Partner',
     intro: (percent: string) =>
-      `Creator und Communities, die unser Team freigegeben hat. Melde dich mit einem ihrer Empfehlungscodes an und du erhältst auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt.`,
+      `Creator und Communities, die unser Team freigegeben hat. Melde dich mit einem ihrer Empfehlungscodes an und du erhältst ${percent} Rabatt auf die erste Rechnung für dein Hosting, außer bei Dedicated Servern.`,
+    introNoCodes: 'Creator und Communities, die unser Team freigegeben hat.',
     emptyIntro:
       'Wir wählen gerade unsere ersten offiziellen Partner aus. Du machst Videos, streamst oder leitest eine Community? Diese Seite könnte mit dir beginnen.',
     featured: 'Hervorgehoben',
@@ -349,18 +352,18 @@ export const de: Copy = {
           'Neue Kunden geben deinen Code bei der Anmeldung im Abrechnungsportal ein oder folgen deinem Link, der ihn für sie einträgt.',
       },
       discount: {
-        title: (percent: string) => `${percent} Rabatt für alle, die du wirbst`,
+        title: (percent: string) => `${percent} Rabatt auf ihre erste Rechnung`,
         body: (percent: string) =>
-          `Wer sich mit deinem Code anmeldet, erhält auf jeder Rechnung ${percent} Rabatt auf sein Hosting, außer bei Dedicated Servern, solange du im Programm bleibst. Er wird nicht mit einem Gutscheincode kombiniert: Es gilt der höhere Rabatt.`,
+          `Wer sich mit deinem Code anmeldet, erhält ${percent} Rabatt auf die erste Rechnung für sein Hosting, außer bei Dedicated Servern. Der Rabatt gilt nur einmal, für diese erste Rechnung. Er wird nicht mit einem Gutscheincode kombiniert: Es gilt der höhere Rabatt.`,
       },
       credit: {
         title: 'Guthaben für dich',
         body:
-          'Du erhältst einen Anteil dessen, was jede geworbene Person für ihre erste Rechnung zahlt, als Guthaben auf deinem Konto.',
+          'Sobald eine geworbene Person ihre erste Rechnung bezahlt hat, erhältst du einmalig einen Anteil davon als Guthaben auf deinem Konto.',
       },
       profile: {
         title: 'Ein Profil auf dieser Seite',
-        body: 'Mit deinem Einverständnis zeigen wir dich hier mit Banner, Bild, Links und Code.',
+        body: 'Mit deinem Einverständnis zeigen wir dich hier mit Banner, Bild und Links, auf Wunsch auch mit deinem Code.',
       },
       discordCta: 'Frag uns auf Discord',
       ticketCta: 'Ticket öffnen',
@@ -371,14 +374,15 @@ export const de: Copy = {
     profile: {
       metaTitle: (name: string) => `${name}, offizieller Partner`,
       metaDescription: (code: string, percent: string) =>
-        `Melde dich mit dem Code ${code} an und erhalte auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt.`,
+        `Melde dich mit dem Code ${code} an und erhalte ${percent} Rabatt auf die erste Rechnung für dein Hosting, außer bei Dedicated Servern.`,
+      metaDescriptionNoCode: (name: string) => `${name} ist offizieller Partner von WSLATL LLC.`,
       about: (name: string) => `Über ${name}`,
       links: (name: string) => `${name} im Netz`,
       games: 'Gespielte Spiele',
       referral: (name: string) => `Empfehlungscode von ${name}`,
       signUp: 'Mit diesem Code anmelden',
       discount: (percent: string) =>
-        `Mit diesem Code erhältst du auf jeder Rechnung ${percent} Rabatt auf dein Hosting, außer bei Dedicated Servern, solange dieser Partner im Programm bleibt. Er wird nicht mit einem Gutscheincode kombiniert: Es gilt der höhere Rabatt.`,
+        `Mit diesem Code erhältst du ${percent} Rabatt auf die erste Rechnung für dein Hosting, außer bei Dedicated Servern. Der Rabatt gilt nur einmal, für diese erste Rechnung. Er wird nicht mit einem Gutscheincode kombiniert: Es gilt der höhere Rabatt.`,
       avatarAlt: (name: string) => `Profilbild von ${name}`,
       bannerAlt: (name: string) => `Banner von ${name}`,
       allPartners: 'Alle Partner',

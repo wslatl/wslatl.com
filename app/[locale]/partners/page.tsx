@@ -9,11 +9,14 @@ import type { Locale } from '@/i18n/config'
 import { copy } from '@/i18n/copy'
 import { setLocale } from '@/i18n/locale'
 import { pageMetadata } from '@/lib/metadata'
-import { partnersPageText } from '@/lib/partners'
+import { hasReferralCode, partnersPageText } from '@/lib/partners'
 
 interface PageProps {
   params: Promise<{ locale: Locale }>
 }
+
+/** How many of the partners show a referral code. */
+const codeCount = partners.filter(hasReferralCode).length
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params
@@ -22,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return pageMetadata({
     title: t.metaTitle,
     // Search results and link previews say what the page says.
-    description: partnersPageText(t, partners.length, locale).description,
+    description: partnersPageText(t, partners.length, locale, codeCount).description,
     path: '/partners',
     locale,
   })
@@ -38,7 +41,7 @@ export default async function PartnersPage({ params }: PageProps) {
       <SiteHeader />
       <Main className="shell">
         <PageHeader title={t.heading} breadcrumbs={[]} crumbLabel={t.crumb} path="/partners">
-          <p>{partnersPageText(t, partners.length, locale).intro}</p>
+          <p>{partnersPageText(t, partners.length, locale, codeCount).intro}</p>
         </PageHeader>
         <PartnerShowcase partners={partners} />
       </Main>

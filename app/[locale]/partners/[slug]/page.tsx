@@ -9,7 +9,7 @@ import type { Locale } from '@/i18n/config'
 import { copy } from '@/i18n/copy'
 import { setLocale } from '@/i18n/locale'
 import { pageMetadata } from '@/lib/metadata'
-import { partnerText, referralDiscount } from '@/lib/partners'
+import { partnerMetaDescription } from '@/lib/partners'
 
 interface PageProps {
   params: Promise<{ locale: Locale; slug: string }>
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return pageMetadata({
     title: t.metaTitle(partner.name),
-    description: `${partnerText(partner.tagline, locale)} ${t.metaDescription(partner.referralCode, referralDiscount(locale))}`,
+    description: partnerMetaDescription(partner, t, locale),
     path: `/partners/${partner.slug}`,
     locale,
     // Their banner is the picture a shared link shows, rather than ours.
