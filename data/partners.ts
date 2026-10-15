@@ -31,13 +31,18 @@ export interface Partner {
   tagline: PartnerText
   /** Who they are, up to 600 characters. A blank line (\n\n) starts a new paragraph. */
   description: PartnerText
-  /** Square picture, at least 256px across, at /partners/<slug>/<file>. */
-  avatar: string
+  /**
+   * Square picture, at least 256px across, at /partners/<slug>/<file>. Optional:
+   * without one the card and profile show a circle with their initials.
+   */
+  avatar?: string
   /**
    * Wide picture about 3:1 (1500x500 is ideal), at /partners/<slug>/<file>.
-   * It is also the picture shown when someone shares the profile.
+   * It is also the picture shown when someone shares the profile. Optional:
+   * without one they get a plain branded banner, and a shared link shows the
+   * site's own picture.
    */
-  banner: string
+  banner?: string
   /**
    * Their code on the billing panel, as it stores it: A to Z and 0 to 9, up to
    * 32 characters. Leave it out for a partner who is not in the referral
@@ -93,6 +98,37 @@ export const partners: Partner[] = [
       x: 'https://x.com/vulnradardev',
       github: 'https://github.com/VulnRadar',
       website: 'https://vulnradar.dev',
+    },
+    featured: true,
+  },
+  {
+    slug: 'haskins',
+    name: 'Haskins',
+    tagline: 'Making mods and playing games while serving my community, a great life!',
+    description:
+      "I'm Russell Haskins, and I go by my last name online. I make scripts, mods and textures, mainly for FiveM, and I take on projects elsewhere too.\n\nI run Sandbox One, a FiveM server full of random modes I felt like making, from races and military ops to VIP protection and runaway aliens.",
+    avatar: '/partners/haskins/avatar.webp',
+    banner: '/partners/haskins/banner.webp',
+    referralCode: 'HASKINSDRAGSHOSE',
+    since: '2026-10',
+    games: ['fivem', 'minecraft'],
+    socials: {
+      discord: 'https://discord.com/users/333693993034448896',
+    },
+    featured: true,
+  },
+  {
+    slug: 'last-stop',
+    name: 'Last Stop',
+    tagline: 'Game nights, art sharing and giveaways in a welcoming Minecraft community.',
+    description:
+      'Last Stop is a community Discord server built to give every member a great time, with game nights, art sharing and plenty of giveaways.\n\nWe host two Minecraft servers with WSLATL: a regular server and a busier, casual-friendly Lifesteal server. Clear guidelines keep it fun and welcoming, and you can jump straight into the game servers.',
+    avatar: '/partners/last-stop/avatar.webp',
+    referralCode: 'TLS',
+    since: '2026-10',
+    games: ['minecraft'],
+    socials: {
+      discord: 'https://discord.gg/thelaststop',
     },
     featured: true,
   },
