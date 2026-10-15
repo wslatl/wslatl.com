@@ -99,7 +99,6 @@ export const partners: Partner[] = [
       github: 'https://github.com/VulnRadar',
       website: 'https://vulnradar.dev',
     },
-    featured: true,
   },
   {
     slug: 'haskins',
@@ -115,7 +114,6 @@ export const partners: Partner[] = [
     socials: {
       discord: 'https://discord.com/users/333693993034448896',
     },
-    featured: true,
   },
   {
     slug: 'last-stop',
@@ -130,6 +128,5 @@ export const partners: Partner[] = [
     socials: {
       discord: 'https://discord.gg/thelaststop',
     },
-    featured: true,
   },
 ]
