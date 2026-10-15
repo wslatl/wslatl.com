@@ -30,9 +30,10 @@ export function referralSignupUrl(code: string): string {
 
 /** The referral discount as the reader's language writes a percent: "10%", "10 %". */
 export function referralDiscount(locale: Locale): string {
-  return new Intl.NumberFormat(languageTag(locale), { style: 'percent', maximumFractionDigits: 0 }).format(
-    referralDiscountPercent / 100,
-  )
+  return new Intl.NumberFormat(languageTag(locale), {
+    style: 'percent',
+    maximumFractionDigits: 0,
+  }).format(referralDiscountPercent / 100)
 }
 
 /** True when the partner shows a referral code: the box on their card and the sign-up button on their profile. */
@@ -91,7 +92,16 @@ export function partnerTextLang(text: PartnerText, locale: Locale): Locale | und
 
 /** Every language a piece of partner text is written in, as [locale, text] pairs. */
 function partnerTextEntries(text: PartnerText): [string, string][] {
-  return typeof text === 'string' ? [[defaultLocale, text]] : Object.entries(text).map(([key, value]) => [key, value ?? ''])
+  return typeof text === 'string'
+    ? [[defaultLocale, text]]
+    : Object.entries(text).map(([key, value]) => [key, value ?? ''])
+}
+
+/** Up to two capital letters from a name, for the circle shown when a partner has no picture: "Last Stop" is "LS". */
+export function partnerInitials(name: string): string {
+  const words = name.split(/[^\p{L}\p{N}]+/u).filter(Boolean)
+  const letters = words.length > 1 ? words.slice(0, 2).map((word) => [...word][0]) : [...(words[0] ?? '?')].slice(0, 2)
+  return letters.join('').toLocaleUpperCase()
 }
 
 /** Featured partners first; otherwise the order data/partners.ts lists them in. */
@@ -120,10 +130,10 @@ const handlePath = /^\/@?[\w.-]+\/?$/
 export const socialPlatforms: Record<SocialPlatform, PlatformRule> = {
   discord: {
     name: 'Discord',
-    expected: 'https://discord.gg/<invite> or https://discord.com/invite/<invite>',
+    expected: 'https://discord.gg/<invite>, https://discord.com/invite/<invite> or https://discord.com/users/<number>',
     accepts: (url) =>
       (onHost(url, ['discord.gg']) && /^\/[\w-]+\/?$/.test(url.pathname)) ||
-      (onHost(url, ['discord.com', 'www.discord.com']) && /^\/invite\/[\w-]+\/?$/.test(url.pathname)),
+      (onHost(url, ['discord.com', 'www.discord.com']) && /^\/(invite\/[\w-]+|users\/\d+)\/?$/.test(url.pathname)),
   },
   youtube: {
     name: 'YouTube',
@@ -161,8 +171,7 @@ export const socialPlatforms: Record<SocialPlatform, PlatformRule> = {
   steam: {
     name: 'Steam',
     expected: 'https://steamcommunity.com/groups/<name>, /id/<name> or /profiles/<number>',
-    accepts: (url) =>
-      onHost(url, ['steamcommunity.com']) && /^\/(groups|id|profiles)\/[\w-]+\/?$/.test(url.pathname),
+    accepts: (url) => onHost(url, ['steamcommunity.com']) && /^\/(groups|id|profiles)\/[\w-]+\/?$/.test(url.pathname),
   },
   github: {
     name: 'GitHub',
@@ -291,14 +300,21 @@ export function partnerProblems(list: readonly Partner[], context: PartnerCheckC
     }
 
     const folder = `/partners/${partner.slug}/`
-    for (const [kind, path] of [['avatar', partner.avatar], ['banner', partner.banner]] as const) {
+    for (const [kind, path] of [
+      ['avatar', partner.avatar],
+      ['banner', partner.banner],
+    ] as const) {
+      // A picture is optional, but one that is given must pass every check below.
+      if (path === undefined) continue
       // A path that fails either check is never looked up, so it cannot reach another file.
       if (!path.startsWith(folder)) {
         at(`${kind} must be in ${folder}`)
         continue
       }
       if (!imageFileName.test(path.slice(folder.length))) {
-        at(`${kind} ${path} must be a WebP, PNG or JPEG file directly in ${folder}, named in lowercase letters, digits and hyphens`)
+        at(
+          `${kind} ${path} must be a WebP, PNG or JPEG file directly in ${folder}, named in lowercase letters, digits and hyphens`,
+        )
         continue
       }
       const size = context.imageSize(path)

@@ -1,9 +1,9 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowLeft, ArrowUpRight, BadgeCheck } from 'lucide-react'
 import { Breadcrumbs } from '@/components/layout/page-header'
 import { CopyCode } from '@/components/partners/copy-code'
 import { copyLabels, platformName } from '@/components/partners/partner-card'
+import { PartnerAvatar, PartnerBanner } from '@/components/partners/partner-pictures'
 import { SocialIcon } from '@/components/partners/social-icon'
 import { Button } from '@/components/ui/button'
 import type { Partner } from '@/data/partners'
@@ -48,25 +48,21 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
         />
 
         <div className="aspect-[3/1] overflow-hidden rounded-2xl border bg-card">
-          <Image
+          <PartnerBanner
             src={partner.banner}
             alt={words.profile.bannerAlt(partner.name)}
-            width={1500}
-            height={500}
             preload
             sizes="(min-width: 72rem) 68rem, 100vw"
-            className="size-full object-cover"
           />
         </div>
 
         <div className="flex flex-col gap-4 px-1 sm:flex-row sm:items-end sm:gap-6 sm:px-6">
-          <Image
+          <PartnerAvatar
+            name={partner.name}
             src={partner.avatar}
             alt={words.profile.avatarAlt(partner.name)}
-            width={256}
-            height={256}
             loading="eager"
-            className="relative -mt-12 size-24 shrink-0 rounded-full bg-card object-cover ring-4 ring-background sm:-mt-16 sm:size-32 md:-mt-20 md:size-40"
+            className="-mt-12 size-24 shrink-0 text-xl sm:-mt-16 sm:size-32 sm:text-2xl md:-mt-20 md:size-40 md:text-3xl"
           />
           {/* The top padding keeps a long name that wraps onto several lines clear of the banner. */}
           <div className="min-w-0 sm:pt-5 sm:pb-2">
@@ -91,7 +87,9 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
       </div>
 
       {/* With no code there is no side box, so the page is one column rather than a column and an empty gap. */}
-      <div className={cn('mt-12 grid gap-12', hasReferralCode(partner) && 'lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16')}>
+      <div
+        className={cn('mt-12 grid gap-12', hasReferralCode(partner) && 'lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-16')}
+      >
         {/* First in reading order on a phone, where the code is what most visitors came for. */}
         {hasReferralCode(partner) && (
           <aside aria-labelledby="referral-heading" className="lg:order-last">

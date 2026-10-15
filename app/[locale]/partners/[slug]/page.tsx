@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: partnerMetaDescription(partner, t, locale),
     path: `/partners/${partner.slug}`,
     locale,
-    // Their banner is the picture a shared link shows, rather than ours.
-    image: { url: partner.banner, alt: t.bannerAlt(partner.name) },
+    // Their banner is the picture a shared link shows, rather than ours; with none, ours.
+    image: partner.banner ? { url: partner.banner, alt: t.bannerAlt(partner.name) } : undefined,
   })
 }
 
