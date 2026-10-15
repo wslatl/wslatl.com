@@ -1,6 +1,6 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowDown, ArrowRight, UserRound } from 'lucide-react'
+import { PartnerAvatar, PartnerBanner } from '@/components/partners/partner-pictures'
 import { CopyCode } from '@/components/partners/copy-code'
 import { SocialIcon } from '@/components/partners/social-icon'
 import type { Partner, SocialPlatform } from '@/data/partners'
@@ -21,7 +21,11 @@ export function platformName(platform: SocialPlatform, t: Copy): string {
 
 /** The words the Copy button needs, in the language of the page. */
 export function copyLabels(t: Copy) {
-  return { copy: t.partners.copy, copied: t.partners.copied, copyFailed: t.partners.copyFailed }
+  return {
+    copy: t.partners.copy,
+    copied: t.partners.copied,
+    copyFailed: t.partners.copyFailed,
+  }
 }
 
 /** One partner on /partners: banner, picture, name, links, their code if they show one, and the way to their profile. */
@@ -41,14 +45,7 @@ export function PartnerCard({ partner }: { partner: Partner }) {
     >
       {/* overflow-hidden holds the box at 3:1 when a banner is a little taller than that. */}
       <div className="relative aspect-[3/1] overflow-hidden bg-card">
-        <Image
-          src={partner.banner}
-          alt=""
-          width={1500}
-          height={500}
-          sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 50vw, 100vw"
-          className="size-full object-cover"
-        />
+        <PartnerBanner src={partner.banner} alt="" sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 50vw, 100vw" />
         {partner.featured && (
           <span className="absolute top-3 right-3 rounded-full border border-primary/40 bg-background/85 px-2.5 py-0.5 text-xs font-medium text-foreground">
             {t.partners.featured}
@@ -57,13 +54,7 @@ export function PartnerCard({ partner }: { partner: Partner }) {
       </div>
 
       <div className="flex flex-1 flex-col px-5 pb-5">
-        <Image
-          src={partner.avatar}
-          alt=""
-          width={256}
-          height={256}
-          className="relative -mt-8 size-16 rounded-full bg-card object-cover ring-4 ring-background"
-        />
+        <PartnerAvatar name={partner.name} src={partner.avatar} alt="" className="-mt-8 size-16 text-xs" />
         <h2 id={headingId} className="mt-3 text-lg font-semibold tracking-tight text-foreground">
           {partner.name}
         </h2>

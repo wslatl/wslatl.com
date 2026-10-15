@@ -4,6 +4,7 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { generateMetadata as partnersPageMetadata } from '@/app/[locale]/partners/page'
+import { generateMetadata as profileMetadata } from '@/app/[locale]/partners/[slug]/page'
 import sitemap from '@/app/sitemap'
 import { PartnerCard, ghostAloneAt, ghostItemClass } from '@/components/partners/partner-card'
 import { PartnerProfile } from '@/components/partners/partner-profile'
@@ -22,6 +23,7 @@ import { en } from '@/i18n/copy/en'
 import {
   hasReferralCode,
   orderedPartners,
+  partnerInitials,
   partnerMetaDescription,
   partnerProblems,
   partnersPageText,
@@ -57,7 +59,10 @@ const realContext: PartnerCheckContext = {
 }
 
 /** The same check for the made-up partner, whose pictures are not on disk. */
-const exampleContext: PartnerCheckContext = { ...realContext, imageSize: (path) => exampleImages[path] ?? null }
+const exampleContext: PartnerCheckContext = {
+  ...realContext,
+  imageSize: (path) => exampleImages[path] ?? null,
+}
 
 /** The problems one changed copy of the example partner has. */
 const problemsWith = (change: Partial<Partner>) => partnerProblems([{ ...examplePartner, ...change }], exampleContext)
@@ -70,6 +75,7 @@ describe('the partners in data/partners.ts', () => {
   it('have their pictures in public/, where the profile pages load them from', () => {
     const missing = partners
       .flatMap((partner) => [partner.avatar, partner.banner])
+      .filter((path): path is string => path !== undefined)
       .filter((path) => !existsSync(join(root, 'public', path)))
     expect(missing).toEqual([])
   })
@@ -112,13 +118,18 @@ describe('the partner checks', () => {
     const problems = partnerProblems([partnerWithoutCode, second], exampleContext)
     expect(problems.filter((problem) => /referral code/.test(problem))).toEqual([])
     // A code still has to be unique among the partners that have one.
-    const twice = partnerProblems([examplePartner, partnerWithoutCode, { ...examplePartner, slug: 'third' }], exampleContext)
+    const twice = partnerProblems(
+      [examplePartner, partnerWithoutCode, { ...examplePartner, slug: 'third' }],
+      exampleContext,
+    )
     expect(twice.join('\n')).toMatch(/EXAMPLE10 is used twice/)
   })
 
   it('still reject an empty referral code, which is a mistake rather than no code', () => {
     for (const referralCode of ['', ' ', '\n']) {
-      expect(problemsWith({ referralCode }).join('\n'), JSON.stringify(referralCode)).toMatch(/must be 1 to 32 characters/)
+      expect(problemsWith({ referralCode }).join('\n'), JSON.stringify(referralCode)).toMatch(
+        /must be 1 to 32 characters/,
+      )
     }
   })
 
@@ -132,7 +143,10 @@ describe('the partner checks', () => {
 
   it('reject empty text and a language the site is not published in', () => {
     expect(problemsWith({ tagline: ' ' }).join('\n')).toMatch(/tagline \(en\) is empty/)
-    const unknown = { en: 'Fine.', it: 'Va bene.' } as unknown as Partner['description']
+    const unknown = {
+      en: 'Fine.',
+      it: 'Va bene.',
+    } as unknown as Partner['description']
     expect(problemsWith({ description: unknown }).join('\n')).toMatch(/language we do not publish: it/)
   })
 
@@ -143,7 +157,9 @@ describe('the partner checks', () => {
   })
 
   it('only list games that have a page', () => {
-    expect(problemsWith({ games: ['minecraft', 'not-a-game'] }).join('\n')).toMatch(/not-a-game is not in data\/games\.ts/)
+    expect(problemsWith({ games: ['minecraft', 'not-a-game'] }).join('\n')).toMatch(
+      /not-a-game is not in data\/games\.ts/,
+    )
     expect(problemsWith({ games: ['minecraft', 'minecraft'] }).join('\n')).toMatch(/listed twice/)
   })
 
@@ -161,6 +177,20 @@ describe('the partner checks', () => {
     expect(shapes({ width: 128, height: 128 }, { width: 1500, height: 500 })).toMatch(/at least 256px/)
     expect(shapes({ width: 512, height: 512 }, { width: 1500, height: 1000 })).toMatch(/about 3:1/)
     expect(shapes({ width: 512, height: 512 }, { width: 900, height: 300 })).toMatch(/at least 1200px/)
+  })
+
+  it('accept a partner with no pictures, and still check any picture that is given', () => {
+    const bare: Partner = { ...examplePartner }
+    delete bare.avatar
+    delete bare.banner
+    expect(partnerProblems([bare], exampleContext)).toEqual([])
+    expect(partnerProblems([{ ...bare, banner: examplePartner.banner }], exampleContext)).toEqual([])
+    expect(
+      partnerProblems([{ ...bare, avatar: '/partners/example-creator/missing.webp' }], exampleContext).join('\n'),
+    ).toMatch(/missing from public/)
+    expect(
+      partnerProblems([{ ...bare, banner: '/partners/example-creator/banner.gif' }], exampleContext).join('\n'),
+    ).toMatch(/WebP, PNG or JPEG/)
   })
 
   it('never look up a picture path that could lead out of the partner folder', () => {
@@ -198,6 +228,8 @@ describe('social links', () => {
     const good: [Parameters<typeof socialLinkProblem>[0], string][] = [
       ['discord', 'https://discord.gg/abc123'],
       ['discord', 'https://discord.com/invite/abc123'],
+      ['discord', 'https://discord.com/users/333693993034448896'],
+      ['discord', 'https://www.discord.com/users/333693993034448896/'],
       ['youtube', 'https://www.youtube.com/@someone'],
       ['youtube', 'https://youtube.com/channel/UC123abc'],
       ['tiktok', 'https://www.tiktok.com/@someone'],
@@ -225,6 +257,9 @@ describe('social links', () => {
     const bad: [Parameters<typeof socialLinkProblem>[0], string][] = [
       ['discord', 'https://discord.com/channels/123/456'],
       ['discord', 'https://discord.gg.evil.example/abc'],
+      ['discord', 'https://discord.com.evil.example/users/333693993034448896'],
+      ['discord', 'https://notdiscord.com/users/333693993034448896'],
+      ['discord', 'https://discord.com/users/someone'],
       ['youtube', 'https://youtu.be/dQw4w9WgXcQ'],
       ['youtube', 'https://www.youtube.com.evil.example/@someone'],
       ['tiktok', 'https://tiktok.evil.example/@someone'],
@@ -328,7 +363,10 @@ describe('a partner with no referral code', () => {
     for (const locale of locales) {
       const t = copyFor(locale).partners
       const plain = partnersPageText(t, 2, locale, 0)
-      expect(plain, locale).toEqual({ intro: t.introNoCodes, description: t.metaDescriptionNoCodes })
+      expect(plain, locale).toEqual({
+        intro: t.introNoCodes,
+        description: t.metaDescriptionNoCodes,
+      })
       expect(plain.intro, locale).not.toContain(referralDiscount(locale))
       expect(plain.description, locale).not.toContain(referralDiscount(locale))
       // One code anywhere in the list, or no count at all, keeps the offer.
@@ -374,7 +412,10 @@ const renderCard = (partner: Partner) => renderToStaticMarkup(createElement(Part
 const count = (html: string, text: string) => html.split(text).length - 1
 /** Every opening <a> tag in some markup, with its href as written (HTML escaping undone for &). */
 const anchors = (html: string) =>
-  [...html.matchAll(/<a\s[^>]*>/g)].map(([tag]) => ({ tag, href: (/href="([^"]*)"/.exec(tag)?.[1] ?? '').replaceAll('&amp;', '&') }))
+  [...html.matchAll(/<a\s[^>]*>/g)].map(([tag]) => ({
+    tag,
+    href: (/href="([^"]*)"/.exec(tag)?.[1] ?? '').replaceAll('&amp;', '&'),
+  }))
 
 describe('the partners page', () => {
   it('shows the "This could be you" card and the program when there are no partners', () => {
@@ -388,7 +429,10 @@ describe('the partners page', () => {
     // With no partners yet, neither may talk about partners or codes that do not exist.
     for (const locale of locales) {
       const t = copyFor(locale).partners
-      expect(partnersPageText(t, 0, locale), locale).toEqual({ intro: t.emptyIntro, description: t.emptyMetaDescription })
+      expect(partnersPageText(t, 0, locale), locale).toEqual({
+        intro: t.emptyIntro,
+        description: t.emptyMetaDescription,
+      })
       expect(t.emptyMetaDescription, locale).not.toContain(String(referralDiscountPercent))
       const listed = partnersPageText(t, 1, locale)
       expect(listed.description, locale).toBe(t.metaDescription(referralDiscount(locale)))
@@ -396,7 +440,9 @@ describe('the partners page', () => {
     }
 
     // And the page itself, with the list as it ships.
-    const metadata = await partnersPageMetadata({ params: Promise.resolve({ locale: 'en' }) })
+    const metadata = await partnersPageMetadata({
+      params: Promise.resolve({ locale: 'en' }),
+    })
     const codeCount = partners.filter(hasReferralCode).length
     const expected = partnersPageText(en.partners, partners.length, 'en', codeCount).description
     expect(metadata.description).toBe(expected)
@@ -414,12 +460,24 @@ describe('the partners page', () => {
     expect(ghostItemClass(ghostAloneAt(3))).toBe('lg:col-span-3')
     expect(ghostItemClass(ghostAloneAt(6))).toBe('sm:col-span-2 lg:col-span-3')
 
-    const three = [examplePartner, ...['b', 'c'].map((slug) => ({ ...examplePartner, slug, referralCode: `CODE${slug}` }))]
+    const three = [
+      examplePartner,
+      ...['b', 'c'].map((slug) => ({
+        ...examplePartner,
+        slug,
+        referralCode: `CODE${slug}`,
+      })),
+    ]
     expect(render(three)).toMatch(/<li class="lg:col-span-3"><a [^>]*data-ghost-card/)
   })
 
   it('always ends the grid on the "This could be you" card', () => {
-    const second = { ...examplePartner, slug: 'second-creator', referralCode: 'SECOND10', featured: true }
+    const second = {
+      ...examplePartner,
+      slug: 'second-creator',
+      referralCode: 'SECOND10',
+      featured: true,
+    }
     const html = render([examplePartner, second])
     expect(count(html, 'data-ghost-card')).toBe(1)
     const ghost = html.indexOf('data-ghost-card')
@@ -440,7 +498,10 @@ describe('the partners page', () => {
     // and on the profile, the sign-up button, and the program's short links.
     const hrefs = leaving.map(({ href }) => href)
     for (const link of socialLinks(examplePartner)) {
-      expect(hrefs.filter((href) => href === link.href), link.href).toHaveLength(2)
+      expect(
+        hrefs.filter((href) => href === link.href),
+        link.href,
+      ).toHaveLength(2)
     }
     expect(hrefs).toContain(referralSignupUrl(examplePartner.referralCode ?? ''))
     expect(hrefs).toContain(siteConfig.links.discord)
@@ -479,15 +540,67 @@ describe('the partners page', () => {
     expect(html).not.toContain('bg-background/50')
     expect(html).toContain(`>${partnerWithoutCode.name}</h2>`)
     expect(html).toContain(partnerText(partnerWithoutCode.tagline, 'en'))
-    expect(html).toContain(encodeURIComponent(partnerWithoutCode.banner))
-    expect(html).toContain(encodeURIComponent(partnerWithoutCode.avatar))
+    expect(html).toContain(encodeURIComponent(partnerWithoutCode.banner ?? ''))
+    expect(html).toContain(encodeURIComponent(partnerWithoutCode.avatar ?? ''))
     expect(html).toContain(en.partners.featured)
     expect(html).toContain(`href="/partners/${partnerWithoutCode.slug}"`)
     for (const link of socialLinks(partnerWithoutCode)) expect(html, link.platform).toContain(`href="${link.href}"`)
   })
 
+  it('shows initials and a plain banner, with no <img>, for a partner with no pictures', () => {
+    const bare: Partner = {
+      ...examplePartner,
+      name: 'Last Stop',
+      featured: true,
+    }
+    delete bare.avatar
+    delete bare.banner
+    const card = renderCard(bare)
+    expect(card).not.toContain('<img')
+    expect(card).toContain('>LS</span>')
+    expect(card).toContain('data-plain-banner')
+    expect(card).toContain(`>${bare.name}</h2>`)
+    const profile = renderProfile(bare)
+    expect(profile).not.toContain('<img')
+    expect(profile).toContain('>LS</span>')
+    expect(profile).toContain(`aria-label="${en.partners.profile.avatarAlt(bare.name)}"`)
+    expect(profile).toContain('data-plain-banner')
+  })
+
+  it('keeps the pictures of a partner who has them', () => {
+    for (const html of [renderCard(examplePartner), renderProfile(examplePartner)]) {
+      expect(html).toContain('<img')
+      expect(html).toContain(encodeURIComponent(examplePartner.avatar ?? ''))
+      expect(html).toContain(encodeURIComponent(examplePartner.banner ?? ''))
+      expect(html).not.toContain('data-plain-banner')
+    }
+  })
+
+  it('shares a profile with their banner, or the site picture when they have none', async () => {
+    const images = async (slug: string) => {
+      const meta = await profileMetadata({
+        params: Promise.resolve({ locale: 'en', slug }),
+      })
+      return JSON.stringify(meta.openGraph?.images)
+    }
+    expect(await images('haskins')).toContain('/partners/haskins/banner.webp')
+    expect(await images('last-stop')).not.toContain('/partners/')
+    expect(await images('last-stop')).toContain('og-image')
+  })
+
+  it('takes up to two initials from a name', () => {
+    expect(partnerInitials('Haskins')).toBe('HA')
+    expect(partnerInitials('Last Stop')).toBe('LS')
+    expect(partnerInitials('the big  red button')).toBe('TB')
+    expect(partnerInitials('élan')).toBe('ÉL')
+  })
+
   it('lists a partner with no code beside one that has a code', () => {
-    const other = { ...partnerWithoutCode, slug: 'no-code-creator', name: 'No Code Creator' }
+    const other = {
+      ...partnerWithoutCode,
+      slug: 'no-code-creator',
+      name: 'No Code Creator',
+    }
     const html = render([examplePartner, other])
     expect(html).toContain('id="partner-example-creator"')
     expect(html).toContain('id="partner-no-code-creator"')
@@ -506,8 +619,8 @@ describe('the partners page', () => {
     expect(html).toContain(partnerText(partnerWithoutCode.tagline, 'en'))
     expect(html).toContain('A made-up partner used by the tests.')
     expect(html).toContain(en.partners.officialPartner)
-    expect(html).toContain(encodeURIComponent(partnerWithoutCode.banner))
-    expect(html).toContain(encodeURIComponent(partnerWithoutCode.avatar))
+    expect(html).toContain(encodeURIComponent(partnerWithoutCode.banner ?? ''))
+    expect(html).toContain(encodeURIComponent(partnerWithoutCode.avatar ?? ''))
     for (const link of socialLinks(partnerWithoutCode)) expect(html, link.platform).toContain(`href="${link.href}"`)
     for (const game of partnerWithoutCode.games ?? []) expect(html, game).toContain(`href="/games/${game}"`)
 
@@ -537,9 +650,15 @@ describe('the partners page', () => {
     for (const locale of locales) {
       const t = copyFor(locale)
       const target = locale === defaultLocale ? '/partners' : `/${locale}/partners`
-      expect(mainNav(t, locale).map((link) => link.href), locale).toContain(target)
+      expect(
+        mainNav(t, locale).map((link) => link.href),
+        locale,
+      ).toContain(target)
       const footer = footerColumns(t, locale, legalPages).flatMap((column) => column.links)
-      expect(footer.map((link) => link.href), locale).toContain(target)
+      expect(
+        footer.map((link) => link.href),
+        locale,
+      ).toContain(target)
     }
   })
 
