@@ -9,6 +9,7 @@ import { PlanGroupTable } from '@/components/pricing/plan-group'
 import { ComparisonList, comparisonLine } from '@/components/pricing/comparisons'
 import { FaqList } from '@/components/sections/faq'
 import { JsonLd } from '@/components/seo/json-ld'
+import { ShareGameAd } from '@/components/share/ads'
 import { Button } from '@/components/ui/button'
 import { games, ramNeedGb, type RamRow } from '@/data/games'
 import { gameComparisons } from '@/data/pricing'
@@ -138,6 +139,7 @@ export default async function GamePage({ params }: PageProps) {
               <a href="#plans">{t.games.detail.comparePlans}</a>
             </Button>
           </div>
+          <ShareGameAd game={game} className="mt-4" />
           <p className="mt-4 text-sm text-muted-foreground lg:mt-0">
             {t.games.detail.listedUnderPrefix}{' '}
             <Link

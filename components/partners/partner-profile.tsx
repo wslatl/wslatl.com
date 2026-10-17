@@ -4,6 +4,7 @@ import { Breadcrumbs } from '@/components/layout/page-header'
 import { CopyCode } from '@/components/partners/copy-code'
 import { copyLabels, platformName } from '@/components/partners/partner-card'
 import { PartnerAvatar, PartnerBanner } from '@/components/partners/partner-pictures'
+import { SharePartnerAd } from '@/components/share/ads'
 import { SocialIcon } from '@/components/partners/social-icon'
 import { Button } from '@/components/ui/button'
 import type { Partner } from '@/data/partners'
@@ -84,6 +85,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
         >
           {partnerText(partner.tagline, locale)}
         </p>
+        <SharePartnerAd partner={partner} variant="default" className="mt-6" />
       </div>
 
       {/* With no code there is no side box, so the page is one column rather than a column and an empty gap. */}

@@ -5,6 +5,7 @@ import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
 import { PlanGroupTable } from '@/components/pricing/plan-group'
 import { SectionNav } from '@/components/pricing/section-nav'
+import { ShareLineAd } from '@/components/share/ads'
 import { Button } from '@/components/ui/button'
 import { HowItWorks } from '@/components/sections/how-it-works'
 import type { ProductLine } from '@/data/pricing'
@@ -122,6 +123,7 @@ export default async function PricingPage({ params }: PageProps) {
                     {t.lines[line.id]}
                   </h2>
                   <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">{line.intro}</p>
+                  <ShareLineAd line={line} className="mt-5" />
                 </div>
                 <div className="self-start rounded-xl border bg-card/30 p-5">
                   <h3 className="text-sm font-semibold text-foreground">{t.included}</h3>

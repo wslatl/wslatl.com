@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { BadgeCheck, IdCard, Percent, Tag, Wallet } from 'lucide-react'
 import { becomePartnerAnchor } from '@/components/partners/partner-card'
+import { SharePartnersIndexAd } from '@/components/share/ads'
 import { Button } from '@/components/ui/button'
 import { siteConfig } from '@/config/site'
 import { localePath } from '@/i18n/config'
@@ -59,6 +60,7 @@ export function BecomePartner({ className }: { className?: string }) {
             </Button>
           </div>
           <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground">{program.ticketNote}</p>
+          <SharePartnersIndexAd className="mt-5" />
           <p className="mt-3 text-sm">
             <Link
               href={localePath(locale, siteConfig.paths.accountCredit)}
