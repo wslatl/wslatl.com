@@ -129,4 +129,19 @@ export const partners: Partner[] = [
       discord: 'https://discord.gg/thelaststop',
     },
   },
+  {
+    slug: 'vsrp',
+    name: 'Volunteer State Roleplay',
+    tagline: 'Experience Tennessee Roleplay Like Never Before!',
+    description:
+      "Volunteer State Roleplay (VSRP) is a Tennessee-based FiveM roleplay community focused on a realistic, enjoyable and welcoming experience. Based in Sevier County, Tennessee, we offer law enforcement, fire and EMS, civilian roleplay and more.\n\nOur goal is an active, friendly community where everyone can create their own stories, meet new people and enjoy quality roleplay. Whether you're experienced or just getting started, there's a place for you at VSRP!",
+    avatar: '/partners/vsrp/avatar.webp',
+    referralCode: 'TNVSRP10',
+    since: '2026-10',
+    games: ['fivem'],
+    socials: {
+      discord: 'https://discord.gg/tnvsrp',
+      tiktok: 'https://www.tiktok.com/@vsrp_fivem',
+    },
+  },
 ]
