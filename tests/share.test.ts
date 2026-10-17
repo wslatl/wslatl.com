@@ -89,7 +89,7 @@ describe('every ad', () => {
     for (const ad of ads) {
       const lines = ad.text.split('\n')
       expect(lines.at(-1), `${ad.locale} ${ad.name}`).toBe(ad.url)
-      expect(ad.url.startsWith('https://wslatl.com')).toBe(true)
+      expect(new URL(ad.url).origin).toBe('https://wslatl.com')
       expect(lines.at(-2)).toBe('')
     }
   })
