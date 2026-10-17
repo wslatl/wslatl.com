@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Wordmark } from '@/components/brand/wordmark'
+import { ShareSiteAd } from '@/components/share/ads'
 import { Email } from '@/components/ui/email'
 import { SiteLink } from '@/components/ui/site-link'
 import { footerColumns } from '@/data/footer'
@@ -33,6 +34,8 @@ export function Footer() {
           <p className="mt-4 text-sm">
             <Email name="support" className="text-foreground hover:text-link" />
           </p>
+          <p className="mt-5 text-sm text-muted-foreground">{t.share.shareOurAdHint}</p>
+          <ShareSiteAd size="sm" className="mt-2" />
         </div>
 
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4">

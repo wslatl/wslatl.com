@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SiteHeader } from '@/components/layout/site-header'
+import { ShareGamesIndexAd } from '@/components/share/ads'
 import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
 import { GameDirectory, type GameListing } from '@/components/games/game-directory'
@@ -67,6 +68,7 @@ export default async function GamesPage({ params }: PageProps) {
             {t.games.introSuffix}
           </p>
         </PageHeader>
+        <ShareGamesIndexAd className="-mt-4 mb-10" />
 
         <GameDirectory
           games={listings}

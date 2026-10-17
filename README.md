@@ -62,6 +62,16 @@ tests/                     Vitest suites for data, links, and house style.
 
 ---
 
+## Discord ads (share buttons)
+
+Visitors can copy a ready-made Discord post about a page: the footer has "Share our ad" for the whole company, every partner card and profile, game page, the games index, each plan line on /pricing and the partner program have "Copy Discord ad". A Preview button shows the exact text first, and phones that support it also get a Share button.
+
+- The text is built by pure functions in `lib/share.ts` (`homeAd`, `partnerAd`, `gameAd`, `gamesIndexAd`, `productLineAd`, `partnersIndexAd`). They take the site's words and data as arguments and use only what is already on the site: prices come from `data/pricing.ts`, a partner's discount line only appears when they have a code.
+- Each ad is Discord markdown: a `## ` title, `### ` headings, `- ` bullets, and the page's full address alone on the last line so Discord shows a link preview. Other links are wrapped in `<angle brackets>` so they do not push that preview out. No mentions are ever written, and a partner's own words are escaped.
+- The wording is under `share` in `i18n/copy/*.ts` (all five languages); the ad follows the page's language. Which facts go into the main ad (services, features, commitments) is chosen in `homeAd`.
+- Ads are kept under Discord's 2000 character limit: the required lines always stay, optional lines are added only while they fit. `tests/share.test.ts` checks every ad in every language.
+- The button is `components/share/share-ad.tsx`; `components/share/ads.tsx` builds the text on the server for each page.
+
 ## Single sources of truth
 
 Some facts appear on many pages. Each one is defined exactly once, and everything else derives from it:

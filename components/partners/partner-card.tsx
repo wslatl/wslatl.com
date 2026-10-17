@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowDown, ArrowRight, UserRound } from 'lucide-react'
 import { PartnerAvatar, PartnerBanner } from '@/components/partners/partner-pictures'
 import { CopyCode } from '@/components/partners/copy-code'
+import { SharePartnerAd } from '@/components/share/ads'
 import { SocialIcon } from '@/components/partners/social-icon'
 import type { Partner, SocialPlatform } from '@/data/partners'
 import { localePath } from '@/i18n/config'
@@ -91,11 +92,11 @@ export function PartnerCard({ partner }: { partner: Partner }) {
               <CopyCode code={partner.referralCode} labels={copyLabels(t)} className="mt-1" />
             </div>
           )}
+          <SharePartnerAd partner={partner} size="sm" className={cn('mb-4', hasReferralCode(partner) && 'mt-4')} />
           <Link
             href={localePath(locale, `/partners/${partner.slug}`)}
             className={cn(
               'group inline-flex items-center gap-1.5 text-sm font-medium text-link transition-colors hover:text-foreground',
-              hasReferralCode(partner) && 'mt-4',
             )}
           >
             {t.partners.viewProfile}
