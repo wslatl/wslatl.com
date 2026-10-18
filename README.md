@@ -36,7 +36,7 @@ app/
     partners/[slug]/page.tsx  One profile per partner, statically generated from data/partners.ts.
     not-found.tsx, error.tsx  Branded 404 and error pages.
 
-proxy.ts                   Serves the English tree at the unprefixed URLs.
+proxy.ts                   Serves the English tree at the unprefixed URLs, and answers Server Action probes with a 400 (the site has none).
 
 components/
   ui/                      Primitives: button, dropdown-menu, section-header, site-link.
