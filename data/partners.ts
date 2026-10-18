@@ -144,4 +144,18 @@ export const partners: Partner[] = [
       tiktok: 'https://www.tiktok.com/@vsrp_fivem',
     },
   },
+  {
+    slug: 'nxtlyfe-zsr',
+    name: 'NxtLyfe ZSR',
+    tagline: 'Zombie Apocalypse Server',
+    description:
+      'NxtLyfe ZSR is a FiveM community for people who enjoy the thrill. We have custom scripts and immersive gameplay.',
+    avatar: '/partners/nxtlyfe-zsr/avatar.webp',
+    referralCode: 'NXTLYFEZSR',
+    since: '2026-10',
+    games: ['fivem'],
+    socials: {
+      discord: 'https://discord.gg/sseaUasVEt',
+    },
+  },
 ]
