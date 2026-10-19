@@ -60,7 +60,7 @@ export const fr: ContentTranslation = {
     'getting-started': {
       question: "Comment démarrer ?",
       answer:
-        "Rendez-vous sur billing.wslatl.com/register et demandez un accès. Un administrateur examine chaque candidature et la valide avant que vous puissiez accéder au moindre service. Une fois accepté, écrivez-nous sur Discord ou ouvrez un ticket de facturation et nous vous installons.",
+        "Rendez-vous sur billing.wslatl.com/register et demandez un accès. Un administrateur examine chaque candidature et la valide avant que vous puissiez accéder au moindre service. Une fois accepté, vous pouvez commander un serveur de jeu ou un VPS dans le portail de facturation et payer en ligne. Pour un serveur dédié ou un hébergement web, écrivez-nous sur Discord ou ouvrez un ticket de facturation, et nous le mettons en place avec vous.",
     },
     'what-makes-you-different': {
       question: "Qu'est-ce qui vous différencie des gros hébergeurs ?",
@@ -90,7 +90,7 @@ export const fr: ContentTranslation = {
     'changes-later': {
       question: "Puis-je monter, descendre ou changer d'offre plus tard ?",
       answer:
-        "Bien sûr. Chaque relation client est gérée personnellement, donc les montées en gamme, les changements d'offre et les migrations tiennent en un message sur Discord. Nous réglons ça en général le jour même.",
+        "Oui. Sur un serveur de jeu ou un VPS, le titulaire du compte peut changer d'offre ou de cycle de facturation depuis la page du service dans le portail de facturation, soit immédiatement avec un calcul au prorata, soit au prochain renouvellement. Pour plus de RAM, de vCores ou de disque, il peut utiliser « Request an upgrade » sur la même page : cela ouvre un ticket, et rien n'est facturé tant que notre équipe n'a pas validé la demande. Les serveurs dédiés, l'hébergement web et les migrations sont gérés par notre équipe : ouvrez un ticket ou écrivez-nous sur Discord.",
     },
     'vps-vs-shared': {
       question: "L'hébergement VPS est-il meilleur que l'hébergement mutualisé ?",
@@ -139,7 +139,7 @@ export const fr: ContentTranslation = {
         included: [
           "Accès root et sudo complet",
           "L'OS de votre choix",
-          "Montées en gamme et changements d'offre gérés par une personne",
+          "Changements d'offre et de cycle de facturation dans le portail de facturation, ou par une personne",
           "Une vraie personne à qui parler si quelque chose casse",
         ],
       },

@@ -12,7 +12,7 @@ export const faqs: Faq[] = [
     id: 'getting-started',
     question: 'How do I get started?',
     answer:
-      'Head to billing.wslatl.com/register and request access. An admin reviews every application and approves it before you can access any services. Once approved, reach out to us on Discord or open a billing ticket and we will get you set up.',
+      'Head to billing.wslatl.com/register and request access. An admin reviews every application and approves it before you can access any services. Once approved, you can order a game server or VPS in the billing portal and pay online. For a dedicated server or web hosting, reach out to us on Discord or open a billing ticket and we will set it up with you.',
   },
   {
     id: 'what-makes-you-different',
@@ -50,7 +50,7 @@ export const faqs: Faq[] = [
     id: 'changes-later',
     question: 'Can I upgrade, downgrade, or change things later?',
     answer:
-      'Of course. Every client relationship is handled personally, so upgrades, plan changes, and migrations are just a Discord message away. We usually get it sorted the same day.',
+      'Yes. On a game server or VPS, the account holder can switch plan or billing cycle from the service page in the billing portal, either right away with proration or at the next renewal. For more RAM, vCores or disk, they can use Request an upgrade on the same page, which opens a ticket and charges nothing until our team approves it. Dedicated servers, web hosting and migrations are handled by our team: open a ticket or message us on Discord.',
   },
   {
     id: 'vps-vs-shared',

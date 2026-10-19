@@ -120,14 +120,14 @@ export const es: Copy = {
             'Rellena una solicitud breve en el portal de facturación. Una persona las lee todas, y la mayoría se aprueban el mismo día.',
         },
         {
-          title: 'Cuéntanos qué necesitas',
+          title: 'Elige un plan o cuéntanos qué necesitas',
           description:
-            'Una vez aprobada, escríbenos por Discord o abre un ticket. Repasamos tu configuración contigo. Nada de procesos automáticos.',
+            'Una vez aprobada tu solicitud, pide un servidor de juego o un VPS en el portal de facturación y paga en línea. Para un servidor dedicado o hosting web, escríbenos por Discord o abre un ticket y lo configuramos contigo.',
         },
         {
           title: 'Tu servidor se pone en marcha',
           description:
-            'Te lo dejamos montado, te guiamos por tu panel y seguimos disponibles después. La mayoría de clientes están funcionando el mismo día.',
+            'Los servidores de juego y los VPS suelen estar en marcha el mismo día. Los servidores dedicados tardan más, normalmente unos días laborables. Te guiamos por tu panel y seguimos disponibles después.',
         },
       ],
       readyPrefix: '¿Listo?',
@@ -223,7 +223,7 @@ export const es: Copy = {
     custom: {
       heading: 'Servidores dedicados y hosting web',
       body:
-        'Estos se presupuestan por configuración en lugar de venderse desde una lista de precios, porque el hardware o el montaje adecuados dependen de lo que vayas a ejecutar. Cuéntanos qué necesitas y te damos un precio.',
+        'Estos se presupuestan por configuración en lugar de venderse desde una lista de precios, porque el hardware o el montaje adecuados dependen de lo que vayas a ejecutar. Cuéntanos qué necesitas y te damos un precio. ¿Ya eres cliente? En el portal de facturación, abre “Browse plans”, elige un servidor en la pestaña “Dedicated servers” y pulsa “Request this server”. Los servidores dedicados tardan más en configurarse que los servidores de juego y los VPS, normalmente unos días laborables.',
       cta: 'Pedir presupuesto',
     },
   },
@@ -348,7 +348,7 @@ export const es: Copy = {
       code: {
         title: 'Tu propio código de referido',
         body:
-          'La gente introduce tu código al registrarse en el portal de facturación, o sigue tu enlace, que lo rellena por ella.',
+          'La gente introduce tu código al registrarse en el portal de facturación, o sigue tu enlace, que lo rellena por ella. ¿Se les olvidó introducirlo? Pueden añadirlo en la página “Referrals” del portal de facturación antes de su primer pago. Una vez aprobado, puedes pedirnos en un ticket un código personalizado: solo letras y números, hasta 32 caracteres, y que no esté ya en uso.',
       },
       discount: {
         title: (percent: string) => `Un ${percent} de descuento en su primera factura`,
@@ -357,7 +357,7 @@ export const es: Copy = {
       },
       credit: {
         title: 'Crédito de cuenta para ti',
-        body: 'Cuando una persona referida paga su primera factura, recibes una sola vez una parte de ese pago, como crédito de cuenta.',
+        body: 'Cuando una persona referida paga su primera factura, recibes una sola vez una parte de ese pago, como crédito de cuenta. Los servidores dedicados no cuentan y, si ese pago se reembolsa, el crédito se retira.',
       },
       profile: {
         title: 'Un perfil en esta página',

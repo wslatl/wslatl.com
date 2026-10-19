@@ -129,14 +129,14 @@ export const en = {
             'Fill in a short application in the billing portal. A person reads every one, and most are approved the same day.',
         },
         {
-          title: 'Tell us what you need',
+          title: 'Pick a plan or tell us what you need',
           description:
-            'Once you are approved, message us on Discord or open a ticket. We talk through your setup with you. No automated flow.',
+            'Once you are approved, order a game server or VPS in the billing portal and pay online. For a dedicated server or web hosting, message us on Discord or open a ticket and we set it up with you.',
         },
         {
           title: 'Your server goes live',
           description:
-            'We set you up, walk you through your panel, and stay available after. Most clients are up and running the same day.',
+            'Game servers and VPS usually go live the same day. Dedicated servers take longer, usually a few business days. We walk you through your panel and stay available after.',
         },
       ],
       readyPrefix: 'Ready?',
@@ -232,7 +232,7 @@ export const en = {
     custom: {
       heading: 'Dedicated servers and web hosting',
       body:
-        'These are quoted per build rather than sold off a price list, because the right hardware or setup depends on what you are running. Tell us what you need and we will come back with a price.',
+        'These are quoted per build rather than sold off a price list, because the right hardware or setup depends on what you are running. Tell us what you need and we will come back with a price. Already a client? In the billing portal, open Browse plans, pick a server on the Dedicated servers tab and press Request this server. Dedicated servers take longer to set up than game servers and VPS, usually a few business days.',
       cta: 'Get a quote',
     },
   },
@@ -357,7 +357,7 @@ export const en = {
       code: {
         title: 'Your own referral code',
         body:
-          'People enter your code when they sign up in the billing portal, or follow your link, which fills it in for them.',
+          'People enter your code when they sign up in the billing portal, or follow your link, which fills it in for them. Forgot to enter it? They can add it on the Referrals page in the billing portal before their first payment. Once you are approved, you can ask us in a ticket for a custom code: letters and numbers only, up to 32 characters, and not already taken.',
       },
       discount: {
         title: (percent: string) => `${percent} off their first invoice`,
@@ -366,7 +366,7 @@ export const en = {
       },
       credit: {
         title: 'Account credit for you',
-        body: 'Once a person you refer has paid their first invoice, you get a one-time share of it as account credit.',
+        body: 'Once a person you refer has paid their first invoice, you get a one-time share of it as account credit. Dedicated servers do not count, and if that payment is refunded, the credit is taken back.',
       },
       profile: {
         title: 'A profile on this page',

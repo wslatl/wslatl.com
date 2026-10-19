@@ -25,13 +25,14 @@ export default function AccountCreditContent() {
           détermine si le remboursement est approuvé et les présentes conditions déterminent ce
           qu&rsquo;est le solde d&rsquo;avoir qui en résulte et comment il se comporte.
         </p>
-        <p>L&rsquo;avoir peut arriver sur votre compte de trois façons&nbsp;:</p>
+        <p>L&rsquo;avoir peut arriver sur votre compte de quatre façons&nbsp;:</p>
         <ul>
           <li>Vous l&rsquo;achetez directement sous forme de recharge via le portail de facturation</li>
           <li>Nous vous l&rsquo;émettons, par exemple à l&rsquo;issue d&rsquo;une demande de remboursement approuvée ou au titre d&rsquo;un avoir de service prévu par notre{' '}
             <Link href={siteConfig.paths.sla}>Accord de niveau de service</Link>
           </li>
           <li>Un autre client WSLATL vous l&rsquo;offre et vous acceptez le don (voir la section 5)</li>
+          <li>En tant que parrain approuvé, vous gagnez une récompense de parrainage lorsqu&rsquo;une personne que vous avez parrainée paie sa première facture (voir la section 6)</li>
         </ul>
       </LegalSection>
 
@@ -240,6 +241,14 @@ export default function AccountCreditContent() {
             avoir porté à votre compte à la suite d&rsquo;une erreur administrative ou système peut
             être corrigé. Nous vous préviendrons lorsque nous le ferons et nous vous expliquerons
             la correction.
+          </li>
+          <li>
+            <strong>Aux récompenses de parrainage.</strong> Une
+            récompense de parrainage est un avoir versé une seule fois, pour la première facture
+            que paie la personne que vous avez parrainée. Les serveurs dédiés ne comptent jamais
+            pour une récompense. Si ce paiement est remboursé ou fait l&rsquo;objet d&rsquo;un
+            chargeback, nous reprenons la récompense, ou la part correspondante si seule une partie
+            du paiement est remboursée.
           </li>
         </ul>
         <p>

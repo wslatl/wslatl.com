@@ -206,14 +206,19 @@ export default function SubprocessorsContent() {
             <li>
               <strong>Ask Ava, o chat de ajuda da área do cliente.</strong> O seu primeiro nome,
               as perguntas que você faz e os dados da sua conta que ele consulta para
-              respondê-las, como os seus serviços, faturas, tickets e crédito. Ele só pode ler o
-              que você mesmo poderia ver na área do cliente e não pode alterar nada.
+              respondê-las, como os seus serviços, faturas, tickets, crédito e atividade recente.
+              Ele só pode ler o que você mesmo poderia ver na área do cliente. Ele nunca altera
+              nada por conta própria. Quando oferece fazer algo por você, como abrir um ticket,
+              reiniciar um servidor, renovar um serviço, pagar uma fatura, adicionar crédito,
+              solicitar um upgrade, ou cancelar ou manter um serviço, nada acontece até você
+              apertar o botão desse cartão, e a área do cliente confere o pedido de novo antes.
             </li>
             <li>
               <strong>O assistente da equipe no nosso painel de administração.</strong> O que a
               nossa equipe pergunta a ele, incluindo as capturas de tela que anexar, e os
               registros que ele consulta para ela, como nomes de clientes, endereços de e-mail,
-              serviços, faturas e tickets.
+              serviços, faturas e tickets. Ele também pode preparar alterações em registros, e um
+              membro da nossa equipe aprova cada alteração antes de ela ser feita.
             </li>
             <li>
               <strong>A redação de respostas a tickets para a equipe.</strong> O assunto, o

@@ -219,10 +219,17 @@ export default function PrivacyContent() {
           <li>Respecter les lois, réglementations et obligations légales applicables</li>
           <li>Faire appliquer nos Conditions de service</li>
           <li>Envoyer des communications liées au service, telles que des avis de maintenance, des alertes de facturation et des mises à jour de compte</li>
+          <li>
+            Uniquement si vous dites oui, vous envoyer de temps en temps des nouveautés et des
+            offres par e-mail. Vous pouvez changer d&rsquo;avis à tout moment dans votre profil,
+            sous &laquo;&nbsp;Data and privacy&nbsp;&raquo;, ou avec le lien de désinscription de
+            ces e-mails. Les e-mails liés au service, comme les factures et les alertes de
+            sécurité, ne sont pas concernés.
+          </li>
           <li>Améliorer nos services et notre infrastructure à partir des usages constatés</li>
         </ul>
         <p className="font-medium text-foreground">
-          Nous n&rsquo;utilisons pas vos données à des fins publicitaires. Nous ne vendons, ne louons ni n&rsquo;échangeons vos informations personnelles
+          Nous n&rsquo;utilisons pas vos données à des fins de publicité pour des tiers. Nous ne vendons, ne louons ni n&rsquo;échangeons vos informations personnelles
           auprès d&rsquo;un tiers, à quelque fin commerciale que ce soit.
         </p>
       </LegalSection>
@@ -259,14 +266,18 @@ export default function PrivacyContent() {
           <p>
             Nous utilisons un fournisseur d&rsquo;IA, actuellement MiniMax, pour Ask Ava, le chat
             d&rsquo;aide de l&rsquo;espace client, et pour les outils avec lesquels notre équipe
-            consulte des dossiers et rédige des réponses aux tickets. Il reçoit ce dont chaque
+            consulte des dossiers, rédige des réponses aux tickets et prépare des modifications
+            qu&rsquo;un membre de l&rsquo;équipe approuve. Il reçoit ce dont chaque
             réponse a besoin, comme vos questions, vos messages de ticket et les informations de
             compte et de facturation consultées pour vous. Il les traite pour produire la réponse
             selon ses propres conditions&nbsp;; nous n&rsquo;avons pas encore confirmé ce que ces
             conditions lui imposent ni où il traite les requêtes (voir la section 4.5). Les
             réponses d&rsquo;Ask Ava sont rédigées par l&rsquo;IA, pas par une personne, et vous
             pouvez désactiver Ask Ava dans votre profil, sous
-            &laquo;&nbsp;Data and privacy&nbsp;&raquo;. L&rsquo;IA ne répond jamais seule à un
+            &laquo;&nbsp;Data and privacy&nbsp;&raquo;. Ask Ava ne modifie jamais rien de
+            lui-même&nbsp;: lorsqu&rsquo;il vous propose de faire quelque chose, comme redémarrer
+            un serveur ou payer une facture, rien ne se passe tant que vous n&rsquo;avez pas
+            appuyé sur le bouton de sa carte. L&rsquo;IA ne répond jamais seule à un
             ticket&nbsp;: un membre de notre équipe approuve chaque réponse qu&rsquo;elle rédige
             avant son envoi. Nos consultations n&rsquo;envoient jamais au fournisseur d&rsquo;IA
             votre mot de passe ni les données de votre carte de paiement, mais tout ce que vous
@@ -405,6 +416,33 @@ export default function PrivacyContent() {
           au droit applicable, y compris la loi du Missouri sur la notification des violations de données
           (Mo. Rev. Stat. &sect;&nbsp;407.1500), aussi rapidement que les circonstances le permettent.
         </p>
+
+        <LegalSubSection title="6.1 Accès de notre équipe à votre compte">
+          <p>
+            Pour vous aider à résoudre un problème, un membre de notre équipe disposant de
+            l&rsquo;autorisation nécessaire peut ouvrir une session d&rsquo;assistance, qui le
+            connecte à votre espace client sous votre identité. Pour l&rsquo;ouvrir, il a besoin
+            du code de vérification affiché sur vos tickets d&rsquo;assistance dans le portail de
+            facturation, que vous lui communiquez. Ce code change toutes les 12 heures. Un petit
+            nombre d&rsquo;administrateurs principaux peuvent ouvrir une session sans ce code.
+            Chaque session est enregistrée de notre côté avec le nom du membre de l&rsquo;équipe
+            qui l&rsquo;a ouverte, et l&rsquo;onglet &laquo;&nbsp;Activity&nbsp;&raquo; de votre
+            profil indique que notre équipe d&rsquo;assistance a accédé à votre compte.
+          </p>
+          <p>
+            Une session d&rsquo;assistance ne peut pas modifier votre e-mail de connexion, votre
+            mot de passe, votre numéro de téléphone ni vos réglages de connexion à deux facteurs.
+          </p>
+          <p>
+            Notre équipe ne peut ouvrir le panneau VPS de votre serveur pendant une session
+            d&rsquo;assistance que si vous avez activé &laquo;&nbsp;Let WSLATL support open my VPS
+            panel during a support session&nbsp;&raquo; dans votre profil, sous
+            &laquo;&nbsp;Data and privacy&nbsp;&raquo;. Cette option reste désactivée tant que vous
+            ne l&rsquo;activez pas, vous seul pouvez la modifier, et chaque fois que notre équipe
+            ouvre votre panneau, votre onglet &laquo;&nbsp;Activity&nbsp;&raquo; indique qui
+            l&rsquo;a fait et quand.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="7" title="Cookies">
@@ -441,6 +479,32 @@ export default function PrivacyContent() {
           <li><strong>Limitation&nbsp;:</strong> demander que nous limitions la façon dont nous traitons vos données.</li>
           <li><strong>Opposition&nbsp;:</strong> vous opposer à certains types de traitement de données.</li>
         </ul>
+        <p>
+          <strong>Téléchargez vos données vous-même.</strong> Dans le portail de facturation,
+          ouvrez votre profil, sous &laquo;&nbsp;Data and privacy&nbsp;&raquo;. Vous saisissez
+          d&rsquo;abord votre mot de passe, et vous pouvez télécharger une copie une fois par
+          jour. Le fichier contient votre profil, vos services, vos factures et paiements, la
+          marque, les quatre derniers chiffres et la date d&rsquo;expiration de vos cartes
+          enregistrées, votre historique de crédit, vos tickets et leurs réponses, vos
+          conversations avec Ask Ava, vos demandes de remboursement et de changement de nom, et
+          votre activité. Il exclut votre mot de passe, les secrets de sécurité comme les clés de
+          connexion à deux facteurs, ainsi que les notes internes de notre équipe et nos
+          contrôles antifraude. L&rsquo;activité qu&rsquo;il contient correspond à
+          l&rsquo;onglet &laquo;&nbsp;Activity&nbsp;&raquo; de votre profil&nbsp;: elle
+          indique quand notre équipe d&rsquo;assistance a accédé à votre compte, mais pas les
+          historiques de connexion ni les adresses IP de notre personnel. Si notre équipe produit le fichier pour vous,
+          nous vous en informons par e-mail.
+        </p>
+        <p>
+          <strong>Demandez la suppression de votre compte.</strong> Vous pouvez le faire au même
+          endroit, après avoir saisi votre mot de passe. Notre équipe approuve ou refuse la
+          demande. Si elle est approuvée, vous êtes déconnecté et nous vous indiquons par e-mail
+          la date à laquelle vos données personnelles seront effacées. Cette date marque la fin du
+          délai de récupération que la section 5 prévoit pour les données après résiliation, et
+          tombe donc au plus tard 14 jours après l&rsquo;approbation. D&rsquo;ici là, vous pouvez
+          nous demander de restaurer votre compte. Les factures, les paiements et votre historique
+          de crédit sont conservés comme documents comptables, sans vos données personnelles.
+        </p>
         <p>
           Pour exercer l&rsquo;un de ces droits, contactez-nous à{' '}
           <Email name="support" />.

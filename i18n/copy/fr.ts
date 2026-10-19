@@ -120,14 +120,14 @@ export const fr: Copy = {
             "Remplissez une courte demande dans le portail de facturation. Une personne les lit toutes, et la plupart sont acceptées le jour même.",
         },
         {
-          title: "Dites-nous ce qu'il vous faut",
+          title: "Choisissez une offre ou dites-nous ce qu'il vous faut",
           description:
-            "Une fois votre demande acceptée, écrivez-nous sur Discord ou ouvrez un ticket. Nous passons votre configuration en revue avec vous. Aucun parcours automatisé.",
+            "Une fois votre demande acceptée, commandez un serveur de jeu ou un VPS dans le portail de facturation et payez en ligne. Pour un serveur dédié ou un hébergement web, écrivez-nous sur Discord ou ouvrez un ticket, et nous le mettons en place avec vous.",
         },
         {
           title: "Votre serveur passe en ligne",
           description:
-            "Nous mettons tout en place, nous vous faisons le tour de votre panneau, et nous restons disponibles ensuite. La plupart des clients sont opérationnels le jour même.",
+            "Les serveurs de jeu et les VPS sont en général en ligne le jour même. Les serveurs dédiés demandent plus de temps, en général quelques jours ouvrés. Nous vous faisons le tour de votre panneau et restons disponibles ensuite.",
         },
       ],
       readyPrefix: "Prêt ?",
@@ -223,7 +223,7 @@ export const fr: Copy = {
     custom: {
       heading: "Serveurs dédiés et hébergement web",
       body:
-        "Ces services sont chiffrés au cas par cas plutôt que vendus sur catalogue, parce que le matériel ou la configuration qui conviennent dépendent de ce que vous faites tourner. Dites-nous ce qu'il vous faut et nous revenons vers vous avec un prix.",
+        "Ces services sont chiffrés au cas par cas plutôt que vendus sur catalogue, parce que le matériel ou la configuration qui conviennent dépendent de ce que vous faites tourner. Dites-nous ce qu'il vous faut et nous revenons vers vous avec un prix. Déjà client ? Dans le portail de facturation, ouvrez « Browse plans », choisissez un serveur dans l'onglet « Dedicated servers » et appuyez sur « Request this server ». La mise en place d'un serveur dédié prend plus de temps que celle d'un serveur de jeu ou d'un VPS, en général quelques jours ouvrés.",
       cta: "Demander un devis",
     },
   },
@@ -350,7 +350,7 @@ export const fr: Copy = {
       code: {
         title: 'Votre propre code de parrainage',
         body:
-          "Les gens saisissent votre code en s'inscrivant sur le portail de facturation, ou suivent votre lien, qui le remplit pour eux.",
+          "Les gens saisissent votre code en s'inscrivant sur le portail de facturation, ou suivent votre lien, qui le remplit pour eux. Ils ont oublié de le saisir ? Ils peuvent l'ajouter sur la page « Referrals » du portail de facturation avant leur premier paiement. Une fois votre candidature acceptée, vous pouvez nous demander dans un ticket un code personnalisé : uniquement des lettres et des chiffres, 32 caractères au maximum, et pas déjà utilisé.",
       },
       discount: {
         title: (percent: string) => `${percent} de réduction sur leur première facture`,
@@ -360,7 +360,7 @@ export const fr: Copy = {
       credit: {
         title: 'Un avoir pour vous',
         body:
-          "Dès qu'un filleul a payé sa première facture, vous recevez une seule fois une part de ce paiement, sous forme d'avoir sur votre compte.",
+          "Dès qu'un filleul a payé sa première facture, vous recevez une seule fois une part de ce paiement, sous forme d'avoir sur votre compte. Les serveurs dédiés ne comptent pas, et si ce paiement est remboursé, l'avoir est repris.",
       },
       profile: {
         title: 'Un profil sur cette page',

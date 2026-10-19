@@ -210,10 +210,17 @@ export default function PrivacyContent() {
           <li>Cumplir las leyes, los reglamentos y las obligaciones legales aplicables</li>
           <li>Hacer cumplir nuestras Condiciones del servicio</li>
           <li>Enviar comunicaciones relacionadas con el servicio, como avisos de mantenimiento, alertas de facturación y novedades de la cuenta</li>
+          <li>
+            Solo si nos dices que sí, enviarte de vez en cuando novedades y ofertas por correo
+            electrónico. Puedes cambiar de opinión en cualquier momento en tu perfil, en
+            &ldquo;Data and privacy&rdquo;, o con el enlace para darte de baja de esos correos.
+            Los correos del servicio, como las facturas y los avisos de seguridad, no se ven
+            afectados.
+          </li>
           <li>Mejorar nuestros servicios y nuestra infraestructura a partir de los patrones de uso</li>
         </ul>
         <p className="font-medium text-foreground">
-          No usamos tus datos para publicidad. No vendemos, alquilamos ni intercambiamos tu información
+          No usamos tus datos para publicidad de terceros. No vendemos, alquilamos ni intercambiamos tu información
           personal con ningún tercero para ningún fin comercial.
         </p>
       </LegalSection>
@@ -250,13 +257,16 @@ export default function PrivacyContent() {
           <p>
             Usamos un proveedor de IA, actualmente MiniMax, para Ask Ava, el chat de ayuda del
             área de clientes, y para las herramientas con las que nuestro personal consulta
-            registros y redacta respuestas a tickets. Recibe lo que necesita cada respuesta, como
+            registros, redacta respuestas a tickets y prepara cambios que aprueba un miembro del
+            personal. Recibe lo que necesita cada respuesta, como
             tus preguntas, tus mensajes de tickets y los datos de cuenta y de facturación
             consultados para ti. Los trata para producir la respuesta conforme a sus propias
             condiciones; aún no hemos confirmado qué le exigen esas condiciones ni dónde procesa
             las solicitudes (véase la Sección 4.5). Las respuestas de Ask Ava las escribe la IA,
             no una persona, y puedes desactivar Ask Ava en tu perfil, en
-            &ldquo;Data and privacy&rdquo;. La IA nunca responde a un ticket por su cuenta: un
+            &ldquo;Data and privacy&rdquo;. Ask Ava nunca cambia nada por su cuenta: cuando te
+            ofrece hacer algo, como reiniciar un servidor o pagar una factura, no ocurre nada hasta
+            que pulsas el botón de su tarjeta. La IA nunca responde a un ticket por su cuenta: un
             miembro de nuestro equipo aprueba cada respuesta que escribe antes de que se envíe.
             Nuestras consultas nunca envían al proveedor de IA tu contraseña ni los datos de tu
             tarjeta de pago, pero todo lo que escribas en Ask Ava o en un ticket puede llegarle,
@@ -393,6 +403,31 @@ export default function PrivacyContent() {
           legislación aplicable, incluida la ley de notificación de brechas de datos de Missouri
           (Mo. Rev. Stat. &sect;&nbsp;407.1500), con la mayor rapidez que permitan las circunstancias.
         </p>
+
+        <LegalSubSection title="6.1 Acceso del personal a tu cuenta">
+          <p>
+            Para ayudarte con un problema, un miembro de nuestro equipo con el permiso adecuado
+            puede abrir una sesión de soporte, que le permite entrar en tu área de clientes como
+            si fuera tú. Para abrirla necesita el código de verificación que aparece en tus
+            tickets de soporte del portal de facturación, y que tú le facilitas. Ese código cambia
+            cada 12 horas. Un número reducido de administradores sénior puede abrir una sesión sin
+            él. Cada sesión queda registrada por nuestra parte con el nombre del miembro del
+            personal que la abrió, y la pestaña &ldquo;Activity&rdquo; de tu perfil muestra que
+            nuestro equipo de soporte accedió a tu cuenta.
+          </p>
+          <p>
+            Una sesión de soporte no puede cambiar tu correo electrónico de inicio de sesión, tu
+            contraseña, tu número de teléfono ni tu configuración de inicio de sesión en dos
+            pasos.
+          </p>
+          <p>
+            Nuestro personal solo puede abrir el panel VPS de tu servidor durante una sesión de
+            soporte si has activado &ldquo;Let WSLATL support open my VPS panel during a support
+            session&rdquo; en tu perfil, en &ldquo;Data and privacy&rdquo;. Está desactivado salvo
+            que lo actives, solo tú puedes cambiarlo y, cada vez que nuestro personal abre tu
+            panel, la pestaña &ldquo;Activity&rdquo; muestra quién lo hizo y cuándo.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="7" title="Cookies">
@@ -430,6 +465,30 @@ export default function PrivacyContent() {
           <li><strong>Limitación:</strong> Solicitar que limitemos cómo tratamos tus datos.</li>
           <li><strong>Oposición:</strong> Oponerte a determinados tipos de tratamiento de datos.</li>
         </ul>
+        <p>
+          <strong>Descarga tus datos tú mismo.</strong> En el portal de facturación, ve a tu
+          perfil, en &ldquo;Data and privacy&rdquo;. Primero introduces tu contraseña, y puedes
+          descargar una copia una vez al día. El archivo contiene tu perfil, tus servicios, tus
+          facturas y pagos, la marca, los cuatro últimos dígitos y la fecha de caducidad de tus
+          tarjetas guardadas, tu historial de crédito, tus tickets y respuestas, tus chats con Ask
+          Ava, tus solicitudes de reembolso y de cambio de nombre, y tu actividad. Deja fuera tu
+          contraseña, los secretos de seguridad como las claves del inicio de sesión en dos pasos,
+          y nuestras notas internas del personal y comprobaciones antifraude. La actividad que
+          incluye coincide con la pestaña &ldquo;Activity&rdquo; de tu perfil: muestra cuándo
+          nuestro equipo de soporte accedió a tu cuenta, pero no los registros de inicio de
+          sesión ni las direcciones IP de nuestro personal. Si es nuestro equipo quien genera el archivo para ti, te avisamos por correo
+          electrónico.
+        </p>
+        <p>
+          <strong>Pide que se elimine tu cuenta.</strong> Puedes hacerlo desde el mismo sitio,
+          después de introducir tu contraseña. Nuestro equipo aprueba o rechaza la solicitud. Si
+          la aprueba, se cierra tu sesión y te enviamos por correo electrónico la fecha en que se
+          borrarán tus datos personales. Esa fecha marca el final del plazo de recuperación que la
+          Sección 5 indica para los datos posteriores a la cancelación, por lo que nunca es más de
+          14 días después de la aprobación. Hasta entonces, puedes pedirnos que restauremos tu
+          cuenta. Las facturas, los pagos y tu historial de crédito se conservan como registros
+          financieros, sin tus datos personales.
+        </p>
         <p>
           Para ejercer cualquiera de estos derechos, escríbenos a{' '}
           <Email name="support" />.

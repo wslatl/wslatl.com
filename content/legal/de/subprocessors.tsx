@@ -209,14 +209,20 @@ export default function SubprocessorsContent() {
             <li>
               <strong>Ask Ava, der Hilfe-Chat im Kundenbereich.</strong> Ihren Vornamen, Ihre
               Fragen und die Angaben zu Ihrem Konto, die der Chat nachschlägt, um sie zu
-              beantworten, etwa Ihre Services, Rechnungen, Tickets und Ihr Guthaben. Er kann nur
-              lesen, was Sie im Kundenbereich auch selbst sehen könnten, und kann nichts ändern.
+              beantworten, etwa Ihre Services, Rechnungen, Tickets, Ihr Guthaben und Ihre letzten
+              Aktivitäten. Er kann nur lesen, was Sie im Kundenbereich auch selbst sehen könnten.
+              Er ändert nie etwas von sich aus. Wenn er anbietet, etwas für Sie zu erledigen, etwa
+              ein Ticket zu eröffnen, einen Server neu zu starten, einen Service zu verlängern,
+              eine Rechnung zu bezahlen, Guthaben aufzuladen, ein Upgrade anzufragen oder einen
+              Service zu kündigen oder zu behalten, passiert nichts, bis Sie auf die Schaltfläche
+              auf dieser Karte klicken, und der Kundenbereich prüft die Anfrage vorher noch einmal.
             </li>
             <li>
               <strong>Der Assistent für Mitarbeiter in unserem Admin-Panel.</strong> Was unsere
               Mitarbeiter ihn fragen, einschließlich angehängter Screenshots, und die Datensätze,
               die er für sie nachschlägt, etwa Kundennamen, E-Mail-Adressen, Services, Rechnungen
-              und Tickets.
+              und Tickets. Er kann auch Änderungen an Datensätzen vorbereiten, und ein Mitglied
+              unseres Teams genehmigt jede Änderung, bevor sie ausgeführt wird.
             </li>
             <li>
               <strong>Entwürfe für Ticketantworten.</strong> Betreff, Abteilung, Status und

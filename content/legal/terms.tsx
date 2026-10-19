@@ -99,7 +99,8 @@ export default function TermsContent() {
         <LegalSubSection title="4.1 Billing Cycles">
           <p>
             Services are billed in advance on a cycle you select at signup. Available billing intervals
-            (monthly, quarterly, semi-annual, or annual) depend on the service type. Invoices are
+            (monthly, quarterly, semi-annual, or annual, and for some services every two or three
+            years) depend on the service type. Invoices are
             generated automatically and sent to your registered email address before the due date.
           </p>
         </LegalSubSection>
@@ -152,6 +153,19 @@ export default function TermsContent() {
             duties, or government-imposed charges applicable to your use of our services, unless
             specifically included in your invoice.
           </p>
+        </LegalSubSection>
+
+        <LegalSubSection title="4.7 Team Members">
+          <p>
+            The account holder can invite team members from the Sub-users tab of their profile in the billing portal, and choose what each of them may do. The following applies:
+          </p>
+          <ul>
+            <li>The account holder is responsible for everything a team member orders and pays for on the account</li>
+            <li>Only the account holder can cancel a service or change a plan</li>
+            <li>On plans that allow it, a team member whom the account holder has given permission can pay a share of a renewal invoice with their own card or PayPal. The account holder pays the rest in full</li>
+            <li>On a dedicated server, a share must be paid by the end of the day before the invoice&rsquo;s due date</li>
+            <li>New orders and plan or billing cycle changes are paid in one payment</li>
+          </ul>
         </LegalSubSection>
       </LegalSection>
 

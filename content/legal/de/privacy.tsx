@@ -217,10 +217,16 @@ export default function PrivacyContent() {
           <li>Anwendbare Gesetze, Vorschriften und rechtliche Pflichten einzuhalten</li>
           <li>Unsere Nutzungsbedingungen durchzusetzen</li>
           <li>Servicebezogene Mitteilungen zu senden, etwa Wartungsankündigungen, Abrechnungshinweise und Kontoaktualisierungen</li>
+          <li>
+            Ihnen nur mit Ihrer Zustimmung gelegentlich Neuigkeiten und Angebote per E-Mail zu
+            senden. Sie können Ihre Entscheidung jederzeit in Ihrem Profil unter &bdquo;Data and
+            privacy&ldquo; oder über den Abmeldelink in diesen E-Mails ändern. Service-E-Mails wie
+            Rechnungen und Sicherheitshinweise sind davon nicht betroffen.
+          </li>
           <li>Unsere Services und Infrastruktur anhand von Nutzungsmustern zu verbessern</li>
         </ul>
         <p className="font-medium text-foreground">
-          Wir nutzen Ihre Daten nicht für Werbung. Wir verkaufen, vermieten oder tauschen Ihre
+          Wir nutzen Ihre Daten nicht für Werbung Dritter. Wir verkaufen, vermieten oder tauschen Ihre
           personenbezogenen Informationen nicht an Dritte zu irgendeinem kommerziellen Zweck.
         </p>
       </LegalSection>
@@ -258,14 +264,18 @@ export default function PrivacyContent() {
           </p>
           <p>
             Für Ask Ava, den Hilfe-Chat im Kundenbereich, und für Werkzeuge, mit denen unsere
-            Mitarbeiter Datensätze nachschlagen und Ticketantworten entwerfen, nutzen wir einen
+            Mitarbeiter Datensätze nachschlagen, Ticketantworten entwerfen und Änderungen
+            vorbereiten, die ein Mitarbeiter freigibt, nutzen wir einen
             KI-Anbieter, derzeit MiniMax. Er erhält, was die jeweilige Antwort braucht, etwa Ihre
             Fragen, Ihre Ticketnachrichten und die für Sie nachgeschlagenen Konto- und
             Abrechnungsdaten. Er verarbeitet sie nach seinen eigenen Bedingungen, um die Antwort
             zu erstellen; was diese Bedingungen von ihm verlangen und wo er Anfragen verarbeitet,
             haben wir noch nicht bestätigt (siehe Abschnitt 4.5). Die Antworten von Ask Ava
             schreibt die KI, nicht ein Mensch, und Sie können Ask Ava in Ihrem Profil unter
-            &bdquo;Data and privacy&ldquo; ausschalten. Die KI beantwortet nie selbstständig ein
+            &bdquo;Data and privacy&ldquo; ausschalten. Ask Ava ändert nie etwas von sich aus:
+            Wenn der Chat anbietet, etwas zu erledigen, etwa einen Server neu zu starten oder eine
+            Rechnung zu bezahlen, passiert nichts, bis Sie auf die Schaltfläche auf seiner Karte
+            klicken. Die KI beantwortet nie selbstständig ein
             Ticket: Ein Mitglied unseres Teams gibt jede Antwort, die sie schreibt, frei, bevor
             sie gesendet wird. Bei unseren Abfragen senden wir dem KI-Anbieter nie Ihr Passwort
             oder Ihre Zahlungskartendaten, aber alles, was Sie in Ask Ava oder in ein Ticket
@@ -409,6 +419,31 @@ export default function PrivacyContent() {
           zur Meldung von Datenschutzverletzungen (Mo. Rev. Stat. &sect;&nbsp;407.1500), so
           zügig, wie es die Umstände erlauben.
         </p>
+
+        <LegalSubSection title="6.1 Zugriff unserer Mitarbeiter auf Ihr Konto">
+          <p>
+            Um Ihnen bei einem Problem zu helfen, kann ein Mitglied unseres Teams mit der
+            passenden Berechtigung eine Support-Sitzung öffnen, in der es als Sie in Ihrem
+            Kundenbereich angemeldet ist. Dafür braucht es den Verifizierungscode, der in Ihren
+            Support-Tickets im Abrechnungsportal angezeigt wird und den Sie ihm nennen. Der Code
+            ändert sich alle 12 Stunden. Einige wenige leitende Administratoren können eine
+            Sitzung auch ohne diesen Code öffnen. Jede Sitzung wird bei uns mit dem Namen des
+            Mitarbeiters protokolliert, der sie geöffnet hat, und der Tab &bdquo;Activity&ldquo;
+            in Ihrem Profil zeigt, dass unser Support-Team auf Ihr Konto zugegriffen hat.
+          </p>
+          <p>
+            In einer Support-Sitzung lassen sich Ihre Anmelde-E-Mail-Adresse, Ihr Passwort, Ihre
+            Telefonnummer und Ihre Einstellungen zur Zwei-Faktor-Anmeldung nicht ändern.
+          </p>
+          <p>
+            Unsere Mitarbeiter können das VPS-Panel Ihres Servers während einer Support-Sitzung
+            nur öffnen, wenn Sie in Ihrem Profil unter &bdquo;Data and privacy&ldquo; die Option
+            &bdquo;Let WSLATL support open my VPS panel during a support session&ldquo;
+            eingeschaltet haben. Sie ist aus, solange Sie sie nicht einschalten, nur Sie können
+            sie ändern, und jedes Mal, wenn unsere Mitarbeiter Ihr Panel öffnen, zeigt Ihr Tab
+            &bdquo;Activity&ldquo;, wer es war und wann.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="7" title="Cookies">
@@ -449,6 +484,30 @@ export default function PrivacyContent() {
           <li><strong>Einschränkung:</strong> Verlangen, dass wir die Verarbeitung Ihrer Daten einschränken.</li>
           <li><strong>Widerspruch:</strong> Bestimmten Arten der Datenverarbeitung widersprechen.</li>
         </ul>
+        <p>
+          <strong>Daten selbst herunterladen.</strong> Öffnen Sie im Abrechnungsportal Ihr Profil
+          unter &bdquo;Data and privacy&ldquo;. Sie geben zuerst Ihr Passwort ein und können einmal
+          pro Tag eine Kopie herunterladen. Die Datei enthält Ihr Profil, Ihre Services, Ihre
+          Rechnungen und Zahlungen, Marke, letzte vier Ziffern und Ablaufdatum Ihrer gespeicherten
+          Karten, Ihren Guthabenverlauf, Ihre Tickets und Antworten, Ihre Chats mit Ask Ava, Ihre
+          Erstattungs- und Namensänderungsanfragen sowie Ihre Aktivität. Nicht enthalten sind Ihr
+          Passwort, Sicherheitsgeheimnisse wie Schlüssel für die Zwei-Faktor-Anmeldung sowie
+          unsere internen Mitarbeiternotizen und Betrugsprüfungen. Die Aktivität darin entspricht
+          dem Tab &bdquo;Activity&ldquo; in Ihrem Profil: Sie zeigt, wann unser Support-Team auf
+          Ihr Konto zugegriffen hat, aber nicht die Anmeldeprotokolle oder IP-Adressen unserer
+          Mitarbeiter. Wenn unser Team die Datei für
+          Sie erstellt, informieren wir Sie per E-Mail.
+        </p>
+        <p>
+          <strong>Löschung Ihres Kontos beantragen.</strong> Das geht an derselben Stelle, nachdem
+          Sie Ihr Passwort eingegeben haben. Unser Team genehmigt den Antrag oder lehnt ihn ab.
+          Wird er genehmigt, werden Sie abgemeldet, und wir teilen Ihnen per E-Mail das Datum mit,
+          an dem Ihre personenbezogenen Daten gelöscht werden. Dieses Datum ist das Ende der
+          Wiederherstellungsfrist, die Abschnitt 5 für Daten nach der Kündigung nennt, und liegt
+          daher nie mehr als 14 Tage nach der Genehmigung. Bis dahin können Sie uns bitten, Ihr
+          Konto wiederherzustellen. Rechnungen, Zahlungen und Ihr Guthabenverlauf bleiben als
+          Finanzunterlagen erhalten, ohne Ihre personenbezogenen Daten.
+        </p>
         <p>
           Um eines dieser Rechte auszuüben, wenden Sie sich an uns unter{' '}
           <Email name="support" />.

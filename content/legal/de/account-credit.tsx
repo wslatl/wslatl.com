@@ -24,13 +24,14 @@ export default function AccountCreditContent() {
           ob die Erstattung genehmigt wird, und diese Bedingungen regeln, was das daraus
           entstehende Guthaben ist und wie es sich verhält.
         </p>
-        <p>Guthaben kann auf drei Wegen auf Ihr Konto gelangen:</p>
+        <p>Guthaben kann auf vier Wegen auf Ihr Konto gelangen:</p>
         <ul>
           <li>Sie kaufen es direkt als Aufladung über das Abrechnungsportal</li>
           <li>Wir stellen es Ihnen aus, etwa als Ergebnis einer genehmigten Erstattungsanfrage oder als Servicegutschrift nach unserem{' '}
             <Link href={siteConfig.paths.sla}>Service Level Agreement</Link>
           </li>
           <li>Ein anderer WSLATL Kunde schenkt es Ihnen und Sie nehmen das Geschenk an (siehe Abschnitt 5)</li>
+          <li>Als freigegebener Werber erhalten Sie eine Empfehlungsprämie, wenn eine von Ihnen geworbene Person ihre erste Rechnung bezahlt (siehe Abschnitt 6)</li>
         </ul>
       </LegalSection>
 
@@ -235,6 +236,13 @@ export default function AccountCreditContent() {
             das Ihrem Konto durch einen Verwaltungs- oder Systemfehler gutgeschrieben wurde,
             kann berichtigt werden. Wir sagen Ihnen Bescheid, wenn wir das tun, und erklären die
             Berichtigung.
+          </li>
+          <li>
+            <strong>Empfehlungsprämien.</strong> Eine Empfehlungsprämie
+            ist Guthaben, das einmalig gezahlt wird, für die erste Rechnung, die die von Ihnen
+            geworbene Person bezahlt. Dedicated Server zählen nie für eine Prämie. Wird diese
+            Zahlung erstattet oder per Chargeback zurückgebucht, ziehen wir die Prämie wieder ab,
+            bei einer Teilerstattung den entsprechenden Anteil.
           </li>
         </ul>
         <p>

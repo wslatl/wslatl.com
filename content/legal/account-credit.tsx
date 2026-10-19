@@ -22,13 +22,14 @@ export default function AccountCreditContent() {
           governs whether the refund is approved and these terms govern what the resulting credit
           balance is and how it behaves.
         </p>
-        <p>Credit can reach your account in three ways:</p>
+        <p>Credit can reach your account in four ways:</p>
         <ul>
           <li>You purchase it directly as a top-up through the billing portal</li>
           <li>We issue it to you, for example as the outcome of an approved refund request or a service credit under our{' '}
             <Link href={siteConfig.paths.sla}>Service Level Agreement</Link>
           </li>
           <li>Another WSLATL client gifts it to you and you accept the gift (see Section 5)</li>
+          <li>As an approved referrer, you earn a referral reward when someone you referred pays their first invoice (see Section 6)</li>
         </ul>
       </LegalSection>
 
@@ -216,6 +217,13 @@ export default function AccountCreditContent() {
             <strong>Credit issued in error.</strong> Credit
             applied to your account through an administrative or system error may be corrected. We
             will tell you when we do this and explain the correction.
+          </li>
+          <li>
+            <strong>Referral rewards.</strong> A referral reward
+            is account credit paid once, for the first invoice that the person you referred pays.
+            Dedicated servers never count toward a reward. If that payment is refunded or charged
+            back, we take the reward back, or the matching share of it if only part of the payment
+            is refunded.
           </li>
         </ul>
         <p>

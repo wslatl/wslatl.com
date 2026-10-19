@@ -213,15 +213,22 @@ export default function SubprocessorsContent() {
             <li>
               <strong>Ask Ava, le chat d&rsquo;aide de l&rsquo;espace client.</strong> Votre
               prénom, les questions que vous posez et les informations de votre compte qu&rsquo;il
-              consulte pour y répondre, comme vos services, factures, tickets et crédit. Il ne
-              peut lire que ce que vous pourriez voir vous-même dans l&rsquo;espace client, et il
-              ne peut rien modifier.
+              consulte pour y répondre, comme vos services, factures, tickets, crédit et activité
+              récente. Il ne peut lire que ce que vous pourriez voir vous-même dans l&rsquo;espace
+              client. Il ne modifie jamais rien de lui-même. Lorsqu&rsquo;il vous propose de faire
+              quelque chose, comme ouvrir un ticket, redémarrer un serveur, renouveler un service,
+              payer une facture, ajouter du crédit, demander une montée en gamme, ou résilier ou
+              conserver un service, rien ne se passe tant que vous n&rsquo;avez pas appuyé sur le
+              bouton de cette carte, et l&rsquo;espace client vérifie d&rsquo;abord la demande une
+              nouvelle fois.
             </li>
             <li>
               <strong>L&rsquo;assistant de notre équipe dans notre panneau d&rsquo;administration.</strong>{' '}
               Ce que notre équipe lui demande, y compris les captures d&rsquo;écran jointes, et les
               dossiers qu&rsquo;il consulte pour elle, comme les noms des clients, les adresses
-              e-mail, les services, les factures et les tickets.
+              e-mail, les services, les factures et les tickets. Il peut aussi préparer des
+              modifications de dossiers, et un membre de notre équipe approuve chaque modification
+              avant qu&rsquo;elle soit appliquée.
             </li>
             <li>
               <strong>La rédaction de réponses aux tickets pour notre équipe.</strong>{' '}

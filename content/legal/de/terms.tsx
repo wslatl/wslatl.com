@@ -107,7 +107,8 @@ export default function TermsContent() {
           <p>
             Services werden im Voraus in einem Zyklus abgerechnet, den Sie bei der Anmeldung
             wählen. Die verfügbaren Abrechnungsintervalle (monatlich, vierteljährlich,
-            halbjährlich oder jährlich) hängen vom Servicetyp ab. Rechnungen werden automatisch
+            halbjährlich oder jährlich, bei manchen Services auch alle zwei oder drei Jahre)
+            hängen vom Servicetyp ab. Rechnungen werden automatisch
             erstellt und vor dem Fälligkeitsdatum an Ihre registrierte E-Mail-Adresse gesendet.
           </p>
         </LegalSubSection>
@@ -164,6 +165,19 @@ export default function TermsContent() {
             Gebühren, die auf Ihre Nutzung unserer Services anfallen, sofern sie nicht
             ausdrücklich in Ihrer Rechnung enthalten sind.
           </p>
+        </LegalSubSection>
+
+        <LegalSubSection title="4.7 Teammitglieder">
+          <p>
+            Der Kontoinhaber kann im Abrechnungsportal über den Tab &bdquo;Sub-users&ldquo; in seinem Profil Teammitglieder einladen und festlegen, was jedes von ihnen tun darf. Es gilt Folgendes:
+          </p>
+          <ul>
+            <li>Der Kontoinhaber ist verantwortlich für alles, was ein Teammitglied auf dem Konto bestellt und bezahlt</li>
+            <li>Nur der Kontoinhaber kann einen Service kündigen oder einen Tarif wechseln</li>
+            <li>Bei Tarifen, die dies zulassen, kann ein Teammitglied, dem der Kontoinhaber dies erlaubt hat, einen Anteil an einer Verlängerungsrechnung mit der eigenen Karte oder per PayPal bezahlen. Den Rest zahlt der Kontoinhaber vollständig</li>
+            <li>Bei einem Dedicated Server muss ein Anteil bis zum Ende des Tages vor dem Fälligkeitsdatum der Rechnung bezahlt werden</li>
+            <li>Neue Bestellungen sowie Änderungen des Tarifs oder des Abrechnungszyklus werden in einer einzigen Zahlung bezahlt</li>
+          </ul>
         </LegalSubSection>
       </LegalSection>
 

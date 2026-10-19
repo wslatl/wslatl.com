@@ -24,13 +24,14 @@ export default function AccountCreditContent() {
           rege se o reembolso é aprovado, e estes termos regem o que é o saldo de crédito resultante
           e como ele se comporta.
         </p>
-        <p>O crédito pode chegar à sua conta de três maneiras:</p>
+        <p>O crédito pode chegar à sua conta de quatro maneiras:</p>
         <ul>
           <li>Você o compra diretamente como uma recarga pelo portal de faturamento</li>
           <li>Nós o emitimos para você, por exemplo como resultado de um pedido de reembolso aprovado ou de um crédito de serviço sob o nosso{' '}
             <Link href={siteConfig.paths.sla}>Acordo de Nível de Serviço</Link>
           </li>
           <li>Outro cliente da WSLATL o presenteia a você e você aceita o presente (veja a Seção 5)</li>
+          <li>Como indicador aprovado, você ganha uma recompensa por indicação quando alguém que você indicou paga a primeira fatura (veja a Seção 6)</li>
         </ul>
       </LegalSection>
 
@@ -225,6 +226,13 @@ export default function AccountCreditContent() {
             <strong>Crédito emitido por engano.</strong> O
             crédito aplicado à sua conta por erro administrativo ou do sistema pode ser corrigido.
             Avisaremos você quando fizermos isso e explicaremos a correção.
+          </li>
+          <li>
+            <strong>Recompensas por indicação.</strong> Uma recompensa
+            por indicação é crédito na conta pago uma única vez, pela primeira fatura que a pessoa
+            que você indicou paga. Servidores dedicados nunca contam para uma recompensa. Se esse
+            pagamento for reembolsado ou contestado com chargeback, retiramos a recompensa, ou a
+            parte correspondente se só uma parte do pagamento for reembolsada.
           </li>
         </ul>
         <p>

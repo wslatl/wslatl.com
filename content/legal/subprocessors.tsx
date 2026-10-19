@@ -210,13 +210,19 @@ export default function SubprocessorsContent() {
             <li>
               <strong>Ask Ava, the help chat in the client area.</strong> Your first name, the
               questions you ask, and the details of your account that it looks up to answer
-              them, such as your services, invoices, tickets, and credit. It can only read what
-              you could see in the client area yourself, and it cannot change anything.
+              them, such as your services, invoices, tickets, credit, and recent activity. It can
+              read only what you could see in the client area yourself. It never changes anything
+              on its own. When it offers to do something for you, such as opening a ticket,
+              restarting a server, renewing a service, paying an invoice, adding credit,
+              requesting an upgrade, or cancelling or keeping a service, nothing happens until you
+              press the button on that card, and the client area checks the request again first.
             </li>
             <li>
               <strong>The staff assistant in our admin panel.</strong> What our staff ask it,
               including any screenshots they attach, and the records it looks up for them, such
-              as client names, email addresses, services, invoices, and tickets.
+              as client names, email addresses, services, invoices, and tickets. It can also
+              prepare changes to records, and a member of our team approves each change before
+              it is made.
             </li>
             <li>
               <strong>Ticket reply drafting for staff.</strong> The ticket&rsquo;s subject,

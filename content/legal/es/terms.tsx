@@ -101,8 +101,8 @@ export default function TermsContent() {
         <LegalSubSection title="4.1 Ciclos de facturación">
           <p>
             Los servicios se facturan por adelantado con el ciclo que elijas al darte de alta. Los
-            intervalos de facturación disponibles (mensual, trimestral, semestral o anual) dependen
-            del tipo de servicio. Las facturas se generan automáticamente y se envían a tu dirección
+            intervalos de facturación disponibles (mensual, trimestral, semestral o anual y, para
+            algunos servicios, cada dos o tres años) dependen del tipo de servicio. Las facturas se generan automáticamente y se envían a tu dirección
             de correo electrónico registrada antes de la fecha de vencimiento.
           </p>
         </LegalSubSection>
@@ -158,6 +158,19 @@ export default function TermsContent() {
             públicas que se apliquen a tu uso de nuestros servicios, salvo que se incluyan
             específicamente en tu factura.
           </p>
+        </LegalSubSection>
+
+        <LegalSubSection title="4.7 Miembros del equipo">
+          <p>
+            El titular de la cuenta puede invitar a miembros del equipo desde la pestaña &ldquo;Sub-users&rdquo; de su perfil en el portal de facturación y elegir qué puede hacer cada uno. Se aplica lo siguiente:
+          </p>
+          <ul>
+            <li>El titular de la cuenta es responsable de todo lo que un miembro del equipo pida y pague en la cuenta</li>
+            <li>Solo el titular de la cuenta puede cancelar un servicio o cambiar de plan</li>
+            <li>En los planes que lo permiten, un miembro del equipo al que el titular de la cuenta haya dado permiso puede pagar una parte de una factura de renovación con su propia tarjeta o con PayPal. El titular de la cuenta paga el resto completo</li>
+            <li>En un servidor dedicado, la parte debe pagarse antes de que termine el día anterior a la fecha de vencimiento de la factura</li>
+            <li>Los pedidos nuevos y los cambios de plan o de ciclo de facturación se pagan en un solo pago</li>
+          </ul>
         </LegalSubSection>
       </LegalSection>
 
