@@ -53,7 +53,7 @@ export const siteConfig = {
      */
     effectiveDates: {
       privacy:        '2026-10-19',
-      terms:          '2026-10-19',
+      terms:          '2026-11-02',
       acceptableUse:  '2026-09-19',
       abuse:          '2026-09-19',
       refund:         '2026-09-19',
