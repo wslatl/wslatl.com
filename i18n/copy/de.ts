@@ -120,14 +120,14 @@ export const de: Copy = {
             'Füll im Abrechnungsportal eine kurze Bewerbung aus. Ein Mensch liest jede einzelne, und die meisten werden noch am selben Tag freigegeben.',
         },
         {
-          title: 'Sag uns, was du brauchst',
+          title: 'Wähl einen Tarif oder sag uns, was du brauchst',
           description:
-            'Sobald du freigegeben bist, schreib uns auf Discord oder öffne ein Ticket. Wir gehen dein Setup gemeinsam mit dir durch. Kein automatisierter Ablauf.',
+            'Sobald du freigegeben bist, bestellst du einen Gameserver oder VPS im Abrechnungsportal und bezahlst online. Für einen Dedicated Server oder Webhosting schreib uns auf Discord oder öffne ein Ticket, und wir richten alles gemeinsam mit dir ein.',
         },
         {
           title: 'Dein Server geht online',
           description:
-            'Wir richten dich ein, zeigen dir dein Panel und bleiben danach erreichbar. Die meisten Kunden laufen noch am selben Tag.',
+            'Gameserver und VPS laufen meist noch am selben Tag. Dedicated Server brauchen länger, meist ein paar Werktage. Wir zeigen dir dein Panel und bleiben danach erreichbar.',
         },
       ],
       readyPrefix: 'Bereit?',
@@ -223,7 +223,7 @@ export const de: Copy = {
     custom: {
       heading: 'Dedicated Server und Webhosting',
       body:
-        'Die gibt es als Angebot pro Aufbau statt von der Preisliste, weil die richtige Hardware oder Einrichtung davon abhängt, was du betreibst. Sag uns, was du brauchst, und wir melden uns mit einem Preis.',
+        'Die gibt es als Angebot pro Aufbau statt von der Preisliste, weil die richtige Hardware oder Einrichtung davon abhängt, was du betreibst. Sag uns, was du brauchst, und wir melden uns mit einem Preis. Schon Kunde? Öffne im Abrechnungsportal „Browse plans“, wähl auf dem Tab „Dedicated servers“ einen Server und klick auf „Request this server“. Die Einrichtung eines Dedicated Servers dauert länger als bei Gameservern und VPS, meist ein paar Werktage.',
       cta: 'Angebot anfordern',
     },
   },
@@ -349,7 +349,7 @@ export const de: Copy = {
       code: {
         title: 'Dein eigener Empfehlungscode',
         body:
-          'Neue Kunden geben deinen Code bei der Anmeldung im Abrechnungsportal ein oder folgen deinem Link, der ihn für sie einträgt.',
+          'Neue Kunden geben deinen Code bei der Anmeldung im Abrechnungsportal ein oder folgen deinem Link, der ihn für sie einträgt. Vergessen, ihn einzugeben? Dann können sie ihn vor ihrer ersten Zahlung auf der Seite „Referrals“ im Abrechnungsportal nachtragen. Sobald du freigegeben bist, kannst du uns in einem Ticket um einen eigenen Code bitten: nur Buchstaben und Ziffern, höchstens 32 Zeichen, und noch nicht vergeben.',
       },
       discount: {
         title: (percent: string) => `${percent} Rabatt auf ihre erste Rechnung`,
@@ -359,7 +359,7 @@ export const de: Copy = {
       credit: {
         title: 'Guthaben für dich',
         body:
-          'Sobald eine geworbene Person ihre erste Rechnung bezahlt hat, erhältst du einmalig einen Anteil davon als Guthaben auf deinem Konto.',
+          'Sobald eine geworbene Person ihre erste Rechnung bezahlt hat, erhältst du einmalig einen Anteil davon als Guthaben auf deinem Konto. Dedicated Server zählen nicht, und wird diese Zahlung erstattet, wird das Guthaben wieder abgezogen.',
       },
       profile: {
         title: 'Ein Profil auf dieser Seite',

@@ -60,7 +60,7 @@ export const es: ContentTranslation = {
     'getting-started': {
       question: '¿Cómo empiezo?',
       answer:
-        'Entra en billing.wslatl.com/register y solicita acceso. Un administrador revisa todas las solicitudes y las aprueba antes de que puedas acceder a ningún servicio. Una vez aprobada, escríbenos por Discord o abre un ticket de facturación y te dejamos montado.',
+        'Entra en billing.wslatl.com/register y solicita acceso. Un administrador revisa todas las solicitudes y las aprueba antes de que puedas acceder a ningún servicio. Una vez aprobada, puedes pedir un servidor de juego o un VPS en el portal de facturación y pagar en línea. Para un servidor dedicado o hosting web, escríbenos por Discord o abre un ticket de facturación y lo configuramos contigo.',
     },
     'what-makes-you-different': {
       question: '¿Qué diferencia a WSLATL de las grandes empresas de hosting?',
@@ -90,7 +90,7 @@ export const es: ContentTranslation = {
     'changes-later': {
       question: '¿Puedo subir, bajar o cambiar cosas más adelante?',
       answer:
-        'Por supuesto. Cada relación con un cliente se lleva de forma personal, así que las mejoras, los cambios de plan y las migraciones están a un mensaje de Discord de distancia. Normalmente lo resolvemos el mismo día.',
+        'Sí. En un servidor de juego o un VPS, el titular de la cuenta puede cambiar de plan o de ciclo de facturación desde la página del servicio en el portal de facturación, ya sea al momento con prorrateo o en la próxima renovación. Para más RAM, vCores o disco, puede usar “Request an upgrade” en esa misma página, que abre un ticket y no cobra nada hasta que nuestro equipo lo aprueba. Los servidores dedicados, el hosting web y las migraciones los gestiona nuestro equipo: abre un ticket o escríbenos por Discord.',
     },
     'vps-vs-shared': {
       question: '¿Es mejor el hosting VPS que el compartido?',
@@ -139,7 +139,7 @@ export const es: ContentTranslation = {
         included: [
           'Acceso root y sudo completo',
           'El sistema operativo que elijas',
-          'Mejoras y cambios de plan gestionados por una persona',
+          'Cambios de plan y de ciclo de facturación en el portal de facturación, o con una persona',
           'Una persona de verdad con quien hablar si algo se rompe',
         ],
       },

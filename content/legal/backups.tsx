@@ -77,7 +77,7 @@ export default function BackupsContent() {
               </tr>
               <tr>
                 <td className="font-medium text-foreground">VPS Hosting</td>
-                <td>Included <span className="text-muted-foreground">(launching soon)</span></td>
+                <td>Included</td>
                 <td>Full disk image</td>
                 <td>Monthly</td>
               </tr>
@@ -105,10 +105,8 @@ export default function BackupsContent() {
             backup of the full game server container on a monthly cycle.
           </li>
           <li>
-            <strong>VPS Hosting.</strong> VPS hosting is
-            launching soon. When it goes live, we take a monthly backup of the full disk image of
-            each VPS. Until then, this row describes what is planned, not something already
-            running.
+            <strong>VPS Hosting.</strong> We take a monthly
+            backup of the full disk image of each VPS.
           </li>
           <li>
             <strong>Web Hosting.</strong> We take a monthly

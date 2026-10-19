@@ -78,7 +78,7 @@ export default function BackupsContent() {
               </tr>
               <tr>
                 <td className="font-medium text-foreground">Hospedagem VPS</td>
-                <td>Incluído <span className="text-muted-foreground">(em breve)</span></td>
+                <td>Incluído</td>
                 <td>Imagem completa do disco</td>
                 <td>Mensal</td>
               </tr>
@@ -106,10 +106,8 @@ export default function BackupsContent() {
             um backup do contêiner completo do servidor de jogos em um ciclo mensal.
           </li>
           <li>
-            <strong>Hospedagem VPS.</strong> A hospedagem VPS
-            será lançada em breve. Quando entrar no ar, faremos um backup mensal da imagem completa
-            do disco de cada VPS. Até lá, esta linha descreve o que está planejado, não algo que já
-            está em funcionamento.
+            <strong>Hospedagem VPS.</strong> Fazemos um backup
+            mensal da imagem completa do disco de cada VPS.
           </li>
           <li>
             <strong>Hospedagem de sites.</strong> Fazemos um

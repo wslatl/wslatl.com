@@ -24,13 +24,14 @@ export default function AccountCreditContent() {
           rige si el reembolso se aprueba, y estas condiciones rigen qué es el saldo de crédito
           resultante y cómo se comporta.
         </p>
-        <p>El crédito puede llegar a tu cuenta de tres formas:</p>
+        <p>El crédito puede llegar a tu cuenta de cuatro formas:</p>
         <ul>
           <li>Lo compras directamente como recarga a través del portal de facturación</li>
           <li>Te lo emitimos nosotros, por ejemplo como resultado de una solicitud de reembolso aprobada o como crédito de servicio conforme a nuestro{' '}
             <Link href={siteConfig.paths.sla}>Acuerdo de Nivel de Servicio</Link>
           </li>
           <li>Otro cliente de WSLATL te lo regala y tú aceptas el regalo (véase la Sección 5)</li>
+          <li>Como referidor aprobado, ganas una recompensa por referido cuando alguien a quien has referido paga su primera factura (véase la Sección 6)</li>
         </ul>
       </LegalSection>
 
@@ -224,6 +225,13 @@ export default function AccountCreditContent() {
             <strong>Crédito emitido por error.</strong> El
             crédito aplicado a tu cuenta por un error administrativo o del sistema puede corregirse.
             Te avisaremos cuando lo hagamos y te explicaremos la corrección.
+          </li>
+          <li>
+            <strong>Recompensas por referido.</strong> Una recompensa
+            por referido es crédito de cuenta que se paga una sola vez, por la primera factura que
+            paga la persona a la que has referido. Los servidores dedicados nunca cuentan para una
+            recompensa. Si ese pago se reembolsa o es objeto de un contracargo, retiramos la
+            recompensa, o la parte que corresponda si solo se reembolsa una parte del pago.
           </li>
         </ul>
         <p>

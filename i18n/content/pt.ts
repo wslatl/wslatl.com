@@ -70,7 +70,7 @@ export const pt: ContentTranslation = {
     'getting-started': {
       question: 'Como eu começo?',
       answer:
-        'Vá até billing.wslatl.com/register e solicite acesso. Um admin analisa cada inscrição e aprova antes de você poder acessar qualquer serviço. Depois de aprovado, fale com a gente no Discord ou abra um ticket de faturamento que deixamos tudo pronto.',
+        'Vá até billing.wslatl.com/register e solicite acesso. Um admin analisa cada inscrição e aprova antes de você poder acessar qualquer serviço. Depois de aprovado, você pode pedir um servidor de jogos ou um VPS no portal de faturamento e pagar online. Para um servidor dedicado ou hospedagem de sites, fale com a gente no Discord ou abra um ticket de faturamento que configuramos tudo com você.',
     },
     'what-makes-you-different': {
       question: 'O que diferencia vocês das grandes empresas de hospedagem?',
@@ -100,7 +100,7 @@ export const pt: ContentTranslation = {
     'changes-later': {
       question: 'Dá para fazer upgrade, downgrade ou mudar as coisas depois?',
       answer:
-        'Claro. Cada relação com cliente é tratada pessoalmente, então upgrades, mudanças de plano e migrações estão a uma mensagem de Discord de distância. Normalmente resolvemos no mesmo dia.',
+        'Sim. Em um servidor de jogos ou VPS, o titular da conta pode trocar de plano ou de ciclo de faturamento na página do serviço no portal de faturamento, na hora com cobrança proporcional ou na próxima renovação. Para mais RAM, vCores ou disco, dá para usar “Request an upgrade” na mesma página, que abre um ticket e não cobra nada até a nossa equipe aprovar. Servidores dedicados, hospedagem de sites e migrações ficam com a nossa equipe: abra um ticket ou fale com a gente no Discord.',
     },
     'vps-vs-shared': {
       question: 'Hospedagem VPS é melhor que hospedagem compartilhada?',
@@ -146,7 +146,7 @@ export const pt: ContentTranslation = {
         included: [
           'Acesso root e sudo completos',
           'O sistema operacional que você escolher',
-          'Upgrades e mudanças de plano feitos por uma pessoa',
+          'Mudanças de plano e de ciclo de faturamento no portal de faturamento, ou com uma pessoa',
           'Uma pessoa de verdade para conversar se algo quebrar',
         ],
       },

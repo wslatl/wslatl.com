@@ -205,10 +205,16 @@ export default function PrivacyContent() {
           <li>Comply with applicable laws, regulations, and legal obligations</li>
           <li>Enforce our Terms of Service</li>
           <li>Send service-related communications such as maintenance notices, billing alerts, and account updates</li>
+          <li>
+            Only if you say yes, send you occasional news and offers by email. You can change your
+            mind at any time in your profile under Data and privacy, or with the unsubscribe link
+            in those emails. Service emails such as invoices and security notices are not
+            affected.
+          </li>
           <li>Improve our services and infrastructure based on usage patterns</li>
         </ul>
         <p className="font-medium text-foreground">
-          We do not use your data for advertising. We do not sell, rent, or trade your personal information
+          We do not use your data for third-party advertising. We do not sell, rent, or trade your personal information
           to any third party for any commercial purpose.
         </p>
       </LegalSection>
@@ -244,13 +250,16 @@ export default function PrivacyContent() {
           </p>
           <p>
             We use an AI provider, currently MiniMax, for Ask Ava, the help chat in the client
-            area, and for tools our staff use to look up records and draft ticket replies. It
+            area, and for tools our staff use to look up records, draft ticket replies, and
+            prepare changes that a member of staff approves. It
             receives what each answer needs, such as your questions, your ticket messages, and the
             account and billing details looked up for you. It processes them to produce the answer
             under its own terms; we have not yet confirmed what those terms require of it or where
             it processes requests (see Section 4.5). Ask Ava&rsquo;s answers are written by the
             AI, not by a person, and you can turn Ask Ava off in your profile under Data and
-            privacy. The AI never answers a ticket by itself: a member of our team approves every
+            privacy. Ask Ava never changes anything on its own: when it offers to do something,
+            such as restarting a server or paying an invoice, nothing happens until you press the
+            button on its card. The AI never answers a ticket by itself: a member of our team approves every
             reply it writes before it is sent. Our look-ups never send the AI provider your
             password or payment card details, but anything you type into Ask Ava or a ticket can
             reach it, so please never type them there. When we need to confirm who owns an
@@ -384,6 +393,29 @@ export default function PrivacyContent() {
           with applicable law, including Missouri&apos;s data breach notification statute
           (Mo. Rev. Stat. &sect;&nbsp;407.1500), as promptly as circumstances allow.
         </p>
+
+        <LegalSubSection title="6.1 Staff Access to Your Account">
+          <p>
+            To help with a problem, a member of our team with the right permission can open a
+            support session, which signs them in to your client area as you. To open one, they
+            need the verification code shown on your support tickets in the billing portal, which
+            you give them. It changes every 12 hours. A small number of senior administrators can
+            open a session without it. Every session is recorded on our side with the name of the
+            staff member who opened it, and the Activity tab in your profile shows that our
+            support team accessed your account.
+          </p>
+          <p>
+            A support session cannot change your sign-in email, password, phone number, or
+            two-factor settings.
+          </p>
+          <p>
+            Staff can open the VPS panel for your server during a support session only if you
+            have turned on &ldquo;Let WSLATL support open my VPS panel during a support
+            session&rdquo; in your profile under Data and privacy. It is off unless you turn it
+            on, only you can change it, and each time staff open your panel, your Activity tab
+            shows who did it and when.
+          </p>
+        </LegalSubSection>
       </LegalSection>
 
       <LegalSection number="7" title="Cookies">
@@ -420,6 +452,26 @@ export default function PrivacyContent() {
           <li><strong>Restriction:</strong> Request that we limit how we process your data.</li>
           <li><strong>Objection:</strong> Object to certain types of data processing.</li>
         </ul>
+        <p>
+          <strong>Download your data yourself.</strong> In the billing portal, go to your profile
+          under Data and privacy. You enter your password first, and you can download a copy once
+          a day. The file holds your profile, services, invoices and payments, the brand, last
+          four digits and expiry date of your saved cards, your credit history, your tickets and
+          replies, your Ask Ava chats, your refund and name change requests, and your activity.
+          It leaves out your password, security secrets such as two-factor keys, and our internal
+          staff notes and fraud checks. The activity in it matches the Activity tab in your
+          profile: it shows when our support team accessed your account, but not the sign-in
+          records or IP addresses of our staff. If our team produces the file for you, we email you to let you know.
+        </p>
+        <p>
+          <strong>Ask for your account to be deleted.</strong> You can do this from the same
+          place, after entering your password. Our team approves or declines the request. If it is
+          approved, you are signed out and we email you the date your personal details will be
+          erased. That date is the end of the recovery window for post-termination data in
+          Section 5, so it is never more than 14 days after the approval. Until then, you can ask
+          us to restore your account. Invoices, payments, and your credit history are kept as
+          financial records, with your personal details removed.
+        </p>
         <p>
           To exercise any of these rights, contact us at{' '}
           <Email name="support" />.

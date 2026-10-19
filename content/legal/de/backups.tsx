@@ -82,7 +82,7 @@ export default function BackupsContent() {
               </tr>
               <tr>
                 <td className="font-medium text-foreground">VPS-Hosting</td>
-                <td>Enthalten <span className="text-muted-foreground">(startet bald)</span></td>
+                <td>Enthalten</td>
                 <td>Vollständiges Disk-Image</td>
                 <td>Monatlich</td>
               </tr>
@@ -110,10 +110,8 @@ export default function BackupsContent() {
             monatlichen Zyklus ein Backup des vollständigen Gameserver-Containers.
           </li>
           <li>
-            <strong>VPS-Hosting.</strong> VPS-Hosting startet
-            bald. Wenn es live geht, erstellen wir monatlich ein Backup des vollständigen
-            Disk-Images jedes VPS. Bis dahin beschreibt diese Zeile, was geplant ist, und nicht
-            etwas, das bereits läuft.
+            <strong>VPS-Hosting.</strong> Wir erstellen monatlich
+            ein Backup des vollständigen Disk-Images jedes VPS.
           </li>
           <li>
             <strong>Webhosting.</strong> Wir erstellen monatlich

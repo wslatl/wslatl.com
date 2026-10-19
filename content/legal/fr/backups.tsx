@@ -83,7 +83,7 @@ export default function BackupsContent() {
               </tr>
               <tr>
                 <td className="font-medium text-foreground">Hébergement VPS</td>
-                <td>Incluses <span className="text-muted-foreground">(bientôt disponible)</span></td>
+                <td>Incluses</td>
                 <td>Image disque complète</td>
                 <td>Mensuelle</td>
               </tr>
@@ -113,10 +113,8 @@ export default function BackupsContent() {
             mensuel.
           </li>
           <li>
-            <strong>Hébergement VPS.</strong> L&rsquo;hébergement
-            VPS arrive bientôt. À son lancement, nous effectuerons une sauvegarde mensuelle de
-            l&rsquo;image disque complète de chaque VPS. D&rsquo;ici là, cette ligne décrit ce qui
-            est prévu, et non quelque chose qui fonctionne déjà.
+            <strong>Hébergement VPS.</strong> Nous effectuons une
+            sauvegarde mensuelle de l&rsquo;image disque complète de chaque VPS.
           </li>
           <li>
             <strong>Hébergement web.</strong> Nous effectuons

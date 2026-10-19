@@ -59,7 +59,7 @@ export const de: ContentTranslation = {
     'getting-started': {
       question: 'Wie fange ich an?',
       answer:
-        'Geh auf billing.wslatl.com/register und frag Zugang an. Ein Admin prüft jede Bewerbung und gibt sie frei, bevor du auf Services zugreifen kannst. Sobald du freigegeben bist, melde dich bei uns auf Discord oder öffne ein Ticket im Abrechnungsportal, und wir richten dich ein.',
+        'Geh auf billing.wslatl.com/register und frag Zugang an. Ein Admin prüft jede Bewerbung und gibt sie frei, bevor du auf Services zugreifen kannst. Sobald du freigegeben bist, kannst du im Abrechnungsportal einen Gameserver oder VPS bestellen und online bezahlen. Für einen Dedicated Server oder Webhosting melde dich bei uns auf Discord oder öffne ein Ticket im Abrechnungsportal, und wir richten alles gemeinsam mit dir ein.',
     },
     'what-makes-you-different': {
       question: 'Was unterscheidet euch von den großen Hosting-Unternehmen?',
@@ -89,7 +89,7 @@ export const de: ContentTranslation = {
     'changes-later': {
       question: 'Kann ich später upgraden, downgraden oder etwas ändern?',
       answer:
-        'Natürlich. Jede Kundenbeziehung wird persönlich betreut, Upgrades, Tarifwechsel und Migrationen sind also nur eine Discord-Nachricht entfernt. Meistens haben wir das noch am selben Tag erledigt.',
+        'Ja. Bei einem Gameserver oder VPS kann der Kontoinhaber Tarif oder Abrechnungszyklus selbst auf der Serviceseite im Abrechnungsportal wechseln, entweder sofort mit anteiliger Verrechnung oder zur nächsten Verlängerung. Für mehr RAM, vCores oder Speicher gibt es auf derselben Seite „Request an upgrade“: Das öffnet ein Ticket, und berechnet wird erst etwas, wenn unser Team zustimmt. Dedicated Server, Webhosting und Migrationen übernimmt unser Team: Öffne ein Ticket oder schreib uns auf Discord.',
     },
     'vps-vs-shared': {
       question: 'Ist VPS-Hosting besser als Shared Hosting?',
@@ -135,7 +135,7 @@ export const de: ContentTranslation = {
         included: [
           'Voller root- und sudo-Zugriff',
           'Betriebssystem deiner Wahl',
-          'Upgrades und Tarifwechsel erledigt ein Mensch',
+          'Tarif- und Zykluswechsel im Abrechnungsportal oder durch einen Menschen',
           'Ein echter Mensch zum Reden, wenn etwas kaputtgeht',
         ],
       },

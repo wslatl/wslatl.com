@@ -120,14 +120,14 @@ export const pt: Copy = {
             'Preencha uma inscrição curta no portal de faturamento. Uma pessoa lê todas elas, e a maioria é aprovada no mesmo dia.',
         },
         {
-          title: 'Conte o que você precisa',
+          title: 'Escolha um plano ou conte o que você precisa',
           description:
-            'Depois de aprovado, fale com a gente no Discord ou abra um ticket. Conversamos sobre a sua configuração com você. Nada de fluxo automatizado.',
+            'Depois de aprovado, peça um servidor de jogos ou um VPS no portal de faturamento e pague online. Para um servidor dedicado ou hospedagem de sites, fale com a gente no Discord ou abra um ticket que configuramos tudo com você.',
         },
         {
           title: 'Seu servidor entra no ar',
           description:
-            'Configuramos tudo, mostramos o seu painel e continuamos por perto depois. A maioria dos clientes fica no ar no mesmo dia.',
+            'Servidores de jogos e VPS costumam entrar no ar no mesmo dia. Servidores dedicados levam mais tempo, normalmente alguns dias úteis. Mostramos o seu painel e continuamos por perto depois.',
         },
       ],
       readyPrefix: 'Pronto?',
@@ -223,7 +223,7 @@ export const pt: Copy = {
     custom: {
       heading: 'Servidores dedicados e hospedagem de sites',
       body:
-        'Estes são orçados por projeto em vez de vendidos numa tabela de preços, porque o hardware ou a configuração certa depende do que você vai rodar. Conte o que você precisa e voltamos com um preço.',
+        'Estes são orçados por projeto em vez de vendidos numa tabela de preços, porque o hardware ou a configuração certa depende do que você vai rodar. Conte o que você precisa e voltamos com um preço. Já é cliente? No portal de faturamento, abra “Browse plans”, escolha um servidor na aba “Dedicated servers” e clique em “Request this server”. Servidores dedicados levam mais tempo para ficar prontos do que servidores de jogos e VPS, normalmente alguns dias úteis.',
       cta: 'Pedir um orçamento',
     },
   },
@@ -348,7 +348,7 @@ export const pt: Copy = {
       code: {
         title: 'Seu próprio código de indicação',
         body:
-          'As pessoas digitam seu código ao se cadastrar no portal de faturamento, ou usam seu link, que já preenche o código para elas.',
+          'As pessoas digitam seu código ao se cadastrar no portal de faturamento, ou usam seu link, que já preenche o código para elas. Esqueceram de digitar? Dá para adicionar o código na página “Referrals” do portal de faturamento antes do primeiro pagamento. Depois de aprovado, você pode pedir em um ticket um código personalizado: só letras e números, até 32 caracteres, e que ainda não esteja em uso.',
       },
       discount: {
         title: (percent: string) => `${percent} de desconto na primeira fatura de quem você indicar`,
@@ -357,7 +357,7 @@ export const pt: Copy = {
       },
       credit: {
         title: 'Crédito na conta para você',
-        body: 'Quando uma pessoa indicada paga a primeira fatura, você recebe uma única vez uma parte desse pagamento, como crédito na sua conta.',
+        body: 'Quando uma pessoa indicada paga a primeira fatura, você recebe uma única vez uma parte desse pagamento, como crédito na sua conta. Servidores dedicados não contam e, se esse pagamento for reembolsado, o crédito é retirado.',
       },
       profile: {
         title: 'Um perfil nesta página',

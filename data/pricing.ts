@@ -61,7 +61,7 @@ export const productLines: ProductLine[] = [
     included: [
       'Full root and sudo access',
       'Your choice of OS',
-      'Upgrades and plan changes handled by a person',
+      'Plan and billing cycle changes in the billing portal, or by a person',
       'A real person to talk to if something breaks',
     ],
     groups: [

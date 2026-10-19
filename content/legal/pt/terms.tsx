@@ -101,8 +101,8 @@ export default function TermsContent() {
         <LegalSubSection title="4.1 Ciclos de Faturamento">
           <p>
             Os serviços são cobrados antecipadamente em um ciclo que você seleciona no cadastro. Os
-            intervalos de faturamento disponíveis (mensal, trimestral, semestral ou anual) dependem
-            do tipo de serviço. As faturas são geradas automaticamente e enviadas ao endereço de
+            intervalos de faturamento disponíveis (mensal, trimestral, semestral ou anual e, para
+            alguns serviços, a cada dois ou três anos) dependem do tipo de serviço. As faturas são geradas automaticamente e enviadas ao endereço de
             e-mail cadastrado antes da data de vencimento.
           </p>
         </LegalSubSection>
@@ -156,6 +156,19 @@ export default function TermsContent() {
             todos os impostos, tributos ou encargos impostos pelo governo aplicáveis ao seu uso dos
             nossos serviços, salvo se especificamente incluídos na sua fatura.
           </p>
+        </LegalSubSection>
+
+        <LegalSubSection title="4.7 Membros da Equipe">
+          <p>
+            O titular da conta pode convidar membros da equipe pela aba &ldquo;Sub-users&rdquo; do perfil dele no portal de faturamento e escolher o que cada um pode fazer. Aplica-se o seguinte:
+          </p>
+          <ul>
+            <li>O titular da conta é responsável por tudo o que um membro da equipe pedir e pagar na conta</li>
+            <li>Somente o titular da conta pode cancelar um serviço ou mudar de plano</li>
+            <li>Nos planos que permitem, um membro da equipe a quem o titular da conta tenha dado permissão pode pagar uma parte de uma fatura de renovação com o próprio cartão ou com o PayPal. O titular da conta paga o restante integralmente</li>
+            <li>Em um servidor dedicado, a parte deve ser paga até o fim do dia anterior à data de vencimento da fatura</li>
+            <li>Novos pedidos e mudanças de plano ou de ciclo de faturamento são pagos em um único pagamento</li>
+          </ul>
         </LegalSubSection>
       </LegalSection>
 

@@ -99,7 +99,8 @@ export default function TermsContent() {
         <LegalSubSection title="4.1 Cycles de facturation">
           <p>
             Les services sont facturés d&rsquo;avance selon un cycle que vous choisissez à l&rsquo;inscription. Les intervalles de facturation
-            disponibles (mensuel, trimestriel, semestriel ou annuel) dépendent du type de service. Les factures sont
+            disponibles (mensuel, trimestriel, semestriel ou annuel, et pour certains services tous les deux ou
+            trois ans) dépendent du type de service. Les factures sont
             générées automatiquement et envoyées à l&rsquo;adresse e-mail enregistrée sur votre compte avant la date d&rsquo;échéance.
           </p>
         </LegalSubSection>
@@ -152,6 +153,19 @@ export default function TermsContent() {
             droits ou prélèvements imposés par les pouvoirs publics qui s&rsquo;appliquent à votre utilisation de nos services, sauf
             s&rsquo;ils sont spécifiquement inclus dans votre facture.
           </p>
+        </LegalSubSection>
+
+        <LegalSubSection title="4.7 Membres de l&rsquo;équipe">
+          <p>
+            Le titulaire du compte peut inviter des membres de l&rsquo;équipe depuis l&rsquo;onglet &laquo;&nbsp;Sub-users&nbsp;&raquo; de son profil dans le portail de facturation, et choisir ce que chacun peut faire. Ce qui suit s&rsquo;applique&nbsp;:
+          </p>
+          <ul>
+            <li>Le titulaire du compte est responsable de tout ce qu&rsquo;un membre de l&rsquo;équipe commande et paie sur le compte</li>
+            <li>Seul le titulaire du compte peut annuler un service ou changer d&rsquo;offre</li>
+            <li>Pour les offres qui le permettent, un membre de l&rsquo;équipe à qui le titulaire du compte en a donné l&rsquo;autorisation peut payer une part d&rsquo;une facture de renouvellement avec sa propre carte ou avec PayPal. Le titulaire du compte règle le reste en totalité</li>
+            <li>Pour un serveur dédié, une part doit être payée avant la fin de la journée précédant la date d&rsquo;échéance de la facture</li>
+            <li>Les nouvelles commandes et les changements d&rsquo;offre ou de cycle de facturation se règlent en un seul paiement</li>
+          </ul>
         </LegalSubSection>
       </LegalSection>
 
