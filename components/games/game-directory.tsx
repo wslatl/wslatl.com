@@ -41,9 +41,18 @@ function fill(template: string, values: Record<string, string | number>) {
   return template.replace(/\{(\w+)\}/g, (whole, key) => String(values[key] ?? whole))
 }
 
-/** Lowercase, punctuation-insensitive text for matching "counter strike" to "Counter-Strike". */
-function normalize(text: string) {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+/**
+ * Lowercase, punctuation- and accent-insensitive text, for matching "counter
+ * strike" to "Counter-Strike" and "strategie" to "Stratégie". Letters outside
+ * a to z are kept (only their accents go), so "où" stays a real search.
+ */
+export function normalize(text: string) {
+  return text
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/\p{M}/gu, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim()
 }
 
 function matches(game: GameListing, query: string) {

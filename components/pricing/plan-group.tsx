@@ -28,7 +28,7 @@ function OrderButton({ planName, emphasis, className }: { planName: string; emph
 function PopularTag() {
   return (
     <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-link">
-      Popular
+      {copy().pricing.table.popular}
     </span>
   )
 }
@@ -98,10 +98,10 @@ export function PlanGroupTable({ line, group, showComparisons = true }: PlanGrou
                 <td className="px-4 py-3.5 text-foreground/90">{plan.cpu}</td>
                 <td className="px-4 py-3.5 text-foreground/90">{formatGb(plan.ramGb)}</td>
                 <td className="px-4 py-3.5 text-foreground/90">{formatGb(plan.storageGb)}</td>
-                {showTraffic && <td className="px-4 py-3.5 text-foreground/90">{formatTraffic(plan) ?? 'n/a'}</td>}
+                {showTraffic && <td className="px-4 py-3.5 text-foreground/90">{formatTraffic(plan) ?? t.table.notAvailable}</td>}
                 <td className="px-4 py-3.5 text-right whitespace-nowrap">
                   <span className="text-base font-semibold text-foreground">{formatPrice(plan.price)}</span>
-                  <span className="text-muted-foreground">/mo</span>
+                  <span className="text-muted-foreground">{t.perMonth}</span>
                 </td>
                 <td className="px-5 py-3 text-right">
                   <OrderButton planName={plan.name} emphasis={!!plan.popular} />
@@ -123,7 +123,7 @@ export function PlanGroupTable({ line, group, showComparisons = true }: PlanGrou
               </p>
               <p className="shrink-0 tabular-nums">
                 <span className="text-lg font-semibold text-foreground">{formatPrice(plan.price)}</span>
-                <span className="text-sm text-muted-foreground">/mo</span>
+                <span className="text-sm text-muted-foreground">{t.perMonth}</span>
               </p>
             </div>
             <dl className={cn('mt-3 grid grid-cols-2 gap-2 text-sm tabular-nums', showTraffic ? '@min-[20rem]:grid-cols-4' : '@min-[16rem]:grid-cols-3')}>
@@ -132,17 +132,17 @@ export function PlanGroupTable({ line, group, showComparisons = true }: PlanGrou
                 <dd className="text-foreground/90">{plan.cpu}</dd>
               </div>
               <div>
-                <dt className="text-xs text-muted-foreground">RAM</dt>
+                <dt className="text-xs text-muted-foreground">{t.table.ram}</dt>
                 <dd className="text-foreground/90">{formatGb(plan.ramGb)}</dd>
               </div>
               <div>
-                <dt className="text-xs text-muted-foreground">Storage</dt>
+                <dt className="text-xs text-muted-foreground">{t.table.storage}</dt>
                 <dd className="text-foreground/90">{formatGb(plan.storageGb)}</dd>
               </div>
               {showTraffic && (
                 <div>
-                  <dt className="text-xs text-muted-foreground">Traffic</dt>
-                  <dd className="text-foreground/90">{formatTraffic(plan) ?? 'n/a'}</dd>
+                  <dt className="text-xs text-muted-foreground">{t.table.traffic}</dt>
+                  <dd className="text-foreground/90">{formatTraffic(plan) ?? t.table.notAvailable}</dd>
                 </div>
               )}
             </dl>

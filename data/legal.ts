@@ -20,7 +20,8 @@ export const legalPages: LegalPage[] = [
     label: 'Privacy Policy',
     title: 'Privacy Policy',
     href: siteConfig.paths.privacy,
-    metaDescription: 'How WSLATL LLC collects, uses, and protects your personal information.',
+    metaDescription:
+      'What personal data WSLATL LLC collects for accounts, billing, support and this website, how it is used and shared, and where it is transferred.',
     intro:
       'We collect only what we need to run your services. We do not sell your data, ever. Here is exactly what we do with the information you share with us.',
   },
@@ -29,7 +30,8 @@ export const legalPages: LegalPage[] = [
     label: 'Terms of Service',
     title: 'Terms of Service',
     href: siteConfig.paths.terms,
-    metaDescription: 'The terms and conditions governing your use of WSLATL LLC hosting services.',
+    metaDescription:
+      'The terms for WSLATL LLC hosting: applying for an account, billing cycles, late payments and suspension, refunds, price changes and SLA credits.',
     intro:
       'These terms govern your use of all services provided by WSLATL LLC. Please read them carefully before using our services. By using any WSLATL service, you agree to these terms.',
   },
@@ -38,7 +40,8 @@ export const legalPages: LegalPage[] = [
     label: 'Acceptable Use',
     title: 'Acceptable Use Policy',
     href: siteConfig.paths.acceptableUse,
-    metaDescription: 'What is and is not permitted on WSLATL LLC hosting infrastructure.',
+    metaDescription:
+      'What you may and may not run on WSLATL hosting: age rules, banned content, network attacks, spam, crypto mining, resource limits and game server rules.',
     intro:
       'Our infrastructure is shared between clients. One bad actor affects everyone. This policy defines what is and is not acceptable on WSLATL servers. Read it. Follow it. We enforce it.',
   },

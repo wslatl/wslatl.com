@@ -66,12 +66,18 @@ export function partnersPageText(
  * A partner's profile in search results and link previews: their tagline,
  * then either the sign-up offer with their code or, for a partner with no
  * code, a plain line that says nothing about a code or a discount.
+ *
+ * The tagline only leads when it is in the page's language: an English one in
+ * front of a German sentence reads as a mistake and muddles which language
+ * the page is in. It ends with a full stop, so the two read as sentences.
  */
 export function partnerMetaDescription(partner: Partner, t: Copy['partners']['profile'], locale: Locale): string {
   const about = hasReferralCode(partner)
     ? t.metaDescription(partner.referralCode, referralDiscount(locale))
     : t.metaDescriptionNoCode(partner.name)
-  return `${partnerText(partner.tagline, locale)} ${about}`
+  if (partnerTextLang(partner.tagline, locale)) return about
+  const tagline = partnerText(partner.tagline, locale).trim()
+  return `${/[.!?]$/.test(tagline) ? tagline : `${tagline}.`} ${about}`
 }
 
 /** A partner's own words in one language, or the English when they gave none. */
@@ -268,6 +274,10 @@ export function partnerProblems(list: readonly Partner[], context: PartnerCheckC
       }
       if (seen.codes.has(partner.referralCode)) at(`referral code ${partner.referralCode} is used twice`)
       seen.codes.add(partner.referralCode)
+    }
+
+    if (partner.name.length > partnerTextLimits.name) {
+      at(`name is ${partner.name.length} characters, over ${partnerTextLimits.name}`)
     }
 
     for (const field of ['tagline', 'description'] as const) {

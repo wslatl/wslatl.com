@@ -25,7 +25,7 @@ export type SocialPlatform = (typeof socialPlatformIds)[number]
 export interface Partner {
   /** The profile's address, /partners/<slug>: lowercase letters, digits and hyphens. */
   slug: string
-  /** Their name as they write it. Never translated. */
+  /** Their name as they write it, up to 60 characters. Never translated. */
   name: string
   /** One line under the name, up to 80 characters. */
   tagline: PartnerText
@@ -61,8 +61,12 @@ export interface Partner {
   featured?: boolean
 }
 
-/** Longest tagline and description, in characters, in any language. */
-export const partnerTextLimits = { tagline: 80, description: 600 } as const
+/**
+ * Longest name, tagline and description, in characters, in any language. The
+ * name limit keeps a partner's Discord ad (lib/share.ts) inside Discord's
+ * 2000 characters, since the name is a line the ad never drops.
+ */
+export const partnerTextLimits = { name: 60, tagline: 80, description: 600 } as const
 
 /**
  * A referral code as the billing panel stores it: letters and digits, at

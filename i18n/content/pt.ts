@@ -12,7 +12,7 @@ export const pt: ContentTranslation = {
     game: {
       title: 'Hospedagem de servidores de jogos',
       description:
-        'Servidores de jogos com um painel de controle limpo e zero dor de cabeça. Deixamos rápido, deixamos no ar, e se algo quebrar, a gente conserta.',
+        'Servidores de jogos em um painel Pterodactyl, cobrados por RAM e não por jogo. Se algo quebrar, alguém da nossa equipe resolve.',
       features: ['Painel Pterodactyl incluído', 'Proteção DDoS já embutida', 'Suporte a mods e plugins'],
     },
     dedicated: {
@@ -29,7 +29,7 @@ export const pt: ContentTranslation = {
     web: {
       title: 'Hospedagem de sites',
       description:
-        'Hospedagem confiável para sites e aplicações web, gerenciada por nós, com uma pessoa de verdade para procurar se algo sair do rumo.',
+        'Sites e aplicações web no cPanel, gerenciados por nós, com uma pessoa de verdade para chamar se algo der errado.',
       features: [
         'Certificados SSL gratuitos',
         'cPanel com instalação de aplicativos em um clique',
@@ -53,12 +53,12 @@ export const pt: ContentTranslation = {
     hardware: {
       title: 'Hardware que aguenta',
       description:
-        'SSDs NVMe no Premium e SATA SSD no Budget, CPUs de alta frequência, caminhos de rede redundantes e roteamento de baixa latência. Feito para rodar pesado sem cortar caminho.',
+        'O Premium roda em um AMD Ryzen 9 3900X com discos NVMe em RAID 1, em Los Angeles. O Budget roda em um Intel Core i7-6700K com SSDs SATA em RAID 1, em Nova York: uma CPU mais antiga e mais ocupada, por isso custa menos.',
     },
     uptime: {
       title: 'No ar quando importa',
       description:
-        'Mitigação de DDoS embutida desde o começo. Se algo tentar te derrubar, a gente cuida disso.',
+        'Os planos de servidores de jogos incluem mitigação de DDoS sempre ativa, sem custo extra. Hospedagem VPS, web e de jogos tem uma meta mensal de disponibilidade, com créditos do SLA se não a cumprirmos.',
     },
     'application-only': {
       title: 'Exigentes por um bom motivo',
@@ -70,7 +70,7 @@ export const pt: ContentTranslation = {
     'getting-started': {
       question: 'Como eu começo?',
       answer:
-        'Vá até billing.wslatl.com/register e solicite acesso. Um admin analisa cada inscrição e aprova antes de você poder acessar qualquer serviço. Depois de aprovado, você pode pedir um servidor de jogos ou um VPS no portal de faturamento e pagar online. Para um servidor dedicado ou hospedagem de sites, fale com a gente no Discord ou abra um ticket de faturamento que configuramos tudo com você.',
+        'Vá até wslatl.com/register e solicite acesso. Um admin analisa cada inscrição e aprova antes de você poder acessar qualquer serviço. Depois de aprovado, você pode pedir um servidor de jogos ou um VPS no portal de faturamento e pagar online. Para um servidor dedicado ou hospedagem de sites, fale com a gente no Discord ou abra um ticket de faturamento que configuramos tudo com você.',
     },
     'what-makes-you-different': {
       question: 'O que diferencia vocês das grandes empresas de hospedagem?',
@@ -105,7 +105,7 @@ export const pt: ContentTranslation = {
     'vps-vs-shared': {
       question: 'Hospedagem VPS é melhor que hospedagem compartilhada?',
       answer:
-        'Para a maioria de quem toca um projeto de verdade, sim. Um VPS te dá CPU e RAM dedicadas que mais ninguém encosta, acesso root completo e nenhum risco de uma conta vizinha derrubar o seu desempenho. A hospedagem compartilhada é mais barata, mas você divide recursos com estranhos.',
+        'Para a maioria de quem toca um projeto de verdade, sim. Um VPS te dá sua própria parte de CPU e RAM, acesso root completo e o sistema operacional que você escolher. Os planos Premium rodam em um AMD Ryzen 9 3900X; os Budget, em uma CPU mais antiga e mais ocupada, então podem ficar mais lentos nos horários de pico. Hospedagem compartilhada é mais barata, mas todos os sites do servidor usam os mesmos recursos.',
     },
     'ddos-protection': {
       question: 'Vocês oferecem proteção DDoS?',
@@ -708,21 +708,21 @@ export const pt: ContentTranslation = {
     privacy: {
       label: 'Política de Privacidade',
       title: 'Política de Privacidade',
-      metaDescription: 'Como a WSLATL LLC coleta, usa e protege as suas informações pessoais.',
+      metaDescription: 'Quais dados pessoais a WSLATL LLC coleta para contas, cobrança, suporte e este site, como são usados e compartilhados, e para onde são transferidos.',
       intro:
         'Coletamos só o que precisamos para operar os seus serviços. Nunca vendemos os seus dados. Aqui está exatamente o que fazemos com as informações que você compartilha com a gente.',
     },
     terms: {
       label: 'Termos de Serviço',
       title: 'Termos de Serviço',
-      metaDescription: 'Os termos e condições que regem o seu uso dos serviços de hospedagem da WSLATL LLC.',
+      metaDescription: 'Os termos da hospedagem da WSLATL LLC: pedido de conta, ciclos de cobrança, atrasos e suspensão, reembolsos, mudanças de preço e créditos de SLA.',
       intro:
         'Estes termos regem o seu uso de todos os serviços prestados pela WSLATL LLC. Leia com atenção antes de usar os nossos serviços. Ao usar qualquer serviço da WSLATL, você concorda com estes termos.',
     },
     acceptableUse: {
       label: 'Uso Aceitável',
       title: 'Política de Uso Aceitável',
-      metaDescription: 'O que é e o que não é permitido na infraestrutura de hospedagem da WSLATL LLC.',
+      metaDescription: 'O que você pode e não pode hospedar na WSLATL: idade mínima, conteúdo proibido, ataques de rede, spam, mineração de criptomoedas e regras de servidores de jogos.',
       intro:
         'A nossa infraestrutura é compartilhada entre clientes. Um único mau ator afeta todo mundo. Esta política define o que é e o que não é aceitável nos servidores da WSLATL. Leia. Siga. A gente fiscaliza.',
     },

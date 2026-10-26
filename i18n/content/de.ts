@@ -11,19 +11,19 @@ export const de: ContentTranslation = {
     game: {
       title: 'Gameserver-Hosting',
       description:
-        'Gameserver mit einem aufgeräumten Control Panel und null Kopfschmerzen. Wir halten sie schnell, wir halten sie online, und wenn etwas kaputtgeht, reparieren wir es.',
+        'Gameserver auf einem Pterodactyl-Panel, bezahlt nach RAM statt nach Spiel. Wenn etwas kaputtgeht, repariert es jemand aus unserem Team.',
       features: ['Pterodactyl-Panel inklusive', 'DDoS-Schutz von Haus aus', 'Unterstützung für Mods und Plugins'],
     },
     dedicated: {
       title: 'Dedicated Server',
       description:
         'Deine eigene Hardware und deine eigenen Ressourcen. Niemand teilt sich deine CPU oder deinen RAM. Voller root-Zugriff, managed oder unmanaged, und wir sind erreichbar, falls etwas aufkommt.',
-      features: ['Keine geteilten Ressourcen', 'NVMe-SSD-Speicher', 'IPMI- und KVM-Fernzugriff', 'Optionen mit unbegrenztem Traffic'],
+      features: ['Keine geteilten Ressourcen', 'NVMe-SSD-Speicher', 'IPMI- und KVM-Fernzugriff', 'Optionen mit Traffic-Flatrate (Fair Use)'],
     },
     web: {
       title: 'Webhosting',
       description:
-        'Zuverlässiges Hosting für Websites und Web-Apps, von uns verwaltet, mit einem echten Menschen als Ansprechpartner, wenn etwas schiefgeht.',
+        'Websites und Web-Apps auf cPanel, von uns verwaltet, mit einem echten Menschen als Ansprechpartner, wenn etwas schiefgeht.',
       features: ['Kostenlose SSL-Zertifikate', 'cPanel mit App-Installation per Klick', 'E-Mail-Hosting inklusive', 'Monatliche Backups inklusive'],
     },
   },
@@ -42,12 +42,12 @@ export const de: ContentTranslation = {
     hardware: {
       title: 'Hardware, die durchhält',
       description:
-        'NVMe-SSDs bei Premium und SATA-SSDs bei Budget, hoch getaktete CPUs, redundante Netzwerkwege und Routing mit niedriger Latenz. Gebaut, um hart zu laufen, ohne an der falschen Stelle zu sparen.',
+        'Premium läuft auf einem AMD Ryzen 9 3900X mit NVMe-Laufwerken im RAID 1 in Los Angeles. Budget läuft auf einem Intel Core i7-6700K mit SATA-SSDs im RAID 1 in New York City: eine ältere, stärker ausgelastete CPU, deshalb ist es günstiger.',
     },
     uptime: {
       title: 'Online, wenn es darauf ankommt',
       description:
-        'DDoS-Abwehr von Anfang an eingebaut. Wenn dich jemand offline schießen will, kümmern wir uns darum.',
+        'Gameserver-Tarife enthalten eine immer aktive DDoS-Abwehr ohne Aufpreis. VPS-, Web- und Gameserver-Hosting haben jeweils ein monatliches Uptime-Ziel, mit SLA-Gutschriften, wenn wir es verfehlen.',
     },
     'application-only': {
       title: 'Wählerisch, und das aus gutem Grund',
@@ -59,7 +59,7 @@ export const de: ContentTranslation = {
     'getting-started': {
       question: 'Wie fange ich an?',
       answer:
-        'Geh auf billing.wslatl.com/register und frag Zugang an. Ein Admin prüft jede Bewerbung und gibt sie frei, bevor du auf Services zugreifen kannst. Sobald du freigegeben bist, kannst du im Abrechnungsportal einen Gameserver oder VPS bestellen und online bezahlen. Für einen Dedicated Server oder Webhosting melde dich bei uns auf Discord oder öffne ein Ticket im Abrechnungsportal, und wir richten alles gemeinsam mit dir ein.',
+        'Geh auf wslatl.com/register und frag Zugang an. Ein Admin prüft jede Bewerbung und gibt sie frei, bevor du auf Services zugreifen kannst. Sobald du freigegeben bist, kannst du im Abrechnungsportal einen Gameserver oder VPS bestellen und online bezahlen. Für einen Dedicated Server oder Webhosting melde dich bei uns auf Discord oder öffne ein Ticket im Abrechnungsportal, und wir richten alles gemeinsam mit dir ein.',
     },
     'what-makes-you-different': {
       question: 'Was unterscheidet euch von den großen Hosting-Unternehmen?',
@@ -94,7 +94,7 @@ export const de: ContentTranslation = {
     'vps-vs-shared': {
       question: 'Ist VPS-Hosting besser als Shared Hosting?',
       answer:
-        'Für die meisten, die ein echtes Projekt betreiben, ja. Ein VPS gibt dir dedizierte CPU und dedizierten RAM, an die sonst niemand rangeht, vollen root-Zugriff und kein Risiko, dass ein Nachbarkonto deine Leistung ruiniert. Shared Hosting ist günstiger, aber du teilst dir die Ressourcen mit Fremden.',
+        'Für die meisten, die ein echtes Projekt betreiben, ja. Ein VPS gibt dir deinen eigenen Anteil an CPU und RAM, vollen Root-Zugriff und das Betriebssystem deiner Wahl. Premium-Tarife laufen auf einem AMD Ryzen 9 3900X, Budget-Tarife auf einer älteren, stärker ausgelasteten CPU, die zu Stoßzeiten langsamer sein kann. Shared Hosting ist günstiger, aber alle Websites auf dem Server teilen sich dieselben Ressourcen.',
     },
     'ddos-protection': {
       question: 'Bietet ihr DDoS-Schutz?',
@@ -688,21 +688,21 @@ export const de: ContentTranslation = {
     privacy: {
       label: 'Datenschutzerklärung',
       title: 'Datenschutzerklärung',
-      metaDescription: 'Wie WSLATL LLC deine personenbezogenen Daten erhebt, nutzt und schützt.',
+      metaDescription: 'Welche personenbezogenen Daten WSLATL LLC für Konten, Abrechnung, Support und diese Website erhebt, wie sie genutzt, geteilt und übermittelt werden.',
       intro:
         'Wir erheben nur, was wir zum Betrieb deiner Services brauchen. Wir verkaufen deine Daten nicht, niemals. Hier steht genau, was wir mit den Informationen machen, die du uns gibst.',
     },
     terms: {
       label: 'Nutzungsbedingungen',
       title: 'Nutzungsbedingungen',
-      metaDescription: 'Die Bedingungen, die für deine Nutzung der Hosting-Services von WSLATL LLC gelten.',
+      metaDescription: 'Die Bedingungen für das Hosting bei WSLATL LLC: Kontoantrag, Abrechnung, Zahlungsverzug und Sperrung, Erstattungen, Preisänderungen und SLA-Gutschriften.',
       intro:
         'Diese Bedingungen gelten für deine Nutzung aller Services von WSLATL LLC. Bitte lies sie sorgfältig, bevor du unsere Services nutzt. Mit der Nutzung eines WSLATL Service stimmst du diesen Bedingungen zu.',
     },
     acceptableUse: {
       label: 'Zulässige Nutzung',
       title: 'Richtlinie zur zulässigen Nutzung',
-      metaDescription: 'Was auf der Hosting-Infrastruktur von WSLATL LLC erlaubt ist und was nicht.',
+      metaDescription: 'Was du bei WSLATL hosten darfst und was nicht: Altersgrenzen, verbotene Inhalte, Netzwerkangriffe, Spam, Krypto-Mining, Ressourcen und Regeln für Gameserver.',
       intro:
         'Unsere Infrastruktur teilen sich mehrere Kunden. Ein Störenfried trifft alle. Diese Richtlinie legt fest, was auf WSLATL Servern akzeptabel ist und was nicht. Lies sie. Halte dich daran. Wir setzen sie durch.',
     },

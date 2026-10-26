@@ -38,6 +38,7 @@ interface HeaderProps {
     discord: string
     getStarted: string
     openMenu: string
+    mainNav: string
     newTab: string
     login: string
     clientPanels: string
@@ -49,7 +50,11 @@ interface HeaderProps {
 
 function isCurrent(pathname: string, href: string) {
   if (isExternal(href) || href.includes('#')) return false
-  return href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
+  // Both without the language: an English page is prerendered at /en/pricing
+  // while its links say /pricing, so comparing them as they are never marked
+  // the current page in English.
+  const [page, link] = [stripLocale(pathname), stripLocale(href)]
+  return link === '/' ? page === '/' : page === link || page.startsWith(`${link}/`)
 }
 
 export function Header({
@@ -78,7 +83,7 @@ export function Header({
           <Wordmark textClassName="@max-[17.5rem]:hidden" />
         </Link>
 
-        <nav aria-label="Main" className="hidden lg:block">
+        <nav aria-label={labels.mainNav} className="hidden lg:block">
           {/* The bar stops growing at 72rem, where all seven links show. The
               spacing is sized so they fit on one line there in every language
               (the French one with the least room), so from 72rem a label never
@@ -90,6 +95,7 @@ export function Header({
                 <li key={link.href} className={cn(link.wideOnly && 'hidden min-[72rem]:block')}>
                   <SiteLink
                     href={link.href}
+                    newTab={labels.newTab}
                     aria-current={current ? 'page' : undefined}
                     // A 404 is prerendered without the visitor's URL, so the
                     // current-page mark can legitimately differ on the client.
@@ -159,12 +165,13 @@ export function Header({
           closeMenu()
         }}
       >
-        <nav aria-label="Main" className="shell py-4">
+        <nav aria-label={labels.mainNav} className="shell py-4">
           <ul className="divide-y divide-border">
             {nav.map((link) => (
               <li key={link.href}>
                 <SiteLink
                   href={link.href}
+                  newTab={labels.newTab}
                   onClick={closeMenu}
                   aria-current={isCurrent(pathname, link.href) ? 'page' : undefined}
                   suppressHydrationWarning

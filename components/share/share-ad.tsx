@@ -129,6 +129,11 @@ export function ShareAd({ text, labels, variant = 'outline', size = 'default', c
             {copied ? labels.copied : labels.copy}
           </Button>
         </div>
+        {/* An open modal dialog makes the page behind it inert, the status line above included, so the dialog announces its own. */}
+        {/* oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- as above */}
+        <p role="status" className="sr-only">
+          {state === 'copied' ? labels.copied : state === 'failed' ? labels.copyFailed : ''}
+        </p>
       </dialog>
     </div>
   )

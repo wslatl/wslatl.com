@@ -9,6 +9,7 @@ export const fr: Copy = {
     getStarted: "Commencer",
     openMenu: "Menu",
     closeMenu: "Fermer le menu",
+    mainNav: 'Principale',
     newTab: " (ouvre un nouvel onglet)",
     login: "Connexion",
     clientPanels: "Espaces client",
@@ -34,7 +35,7 @@ export const fr: Copy = {
     register: { label: "Demander un accès", description: "Nouveau ici ? Faites une demande de compte" },
   },
   footer: {
-    blurb: (location: string) => `Hébergement privé géré par une petite équipe basée au ${location}. Hosting that actually gives a damn.`,
+    blurb: (location: string) => `Hébergement privé géré par une petite équipe basée au ${location}.`,
     columns: {
       hosting: "Hébergement",
       company: "Entreprise",
@@ -70,7 +71,7 @@ export const fr: Copy = {
       emphasis: "actually",
       lineTwo: "gives a damn.",
       intro:
-        "Nous avons travaillé au sein d'entreprises d'hébergement. Nous savons ce qui cloche. WSLATL existe pour y remédier : hébergement VPS abordable, hébergement Minecraft et serveurs de jeu, et serveurs dédiés, portés par une équipe qui répond vraiment.",
+        "Nous avons travaillé au sein d'entreprises d'hébergement. Nous savons ce qui cloche. WSLATL existe pour y remédier : hébergement VPS aux prix tous publiés, hébergement Minecraft et serveurs de jeu, et serveurs dédiés, portés par une équipe qui répond vraiment.",
       seePlans: "Voir les offres et les tarifs",
       products: "Produits",
       entries: {
@@ -160,7 +161,7 @@ export const fr: Copy = {
       heading: "Questions fréquentes",
       stillNotSure: "Toujours un doute ?",
       askOnDiscord: "Posez-nous vos questions sur Discord",
-      alwaysAround: ". Nous sommes toujours là.",
+      alwaysAround: ". Nous répondons en général en moins d'une heure aux heures d'activité.",
     },
     contact: {
       heading: "Un hébergeur qui vous traite comme une personne. Imaginez un peu.",
@@ -215,6 +216,8 @@ export const fr: Copy = {
       ram: "RAM",
       storage: "Stockage",
       traffic: "Trafic",
+      popular: "Populaire",
+      notAvailable: "n.d.",
       price: "Prix",
       order: "Commander",
       orderPlan: (plan: string) => ` ${plan} (ouvre un nouvel onglet)`,
@@ -228,7 +231,7 @@ export const fr: Copy = {
     },
   },
   games: {
-    metaTitle: (more: number) => `Hébergement de serveurs de jeu\u00A0: Minecraft, Rust, ARK et ${more}+ autres`,
+    metaTitle: (more: number) => `Serveurs de jeu\u00A0: Minecraft, Rust, ARK et ${more}+ autres`,
     metaDescription: (price: string) =>
       `Serveurs de jeu dès ${price}/mois, facturés à la RAM et non au jeu. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld et d'autres sur un panneau Pterodactyl.`,
     heading: "Hébergement de serveurs de jeu",
@@ -252,7 +255,7 @@ export const fr: Copy = {
     fromPrice: "à partir de {price}/mois",
     toStart: "{ram} pour démarrer",
     detail: {
-      metaTitle: (game: string, price: string) => `Hébergement de serveur ${game} dès ${price}/mois`,
+      metaTitle: (game: string, price: string) => `Hébergement ${game} dès ${price}/mois`,
       metaDescription: (game: string, price: string, tagline: string) =>
         `Louez votre propre serveur ${game} chez WSLATL dès ${price} par mois. ${tagline}`,
       heading: (game: string) => `Hébergement de serveur ${game}`,
@@ -313,7 +316,7 @@ export const fr: Copy = {
   partners: {
     metaTitle: 'Partenaires officiels',
     metaDescription: (percent: string) =>
-      `Les créateurs et les communautés avec qui nous travaillons, chacun avec son propre code de parrainage. Inscrivez-vous avec l'un d'eux et obtenez ${percent} de réduction sur la première facture de votre hébergement, sauf sur les serveurs dédiés.`,
+      `Les créateurs et communautés avec qui nous travaillons. Avec le code d'un partenaire, ${percent} de réduction sur votre première facture d'hébergement, hors serveurs dédiés.`,
     metaDescriptionNoCodes:
       'Les créateurs et les communautés avec qui nous travaillons, approuvés par notre équipe. Découvrez qui ils sont et où les retrouver en ligne.',
     emptyMetaDescription:
@@ -435,5 +438,6 @@ export const fr: Copy = {
   },
   breadcrumbs: {
     home: "Accueil",
+    label: "Fil d'Ariane",
   },
 }

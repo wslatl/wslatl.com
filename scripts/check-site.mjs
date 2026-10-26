@@ -43,12 +43,24 @@ async function get(path, redirect = 'manual') {
   }
 }
 
-/** Runs fn over items, a few at a time, so the site sees a gentle trickle. */
-async function eachLimited(items, fn, limit = 6) {
+/**
+ * Runs fn over items, a few at a time, so the site sees a gentle trickle. An
+ * item whose request fails goes to onError and the rest carry on, so one
+ * dropped connection is reported as that one page rather than replacing every
+ * result in the group with a single error.
+ */
+async function eachLimited(items, fn, onError, limit = 6) {
   const queue = [...items]
   await Promise.all(
     Array.from({ length: limit }, async () => {
-      while (queue.length) await fn(queue.shift())
+      while (queue.length) {
+        const item = queue.shift()
+        try {
+          await fn(item)
+        } catch (error) {
+          onError(item, error)
+        }
+      }
     }),
   )
 }
@@ -67,7 +79,7 @@ async function checkPages() {
     const res = await get(path)
     if (res.status !== 200) broken.push(`${path} (${res.status})`)
     await res.body?.cancel()
-  })
+  }, (path, error) => broken.push(`${path} (${error.message})`))
   record('Every sitemap page answers 200', broken.length === 0, broken.join(', ') || `${locs.length} pages`)
 
   const missing = await get(`/this-page-does-not-exist-${Date.now()}`)
@@ -110,6 +122,8 @@ async function checkNotFound() {
     // One line covers both halves: the built-in page does not carry our
     // heading, and the wrong language does not carry this one.
     if (!body.includes(heading[lang])) wrong.push(`${label}: not our 404 page in ${lang}`)
+  }, ([label], error) => {
+    wrong.push(`${label}: ${error.message}`)
   })
   record('Unknown paths reach our own 404 page', wrong.length === 0, wrong.join(', ') || `${probes.length} kinds of wrong URL`)
 }
@@ -143,7 +157,7 @@ async function checkRedirects() {
     const res = await get(sample(source), 'follow')
     if (res.status !== 200) lost.push(`${source} (${res.status})`)
     await res.body?.cancel()
-  })
+  }, ({ source }, error) => lost.push(`${source} (${error.message})`))
   record('Moved pages still land on a page', lost.length === 0, lost.join(', ') || `${moved.length} old URLs`)
 
   const links = Object.values(shortLinks)
@@ -152,7 +166,7 @@ async function checkRedirects() {
     const res = await get(path)
     answers.push({ path, url, status: res.status, location: res.headers.get('location') })
     await res.body?.cancel()
-  })
+  }, ({ path, url }) => answers.push({ path, url, status: 0, location: null }))
   if (!answers.some((a) => a.status >= 300 && a.status < 400)) {
     record('Short links', true, 'not deployed here yet, so not checked')
     return

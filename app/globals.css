@@ -396,6 +396,11 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
   font-size: 0.8em;
   text-decoration: none;
 }
+/* The same words in each language, from header.newTab in i18n/copy. */
+.legal-body:lang(es) a[target='_blank']::after { content: '↗' / ' (se abre en una pestaña nueva)'; }
+.legal-body:lang(fr) a[target='_blank']::after { content: '↗' / ' (ouvre un nouvel onglet)'; }
+.legal-body:lang(de) a[target='_blank']::after { content: '↗' / ' (öffnet in einem neuen Tab)'; }
+.legal-body:lang(pt) a[target='_blank']::after { content: '↗' / ' (abre em uma nova aba)'; }
 
 /* ----- Legal-page tables ----- */
 .legal-table {
@@ -565,6 +570,9 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    /* The hero staggers its lines with inline delays; with "both" fill they
+       would sit invisible for the delay and then pop in. */
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }

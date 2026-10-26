@@ -1,6 +1,11 @@
 export interface RamRow {
   players: string
   ram: string
+  /**
+   * The RAM is for each map, as in a cluster where every map is its own
+   * server. Set here rather than read from the words, which are translated.
+   */
+  perMap?: true
 }
 
 export interface GameFaq {
@@ -88,7 +93,7 @@ export const games: GameEntry[] = [
     recommendedRam: [
       { players: 'Single map, small tribe', ram: '6-8GB' },
       { players: 'Single map, full server', ram: '8-12GB' },
-      { players: 'Clustered maps or modded', ram: '16GB+ per map' },
+      { players: 'Clustered maps or modded', ram: '16GB+ per map', perMap: true },
     ],
     popularFor: ['clustered multi-map setups', 'modded boosted-rate servers', 'PvE tribe servers'],
     faqs: [
@@ -105,7 +110,7 @@ export const games: GameEntry[] = [
     recommendedRam: [
       { players: 'Single map, small tribe', ram: '4-6GB' },
       { players: 'Single map, modded', ram: '8GB' },
-      { players: 'Clustered maps', ram: '8GB+ per map' },
+      { players: 'Clustered maps', ram: '8GB+ per map', perMap: true },
     ],
     popularFor: ['S+ and Automated Ark modded servers', 'classic Island/Ragnarok clusters'],
     faqs: [

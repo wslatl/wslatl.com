@@ -209,8 +209,8 @@ export default function AcceptableUseContent() {
             <strong>Bandbreite:</strong> Sie dürfen Bandbreite
             bis zu dem in Ihrem Tarif enthaltenen Kontingent nutzen. Überschreitungen werden zu
             den in Ihrem Abrechnungsportal aufgeführten Sätzen abgerechnet. Tarife mit
-            unbegrenzter Bandbreite unterliegen der fairen Nutzung; ein Missbrauch unbegrenzter
-            Tarife kann zu Drosselung oder zu einem erforderlichen Upgrade führen.
+            Traffic-Flatrate unterliegen der fairen Nutzung; ein Missbrauch von Tarifen mit
+            Traffic-Flatrate kann zu Drosselung oder zu einem erforderlichen Upgrade führen.
           </li>
           <li>
             <strong>CPU & RAM:</strong> Der absichtliche
