@@ -2,6 +2,13 @@ import { links } from './links'
 
 export const siteConfig = {
   name: 'WSLATL LLC',
+  /**
+   * The name the site goes by in search results, browser tabs and link
+   * previews: the brand people type, without the "LLC". It is the WebSite
+   * name Google reads for the site name in results, so it must match what
+   * the titles end with (app/[locale]/layout.tsx and lib/metadata.ts).
+   */
+  brand: 'WSLATL',
   description: 'Missouri-based private hosting company offering dedicated servers, game hosting, VPS, and web hosting.',
   shortDescription: 'Private hosting, personal service.',
   location: 'Missouri, USA',

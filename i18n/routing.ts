@@ -16,13 +16,17 @@ export const rootFiles: readonly string[] = [
   '/favicon.ico',
   '/favicon.png',
   '/favicon.svg',
+  '/apple-icon.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon-maskable-512.png',
   '/logo.png',
   '/og-image.png',
-  // Generated from app/: robots.ts, sitemap.ts, apple-icon.png and the
+  // Generated from app/: robots.ts, sitemap.ts, manifest.ts and the
   // company.json route (the company profile for the billing panel).
   '/robots.txt',
   '/sitemap.xml',
-  '/apple-icon.png',
+  '/manifest.webmanifest',
   '/company.json',
 ]
 

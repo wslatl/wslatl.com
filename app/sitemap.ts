@@ -9,9 +9,14 @@ import { pageUrl } from '@/lib/metadata'
  * Every page in every language. Each entry lists its translations, so a
  * search engine can offer a reader the version in their own language rather
  * than treating the five as duplicates of each other.
+ *
+ * There is no lastModified. Google only trusts it when it is accurate every
+ * time, and a build date on every page says the whole site changed on each
+ * upload, which teaches it to ignore the field for this site for good. No
+ * date is better than a wrong one. (It ignores changeFrequency and priority;
+ * they stay for the other search engines.)
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date()
 
   const paths: { path: string; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']; priority: number }[] = [
     { path: '/', changeFrequency: 'weekly', priority: 1 },
@@ -31,7 +36,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return paths.flatMap(({ path, changeFrequency, priority }) =>
     locales.map((locale) => ({
       url: pageUrl(locale, path),
-      lastModified: now,
       changeFrequency,
       // A translation is not the page people should land on first.
       priority: locale === defaultLocale ? priority : Math.round(priority * 0.8 * 10) / 10,

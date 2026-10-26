@@ -61,9 +61,9 @@ export const de: Copy = {
     reveal: 'E-Mail-Adresse anzeigen',
   },
   home: {
-    metaTitle: 'Günstiges VPS- & Gameserver-Hosting | WSLATL LLC',
-    metaDescription:
-      'Bezahlbares VPS-Hosting, Gameserver-Hosting (Minecraft, Rust, ARK, FiveM und mehr) und Dedicated Server mit DDoS-Schutz und NVMe-Speicher. Aus Missouri, und wir melden uns wirklich.',
+    metaTitle: 'WSLATL: Gameserver, VPS und Dedicated Server aus Missouri',
+    metaDescription: (game: string, vps: string) =>
+      `WSLATL ist ein kleiner Hoster aus Missouri, Aufnahme nur auf Bewerbung. Gameserver ab ${game}, VPS ab ${vps}, Dedicated Server, und wir melden uns wirklich.`,
     hero: {
       // Bleibt in jeder Sprache Englisch: das ist die Markenzeile.
       lineOne: 'Hosting that',
@@ -189,9 +189,9 @@ export const de: Copy = {
     },
   },
   pricing: {
-    metaTitle: 'Preise für günstiges VPS- & Gameserver-Hosting',
+    metaTitle: 'Preise für VPS und Gameserver, alle Pakete offen',
     metaDescription: (vps: string, game: string) =>
-      `Veröffentlichte Monatspreise für VPS-Hosting ab ${vps} und Gameserver-Hosting ab ${game}, auf SATA SSD oder NVMe. Keine Lockpreise, und mindestens 30 Tage Ankündigung vor jeder Preiserhöhung.`,
+      `VPS ab ${vps} und Gameserver ab ${game} im Monat, mit allen technischen Daten. Keine Lockpreise, und mindestens 30 Tage Ankündigung vor jeder Preiserhöhung.`,
     heading: 'Preise',
     intro:
       'Jeder Tarif wird monatlich in US-Dollar abgerechnet. Keine Preisfallen bei der Verlängerung: Das sind die regulären Monatspreise, und jede Erhöhung kommt mit mindestens 30 Tagen schriftlicher Ankündigung.',
@@ -228,9 +228,9 @@ export const de: Copy = {
     },
   },
   games: {
-    metaTitle: (more: number) => `Gameserver-Hosting: Minecraft, Rust, ARK, FiveM und ${more}+ weitere`,
+    metaTitle: (more: number) => `Gameserver mieten: Minecraft, Rust, ARK und ${more}+ weitere`,
     metaDescription: (price: string) =>
-      `DDoS-geschütztes Gameserver-Hosting ab ${price}/Monat auf NVMe- und SATA-SSD-Hardware. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld und dutzende mehr, alle auf demselben Pterodactyl-Panel.`,
+      `Gameserver ab ${price}/Monat, bezahlt nach RAM statt nach Spiel. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld und mehr auf einem Pterodactyl-Panel.`,
     heading: 'Gameserver-Hosting',
     crumb: 'Spiele',
     introPrefix:
@@ -252,7 +252,9 @@ export const de: Copy = {
     fromPrice: 'ab {price}/Monat',
     toStart: '{ram} für den Anfang',
     detail: {
-      metaTitle: (game: string) => `${game} Server-Hosting`,
+      metaTitle: (game: string, price: string) => `${game} Server mieten ab ${price}/Monat`,
+      metaDescription: (game: string, price: string, tagline: string) =>
+        `Miete deinen eigenen ${game} Server bei WSLATL ab ${price} im Monat. ${tagline}`,
       heading: (game: string) => `${game} Server-Hosting`,
       order: (game: string) => `Deinen ${game} Server bestellen`,
       comparePlans: 'Tarife vergleichen',

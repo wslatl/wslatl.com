@@ -61,9 +61,9 @@ export const fr: Copy = {
     reveal: "Afficher l'adresse e-mail",
   },
   home: {
-    metaTitle: "Hébergement VPS et serveurs de jeu pas chers | WSLATL LLC",
-    metaDescription:
-      "Hébergement VPS abordable, hébergement de serveurs de jeu (Minecraft, Rust, ARK, FiveM et bien d'autres) et serveurs dédiés, avec protection DDoS et stockage NVMe. Basés au Missouri, et nous répondons vraiment.",
+    metaTitle: 'WSLATL\u00A0: hébergement de serveurs de jeu, VPS et dédiés',
+    metaDescription: (game: string, vps: string) =>
+      `WSLATL est un petit hébergeur du Missouri, sur candidature uniquement. Serveurs de jeu dès ${game}, VPS dès ${vps}, serveurs dédiés, et nous répondons vraiment.`,
     hero: {
       // Kept in English everywhere: this is the brand line.
       lineOne: "Hosting that",
@@ -189,9 +189,9 @@ export const fr: Copy = {
     },
   },
   pricing: {
-    metaTitle: "Tarifs hébergement VPS et serveurs de jeu pas chers",
+    metaTitle: 'Tarifs VPS et serveurs de jeu, tous les plans affichés',
     metaDescription: (vps: string, game: string) =>
-      `Tarifs mensuels publics pour l'hébergement VPS à partir de ${vps} et les serveurs de jeu à partir de ${game}, sur SATA SSD ou NVMe. Pas de prix d'appel, et au moins 30 jours de préavis avant toute augmentation.`,
+      `VPS dès ${vps} et serveurs de jeu dès ${game} par mois, chaque caractéristique publiée. Pas de prix d'appel, et 30 jours de préavis avant toute hausse.`,
     heading: "Tarifs",
     intro:
       "Chaque offre est facturée au mois, en dollars américains. Pas de piège au renouvellement : ce sont les tarifs mensuels habituels, et toute augmentation est annoncée par écrit au moins 30 jours à l'avance.",
@@ -228,9 +228,9 @@ export const fr: Copy = {
     },
   },
   games: {
-    metaTitle: (more: number) => `Hébergement de serveurs de jeu\u00A0: Minecraft, Rust, ARK, FiveM et ${more}+ autres`,
+    metaTitle: (more: number) => `Hébergement de serveurs de jeu\u00A0: Minecraft, Rust, ARK et ${more}+ autres`,
     metaDescription: (price: string) =>
-      `Hébergement de serveurs de jeu protégés contre les DDoS à partir de ${price}/mois, sur matériel NVMe et SATA SSD. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld et des dizaines d'autres, tous sur le même panneau Pterodactyl.`,
+      `Serveurs de jeu dès ${price}/mois, facturés à la RAM et non au jeu. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld et d'autres sur un panneau Pterodactyl.`,
     heading: "Hébergement de serveurs de jeu",
     crumb: "Jeux",
     introPrefix:
@@ -252,7 +252,9 @@ export const fr: Copy = {
     fromPrice: "à partir de {price}/mois",
     toStart: "{ram} pour démarrer",
     detail: {
-      metaTitle: (game: string) => `Hébergement de serveur ${game}`,
+      metaTitle: (game: string, price: string) => `Hébergement de serveur ${game} dès ${price}/mois`,
+      metaDescription: (game: string, price: string, tagline: string) =>
+        `Louez votre propre serveur ${game} chez WSLATL dès ${price} par mois. ${tagline}`,
       heading: (game: string) => `Hébergement de serveur ${game}`,
       order: (game: string) => `Commandez votre serveur ${game}`,
       comparePlans: "Comparer les offres",
