@@ -158,4 +158,20 @@ export const partners: Partner[] = [
       discord: 'https://discord.gg/sseaUasVEt',
     },
   },
+  {
+    slug: 'cwgaming32',
+    name: 'CWGaming32',
+    tagline: 'Pacific Coast Roleplay, the best Cali-based FiveM server',
+    description:
+      'I am a very persistent person who tries hard to do what I can. I develop, code and make things for people and my community.',
+    avatar: '/partners/cwgaming32/avatar.webp',
+    banner: '/partners/cwgaming32/banner.webp',
+    referralCode: 'CWGAMING32',
+    since: '2026-10',
+    games: ['fivem'],
+    socials: {
+      discord: 'https://discord.gg/NNgS5c2rb8',
+      tiktok: 'https://www.tiktok.com/@cwgaming32',
+    },
+  },
 ]
