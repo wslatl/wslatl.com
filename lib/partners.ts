@@ -191,6 +191,11 @@ export const socialPlatforms: Record<SocialPlatform, PlatformRule> = {
   },
 }
 
+/** A platform's name for a label: its own brand name, or "Website" in the reader's language. */
+export function platformName(platform: SocialPlatform, t: Copy): string {
+  return platform === 'website' ? t.partners.website : socialPlatforms[platform].name
+}
+
 /** Why a social link is not acceptable, or null when it is. */
 export function socialLinkProblem(platform: SocialPlatform, href: string): string | null {
   const rule = socialPlatforms[platform]
@@ -229,6 +234,15 @@ export function socialLinks(partner: Partner): SocialLink[] {
     const display = `${url.hostname.replace(/^www\./, '')}${url.pathname}`.replace(/\/$/, '')
     return [{ platform, href: url.href, display }]
   })
+}
+
+/**
+ * The games a partner plays, in the order they list them, taken from the
+ * games the page already has in its language. A slug with no game behind it
+ * is left out.
+ */
+export function partnerGames<Game extends { slug: string }>(partner: Partner, games: readonly Game[]): Game[] {
+  return (partner.games ?? []).flatMap((slug) => games.filter((game) => game.slug === slug))
 }
 
 export interface PartnerCheckContext {

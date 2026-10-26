@@ -250,11 +250,7 @@ export const games: GameEntry[] = [
   // ── Zombie & PvP ─────────────────────────────────────────────────────
   { slug: 'dayz', name: 'DayZ', category: 'Zombie & PvP', tagline: 'Hardcore open-world survival PvP on the Chernarus map (and mods).', description: 'A punishing open-world survival shooter with a huge modding scene (CF, Namalsk, and dozens of overhaul mods) that each add real memory overhead on top of the base game.', recommendedRam: [{ players: 'Vanilla, 40-60 players', ram: '4-6GB' }, { players: 'Heavily modded (CF, custom maps)', ram: '8-12GB' }], popularFor: ['modded community servers', 'hardcore vanilla-plus servers'], faqs: [{ q: 'Can I run custom maps like Namalsk or Deer Isle?', a: 'Yes, custom map mods work the same way as on a self-hosted DayZ server. Just size RAM for the mod list, not the vanilla baseline.' }] },
   { slug: 'atlas', name: 'ATLAS', category: 'Zombie & PvP', tagline: 'Massive-scale pirate MMO survival.', description: 'A sprawling pirate-themed survival MMO built on the ARK engine, spanning a huge ocean grid. One of the more demanding titles here at full grid scale.', recommendedRam: [{ players: 'Single grid cell', ram: '4-6GB' }, { players: 'Full multi-cell grid', ram: '16GB+ total' }], popularFor: ['company-run pirate servers'], faqs: [] },
-] satisfies GameEntry[]
-
-export function gameBySlug(slug: string): GameEntry | undefined {
-  return games.find((g) => g.slug === slug)
-}
+]
 
 export const gameCategories = Array.from(new Set(games.map((g) => g.category)))
 

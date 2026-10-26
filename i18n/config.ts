@@ -12,9 +12,6 @@ export type Locale = (typeof locales)[number]
 
 export const defaultLocale: Locale = 'en'
 
-/** Locales served under a prefix, which is every one except English. */
-export const prefixedLocales = locales.filter((locale) => locale !== defaultLocale)
-
 /** Each language named in itself, which is what a language picker should show. */
 export const localeNames: Record<Locale, string> = {
   en: 'English',

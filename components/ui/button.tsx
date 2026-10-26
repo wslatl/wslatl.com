@@ -13,15 +13,12 @@ const buttonVariants = cva(
           'bg-primary text-primary-foreground shadow-[inset_0_1px_0_0_rgb(255_255_255/0.14)] hover:bg-primary/88',
         outline:
           'border border-input/70 bg-transparent text-foreground hover:border-foreground/40 hover:bg-accent',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'text-muted-foreground hover:bg-accent hover:text-foreground',
-        link: 'text-link underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-10 px-4',
         sm: 'h-8 gap-1.5 px-3 text-[13px]',
         lg: 'h-11 px-6',
-        icon: 'size-10',
         'icon-sm': 'size-8',
       },
     },
@@ -53,4 +50,4 @@ function Button({
   )
 }
 
-export { Button, buttonVariants }
+export { Button }

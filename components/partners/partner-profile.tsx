@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft, ArrowUpRight, BadgeCheck } from 'lucide-react'
 import { Breadcrumbs } from '@/components/layout/page-header'
 import { CopyCode } from '@/components/partners/copy-code'
-import { copyLabels, platformName } from '@/components/partners/partner-card'
+import { copyLabels } from '@/components/partners/partner-card'
 import { PartnerAvatar, PartnerBanner } from '@/components/partners/partner-pictures'
 import { SharePartnerAd } from '@/components/share/ads'
 import { SocialIcon } from '@/components/partners/social-icon'
@@ -15,8 +15,10 @@ import { formatMonth } from '@/i18n/dates'
 import { getLocale } from '@/i18n/locale'
 import {
   hasReferralCode,
+  partnerGames,
   partnerText,
   partnerTextLang,
+  platformName,
   referralDiscount,
   referralSignupUrl,
   socialLinks,
@@ -34,8 +36,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
   const words = t.partners
   const path = (href: string) => localePath(locale, href)
   const links = socialLinks(partner)
-  const allGames = localizedGames()
-  const games = (partner.games ?? []).flatMap((game) => allGames.filter((entry) => entry.slug === game))
+  const games = partnerGames(partner, localizedGames())
   const paragraphs = partnerText(partner.description, locale).split(/\n\s*\n/)
 
   return (

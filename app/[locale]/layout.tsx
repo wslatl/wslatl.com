@@ -1,11 +1,13 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Instrument_Serif } from 'next/font/google'
+import { notFound } from 'next/navigation'
 import { JsonLd } from '@/components/seo/json-ld'
 import { siteConfig } from '@/config/site'
 import { shortLinks } from '@/config/links'
-import { locales, openGraphLocales } from '@/i18n/config'
+import { isLocale, locales, openGraphLocales } from '@/i18n/config'
 import { getLocale, setLocale } from '@/i18n/locale'
 import { copy } from '@/i18n/copy'
+import { ogImage } from '@/lib/metadata'
 import '../globals.css'
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
@@ -59,21 +61,13 @@ export const metadata: Metadata = {
     siteName: siteConfig.brand,
     title,
     description,
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'WSLATL LLC: hosting that actually gives a damn',
-        type: 'image/png',
-      },
-    ],
+    images: [ogImage],
   },
   twitter: {
     card: 'summary_large_image',
     title,
     description,
-    images: ['/og-image.png'],
+    images: [ogImage.url],
   },
   robots: {
     index: true,
@@ -95,8 +89,9 @@ export const metadata: Metadata = {
  * its own bare 404 page and logging an error for every bot that probes one.
  * True lets the page run and call notFound(), which is what renders ours.
  *
- * Nothing renders under a made-up language, because proxy.ts gives every
- * request a real one before it reaches a route (i18n/routing.ts).
+ * Nothing renders under a made-up language: proxy.ts gives every request a
+ * real one before it reaches a route (i18n/routing.ts), and the layout below
+ * answers 404 for any that still gets through.
  */
 export const dynamicParams = true
 
@@ -108,7 +103,7 @@ export const viewport: Viewport = {
   // The brand blue, matching --primary. Discord and Slack colour the strip
   // down the side of a shared link with this, so near-black read as a fault
   // rather than as a choice.
-  themeColor: '#0073c7',
+  themeColor: siteConfig.themeColor,
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
@@ -143,10 +138,15 @@ export default async function RootLayout({
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }>) {
+  // A language that is not ours is a 404, never a page: rendered, it would be
+  // a copy of a real page with its own canonical address. proxy.ts should
+  // never let one through, so this is the backstop if a path skips it. The
+  // framework's own 404 answers here, since ours lives inside this layout.
+  const requested = (await params).locale
+  if (!isLocale(requested)) notFound()
   // Set before anything below renders: every Server Component under here
-  // reads the language from this (i18n/locale.ts), which also rejects a
-  // language that is not ours.
-  setLocale((await params).locale)
+  // reads the language from this (i18n/locale.ts).
+  setLocale(requested)
   const locale = getLocale()
   const t = copy()
 

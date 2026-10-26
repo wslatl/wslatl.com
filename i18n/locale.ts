@@ -12,9 +12,10 @@ import { defaultLocale, isLocale, type Locale } from '@/i18n/config'
 const holder = cache(() => ({ locale: defaultLocale }))
 
 /**
- * Called by each route before it renders anything. An unknown language (a
- * URL like /xx/pricing, which 404s) falls back to English so the page around
- * the 404 still renders.
+ * Called by each route before it renders anything. The layout answers 404 for
+ * an unknown language before any page runs, so the fallback to English is
+ * only for the 404 page, which reads the language from the address on its
+ * own and must still render whatever that address holds.
  */
 export function setLocale(locale: string) {
   holder().locale = isLocale(locale) ? locale : defaultLocale

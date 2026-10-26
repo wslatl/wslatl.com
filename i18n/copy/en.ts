@@ -55,6 +55,7 @@ export const en = {
       vpsPlans: 'VPS plans',
       gamePlans: 'Game server plans',
       supportedGames: 'Supported games',
+      guides: 'Setup guides',
       dedicated: 'Dedicated servers',
       web: 'Web hosting',
       about: 'About us',
@@ -267,11 +268,15 @@ export const en = {
       metaTitle: (game: string, price: string) => `${game} Server Hosting from ${price}/mo`,
       metaDescription: (game: string, price: string, tagline: string) =>
         `Run your own ${game} server with WSLATL from ${price} a month. ${tagline}`,
+      metaDescriptionNoPrice: (game: string, tagline: string) =>
+        `Run your own ${game} server with WSLATL. Ask us for a plan sized to it. ${tagline}`,
       heading: (game: string) => `${game} server hosting`,
       order: (game: string) => `Order your ${game} server`,
       comparePlans: 'Compare plans',
       listedUnderPrefix: 'Listed under',
       listedUnderSuffix: '. Plans are not locked to one game, so you can switch titles any time.',
+      guidesIntro: 'Setting up your server yourself?',
+      guidesLink: (game: string) => `Read the ${game} server guides`,
       ramHeading: (game: string) => `How much RAM does ${game} need?`,
       ramCaption: (game: string) => `Recommended RAM for ${game} and the smallest plans that cover it`,
       setup: 'Setup',
@@ -285,7 +290,7 @@ export const en = {
       popular: (game: string) => `Popular ${game} setups`,
       included: 'Included with every game plan',
       questions: (game: string) => `${game} hosting questions`,
-      moreIn: (category: string) => `More ${category} games`,
+      moreIn: (category: string) => `More ${category.replace(/\b[A-Z][a-z]+\b/g, (word) => word.toLowerCase())} games`,
       allGames: 'All games',
       plansHeading: 'Game server plans',
       plansIntro:

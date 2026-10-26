@@ -6,6 +6,7 @@ import type { GameEntry } from '@/data/games'
 import { localizedCommitments, localizedFeatures, localizedGames, localizedLeadFeature, localizedProductLine, localizedServices } from '@/i18n/content'
 import { copy } from '@/i18n/copy'
 import { getLocale } from '@/i18n/locale'
+import { partnerGames } from '@/lib/partners'
 import { gameAd, gamesIndexAd, homeAd, partnerAd, partnersIndexAd, productLineAd, shareLabels, whyLines } from '@/lib/share'
 
 /**
@@ -42,8 +43,7 @@ export function ShareSiteAd(look: Look) {
 /** The ad for one partner, with the names of the games they play. */
 export function SharePartnerAd({ partner, ...look }: Look & { partner: Partner }) {
   const ctx = context()
-  const all = localizedGames()
-  const names = (partner.games ?? []).flatMap((slug) => all.filter((game) => game.slug === slug).map((game) => game.name))
+  const names = partnerGames(partner, localizedGames()).map((game) => game.name)
   return <ShareAd text={partnerAd(ctx, partner, names)} labels={shareLabels(ctx.t)} {...look} />
 }
 

@@ -73,8 +73,10 @@ function GameGrid({
     <ul className={cn('grid gap-3 sm:grid-cols-2', featured ? 'lg:grid-cols-4' : 'lg:grid-cols-3')}>
       {games.map((game) => (
         <li key={game.slug}>
+          {/* No prefetch: scrolling the directory would otherwise download every game page. */}
           <Link
             href={game.href}
+            prefetch={false}
             className={cn(
               'group flex h-full flex-col rounded-xl border p-5 transition-colors hover:border-foreground/25 hover:bg-card/50',
               featured ? 'border-primary/30 bg-primary/[0.04]' : 'bg-card/20',

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { ArrowRight, Check, Gamepad2, Globe, HardDrive, Server, type LucideIcon } from 'lucide-react'
 import { SectionHeader } from '@/components/ui/section-header'
+import { siteConfig } from '@/config/site'
 import type { Service } from '@/data/services'
 import { formatPrice, pricingHref, specRanges, startingPrice } from '@/lib/pricing'
 import { copy } from '@/i18n/copy'
@@ -57,7 +58,7 @@ function ServiceCtas({ service }: { service: Service }) {
     )
   }
   return (
-    <Link href={localePath(locale, '/#contact')} className={linkClass}>
+    <Link href={localePath(locale, siteConfig.paths.contact)} className={linkClass}>
       {t.getQuote} {arrow}
     </Link>
   )

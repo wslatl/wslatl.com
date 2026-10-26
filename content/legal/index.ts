@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react'
+import type { ReactNode } from 'react'
 import type { LegalDocumentKey } from '@/config/site'
 import type { Locale } from '@/i18n/config'
 import AbuseContent from './abuse'
@@ -52,8 +52,15 @@ import PtSla from './pt/sla'
 import PtSubprocessors from './pt/subprocessors'
 import PtTerms from './pt/terms'
 
+/**
+ * A document body: a plain function returning its LegalSection tree. Typed
+ * as a function rather than a component, because LegalLayout calls it once
+ * and reads its table of contents from the same tree it renders.
+ */
+export type LegalDocument = () => ReactNode
+
 /** The English body of every document. A missing one is a type error. */
-const english: Record<LegalDocumentKey, ComponentType> = {
+const english: Record<LegalDocumentKey, LegalDocument> = {
   privacy: PrivacyContent,
   terms: TermsContent,
   acceptableUse: AcceptableUseContent,
@@ -71,7 +78,7 @@ const english: Record<LegalDocumentKey, ComponentType> = {
  * entry for a document shows the English one, which is the version that
  * applies in any case (see the notice on every translated legal page).
  */
-const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, ComponentType>>>> = {
+const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, LegalDocument>>>> = {
   es: {
     abuse: EsAbuse,
     acceptableUse: EsAcceptableUse,
@@ -122,7 +129,7 @@ const translations: Partial<Record<Locale, Partial<Record<LegalDocumentKey, Comp
   },
 }
 
-export function legalContent(locale: Locale, key: LegalDocumentKey): ComponentType {
+export function legalContent(locale: Locale, key: LegalDocumentKey): LegalDocument {
   return translations[locale]?.[key] ?? english[key]
 }
 

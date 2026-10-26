@@ -1,4 +1,4 @@
-import { Children, isValidElement, type ComponentType, type ReactElement, type ReactNode } from 'react'
+import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
 import Link from 'next/link'
 import { ChevronDown } from 'lucide-react'
 import { SiteHeader } from '@/components/layout/site-header'
@@ -11,7 +11,7 @@ import { pageMetadata } from '@/lib/metadata'
 import { cn, slugify } from '@/lib/utils'
 import { Main } from '@/components/layout/main'
 import { Email } from '@/components/ui/email'
-import { hasTranslation } from '@/content/legal'
+import { hasTranslation, type LegalDocument } from '@/content/legal'
 import { defaultLocale, localePath, type Locale } from '@/i18n/config'
 import { getLocale } from '@/i18n/locale'
 import { copy } from '@/i18n/copy'
@@ -129,16 +129,16 @@ function MobileDisclosure({ label, children }: { label: string; children: ReactN
 interface LegalLayoutProps {
   page: LegalPage
   /** The document body, built from LegalSection and LegalSubSection. */
-  content: ComponentType
+  content: LegalDocument
 }
 
-export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
+export function LegalLayout({ page, content }: LegalLayoutProps) {
   const locale = getLocale()
   const t = copy().legal
-  // Content components are plain server components, so rendering one here
-  // yields its element tree, which is where the table of contents comes from.
-  const body = <Content />
-  const toc = tableOfContents((Content as () => ReactNode)())
+  // A document is a plain function, so calling it once yields the element
+  // tree that is both rendered below and read for the table of contents.
+  const body = content()
+  const toc = tableOfContents(body)
 
   return (
     <>

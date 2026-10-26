@@ -29,7 +29,7 @@ export function mainNav(t: Copy, locale: Locale): NavLink[] {
     // they do, with the room components/layout/header.tsx leaves; a longer
     // label in any language needs that measured again.
     { label: t.nav.partners, href: path('/partners'), wideOnly: true },
-    { label: t.nav.contact, href: path('/#contact') },
+    { label: t.nav.contact, href: path(siteConfig.paths.contact) },
     { label: t.nav.status, href: siteConfig.links.status },
   ]
 }
