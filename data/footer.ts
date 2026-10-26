@@ -4,6 +4,7 @@ import type { Copy } from '@/i18n/copy/en'
 import type { LegalPage } from '@/data/legal'
 import { portalLinks, requestAccessLink, type NavLink } from '@/data/nav'
 import { pricingHref } from '@/lib/pricing'
+import { knowledgeBaseUrl } from '@/lib/knowledge-base'
 
 export interface FooterColumn {
   title: string
@@ -33,6 +34,7 @@ export function footerColumns(t: Copy, locale: Locale, legalPages: LegalPage[]):
         { label: t.footer.links.reviews, href: siteConfig.links.trustpilot },
         { label: t.footer.links.discord, href: siteConfig.links.discord },
         { label: t.footer.links.status, href: siteConfig.links.status },
+        { label: t.footer.links.guides, href: knowledgeBaseUrl(locale) },
       ],
     },
     {

@@ -4,21 +4,16 @@ import { PartnerAvatar, PartnerBanner } from '@/components/partners/partner-pict
 import { CopyCode } from '@/components/partners/copy-code'
 import { SharePartnerAd } from '@/components/share/ads'
 import { SocialIcon } from '@/components/partners/social-icon'
-import type { Partner, SocialPlatform } from '@/data/partners'
+import type { Partner } from '@/data/partners'
 import { localePath } from '@/i18n/config'
 import { copy } from '@/i18n/copy'
 import type { Copy } from '@/i18n/copy/en'
 import { getLocale } from '@/i18n/locale'
-import { hasReferralCode, partnerText, partnerTextLang, socialLinks, socialPlatforms } from '@/lib/partners'
+import { hasReferralCode, partnerText, partnerTextLang, platformName, socialLinks } from '@/lib/partners'
 import { cn } from '@/lib/utils'
 
 /** Where the "This could be you" card leads: the program, on /partners. */
 export const becomePartnerAnchor = 'become-a-partner'
-
-/** A platform's name for a label: its own brand name, or "Website" in the reader's language. */
-export function platformName(platform: SocialPlatform, t: Copy): string {
-  return platform === 'website' ? t.partners.website : socialPlatforms[platform].name
-}
 
 /** The words the Copy button needs, in the language of the page. */
 export function copyLabels(t: Copy) {

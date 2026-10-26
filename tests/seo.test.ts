@@ -8,6 +8,7 @@ import sitemap from '@/app/sitemap'
 import { siteConfig } from '@/config/site'
 import { games } from '@/data/games'
 import { locales } from '@/i18n/config'
+import { pageUrl } from '@/lib/metadata'
 import { imageSize } from './image-size'
 
 vi.mock('@/components/layout/site-header', () => ({ SiteHeader: () => null }))
@@ -69,5 +70,14 @@ describe('what Google reads for the site and its pages', () => {
 
   it('leaves lastmod out of the sitemap rather than stamping every page with the build date', () => {
     expect(sitemap().filter((entry) => entry.lastModified !== undefined)).toEqual([])
+  })
+
+  it('lists the same translations in the sitemap as in the page head, English as the fallback', async () => {
+    for (const locale of locales) {
+      const head = (await homeMetadata({ params: Promise.resolve({ locale }) })).alternates?.languages
+      const entry = sitemap().find((item) => item.url === pageUrl(locale, '/'))
+      expect(entry?.alternates?.languages).toEqual(head)
+      expect(head).toMatchObject({ 'x-default': siteConfig.siteUrl })
+    }
   })
 })

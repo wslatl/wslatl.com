@@ -13,9 +13,11 @@ import { Button } from '@/components/ui/button'
 import { games, ramNeedGb, type RamRow } from '@/data/games'
 import { gameComparisons } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
-import { cheapestPlanWithRam, formatPrice, smallestPlansWithRam, startingPrice } from '@/lib/pricing'
+import { formatPrice, gameEntryPlan, smallestPlansWithRam } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
 import { slugify } from '@/lib/utils'
+import { gameGuidesUrl } from '@/lib/knowledge-base'
+import { SiteLink } from '@/components/ui/site-link'
 import { Main } from '@/components/layout/main'
 import { localePath, type Locale } from '@/i18n/config'
 import { getLocale, setLocale } from '@/i18n/locale'
@@ -44,7 +46,7 @@ function PlansThatFit({ row }: { row: RamRow }) {
   if (fits.length === 0) {
     return (
       <Link
-        href={localePath(getLocale(), '/#contact')}
+        href={localePath(getLocale(), siteConfig.paths.contact)}
         className="text-link underline underline-offset-4 hover:text-foreground"
       >
         {t.tooBig}
@@ -72,15 +74,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const game = localizedGame(slug)
   if (!game) return {}
 
-  // The same "from" price the page shows: the cheapest plan that covers the
-  // smallest recommended setup.
-  const entry = cheapestPlanWithRam('game', ramNeedGb(game.recommendedRam[0]))
-  const price = formatPrice(entry?.plan.price ?? startingPrice('game'))
+  // The same "from" price the page shows. When no plan covers even the
+  // smallest setup, the page shows no price, so the search result does not
+  // either.
+  const entry = gameEntryPlan(game)
+  const price = entry ? formatPrice(entry.plan.price) : null
   const t = copy().games.detail
 
   return pageMetadata({
-    title: t.metaTitle(game.name, price),
-    description: t.metaDescription(game.name, price, game.tagline),
+    title: price ? t.metaTitle(game.name, price) : t.heading(game.name),
+    description: price
+      ? t.metaDescription(game.name, price, game.tagline)
+      : t.metaDescriptionNoPrice(game.name, game.tagline),
     path: `/games/${game.slug}`,
     locale,
   })
@@ -96,12 +101,14 @@ export default async function GamePage({ params }: PageProps) {
 
   const line = localizedProductLine('game')
   // The cheapest plan that covers the smallest recommended setup.
-  const entry = cheapestPlanWithRam('game', ramNeedGb(game.recommendedRam[0]))
+  const entry = gameEntryPlan(game)
   const related = localizedGames().filter((g) => g.category === game.category && g.slug !== game.slug).slice(0, 8)
   const faqs = game.faqs.map((faq, i) => ({ id: `${game.slug}-faq-${i}`, question: faq.q, answer: faq.a }))
   // Price comparisons for this game only; most games have none (data/pricing.ts).
   const claims = gameComparisons[game.slug]
   const tableClaim = claims?.table ? comparisonLine(claims.table) : null
+  // Setup guides on knowledge.wslatl.com, for the games that have them.
+  const guidesUrl = gameGuidesUrl(game.slug, locale)
 
   return (
     <>
@@ -141,6 +148,21 @@ export default async function GamePage({ params }: PageProps) {
             </Link>
             {t.games.detail.listedUnderSuffix}
           </p>
+          {guidesUrl && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t.games.detail.guidesIntro}{' '}
+              {/* Through SiteLink like the footer's link, so the knowledge base
+                  opens in a new tab from both, as every off-site link does. */}
+              <SiteLink
+                href={guidesUrl}
+                newTab={t.header.newTab}
+                hrefLang={locale}
+                className="text-link underline underline-offset-4 hover:text-foreground"
+              >
+                {t.games.detail.guidesLink(game.name)}
+              </SiteLink>
+            </p>
+          )}
 
         <section aria-labelledby="ram-heading" className="@container mt-16">
           <h2 id="ram-heading" className="text-2xl font-semibold tracking-tight text-foreground">
@@ -299,13 +321,15 @@ export default async function GamePage({ params }: PageProps) {
         {related.length > 0 && (
           <section aria-labelledby="related-heading" className="mt-16">
             <h2 id="related-heading" className="text-lg font-semibold tracking-tight text-foreground">
-              {t.games.detail.moreIn(game.category.toLowerCase())}
+              {t.games.detail.moreIn(game.category)}
             </h2>
+            {/* No prefetch: each chip would pull a whole game page as it scrolls into view. */}
             <ul className="mt-4 flex flex-wrap gap-2">
               {related.map((g) => (
                 <li key={g.slug}>
                   <Link
                     href={path(`/games/${g.slug}`)}
+                    prefetch={false}
                     className="inline-block rounded-full border px-3.5 py-1.5 text-sm text-foreground/85 transition-colors hover:border-foreground/30 hover:text-foreground"
                   >
                     {g.name}

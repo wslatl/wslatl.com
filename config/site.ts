@@ -16,6 +16,21 @@ export const siteConfig = {
   location: 'Missouri, USA',
   jurisdiction: 'WSLATL LLC, Missouri, USA',
   siteUrl: 'https://wslatl.com',
+  /**
+   * The knowledge base, linked directly rather than through a short link:
+   * every page there has its own address in each language, and a redirect
+   * in between would hide those links from search engines. See
+   * lib/knowledge-base.ts.
+   */
+  knowledgeBaseUrl: 'https://knowledge.wslatl.com',
+
+  /**
+   * The brand blue, matching --primary in app/globals.css, and the near-black
+   * page background. The browser theme colour (app/[locale]/layout.tsx) and
+   * the web app manifest (app/manifest.ts) both read these.
+   */
+  themeColor: '#0073c7',
+  backgroundColor: '#050505',
 
   // Short paths (/billing, /discord, ...) that redirect to each panel and
   // profile. Destinations live in config/links.json; see config/links.ts.
@@ -46,12 +61,6 @@ export const siteConfig = {
     mailingAddress: 'Missouri, United States',
 
     /**
-     * Fallback effective date, as YYYY-MM-DD. Only used if a document has
-     * no entry in `effectiveDates` below. Prefer adding an entry there.
-     */
-    effectiveDate: '2026-09-19',
-
-    /**
      * Per-document effective dates, as YYYY-MM-DD. They are written out in
      * the reader's language by formatLegalDate (i18n/dates.ts).
      *
@@ -75,15 +84,14 @@ export const siteConfig = {
   },
 } as const
 
-export type SiteConfig = typeof siteConfig
-
 /** Keys of the per-document effective date map. */
 export type LegalDocumentKey = keyof typeof siteConfig.legal.effectiveDates
 
 /**
- * Effective date for a single legal document, falling back to the shared date
- * if the document has no entry of its own.
+ * Effective date for a single legal document. Every document has its own
+ * entry in effectiveDates (LegalDocumentKey is built from that map), so
+ * there is nothing to fall back to.
  */
 export function legalEffectiveDate(doc: LegalDocumentKey): string {
-  return siteConfig.legal.effectiveDates[doc] ?? siteConfig.legal.effectiveDate
+  return siteConfig.legal.effectiveDates[doc]
 }

@@ -118,7 +118,7 @@ export const legalPages: LegalPage[] = [
 ]
 
 /** Every legal document is served at /legal/<slug>. */
-export const LEGAL_BASE_PATH = '/legal'
+const LEGAL_BASE_PATH = '/legal'
 
 /** The last path segment, for example privacy for the Privacy Policy. */
 export function legalSlug(page: LegalPage): string {

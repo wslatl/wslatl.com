@@ -3,17 +3,17 @@ import { localePath, type Locale } from '@/i18n/config'
 import type { Copy } from '@/i18n/copy/en'
 import type { Commitment, Feature } from '@/data/features'
 import type { Service } from '@/data/services'
-import { ramNeedGb, type GameEntry } from '@/data/games'
+import type { GameEntry } from '@/data/games'
 import type { Partner } from '@/data/partners'
 import type { ProductLine } from '@/data/pricing'
 import {
   hasReferralCode,
   partnerText,
+  platformName,
   referralDiscount,
   socialLinks,
-  socialPlatforms,
 } from '@/lib/partners'
-import { cheapestPlanWithRam, formatPrice, pricingHref, startingPrice } from '@/lib/pricing'
+import { formatPrice, gameEntryPlan, pricingHref, startingPrice } from '@/lib/pricing'
 
 /**
  * Discord-ready ads: plain text, written in Discord's markdown, that a visitor
@@ -191,11 +191,7 @@ export function partnerAd(
       ? [
           '',
           `**${a.findOnline(name)}**`,
-          ...links.map((link) =>
-            bullet(
-              `${link.platform === 'website' ? t.partners.website : socialPlatforms[link.platform].name}: <${link.href}>`,
-            ),
-          ),
+          ...links.map((link) => bullet(`${platformName(link.platform, t)}: <${link.href}>`)),
         ]
       : []
   return assemble(lines, extras, absoluteUrl(locale, `/partners/${partner.slug}`))
@@ -213,7 +209,7 @@ export function gameAd(
   why: string[] = [],
 ): string {
   const a = t.share.ad
-  const entry = cheapestPlanWithRam('game', ramNeedGb(game.recommendedRam[0]))
+  const entry = gameEntryPlan(game)
   const lines = [`## ${t.games.detail.heading(plain(game.name))}`, plain(game.tagline)]
   if (entry) lines.push('', perMonth(entry.plan.price, a.hostingFrom))
   const extras = [

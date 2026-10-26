@@ -3,7 +3,8 @@ import { siteConfig } from '@/config/site'
 import { defaultLocale, localePath, locales, openGraphLocales, type Locale } from '@/i18n/config'
 import { getLocale } from '@/i18n/locale'
 
-const ogImage = {
+/** The site's share picture, used by the layout and by any page without one of its own. */
+export const ogImage = {
   url: '/og-image.png',
   width: 1200,
   height: 630,
@@ -15,6 +16,18 @@ const ogImage = {
 export function pageUrl(locale: Locale, path: string): string {
   const localized = localePath(locale, path)
   return localized === '/' ? siteConfig.siteUrl : `${siteConfig.siteUrl}${localized}`
+}
+
+/**
+ * A page's address in every language, with the English one as the fallback
+ * for everyone else (x-default). The page head and the sitemap both list
+ * these, so they always agree.
+ */
+export function languageAlternates(path: string): Record<Locale | 'x-default', string> {
+  return {
+    ...(Object.fromEntries(locales.map((other) => [other, pageUrl(other, path)])) as Record<Locale, string>),
+    'x-default': pageUrl(defaultLocale, path),
+  }
 }
 
 interface PageMetadataInput {
@@ -54,10 +67,7 @@ export function pageMetadata({ title, description, path, absoluteTitle = false, 
     description,
     alternates: {
       canonical: url,
-      languages: {
-        ...Object.fromEntries(locales.map((other) => [other, pageUrl(other, path)])),
-        'x-default': pageUrl(defaultLocale, path),
-      },
+      languages: languageAlternates(path),
     },
     openGraph: {
       type: 'website',

@@ -7,15 +7,27 @@ import { rewriteTarget } from '@/i18n/routing'
  * lives in i18n/routing.ts, where it is covered by tests; everything that
  * reaches a route from here has a language app/[locale] recognises.
  *
- * The site has no Server Actions, so a request naming one (a Next-Action
- * header) is a scanner probing for one. It gets a plain 400 here: left to
- * Next, each one logs an error, and one that also asks for an RSC payload
- * ends in a 500. tests/proxy.test.ts fails if a Server Action is added.
+ * The site is read-only: it has no forms, no Server Actions and no route that
+ * takes anything but GET. So every other method gets a plain 405 here. Left
+ * to Next, a POST naming a Server Action (a Next-Action header) logs an error
+ * or ends in a 500, and a form-encoded POST without one skips the static page
+ * and renders it from scratch on every request. tests/proxy.test.ts fails if
+ * a Server Action is added.
  */
 export function proxy(request: NextRequest) {
-  if (request.headers.has('next-action')) return new NextResponse(null, { status: 400 })
+  const { pathname } = request.nextUrl
 
-  const target = rewriteTarget(request.nextUrl.pathname)
+  // The error overlay's endpoints, which only `next dev` serves. Some of them
+  // take a POST, so they are let through before the method check. In
+  // production nothing answers there, and the path is given a language like
+  // any other and gets our 404.
+  if (process.env.NODE_ENV === 'development' && pathname.startsWith('/__nextjs_')) return NextResponse.next()
+
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return new NextResponse(null, { status: 405, headers: { Allow: 'GET, HEAD' } })
+  }
+
+  const target = rewriteTarget(pathname)
   if (!target) return NextResponse.next()
 
   const url = request.nextUrl.clone()
@@ -24,7 +36,10 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Next's own assets and dev endpoints. The files served from the app root
-  // are handled in rewriteTarget, where a test can see the list.
-  matcher: ['/((?!_next/|__nextjs).*)'],
+  // Only Next's own assets skip the proxy. The matcher has to be a constant,
+  // so the dev-only endpoints are let through in proxy() instead; a pattern
+  // here broad enough to cover them also let /__nextjsanything/pricing reach
+  // app/[locale] with no language. The files served from the app root are
+  // handled in rewriteTarget, where a test can see the list.
+  matcher: ['/((?!_next/).*)'],
 }

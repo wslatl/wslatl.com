@@ -3,7 +3,7 @@ import { games } from '@/data/games'
 import { legalPages } from '@/data/legal'
 import { partners } from '@/data/partners'
 import { defaultLocale, locales } from '@/i18n/config'
-import { pageUrl } from '@/lib/metadata'
+import { languageAlternates, pageUrl } from '@/lib/metadata'
 
 /**
  * Every page in every language. Each entry lists its translations, so a
@@ -42,10 +42,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       alternates: {
         // The same set the page's own hreflang tags list, x-default included:
         // Google wants the two to agree.
-        languages: {
-          ...Object.fromEntries(locales.map((other) => [other, pageUrl(other, path)])),
-          'x-default': pageUrl(defaultLocale, path),
-        },
+        languages: languageAlternates(path),
       },
     })),
   )

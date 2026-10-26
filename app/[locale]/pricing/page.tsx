@@ -7,6 +7,7 @@ import { PlanGroupTable } from '@/components/pricing/plan-group'
 import { SectionNav } from '@/components/pricing/section-nav'
 import { ShareLineAd } from '@/components/share/ads'
 import { Button } from '@/components/ui/button'
+import { siteConfig } from '@/config/site'
 import { HowItWorks } from '@/components/sections/how-it-works'
 import type { ProductLine } from '@/data/pricing'
 import { uptimeTarget } from '@/data/sla'
@@ -154,7 +155,7 @@ export default async function PricingPage({ params }: PageProps) {
               <p className="mt-2 max-w-2xl leading-relaxed text-muted-foreground">{t.custom.body}</p>
             </div>
             <Button asChild variant="outline" size="lg">
-              <Link href={localePath(locale, '/#contact')}>{t.custom.cta}</Link>
+              <Link href={localePath(locale, siteConfig.paths.contact)}>{t.custom.cta}</Link>
             </Button>
           </section>
 
