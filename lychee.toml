@@ -27,6 +27,10 @@ exclude = [
   # itself is still checked by scripts/check-site.mjs (the Site health run),
   # which confirms /trustpilot goes to the address in config/links.json.
   '^https://wslatl\.com/trustpilot/?$',
+  # X answers 403 to anything that is not a signed-in browser, so every
+  # partner profile on it reads as broken. The tests already check each one
+  # is a plain https://x.com/<handle> address; open it by hand to check it.
+  '^https://(www\.)?(x|twitter)\.com/',
   # Cloudflare rewrites any mailto link it sees into one of these, and they
   # only resolve in a browser. Pages built since September 2026 carry no
   # mailto link at all, so these disappear as the site is deployed.
