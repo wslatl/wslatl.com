@@ -18,7 +18,7 @@ export function pageUrl(locale: Locale, path: string): string {
 }
 
 interface PageMetadataInput {
-  /** Page title. The layout template appends " | WSLATL LLC". */
+  /** Page title. The layout template appends " | WSLATL". */
   title: string
   description: string
   /** Route path without a language prefix, e.g. `/pricing`. */
@@ -47,7 +47,7 @@ export function pageMetadata({ title, description, path, absoluteTitle = false, 
   const language = locale ?? getLocale()
   const shareImage = image ?? ogImage
   const url = pageUrl(language, path)
-  const fullTitle = absoluteTitle ? title : `${title} | ${siteConfig.name}`
+  const fullTitle = absoluteTitle ? title : `${title} | ${siteConfig.brand}`
 
   return {
     title: absoluteTitle ? { absolute: title } : title,
@@ -63,7 +63,7 @@ export function pageMetadata({ title, description, path, absoluteTitle = false, 
       type: 'website',
       locale: openGraphLocales[language],
       alternateLocale: locales.filter((other) => other !== language).map((other) => openGraphLocales[other]),
-      siteName: siteConfig.name,
+      siteName: siteConfig.brand,
       url,
       title: fullTitle,
       description,

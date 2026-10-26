@@ -23,6 +23,7 @@ Every page is static. There is no CMS and no database: content lives in `data/*.
 app/
   globals.css              Tailwind v4 entry, design tokens, the few custom styles.
   sitemap.ts, robots.ts    Every page in every language, from the same data the pages use.
+  manifest.ts              /manifest.webmanifest: the name and icons for a home-screen shortcut.
   company.json/route.ts    /company.json: the company profile for the billing panel, written at build time.
   [locale]/                Every page, once, for all five languages (see Languages).
     layout.tsx             Root layout: language, fonts, default metadata, Organization JSON-LD, skip link.
@@ -56,7 +57,7 @@ content/legal/             The text of each policy; index.ts maps each document 
 data/                      Everything else the pages render (see below).
 i18n/                      Languages: the current one, the dictionaries, the translations.
 lib/                       pricing helpers, pageMetadata(), cn() and slugify().
-scripts/                   Checks that need a build or a live site (see Automation).
+scripts/                   Checks that need a build or a live site (see Automation), and keep-old-assets.mjs (see Deploying).
 tests/                     Vitest suites for data, links, and house style.
 ```
 
@@ -196,11 +197,26 @@ Taking someone down is two steps on the same day: delete their entry and their f
 
 ---
 
+## Search engines
+
+- **Site name.** Google shows "WSLATL" as the site's name in results. It reads that from the `WebSite` structured data, which only the English home page carries (Google ignores it anywhere else), and from `application-name` and `og:site_name`. All three come from `siteConfig.brand`, and every title ends with it. The `Organization` data on every page has the legal name, "WSLATL LLC", with "WSLATL" as an `alternateName`, so the two read as one brand.
+- **Titles and descriptions.** The home page title starts with the brand. Game pages say the game and the real starting price, in the words people search with in each language ("DayZ Server mieten", "hébergement de serveur"). Prices come from `data/pricing.ts`, never typed. `tests/seo.test.ts` checks the brand and that no two game pages share a title.
+- **Sitemap.** It has no `lastmod`. Google only trusts that date when it is accurate every time, and a build date on every page teaches it to ignore the field. Add one back only with a real per-page date.
+- **Icons.** See Images.
+
 ## Images
 
 `images.unoptimized` is on, so every file in `public/` is served as-is. Export images at twice their display size before adding them: client logos are trimmed WebP at 96px tall, team photos are 192px square WebP. Partner pictures go in `public/partners/<slug>/` (see Partners). `public/og-image.png` (1200x630) is rendered from the site's own fonts and logo; re-export it if the slogan or branding changes.
 
+The icons are all the white WSLATL mark on the site's near-black tile (`#050505`), so they read on a white results page and in a light browser tab. A white mark on a transparent background is invisible there. `favicon.ico` holds 16, 32 and 48px, `icon-192.png` is the one Google uses beside results (it takes PNG or ICO, not SVG, square and larger than 48px), `favicon.svg` is for current browsers, `apple-icon.png` (180px, square corners, iOS rounds them) is for iPhones, and `icon-512.png` and `icon-maskable-512.png` are for the web app manifest. `tests/seo.test.ts` checks their sizes. Each one must also be listed in `rootFiles` in `i18n/routing.ts`.
+
 ---
+
+## Deploying
+
+`npm run build` keeps the stylesheets and scripts of earlier builds for 30 days (`scripts/keep-old-assets.mjs`, run before and after `next build` as `prebuild` and `postbuild`). Every build renames them, because their names carry a hash of their content, and `next build` deletes the old ones. Google fetches a page's HTML on one day and renders it later with the files that HTML names, so without the old files it renders the page without its stylesheet. The kept files wait in `.next-static-history/` (gitignored); delete that folder only to start fresh.
+
+This only works if the server builds with `npm run build`, not `npx next build`, and keeps `.next-static-history/` between restarts.
 
 ## Local development
 

@@ -70,9 +70,9 @@ export const en = {
     reveal: 'Show email address',
   },
   home: {
-    metaTitle: 'Cheap VPS & Game Server Hosting | WSLATL LLC',
-    metaDescription:
-      'Affordable VPS hosting, game server hosting (Minecraft, Rust, ARK, FiveM & more), and dedicated servers with DDoS protection and NVMe storage. Missouri-based, and we actually pick up.',
+    metaTitle: 'WSLATL: Game Server, VPS and Dedicated Hosting in Missouri',
+    metaDescription: (game: string, vps: string) =>
+      `WSLATL is a small, application-only hosting company in Missouri. Game servers from ${game}, VPS from ${vps}, dedicated servers, and we actually pick up.`,
     hero: {
       // Kept in English everywhere: this is the brand line.
       lineOne: 'Hosting that',
@@ -198,9 +198,9 @@ export const en = {
     },
   },
   pricing: {
-    metaTitle: 'Cheap VPS & Game Server Hosting Pricing',
+    metaTitle: 'VPS and Game Server Pricing, Every Plan Listed',
     metaDescription: (vps: string, game: string) =>
-      `Published monthly pricing for VPS hosting from ${vps} and game server hosting from ${game}, on SATA SSD or NVMe. No teaser rates, and at least 30 days' notice before any price increase.`,
+      `VPS from ${vps} and game servers from ${game} a month, every spec published. No teaser rates, and at least 30 days' notice before any price goes up.`,
     heading: 'Pricing',
     intro:
       'Every plan is billed monthly in US dollars. No renewal price traps: these are the regular monthly prices, and any increase comes with at least 30 days of written notice.',
@@ -237,9 +237,9 @@ export const en = {
     },
   },
   games: {
-    metaTitle: (more: number) => `Game Server Hosting: Minecraft, Rust, ARK, FiveM & ${more}+ More`,
+    metaTitle: (more: number) => `Game Server Hosting: Minecraft, Rust, ARK and ${more}+ More`,
     metaDescription: (price: string) =>
-      `DDoS-protected game server hosting from ${price}/mo on NVMe and SATA SSD hardware. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld and dozens more, all on the same Pterodactyl panel.`,
+      `Game servers from ${price}/mo, priced by RAM instead of by game. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld and more on one Pterodactyl panel.`,
     heading: 'Game server hosting',
     crumb: 'Games',
     introPrefix:
@@ -261,7 +261,9 @@ export const en = {
     fromPrice: 'from {price}/mo',
     toStart: '{ram} to start',
     detail: {
-      metaTitle: (game: string) => `${game} Server Hosting`,
+      metaTitle: (game: string, price: string) => `${game} Server Hosting from ${price}/mo`,
+      metaDescription: (game: string, price: string, tagline: string) =>
+        `Run your own ${game} server with WSLATL from ${price} a month. ${tagline}`,
       heading: (game: string) => `${game} server hosting`,
       order: (game: string) => `Order your ${game} server`,
       comparePlans: 'Compare plans',

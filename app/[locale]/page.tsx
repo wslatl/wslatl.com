@@ -12,8 +12,10 @@ import { Reviews } from '@/components/sections/reviews'
 import { FAQ } from '@/components/sections/faq'
 import { Contact } from '@/components/sections/contact'
 import { pageMetadata } from '@/lib/metadata'
+import { formatPrice, startingPrice } from '@/lib/pricing'
+import { siteConfig } from '@/config/site'
 import { Main } from '@/components/layout/main'
-import type { Locale } from '@/i18n/config'
+import { defaultLocale, type Locale } from '@/i18n/config'
 import { setLocale } from '@/i18n/locale'
 import { copy } from '@/i18n/copy'
 import { localizedFaqs } from '@/i18n/content'
@@ -26,7 +28,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { locale } = await params
   setLocale(locale)
   const t = copy().home
-  return pageMetadata({ title: t.metaTitle, description: t.metaDescription, path: '/', absoluteTitle: true, locale })
+  return pageMetadata({
+    title: t.metaTitle,
+    description: t.metaDescription(formatPrice(startingPrice('game')), formatPrice(startingPrice('vps'))),
+    path: '/',
+    absoluteTitle: true,
+    locale,
+  })
 }
 
 export default async function Home({ params }: PageProps) {
@@ -44,9 +52,22 @@ export default async function Home({ params }: PageProps) {
     })),
   }
 
+  // The name Google shows for the site in results. It reads this from the
+  // home page of the domain only, so the language home pages leave it out.
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${siteConfig.siteUrl}/#website`,
+    name: siteConfig.brand,
+    alternateName: [siteConfig.name, 'wslatl.com'],
+    url: siteConfig.siteUrl,
+    publisher: { '@id': `${siteConfig.siteUrl}/#organization` },
+  }
+
   return (
     <>
       <SiteHeader />
+      {locale === defaultLocale && <JsonLd data={websiteJsonLd} />}
       <JsonLd data={faqJsonLd} />
       <Main>
         <Hero />

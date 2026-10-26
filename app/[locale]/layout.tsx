@@ -18,18 +18,19 @@ const instrumentSerif = Instrument_Serif({
   variable: '--font-serif',
 })
 
-const title = 'Cheap VPS & Game Server Hosting | WSLATL LLC'
+// Only a fallback: every page sets its own title and description.
+const title = `${siteConfig.brand}: Game Server, VPS and Dedicated Hosting in Missouri`
 const description =
-  'Affordable VPS hosting, game server hosting (Minecraft, Rust, ARK, FiveM & more), and dedicated servers with DDoS protection and NVMe storage. Missouri-based, and we actually pick up.'
+  'WSLATL is a small, application-only hosting company in Missouri: game servers, VPS, dedicated servers and web hosting, and we actually pick up.'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
   title: {
     default: title,
-    template: '%s | WSLATL LLC',
+    template: `%s | ${siteConfig.brand}`,
   },
   description,
-  applicationName: siteConfig.name,
+  applicationName: siteConfig.brand,
   keywords: [
     'WSLATL',
     'cheap VPS hosting',
@@ -52,16 +53,23 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
+  // Google shows the favicon beside every result. It takes PNG or ICO (not
+  // SVG), square and larger than 48px, so the 192px PNG is listed for it; the
+  // ICO holds 16, 32 and 48 for older browsers, and the SVG is for current
+  // ones. All are a white mark on a dark tile, which reads on light and dark.
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.ico', sizes: '16x16 32x32 48x48' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
       { url: '/favicon.svg', type: 'image/svg+xml' },
     ],
+    apple: [{ url: '/apple-icon.png', sizes: '180x180' }],
   },
+  manifest: '/manifest.webmanifest',
   openGraph: {
     type: 'website',
     locale: openGraphLocales.en,
-    siteName: siteConfig.name,
+    siteName: siteConfig.brand,
     title,
     description,
     images: [
@@ -122,9 +130,15 @@ export const viewport: Viewport = {
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
+  '@id': `${siteConfig.siteUrl}/#organization`,
   name: siteConfig.name,
+  // The names people search for us by. "WSLATL" also names the site itself
+  // (the WebSite data on the home page), so the two read as one brand.
+  alternateName: [siteConfig.brand, `${siteConfig.brand} Hosting`],
   url: siteConfig.siteUrl,
+  // 512px square, a white mark on near-black: legible on a white results page.
   logo: `${siteConfig.siteUrl}/logo.png`,
+  slogan: 'Hosting that actually gives a damn.',
   description: siteConfig.description,
   address: {
     '@type': 'PostalAddress',

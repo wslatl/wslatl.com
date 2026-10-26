@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 import { games, ramNeedGb, type RamRow } from '@/data/games'
 import { gameComparisons } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
-import { cheapestPlanWithRam, formatPrice, smallestPlansWithRam } from '@/lib/pricing'
+import { cheapestPlanWithRam, formatPrice, smallestPlansWithRam, startingPrice } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
 import { slugify } from '@/lib/utils'
 import { Main } from '@/components/layout/main'
@@ -74,9 +74,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const game = localizedGame(slug)
   if (!game) return {}
 
+  // The same "from" price the page shows: the cheapest plan that covers the
+  // smallest recommended setup.
+  const entry = cheapestPlanWithRam('game', ramNeedGb(game.recommendedRam[0]))
+  const price = formatPrice(entry?.plan.price ?? startingPrice('game'))
+  const t = copy().games.detail
+
   return pageMetadata({
-    title: copy().games.detail.metaTitle(game.name),
-    description: `${copy().games.detail.heading(game.name)}. ${game.tagline}`,
+    title: t.metaTitle(game.name, price),
+    description: t.metaDescription(game.name, price, game.tagline),
     path: `/games/${game.slug}`,
     locale,
   })
