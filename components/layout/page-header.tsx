@@ -45,7 +45,7 @@ export function Breadcrumbs({ breadcrumbs, crumbLabel, path, className }: Breadc
 
   return (
     <>
-      <nav aria-label="Breadcrumb" className={cn('mb-8 print:hidden', className)}>
+      <nav aria-label={copy().breadcrumbs.label} className={cn('mb-8 print:hidden', className)}>
         <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted-foreground">
           {trail.map((crumb) => (
             <li key={crumb.href} className="flex items-center gap-1.5">

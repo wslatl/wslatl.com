@@ -191,6 +191,14 @@ describe('partner ad', () => {
     expect(plain('# a')).toBe('\\# a')
   })
 
+  it('leaves no way around the escaping', () => {
+    // Doubled @, a marker behind spaces, a masked link, a numbered list.
+    expect(plain('@@everyone and @@@here')).not.toMatch(/@(everyone|here)/i)
+    expect(plain('   # Heading')).toBe('\\# Heading')
+    expect(plain('[click](https://example.com)')).toBe('\\[click\\](https://example.com)')
+    expect(plain('1. first')).toBe('1\\. first')
+  })
+
   it('follows the language of the page', () => {
     expect(partnerAd(ctx('de'), withCode)).toContain('Empfehlungscode: `WITHCODE10`')
     expect(partnerAd(ctx('es'), withCode)).toContain('Código de referido')

@@ -9,6 +9,7 @@ export const pt: Copy = {
     getStarted: 'Começar',
     openMenu: 'Menu',
     closeMenu: 'Fechar menu',
+    mainNav: 'Principal',
     newTab: ' (abre em uma nova aba)',
     login: 'Entrar',
     clientPanels: 'Painéis do cliente',
@@ -34,7 +35,7 @@ export const pt: Copy = {
     register: { label: 'Solicitar acesso', description: 'Novo por aqui? Solicite uma conta' },
   },
   footer: {
-    blurb: (location: string) => `Hospedagem privada tocada por uma equipe pequena em ${location}. Hosting that actually gives a damn.`,
+    blurb: (location: string) => `Hospedagem privada tocada por uma equipe pequena em ${location}.`,
     columns: {
       hosting: 'Hospedagem',
       company: 'Empresa',
@@ -70,7 +71,7 @@ export const pt: Copy = {
       emphasis: 'actually',
       lineTwo: 'gives a damn.',
       intro:
-        'Já trabalhamos dentro de empresas de hospedagem. Sabemos o que dá errado. A WSLATL existe para consertar isso: hospedagem VPS acessível, hospedagem de Minecraft e de servidores de jogos, e servidores dedicados, com uma equipe que realmente atende.',
+        'Já trabalhamos dentro de empresas de hospedagem. Sabemos o que dá errado. A WSLATL existe para consertar isso: hospedagem VPS com todos os preços publicados, hospedagem de Minecraft e de servidores de jogos, e servidores dedicados, com uma equipe que realmente atende.',
       seePlans: 'Ver planos e preços',
       products: 'Produtos',
       entries: {
@@ -160,7 +161,7 @@ export const pt: Copy = {
       heading: 'Perguntas frequentes',
       stillNotSure: 'Ainda na dúvida?',
       askOnDiscord: 'Fale com a gente no Discord',
-      alwaysAround: '. Estamos sempre por aqui.',
+      alwaysAround: '. Costumamos responder em menos de uma hora no horário ativo.',
     },
     contact: {
       heading: 'Uma empresa de hospedagem que trata você como gente. Imagina só.',
@@ -215,6 +216,8 @@ export const pt: Copy = {
       ram: 'RAM',
       storage: 'Armazenamento',
       traffic: 'Tráfego',
+      popular: 'Popular',
+      notAvailable: 'n/d',
       price: 'Preço',
       order: 'Pedir',
       orderPlan: (plan: string) => ` ${plan} (abre em uma nova aba)`,
@@ -228,7 +231,7 @@ export const pt: Copy = {
     },
   },
   games: {
-    metaTitle: (more: number) => `Hospedagem de servidores de jogos: Minecraft, Rust, ARK e mais ${more}+`,
+    metaTitle: (more: number) => `Servidores de jogos: Minecraft, Rust, ARK e mais ${more}+`,
     metaDescription: (price: string) =>
       `Servidores de jogos a partir de ${price}/mês, cobrados por RAM e não por jogo. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld e mais em um painel Pterodactyl.`,
     heading: 'Hospedagem de servidores de jogos',
@@ -252,7 +255,7 @@ export const pt: Copy = {
     fromPrice: 'a partir de {price}/mês',
     toStart: '{ram} para começar',
     detail: {
-      metaTitle: (game: string, price: string) => `Hospedagem de servidor ${game} a partir de ${price}/mês`,
+      metaTitle: (game: string, price: string) => `Hospedagem ${game} a partir de ${price}/mês`,
       metaDescription: (game: string, price: string, tagline: string) =>
         `Alugue seu próprio servidor de ${game} na WSLATL a partir de ${price} por mês. ${tagline}`,
       heading: (game: string) => `Hospedagem de servidor de ${game}`,
@@ -313,7 +316,7 @@ export const pt: Copy = {
   partners: {
     metaTitle: 'Parceiros oficiais',
     metaDescription: (percent: string) =>
-      `Criadores e comunidades com quem trabalhamos, cada um com seu próprio código de indicação. Cadastre-se com um deles e ganhe ${percent} de desconto na primeira fatura da sua hospedagem, exceto em servidores dedicados.`,
+      `Criadores e comunidades com quem trabalhamos. Com o código de um parceiro, ${percent} de desconto na sua primeira fatura de hospedagem, exceto servidores dedicados.`,
     metaDescriptionNoCodes:
       'Criadores e comunidades com quem trabalhamos, aprovados pela nossa equipe. Veja quem são e onde encontrá-los na internet.',
     emptyMetaDescription:
@@ -432,5 +435,6 @@ export const pt: Copy = {
   },
   breadcrumbs: {
     home: 'Início',
+    label: 'Trilha de navegação',
   },
 }

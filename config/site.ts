@@ -9,6 +9,8 @@ export const siteConfig = {
    * the titles end with (app/[locale]/layout.tsx and lib/metadata.ts).
    */
   brand: 'WSLATL',
+  /** Never translated: it stays in English on every page, marked lang="en". */
+  slogan: 'Hosting that actually gives a damn.',
   description: 'Missouri-based private hosting company offering dedicated servers, game hosting, VPS, and web hosting.',
   shortDescription: 'Private hosting, personal service.',
   location: 'Missouri, USA',

@@ -30,7 +30,7 @@ export const leadFeature: Feature = {
   id: 'real-person',
   title: 'You talk to a real person. Every time.',
   description:
-    'No bot wall and no scripted responses. Open a ticket in your billing portal, ping us on Discord, or DM us directly, and you get someone who knows what they are doing and cares about your server.',
+    'Game server plans include always-on DDoS mitigation at no extra cost. VPS, web and game hosting each carry a monthly uptime target, with SLA credits if we miss it.',
 }
 
 export const features: Feature[] = [
@@ -39,7 +39,7 @@ export const features: Feature[] = [
     title: 'Hardware that holds up',
     icon: Cpu,
     description:
-      'NVMe SSDs on Premium and SATA SSDs on Budget, high frequency CPUs, redundant network paths, and low latency routing. Built to run hard without cutting corners.',
+      'Premium runs on an AMD Ryzen 9 3900X with NVMe drives in RAID 1, in Los Angeles. Budget runs on an Intel Core i7-6700K with SATA SSDs in RAID 1, in New York City: an older, busier CPU, which is why it costs less.',
   },
   {
     id: 'uptime',

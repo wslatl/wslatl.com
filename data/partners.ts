@@ -25,7 +25,7 @@ export type SocialPlatform = (typeof socialPlatformIds)[number]
 export interface Partner {
   /** The profile's address, /partners/<slug>: lowercase letters, digits and hyphens. */
   slug: string
-  /** Their name as they write it. Never translated. */
+  /** Their name as they write it, up to 60 characters. Never translated. */
   name: string
   /** One line under the name, up to 80 characters. */
   tagline: PartnerText
@@ -61,8 +61,12 @@ export interface Partner {
   featured?: boolean
 }
 
-/** Longest tagline and description, in characters, in any language. */
-export const partnerTextLimits = { tagline: 80, description: 600 } as const
+/**
+ * Longest name, tagline and description, in characters, in any language. The
+ * name limit keeps a partner's Discord ad (lib/share.ts) inside Discord's
+ * 2000 characters, since the name is a line the ad never drops.
+ */
+export const partnerTextLimits = { name: 60, tagline: 80, description: 600 } as const
 
 /**
  * A referral code as the billing panel stores it: letters and digits, at
@@ -156,6 +160,22 @@ export const partners: Partner[] = [
     games: ['fivem'],
     socials: {
       discord: 'https://discord.gg/sseaUasVEt',
+    },
+  },
+  {
+    slug: 'cwgaming32',
+    name: 'CWGaming32',
+    tagline: 'Pacific Coast Roleplay, the best Cali-based FiveM server',
+    description:
+      'I am a very persistent person who tries hard to do what I can. I develop, code and make things for people and my community.',
+    avatar: '/partners/cwgaming32/avatar.webp',
+    banner: '/partners/cwgaming32/banner.webp',
+    referralCode: 'CWGAMING32',
+    since: '2026-10',
+    games: ['fivem'],
+    socials: {
+      discord: 'https://discord.gg/NNgS5c2rb8',
+      tiktok: 'https://www.tiktok.com/@cwgaming32',
     },
   },
 ]

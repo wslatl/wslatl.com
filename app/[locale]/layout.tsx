@@ -31,19 +31,6 @@ export const metadata: Metadata = {
   },
   description,
   applicationName: siteConfig.brand,
-  keywords: [
-    'WSLATL',
-    'cheap VPS hosting',
-    'game server hosting',
-    'Minecraft server hosting',
-    'dedicated server hosting',
-    'Missouri hosting',
-    'DDoS protected hosting',
-    'NVMe VPS',
-    'Pterodactyl hosting',
-    'private hosting',
-    'application-only hosting',
-  ],
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
   publisher: siteConfig.name,
@@ -138,7 +125,7 @@ const organizationJsonLd = {
   url: siteConfig.siteUrl,
   // 512px square, a white mark on near-black: legible on a white results page.
   logo: `${siteConfig.siteUrl}/logo.png`,
-  slogan: 'Hosting that actually gives a damn.',
+  slogan: siteConfig.slogan,
   description: siteConfig.description,
   address: {
     '@type': 'PostalAddress',

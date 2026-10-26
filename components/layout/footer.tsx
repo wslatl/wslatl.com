@@ -30,7 +30,9 @@ export function Footer() {
           >
             <Wordmark />
           </Link>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{t.footer.blurb(siteConfig.location)}</p>
+          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+            {t.footer.blurb(siteConfig.location)} <span lang="en">{siteConfig.slogan}</span>
+          </p>
           <p className="mt-4 text-sm">
             <Email name="support" className="text-foreground hover:text-link" />
           </p>
@@ -47,6 +49,7 @@ export function Footer() {
                   <li key={`${col.title}-${link.label}`}>
                     <SiteLink
                       href={link.href}
+                      newTab={t.header.newTab}
                       className="text-muted-foreground transition-colors break-words hyphens-auto hover:text-foreground"
                     >
                       {link.label}
@@ -63,7 +66,7 @@ export function Footer() {
         <div className="shell flex flex-col gap-2 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>{t.footer.rights(copyrightYear, siteConfig.legal.companyName)}</p>
           <p>
-            <SiteLink href={siteConfig.links.credits} className="transition-colors hover:text-foreground">
+            <SiteLink href={siteConfig.links.credits} newTab={t.header.newTab} className="transition-colors hover:text-foreground">
               {siteConfig.credits.label}
             </SiteLink>
           </p>

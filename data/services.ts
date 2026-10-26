@@ -27,7 +27,7 @@ export const services: Service[] = [
     id: 'game',
     title: 'Game server hosting',
     description:
-      'Game servers with a clean control panel and zero headache. We keep it fast, we keep it online, and if something breaks we fix it.',
+      'Game servers on a Pterodactyl panel, priced by RAM rather than by game. If something breaks, someone on our team fixes it.',
     features: ['Pterodactyl panel included', 'DDoS protection built in', 'Mod and plugin support'],
     pricing: 'game',
   },
@@ -42,7 +42,7 @@ export const services: Service[] = [
     id: 'web',
     title: 'Web hosting',
     description:
-      'Reliable hosting for websites and web apps, managed by us, with a real person to contact if things go sideways.',
+      'Websites and web apps on cPanel, managed by us, with a real person to contact if things go sideways.',
     features: ['Free SSL certificates', 'cPanel with one-click app installs', 'Email hosting included', 'Monthly backups included'],
   },
 ]

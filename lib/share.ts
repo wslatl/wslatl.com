@@ -45,29 +45,36 @@ export function absoluteUrl(locale: Locale, path: string): string {
 
 /**
  * Text that came from somebody else (a partner's name or tagline) made safe
- * to paste: no angle brackets (so no <@id> mention can be written), no
- * @everyone or @here, and Discord's own formatting characters shown as typed.
+ * to paste: one line, no angle brackets (so no <@id> mention can be written),
+ * no @everyone or @here however many @ come first, and Discord's own
+ * formatting shown as typed: markdown characters, [masked](links), and a
+ * heading, quote or list marker at the start. Spaces are collapsed first, so
+ * a marker cannot hide behind them.
  */
 export function plain(text: string): string {
   return text
-    .replace(/[<>]/g, '')
-    .replace(/@(everyone|here)/gi, '$1')
-    .replace(/[\\*_~`|]/g, (char) => `\\${char}`)
-    .replace(/^([#>-])/gm, '\\$1')
     .replace(/\s+/g, ' ')
     .trim()
+    .replace(/[<>]/g, '')
+    .replace(/@+(?=everyone|here)/gi, '')
+    .replace(/[\\*_~`|[\]]/g, (char) => `\\${char}`)
+    .replace(/^([#>-])/, '\\$1')
+    .replace(/^(\d+)\./, '$1\\.')
 }
 
 /**
- * Joins an ad together. `lines` are always kept; each of `extras` is added in
- * order only while the whole ad still fits in Discord's limit, so a long
- * list is cut short instead of the message being refused.
+ * Joins an ad together. `lines` are always kept; `extras` are added in order
+ * until the next one would not fit in Discord's limit, and none after it, so
+ * a long list is cut short at its end instead of the message being refused.
+ * (Skipping one that does not fit and carrying on could keep a list's bullets
+ * while dropping the heading above them.)
  */
 function assemble(lines: string[], extras: string[], url: string): string {
   const tail = `\n\n${url}`
   let body = lines.join('\n')
   for (const extra of extras) {
-    if (body.length + 1 + extra.length + tail.length <= discordLimit) body += `\n${extra}`
+    if (body.length + 1 + extra.length + tail.length > discordLimit) break
+    body += `\n${extra}`
   }
   return body.replace(/\n{3,}/g, '\n\n').replace(/\n+$/, '') + tail
 }
