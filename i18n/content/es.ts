@@ -12,7 +12,7 @@ export const es: ContentTranslation = {
     game: {
       title: 'Hosting de servidores de juego',
       description:
-        'Servidores de juego con un panel de control limpio y cero quebraderos de cabeza. Los mantenemos rápidos, los mantenemos en línea y, si algo se rompe, lo arreglamos.',
+        'Servidores de juego en un panel Pterodactyl, con precio por RAM y no por juego. Si algo se rompe, alguien de nuestro equipo lo arregla.',
       features: ['Panel Pterodactyl incluido', 'Protección DDoS integrada', 'Compatible con mods y plugins'],
     },
     dedicated: {
@@ -24,7 +24,7 @@ export const es: ContentTranslation = {
     web: {
       title: 'Hosting web',
       description:
-        'Hosting fiable para sitios y aplicaciones web, gestionado por nosotros, con una persona de verdad a quien escribir si algo se tuerce.',
+        'Webs y aplicaciones web en cPanel, gestionadas por nosotros, con una persona real a la que escribir si algo se tuerce.',
       features: ['Certificados SSL gratuitos', 'cPanel con instalación de aplicaciones en un clic', 'Hosting de correo incluido', 'Copias de seguridad mensuales incluidas'],
     },
   },
@@ -43,12 +43,12 @@ export const es: ContentTranslation = {
     hardware: {
       title: 'Hardware que aguanta',
       description:
-        'SSD NVMe en Premium y SATA SSD en los planes económicos, CPU de alta frecuencia, rutas de red redundantes y enrutado de baja latencia. Hecho para trabajar duro sin recortar por el camino.',
+        'Premium funciona con un AMD Ryzen 9 3900X y discos NVMe en RAID 1, en Los Ángeles. Budget, con un Intel Core i7-6700K y SSD SATA en RAID 1, en Nueva York: una CPU más antigua y más cargada, y por eso cuesta menos.',
     },
     uptime: {
       title: 'En línea cuando importa',
       description:
-        'Mitigación de DDoS integrada desde el primer momento. Si algo intenta tumbarte, nos encargamos.',
+        'Los planes de servidores de juego incluyen mitigación de DDoS siempre activa sin coste extra. El hosting VPS, web y de juegos tiene un objetivo de disponibilidad mensual, con créditos del SLA si no lo cumplimos.',
     },
     'application-only': {
       title: 'Exigentes, y por un buen motivo',
@@ -60,7 +60,7 @@ export const es: ContentTranslation = {
     'getting-started': {
       question: '¿Cómo empiezo?',
       answer:
-        'Entra en billing.wslatl.com/register y solicita acceso. Un administrador revisa todas las solicitudes y las aprueba antes de que puedas acceder a ningún servicio. Una vez aprobada, puedes pedir un servidor de juego o un VPS en el portal de facturación y pagar en línea. Para un servidor dedicado o hosting web, escríbenos por Discord o abre un ticket de facturación y lo configuramos contigo.',
+        'Entra en wslatl.com/register y solicita acceso. Un administrador revisa todas las solicitudes y las aprueba antes de que puedas acceder a ningún servicio. Una vez aprobada, puedes pedir un servidor de juego o un VPS en el portal de facturación y pagar en línea. Para un servidor dedicado o hosting web, escríbenos por Discord o abre un ticket de facturación y lo configuramos contigo.',
     },
     'what-makes-you-different': {
       question: '¿Qué diferencia a WSLATL de las grandes empresas de hosting?',
@@ -75,7 +75,7 @@ export const es: ContentTranslation = {
     'game-server-cost': {
       question: '¿Cuánto cuesta el hosting de servidores de juego?',
       answer:
-        'Los servidores de juego económicos empiezan en {gamePrice} al mes por {gameRam} GB de RAM, y los Premium en {gamePremiumPrice}. Los VPS económicos empiezan en {vpsPrice}, y los VPS Premium en {vpsPremiumPrice}. Premium funciona con un AMD Ryzen 9 3900X con NVMe. Los económicos tienen las mismas especificaciones en un Intel Core i7-6700K más antiguo y más cargado, con SATA SSD, así que pueden ir más lentos en las horas de más uso. La página de precios tiene el desglose completo.',
+        'Los servidores de juego Budget empiezan en {gamePrice} al mes por {gameRam} GB de RAM, y los Premium en {gamePremiumPrice}. Los VPS Budget empiezan en {vpsPrice}, y los VPS Premium en {vpsPremiumPrice}. Premium funciona con un AMD Ryzen 9 3900X con NVMe. Los Budget tienen las mismas especificaciones en un Intel Core i7-6700K más antiguo y más cargado, con SATA SSD, así que pueden ir más lentos en las horas de más uso. La página de precios tiene el desglose completo.',
     },
     'response-time': {
       question: '¿Cuánto se tarda de verdad en recibir respuesta?',
@@ -95,7 +95,7 @@ export const es: ContentTranslation = {
     'vps-vs-shared': {
       question: '¿Es mejor el hosting VPS que el compartido?',
       answer:
-        'Para casi cualquiera que tenga un proyecto serio, sí. Un VPS te da CPU y RAM dedicadas que nadie más toca, acceso root completo y ningún riesgo de que una cuenta vecina hunda tu rendimiento. El hosting compartido es más barato, pero compartes recursos con desconocidos.',
+        'Para casi cualquiera que tenga un proyecto serio, sí. Un VPS te da tu propia parte de CPU y RAM, acceso root completo y el sistema operativo que elijas. Los planes Premium funcionan con un AMD Ryzen 9 3900X; los Budget, con una CPU más antigua y más cargada, así que pueden ir más lentos en horas punta. El hosting compartido es más barato, pero todas las webs del servidor tiran de los mismos recursos.',
     },
     'ddos-protection': {
       question: '¿Se incluye protección DDoS?',
@@ -135,7 +135,7 @@ export const es: ContentTranslation = {
       vps: {
         label: 'VPS',
         intro:
-          'Recursos aislados y acceso root completo, con el sistema operativo que elijas. Los planes Premium funcionan con un AMD Ryzen 9 3900X y NVMe en Los Ángeles, y los económicos con un Intel Core i7-6700K y SATA SSD en Nueva York.',
+          'Recursos aislados y acceso root completo, con el sistema operativo que elijas. Los planes Premium funcionan con un AMD Ryzen 9 3900X y NVMe en Los Ángeles, y los Budget con un Intel Core i7-6700K y SATA SSD en Nueva York.',
         included: [
           'Acceso root y sudo completo',
           'El sistema operativo que elijas',
@@ -162,7 +162,7 @@ export const es: ContentTranslation = {
         description: 'AMD Ryzen 9 3900X con memoria DDR4 y discos NVMe en RAID 1, en Los Ángeles.',
       },
       'budget-vps': {
-        label: 'VPS económicos',
+        label: 'VPS Budget',
         description:
           'Intel Core i7-6700K con memoria DDR4 y discos SATA SSD en RAID 1, en Nueva York. Las mismas especificaciones que Premium en una CPU más antigua y más cargada, así que tu servidor puede ir más lento en las horas de más uso.',
       },
@@ -171,7 +171,7 @@ export const es: ContentTranslation = {
         description: 'AMD Ryzen 9 3900X con memoria DDR4 y discos NVMe en RAID 1, en Los Ángeles.',
       },
       'budget-game': {
-        label: 'Servidores de juego económicos',
+        label: 'Servidores de juego Budget',
         description:
           'Intel Core i7-6700K con memoria DDR4 y discos SATA SSD en RAID 1, en Nueva York. Las mismas especificaciones que Premium en una CPU más antigua y más cargada, así que tu servidor puede ir más lento en las horas de más uso.',
       },
@@ -179,7 +179,7 @@ export const es: ContentTranslation = {
     comparisons: {
       'sparked-minecraft': {
         text: 'Servidores de Minecraft Premium por entre un 13% y un 19% menos que los planes Enterprise Minecraft de Sparked Host con la misma RAM (4, 6, 8, 12 y 16 GB).',
-        note: 'Precios de lista de Sparked, consultados el 10 de octubre de 2026. No incluyen cupones como FALL26 y FALLLEAVES2026, y con ellos Sparked puede costar menos durante hasta tres meses. Nuestros servidores de juego Premium funcionan con un AMD Ryzen 9 3900X con DDR4 y NVMe; Sparked Enterprise usa un Ryzen 9 7900 (o equivalente) con DDR5. Sparked incluye 3 vCPU y 100 GB de disco en todos los tamaños, más que nuestros planes de 4 GB y 6 GB. Los planes Budget Minecraft de Sparked cuestan menos que nuestros planes económicos y Premium.',
+        note: 'Precios de lista de Sparked, consultados el 10 de octubre de 2026. No incluyen cupones como FALL26 y FALLLEAVES2026, y con ellos Sparked puede costar menos durante hasta tres meses. Nuestros servidores de juego Premium funcionan con un AMD Ryzen 9 3900X con DDR4 y NVMe; Sparked Enterprise usa un Ryzen 9 7900 (o equivalente) con DDR5. Sparked incluye 3 vCPU y 100 GB de disco en todos los tamaños, más que nuestros planes de 4 GB y 6 GB. Los planes Budget Minecraft de Sparked cuestan menos que nuestros planes Budget y Premium.',
       },
       'apex-minecraft': {
         text: 'Planes Premium por entre un 37% y un 42% menos que los planes de Minecraft Ryzen Series de Apex Hosting con la misma RAM (4, 6 y 8 GB).',
@@ -202,7 +202,7 @@ export const es: ContentTranslation = {
         note: 'Precios de lista de Vultr, consultados el 10 de octubre de 2026. Vultr indica que Regular Performance funciona con CPU Intel de la generación anterior y SSD normal; los nuestros funcionan con un AMD Ryzen 9 3900X con NVMe. Vultr incluye más disco: 55, 80 y 160 GB, frente a nuestros 30, 60 y 120 GB.',
       },
       'hosturly-budget-vps': {
-        text: 'VPS económicos por entre un 16% y un 29% menos que el Budget VPS de Hosturly con la misma RAM, y el doble de vCPU y de disco (4 GB y 8 GB).',
+        text: 'VPS Budget por entre un 16% y un 29% menos que el Budget VPS de Hosturly con la misma RAM, y el doble de vCPU y de disco (4 GB y 8 GB).',
         note: 'Hardware distinto: nuestro Intel Core i7-6700K con SATA SSD en RAID 1 en Nueva York, frente al AMD EPYC 7402P con NVMe de Hosturly en Chicago. Precios de lista de Hosturly, consultados el 10 de octubre de 2026.',
       },
     },
@@ -429,7 +429,7 @@ export const es: ContentTranslation = {
       description: 'Un juego de automatización de fábricas cuyas bases avanzadas son conocidas por exigir mucha CPU según se multiplican cintas y máquinas, así que aquí la velocidad por núcleo importa más que en la mayoría de juegos. Los planes Premium funcionan con un AMD Ryzen 9 3900X.',
       popularFor: ['servidores de automatización de larga duración'],
       setups: ['2-8 jugadores, principio de partida', 'fábricas grandes de partida avanzada'],
-      faqs: [{ q: '¿Por qué Factorio necesita núcleos rápidos más que RAM?', a: 'La simulación de Factorio es de un solo hilo y depende de la CPU según crece tu fábrica, así que la velocidad por núcleo mantiene estables los UPS durante más tiempo que simplemente añadir RAM. Para una fábrica grande, elige Premium (AMD Ryzen 9 3900X) en vez de los planes económicos, que funcionan con una CPU más antigua y más cargada.' }],
+      faqs: [{ q: '¿Por qué Factorio necesita núcleos rápidos más que RAM?', a: 'La simulación de Factorio es de un solo hilo y depende de la CPU según crece tu fábrica, así que la velocidad por núcleo mantiene estables los UPS durante más tiempo que simplemente añadir RAM. Para una fábrica grande, elige Premium (AMD Ryzen 9 3900X) en vez de los planes Budget, que funcionan con una CPU más antigua y más cargada.' }],
     },
     muck: {
       tagline: 'Supervivencia roguelike en cooperativo, rápida y caótica.',
@@ -592,21 +592,21 @@ export const es: ContentTranslation = {
     privacy: {
       label: 'Política de privacidad',
       title: 'Política de privacidad',
-      metaDescription: 'Cómo WSLATL LLC recopila, usa y protege tu información personal.',
+      metaDescription: 'Qué datos personales recopila WSLATL LLC para cuentas, facturación, soporte y este sitio web, cómo se usan y comparten, y a dónde se transfieren.',
       intro:
         'Recopilamos solo lo que necesitamos para prestarte tus servicios. No vendemos tus datos, nunca. Esto es exactamente lo que hacemos con la información que compartes con nosotros.',
     },
     terms: {
       label: 'Condiciones del servicio',
       title: 'Condiciones del servicio',
-      metaDescription: 'Los términos y condiciones que rigen tu uso de los servicios de hosting de WSLATL LLC.',
+      metaDescription: 'Las condiciones del hosting de WSLATL LLC: alta de cuenta, ciclos de facturación, impagos y suspensión, reembolsos, cambios de precio y créditos del SLA.',
       intro:
         'Estas condiciones rigen tu uso de todos los servicios prestados por WSLATL LLC. Léelas con atención antes de usar nuestros servicios. Al usar cualquier servicio de WSLATL, aceptas estas condiciones.',
     },
     acceptableUse: {
       label: 'Uso aceptable',
       title: 'Política de uso aceptable',
-      metaDescription: 'Qué está y qué no está permitido en la infraestructura de hosting de WSLATL LLC.',
+      metaDescription: 'Qué se puede y qué no se puede alojar en WSLATL: edad mínima, contenido prohibido, ataques de red, spam, minería de criptomonedas y normas de servidores de juego.',
       intro:
         'Nuestra infraestructura se comparte entre clientes. Uno que actúe mal afecta a todos. Esta política define qué es y qué no es aceptable en los servidores de WSLATL. Léela. Cúmplela. La hacemos cumplir.',
     },

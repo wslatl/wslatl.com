@@ -81,7 +81,7 @@ const nextConfig = {
     ]
   },
   async redirects() {
-    return [
+    const moved = [
       // Legal documents moved from the site root to /legal on 2026-09-19. Old
       // links live on in emails, forms, the billing portal, and search results,
       // so every old path keeps working. tests/links.test.ts checks this list
@@ -94,6 +94,13 @@ const nextConfig = {
       // licensed partners), so their pages are gone.
       { source: '/games/battlefield-2042-portal', destination: '/games', permanent: true },
       { source: '/games/hell-let-loose', destination: '/games', permanent: true },
+    ]
+    return [
+      ...moved,
+      // The same moves under /en, straight to where they end: otherwise
+      // /en/privacy goes to /privacy and only then to /legal/privacy, a chain
+      // search engines follow less willingly than one hop.
+      ...moved.map((rule) => ({ ...rule, source: `/en${rule.source}` })),
       // English is served at the plain paths (middleware.ts rewrites them),
       // so /en/... would be a second address for the same page.
       { source: '/en', destination: '/', permanent: true },

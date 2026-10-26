@@ -149,11 +149,11 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
               just under the header instead of 6rem down the screen. */}
           <aside className="hidden pt-16 lg:block print:hidden">
             <div className="scroll-quiet scroll-fade sticky top-16 max-h-[calc(100dvh-4rem)] space-y-10 overflow-y-auto pt-8 pb-10">
-              <nav aria-label="On this page">
+              <nav aria-label={t.onThisPage}>
                 <p className="mb-3 text-sm font-semibold text-foreground">{t.onThisPage}</p>
                 <TocList entries={toc} />
               </nav>
-              <nav aria-label="Legal documents">
+              <nav aria-label={t.documents}>
                 <p className="mb-3 text-sm font-semibold text-foreground">{t.documents}</p>
                 <DocList current={page.href} />
               </nav>
@@ -189,12 +189,12 @@ export function LegalLayout({ page, content: Content }: LegalLayoutProps) {
 
             <div className="mb-12 grid gap-3 sm:grid-cols-2 lg:hidden print:hidden">
               <MobileDisclosure label={t.onThisPage}>
-                <nav aria-label="On this page">
+                <nav aria-label={t.onThisPage}>
                   <TocList entries={toc} />
                 </nav>
               </MobileDisclosure>
               <MobileDisclosure label={t.documents}>
-                <nav aria-label="Legal documents">
+                <nav aria-label={t.documents}>
                   <DocList current={page.href} />
                 </nav>
               </MobileDisclosure>

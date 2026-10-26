@@ -42,7 +42,7 @@ export function Contact() {
                   {'email' in option ? (
                     <Email name={option.email} className={ctaClass} />
                   ) : (
-                    <SiteLink href={option.href} className={ctaClass}>
+                    <SiteLink href={option.href} newTab={t.header.newTab} className={ctaClass}>
                       {option.cta}
                     </SiteLink>
                   )}

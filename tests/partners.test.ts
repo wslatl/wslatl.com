@@ -67,6 +67,20 @@ const exampleContext: PartnerCheckContext = {
 /** The problems one changed copy of the example partner has. */
 const problemsWith = (change: Partial<Partner>) => partnerProblems([{ ...examplePartner, ...change }], exampleContext)
 
+/** A partner's problems when their pictures measure as given. */
+function shapes(avatar: { width: number; height: number }, banner: { width: number; height: number }) {
+  return partnerProblems([examplePartner], {
+    ...exampleContext,
+    imageSize: (path) => (path.endsWith('avatar.webp') ? avatar : banner),
+  }).join('\n')
+}
+
+/** The share pictures of a partner's English profile, as text. */
+async function shareImages(slug: string) {
+  const meta = await profileMetadata({ params: Promise.resolve({ locale: 'en', slug }) })
+  return JSON.stringify(meta.openGraph?.images)
+}
+
 describe('the partners in data/partners.ts', () => {
   it('pass every check: links, pictures, codes, dates, games and lengths', () => {
     expect(partnerProblems(partners, realContext)).toEqual([])
@@ -163,16 +177,11 @@ describe('the partner checks', () => {
     expect(problemsWith({ games: ['minecraft', 'minecraft'] }).join('\n')).toMatch(/listed twice/)
   })
 
-  it('need both pictures in the partner folder, with the right shapes', () => {
+  it('check each picture that is given: where it is, its type and its shape', () => {
     expect(problemsWith({ avatar: '/partners/example-creator/missing.webp' }).join('\n')).toMatch(/missing from public/)
     expect(problemsWith({ avatar: '/owners/liam-henry.webp' }).join('\n')).toMatch(/avatar must be in/)
     expect(problemsWith({ banner: '/partners/example-creator/banner.gif' }).join('\n')).toMatch(/WebP, PNG or JPEG/)
 
-    const shapes = (avatar: { width: number; height: number }, banner: { width: number; height: number }) =>
-      partnerProblems([examplePartner], {
-        ...exampleContext,
-        imageSize: (path) => (path.endsWith('avatar.webp') ? avatar : banner),
-      }).join('\n')
     expect(shapes({ width: 512, height: 400 }, { width: 1500, height: 500 })).toMatch(/must be square/)
     expect(shapes({ width: 128, height: 128 }, { width: 1500, height: 500 })).toMatch(/at least 256px/)
     expect(shapes({ width: 512, height: 512 }, { width: 1500, height: 1000 })).toMatch(/about 3:1/)
@@ -341,8 +350,11 @@ describe('a partner with no referral code', () => {
     for (const locale of locales) {
       const t = copyFor(locale).partners.profile
       const description = partnerMetaDescription(partnerWithoutCode, t, locale)
-      const tagline = partnerText(partnerWithoutCode.tagline, locale)
-      expect(description, locale).toBe(`${tagline} ${t.metaDescriptionNoCode(partnerWithoutCode.name)}`)
+      const about = t.metaDescriptionNoCode(partnerWithoutCode.name)
+      // The tagline leads only in its own language, ending as a sentence.
+      const tagline = partnerText(partnerWithoutCode.tagline, locale).replace(/([^.!?])$/, '$1.')
+      const expected = partnerTextLang(partnerWithoutCode.tagline, locale) ? about : `${tagline} ${about}`
+      expect(description, locale).toBe(expected)
       expect(description, locale).toContain(partnerWithoutCode.name)
       expect(description, locale).not.toContain(examplePartner.referralCode ?? '')
       expect(description, locale).not.toContain(referralDiscount(locale))
@@ -577,15 +589,10 @@ describe('the partners page', () => {
   })
 
   it('shares a profile with their banner, or the site picture when they have none', async () => {
-    const images = async (slug: string) => {
-      const meta = await profileMetadata({
-        params: Promise.resolve({ locale: 'en', slug }),
-      })
-      return JSON.stringify(meta.openGraph?.images)
+    // Everyone listed today, so taking a partner down never breaks this.
+    for (const partner of partners) {
+      expect(await shareImages(partner.slug), partner.slug).toContain(partner.banner ?? '/og-image.png')
     }
-    expect(await images('haskins')).toContain('/partners/haskins/banner.webp')
-    expect(await images('last-stop')).not.toContain('/partners/')
-    expect(await images('last-stop')).toContain('og-image')
   })
 
   it('takes up to two initials from a name', () => {

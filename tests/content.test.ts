@@ -93,6 +93,10 @@ describe('email protection', () => {
       expect(unscrambleEmail(code)).toBe(address)
     }
   })
+
+  it('refuses an address it could not get back intact, rather than garbling it', () => {
+    expect(() => scrambleEmail('a€b@example.org')).toThrow(/ASCII/)
+  })
 })
 
 describe('games', () => {
@@ -126,6 +130,14 @@ describe('games', () => {
     expect(ramNeedGb({ players: '', ram: '2-4GB' })).toBe(4)
     expect(ramNeedGb({ players: '', ram: '16GB+ per map' })).toBe(16)
     expect(ramNeedGb({ players: '', ram: '1.5GB' })).toBe(1.5)
+  })
+
+  it('flags every per-map row, since the page cannot read "per map" from translated words', () => {
+    for (const game of games) {
+      for (const row of game.recommendedRam) {
+        expect(row.perMap === true, `${game.slug}: ${row.ram}`).toBe(/per map/i.test(row.ram))
+      }
+    }
   })
 })
 

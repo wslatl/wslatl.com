@@ -12,7 +12,7 @@ export const fr: ContentTranslation = {
     game: {
       title: "Hébergement de serveurs de jeu",
       description:
-        "Des serveurs de jeu avec un panneau de contrôle clair et zéro prise de tête. Nous les gardons rapides, nous les gardons en ligne, et si quelque chose casse, nous le réparons.",
+        "Des serveurs de jeu sur un panneau Pterodactyl, facturés à la RAM et non au jeu. Si quelque chose casse, quelqu'un de notre équipe le répare.",
       features: ["Panneau Pterodactyl inclus", "Protection DDoS intégrée", "Prise en charge des mods et des plugins"],
     },
     dedicated: {
@@ -24,7 +24,7 @@ export const fr: ContentTranslation = {
     web: {
       title: "Hébergement web",
       description:
-        "Un hébergement fiable pour vos sites et applications web, infogéré par nos soins, avec une vraie personne à contacter si ça part de travers.",
+        'Sites et applications web sur cPanel, gérés par nous, avec une vraie personne à contacter si les choses tournent mal.',
       features: ["Certificats SSL gratuits", "cPanel avec installation d'applications en un clic", "Hébergement e-mail inclus", "Sauvegardes mensuelles incluses"],
     },
   },
@@ -43,12 +43,12 @@ export const fr: ContentTranslation = {
     hardware: {
       title: "Du matériel qui tient la route",
       description:
-        "SSD NVMe en Premium et SATA SSD en Budget, CPU à haute fréquence, chemins réseau redondants et routage à faible latence. Conçu pour encaisser sans faire de compromis.",
+        "Premium tourne sur un AMD Ryzen 9 3900X avec des disques NVMe en RAID 1, à Los Angeles. Budget tourne sur un Intel Core i7-6700K avec des SSD SATA en RAID 1, à New York : un CPU plus ancien et plus chargé, d'où son prix plus bas.",
     },
     uptime: {
       title: "En ligne quand ça compte",
       description:
-        "Une mitigation DDoS intégrée dès le départ. Si quelque chose tente de vous mettre hors ligne, nous nous en occupons.",
+        "Les plans de serveurs de jeu incluent une mitigation DDoS toujours active, sans supplément. L'hébergement VPS, web et de jeu a chacun un objectif de disponibilité mensuel, avec des avoirs SLA si nous le manquons.",
     },
     'application-only': {
       title: "Exigeants, et pour de bonnes raisons",
@@ -60,7 +60,7 @@ export const fr: ContentTranslation = {
     'getting-started': {
       question: "Comment démarrer ?",
       answer:
-        "Rendez-vous sur billing.wslatl.com/register et demandez un accès. Un administrateur examine chaque candidature et la valide avant que vous puissiez accéder au moindre service. Une fois accepté, vous pouvez commander un serveur de jeu ou un VPS dans le portail de facturation et payer en ligne. Pour un serveur dédié ou un hébergement web, écrivez-nous sur Discord ou ouvrez un ticket de facturation, et nous le mettons en place avec vous.",
+        "Rendez-vous sur wslatl.com/register et demandez un accès. Un administrateur examine chaque candidature et la valide avant que vous puissiez accéder au moindre service. Une fois accepté, vous pouvez commander un serveur de jeu ou un VPS dans le portail de facturation et payer en ligne. Pour un serveur dédié ou un hébergement web, écrivez-nous sur Discord ou ouvrez un ticket de facturation, et nous le mettons en place avec vous.",
     },
     'what-makes-you-different': {
       question: "Qu'est-ce qui vous différencie des gros hébergeurs ?",
@@ -95,7 +95,7 @@ export const fr: ContentTranslation = {
     'vps-vs-shared': {
       question: "L'hébergement VPS est-il meilleur que l'hébergement mutualisé ?",
       answer:
-        "Pour la plupart des gens qui font tourner un vrai projet, oui. Un VPS vous donne du CPU et de la RAM dédiés auxquels personne d'autre ne touche, un accès root complet, et aucun risque qu'un compte voisin plombe vos performances. Le mutualisé coûte moins cher, mais vous partagez les ressources avec des inconnus.",
+        "Pour la plupart des gens qui font tourner un vrai projet, oui. Un VPS vous donne votre propre part de CPU et de RAM, un accès root complet et le système de votre choix. Les plans Premium tournent sur un AMD Ryzen 9 3900X ; les plans Budget sur un CPU plus ancien et plus chargé, donc parfois plus lents aux heures de pointe. L'hébergement mutualisé coûte moins cher, mais tous les sites du serveur puisent dans les mêmes ressources.",
     },
     'ddos-protection': {
       question: "Proposez-vous une protection DDoS ?",
@@ -692,21 +692,21 @@ export const fr: ContentTranslation = {
     privacy: {
       label: "Politique de confidentialité",
       title: "Politique de confidentialité",
-      metaDescription: "Comment WSLATL LLC collecte, utilise et protège vos informations personnelles.",
+      metaDescription: "Les données personnelles que WSLATL LLC collecte pour les comptes, la facturation, le support et ce site, leur utilisation, leur partage et leurs transferts.",
       intro:
         "Nous ne collectons que ce dont nous avons besoin pour faire tourner vos services. Nous ne vendons jamais vos données. Voici exactement ce que nous faisons des informations que vous nous confiez.",
     },
     terms: {
       label: "Conditions de service",
       title: "Conditions de service",
-      metaDescription: "Les conditions générales qui régissent votre utilisation des services d'hébergement de WSLATL LLC.",
+      metaDescription: "Les conditions d'hébergement de WSLATL LLC : ouverture de compte, facturation, retards de paiement et suspension, remboursements, hausses de prix et avoirs SLA.",
       intro:
         "Ces conditions régissent votre utilisation de tous les services fournis par WSLATL LLC. Merci de les lire attentivement avant d'utiliser nos services. En utilisant un service WSLATL, vous les acceptez.",
     },
     acceptableUse: {
       label: "Usage acceptable",
       title: "Politique d'usage acceptable",
-      metaDescription: "Ce qui est autorisé et ce qui ne l'est pas sur l'infrastructure d'hébergement de WSLATL LLC.",
+      metaDescription: "Ce que vous pouvez héberger ou non chez WSLATL : âge minimum, contenus interdits, attaques réseau, spam, minage de cryptomonnaies et règles des serveurs de jeu.",
       intro:
         "Notre infrastructure est partagée entre les clients. Un seul abus touche tout le monde. Cette politique définit ce qui est acceptable et ce qui ne l'est pas sur les serveurs WSLATL. Lisez-la. Respectez-la. Nous la faisons appliquer.",
     },

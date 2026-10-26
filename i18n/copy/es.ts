@@ -9,6 +9,7 @@ export const es: Copy = {
     getStarted: 'Empezar',
     openMenu: 'Menú',
     closeMenu: 'Cerrar el menú',
+    mainNav: 'Principal',
     newTab: ' (se abre en una pestaña nueva)',
     login: "Acceder",
     clientPanels: 'Paneles de cliente',
@@ -34,7 +35,7 @@ export const es: Copy = {
     register: { label: 'Solicitar acceso', description: '¿Eres nuevo por aquí? Solicita una cuenta' },
   },
   footer: {
-    blurb: (location: string) => `Hosting privado llevado por un equipo pequeño en ${location}. Hosting that actually gives a damn.`,
+    blurb: (location: string) => `Hosting privado llevado por un equipo pequeño en ${location}.`,
     columns: {
       hosting: 'Hosting',
       company: 'Empresa',
@@ -70,7 +71,7 @@ export const es: Copy = {
       emphasis: 'actually',
       lineTwo: 'gives a damn.',
       intro:
-        'Hemos trabajado dentro de empresas de hosting. Sabemos lo que sale mal. WSLATL existe para arreglarlo: hosting VPS asequible, hosting de Minecraft y de servidores de juego, y servidores dedicados, con un equipo detrás que de verdad contesta.',
+        'Hemos trabajado dentro de empresas de hosting. Sabemos lo que sale mal. WSLATL existe para arreglarlo: hosting VPS con todos los precios publicados, hosting de Minecraft y de servidores de juego, y servidores dedicados, con un equipo detrás que de verdad contesta.',
       seePlans: 'Ver planes y precios',
       products: 'Productos',
       entries: {
@@ -160,7 +161,7 @@ export const es: Copy = {
       heading: 'Preguntas frecuentes',
       stillNotSure: '¿Sigues con dudas?',
       askOnDiscord: 'Pregúntanos en Discord',
-      alwaysAround: '. Siempre andamos por aquí.',
+      alwaysAround: '. Solemos responder en menos de una hora en horario activo.',
     },
     contact: {
       heading: 'Una empresa de hosting que te trata como a una persona. Imagínate.',
@@ -215,6 +216,8 @@ export const es: Copy = {
       ram: 'RAM',
       storage: 'Almacenamiento',
       traffic: 'Tráfico',
+      popular: 'Popular',
+      notAvailable: 'n/d',
       price: 'Precio',
       order: 'Pedir',
       orderPlan: (plan: string) => ` ${plan} (se abre en una pestaña nueva)`,
@@ -277,10 +280,10 @@ export const es: Copy = {
       allGames: 'Todos los juegos',
       plansHeading: 'Planes de servidores de juego',
       plansIntro:
-        'Los mismos planes sirven para todos los juegos que alojamos. Premium funciona con un AMD Ryzen 9 3900X con almacenamiento NVMe, y los económicos con un Intel Core i7-6700K más antiguo con SATA SSD.',
+        'Los mismos planes sirven para todos los juegos que alojamos. Premium funciona con un AMD Ryzen 9 3900X con almacenamiento NVMe, y los Budget con un Intel Core i7-6700K más antiguo con SATA SSD.',
       atAGlance: (game: string) => `Hosting de ${game} de un vistazo`,
       hosting: (game: string) => `Hosting de ${game}`,
-      budgetNote: 'Los planes económicos funcionan con una CPU más antigua y más cargada, así que pueden ir más lentos en las horas de más uso.',
+      budgetNote: 'Los planes Budget funcionan con una CPU más antigua y más cargada, así que pueden ir más lentos en las horas de más uso.',
     },
   },
   legal: {
@@ -313,7 +316,7 @@ export const es: Copy = {
   partners: {
     metaTitle: 'Socios oficiales',
     metaDescription: (percent: string) =>
-      `Creadores y comunidades con los que trabajamos, cada uno con su propio código de referido. Regístrate con uno y obtén un ${percent} de descuento en la primera factura de tu hosting, salvo en servidores dedicados.`,
+      `Creadores y comunidades con los que trabajamos. Con el código de un socio tienes un ${percent} de descuento en tu primera factura de hosting, salvo servidores dedicados.`,
     metaDescriptionNoCodes:
       'Creadores y comunidades con los que trabajamos, aprobados por nuestro equipo. Descubre quiénes son y dónde encontrarlos en internet.',
     emptyMetaDescription:
@@ -432,5 +435,6 @@ export const es: Copy = {
   },
   breadcrumbs: {
     home: 'Inicio',
+    label: 'Ruta de navegación',
   },
 }
