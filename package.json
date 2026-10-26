@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/keep-old-assets.mjs save",
     "build": "next build",
+    "postbuild": "node scripts/keep-old-assets.mjs restore",
     "start": "next start",
     "lint": "oxlint && eslint .",
     "typecheck": "tsc --noEmit",

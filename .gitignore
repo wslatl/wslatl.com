@@ -5,6 +5,8 @@ node_modules/
 
 # next.js
 .next/
+# earlier builds' hashed files, kept by scripts/keep-old-assets.mjs
+.next-static-history/
 out/
 build/
 dist/
