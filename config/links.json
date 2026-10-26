@@ -1,5 +1,5 @@
 {
-  "billing": { "path": "/billing", "url": "https://billing.wslatl.com" },
+  "billing": { "path": "/billing", "url": "https://billing.wslatl.com/login" },
   "register": { "path": "/register", "url": "https://billing.wslatl.com/register" },
   "gamingPanel": { "path": "/game-panel", "url": "https://panel.wslatl.com" },
   "vpsPanel": { "path": "/vps-panel", "url": "https://vps.wslatl.com" },
