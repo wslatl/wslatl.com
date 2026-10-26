@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef } from 'react'
 import { Check, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useCopyText } from '@/components/ui/use-copy-text'
 import { cn } from '@/lib/utils'
 
 export interface CopyCodeLabels {
@@ -35,31 +36,9 @@ function largeCodeSize(length: number): string {
  * label changes, so nothing around it moves.
  */
 export function CopyCode({ code, labels, size = 'sm', className }: CopyCodeProps) {
-  const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle')
   const codeRef = useRef<HTMLElement>(null)
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
-
-  useEffect(() => () => clearTimeout(timer.current), [])
-
-  async function copyCode() {
-    clearTimeout(timer.current)
-    try {
-      await navigator.clipboard.writeText(code)
-      setState('copied')
-    } catch {
-      // No clipboard here (an older browser, or a page not served over
-      // https): select the code so the reader can copy it themselves.
-      const selection = window.getSelection()
-      if (codeRef.current && selection) {
-        const range = document.createRange()
-        range.selectNodeContents(codeRef.current)
-        selection.removeAllRanges()
-        selection.addRange(range)
-      }
-      setState('failed')
-    }
-    timer.current = setTimeout(() => setState('idle'), 2500)
-  }
+  // Without a clipboard the code itself is selected, so the reader can copy it.
+  const { state, copy } = useCopyText(codeRef)
 
   const copied = state === 'copied'
 
@@ -81,7 +60,7 @@ export function CopyCode({ code, labels, size = 'sm', className }: CopyCodeProps
         type="button"
         variant="outline"
         size={size === 'lg' ? 'default' : 'sm'}
-        onClick={copyCode}
+        onClick={() => copy(code)}
         className="ml-auto shrink-0"
       >
         {copied ? (

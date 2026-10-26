@@ -29,8 +29,10 @@ export interface ContentTranslation {
    */
   sla?: Record<string, { label: string; target?: string }>
   pricing?: {
-    /** Keyed by product line id: vps, game. */
-    /** cpuUnit (vCPU, vCores) is a spec, not a word, so it is not translated. */
+    /**
+     * Keyed by product line id: vps, game. cpuUnit (vCPU, vCores) is a spec,
+     * not a word, so it is not translated.
+     */
     lines: Record<string, { label: string; intro: string; included: string[] }>
     /** Keyed by plan group id. */
     groups: Record<string, { label: string; description: string }>

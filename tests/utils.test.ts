@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { slugify } from '@/lib/utils'
+import { foldText, slugify } from '@/lib/utils'
 
 describe('slugify', () => {
   it('turns headings into stable anchors', () => {
@@ -18,5 +18,14 @@ describe('slugify', () => {
     // leaves these whole and everything outside a to z becomes a hyphen.
     expect(slugify('Kontoschlie' + String.fromCharCode(0xdf) + 'ung')).toBe('kontoschliessung')
     expect(slugify('Verst' + String.fromCharCode(0xf6) + String.fromCharCode(0xdf) + 'e')).toBe('verstosse')
+  })
+})
+
+describe('foldText', () => {
+  it('takes the accents off, so a search typed without them still matches', () => {
+    const o = String.fromCharCode(0xf3)
+    expect(foldText(`Construcci${o}n y simulaci${o}n`)).toBe('construccion y simulacion')
+    expect(foldText(String.fromCharCode(0xdc) + 'berleben')).toBe('uberleben')
+    expect(foldText('Counter-Strike 2')).toBe('counter-strike 2')
   })
 })

@@ -6,6 +6,7 @@ import {
   type ProductLineId,
   type StorageType,
 } from '@/data/pricing'
+import { ramNeedGb, type GameEntry } from '@/data/games'
 
 const usd = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
@@ -84,6 +85,16 @@ export function cheapestPlanWithRam(id: ProductLineId, ramGb: number): PlanMatch
     (min, match) => (!min || match.plan.price < min.plan.price ? match : min),
     null,
   )
+}
+
+/**
+ * The plan behind a game's "from" price: the cheapest one that covers its
+ * smallest recommended setup (the first row in data/games.ts), or null when
+ * even that is bigger than every game plan. /games, each game page and its
+ * search title all read it from here, so they cannot disagree.
+ */
+export function gameEntryPlan(game: Pick<GameEntry, 'recommendedRam'>): PlanMatch | null {
+  return cheapestPlanWithRam('game', ramNeedGb(game.recommendedRam[0]))
 }
 
 /**

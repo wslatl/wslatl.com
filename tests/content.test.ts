@@ -54,6 +54,14 @@ describe('legal paths', () => {
       .filter((file) => literal.test(readFileSync(file, 'utf8')))
     expect(offenders).toEqual([])
   })
+
+  it('links to the contact section through siteConfig.paths, never a hard-coded anchor', () => {
+    // Moving or renaming the section should change every link to it at once.
+    const offenders = ['app', 'components', 'content', 'data', 'lib']
+      .flatMap((dir) => sourceFiles(join(root, dir)))
+      .filter((file) => /["'`]\/#contact["'`]/.test(readFileSync(file, 'utf8')))
+    expect(offenders).toEqual([])
+  })
 })
 
 describe('legal documents render as sentences', () => {

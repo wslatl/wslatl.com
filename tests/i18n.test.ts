@@ -113,6 +113,13 @@ describe('site copy', () => {
       expect(errorCopy[locale].tryAgain, locale).not.toBe(errorCopy.en.tryAgain)
     }
   })
+
+  it('lets each language case the category in "more games" its own way', () => {
+    // German capitalizes nouns, so lowercasing it there reads as a mistake.
+    expect(copyFor('de').games.detail.moreIn('Shooter & Taktik')).toBe('Mehr Spiele aus Shooter & Taktik')
+    expect(copyFor('en').games.detail.moreIn('Survival & Sandbox')).toBe('More survival & sandbox games')
+    expect(copyFor('en').games.detail.moreIn('Zombie & PvP')).toBe('More zombie & PvP games')
+  })
 })
 
 describe('content translations', () => {

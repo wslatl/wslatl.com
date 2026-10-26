@@ -46,6 +46,7 @@ export const de: Copy = {
       vpsPlans: 'VPS-Tarife',
       gamePlans: 'Gameserver-Tarife',
       supportedGames: 'Unterstützte Spiele',
+      guides: 'Anleitungen',
       dedicated: 'Dedicated Server',
       web: 'Webhosting',
       about: 'Über uns',
@@ -258,11 +259,15 @@ export const de: Copy = {
       metaTitle: (game: string, price: string) => `${game} Server mieten ab ${price}/Monat`,
       metaDescription: (game: string, price: string, tagline: string) =>
         `Miete deinen eigenen ${game} Server bei WSLATL ab ${price} im Monat. ${tagline}`,
+      metaDescriptionNoPrice: (game: string, tagline: string) =>
+        `Miete deinen eigenen ${game} Server bei WSLATL. Frag uns nach einem passenden Tarif. ${tagline}`,
       heading: (game: string) => `${game} Server-Hosting`,
       order: (game: string) => `Deinen ${game} Server bestellen`,
       comparePlans: 'Tarife vergleichen',
       listedUnderPrefix: 'Gelistet unter',
       listedUnderSuffix: '. Tarife sind nicht an ein Spiel gebunden, du kannst also jederzeit den Titel wechseln.',
+      guidesIntro: 'Du richtest deinen Server selbst ein?',
+      guidesLink: (game: string) => `Zu den Server-Anleitungen für ${game}`,
       ramHeading: (game: string) => `Wie viel RAM braucht ${game}?`,
       ramCaption: (game: string) => `Empfohlener RAM für ${game} und die kleinsten Tarife, die dafür reichen`,
       setup: 'Setup',

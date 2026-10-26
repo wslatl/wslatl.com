@@ -5,9 +5,9 @@ import { ShareGamesIndexAd } from '@/components/share/ads'
 import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
 import { GameDirectory, type GameListing } from '@/components/games/game-directory'
-import { games, ramNeedGb } from '@/data/games'
+import { games } from '@/data/games'
 import { siteConfig } from '@/config/site'
-import { cheapestPlanWithRam, formatPrice, pricingHref, startingPrice } from '@/lib/pricing'
+import { formatPrice, gameEntryPlan, pricingHref, startingPrice } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
 import { Main } from '@/components/layout/main'
 import { localePath, type Locale } from '@/i18n/config'
@@ -42,7 +42,7 @@ export default async function GamesPage({ params }: PageProps) {
 
   const listings: GameListing[] = localizedGames().map((game) => {
     // The cheapest plan that covers the game's smallest recommended setup.
-    const entry = cheapestPlanWithRam('game', ramNeedGb(game.recommendedRam[0]))
+    const entry = gameEntryPlan(game)
     return {
       slug: game.slug,
       name: game.name,

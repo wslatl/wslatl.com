@@ -17,6 +17,7 @@ import {
   entryPlan,
   fillPrices,
   formatPrice,
+  gameEntryPlan,
   pricingHref,
   smallestPlansWithRam,
   specRanges,
@@ -145,6 +146,9 @@ describe('pricing data', () => {
   })
 })
 
+/** A game whose smallest recommended setup needs `ram`. */
+const game = (ram: string) => ({ recommendedRam: [{ players: '', ram }, { players: '', ram: '64GB' }] })
+
 describe('pricing helpers', () => {
   it('formats US dollars with cents', () => {
     expect(formatPrice(6.5)).toBe('$6.50')
@@ -195,6 +199,11 @@ describe('pricing helpers', () => {
     const overall = cheapestPlanWithRam('game', 5)
     expect(overall?.plan.price).toBe(Math.min(...matches.map((m) => m.plan.price)))
     expect(cheapestPlanWithRam('game', 10_000)).toBeNull()
+  })
+
+  it('prices a game from the cheapest plan that covers its smallest setup, or not at all', () => {
+    expect(gameEntryPlan(game('5GB'))).toEqual(cheapestPlanWithRam('game', 5))
+    expect(gameEntryPlan(game('10000GB'))).toBeNull()
   })
 
   it('links to the pricing anchors', () => {

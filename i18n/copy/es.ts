@@ -46,6 +46,7 @@ export const es: Copy = {
       vpsPlans: 'Planes VPS',
       gamePlans: 'Planes de servidor de juego',
       supportedGames: 'Juegos compatibles',
+      guides: 'Guías de configuración',
       dedicated: 'Servidores dedicados',
       web: 'Hosting web',
       about: 'Sobre nosotros',
@@ -258,11 +259,15 @@ export const es: Copy = {
       metaTitle: (game: string, price: string) => `Servidor de ${game} desde ${price}/mes`,
       metaDescription: (game: string, price: string, tagline: string) =>
         `Alquila tu propio servidor de ${game} con WSLATL desde ${price} al mes. ${tagline}`,
+      metaDescriptionNoPrice: (game: string, tagline: string) =>
+        `Alquila tu propio servidor de ${game} con WSLATL. Pídenos un plan a su medida. ${tagline}`,
       heading: (game: string) => `Hosting de servidores de ${game}`,
       order: (game: string) => `Pide tu servidor de ${game}`,
       comparePlans: 'Comparar planes',
       listedUnderPrefix: 'Aparece en',
       listedUnderSuffix: '. Los planes no están atados a un solo juego, así que puedes cambiar de título cuando quieras.',
+      guidesIntro: '¿Vas a configurar tu servidor tú mismo?',
+      guidesLink: (game: string) => `Lee las guías de servidor de ${game}`,
       ramHeading: (game: string) => `¿Cuánta RAM necesita ${game}?`,
       ramCaption: (game: string) => `RAM recomendada para ${game} y los planes más pequeños que la cubren`,
       setup: 'Configuración',
@@ -276,7 +281,7 @@ export const es: Copy = {
       popular: (game: string) => `Configuraciones populares de ${game}`,
       included: 'Incluido en todos los planes de juego',
       questions: (game: string) => `Preguntas sobre el hosting de ${game}`,
-      moreIn: (category: string) => `Más juegos de ${category}`,
+      moreIn: (category: string) => `Más juegos de ${category.charAt(0).toLowerCase()}${category.slice(1)}`,
       allGames: 'Todos los juegos',
       plansHeading: 'Planes de servidores de juego',
       plansIntro:

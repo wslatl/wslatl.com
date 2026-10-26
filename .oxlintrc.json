@@ -18,7 +18,8 @@
     {
       "files": ["tests/**/*.test.ts"],
       "rules": {
-        "vitest/valid-expect": ["error", { "maxArgs": 2 }]
+        "vitest/valid-expect": ["error", { "maxArgs": 2 }],
+        "vitest/expect-expect": ["error", { "assertFunctionNames": ["expect", "expectRefused"] }]
       }
     }
   ]

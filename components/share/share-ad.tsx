@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
+import { useId, useRef, useSyncExternalStore } from 'react'
 import { Check, Copy, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useCopyText } from '@/components/ui/use-copy-text'
 import type { ShareLabels } from '@/lib/share'
 import { cn } from '@/lib/utils'
 
@@ -27,8 +28,6 @@ const canShareNow = () => typeof navigator !== 'undefined' && typeof navigator.s
  * changes width.
  */
 export function ShareAd({ text, labels, variant = 'outline', size = 'default', className }: ShareAdProps) {
-  const [state, setState] = useState<'idle' | 'copied' | 'failed'>('idle')
-  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
   const dialog = useRef<HTMLDialogElement>(null)
   const preText = useRef<HTMLPreElement>(null)
   const titleId = useId()
@@ -36,26 +35,15 @@ export function ShareAd({ text, labels, variant = 'outline', size = 'default', c
   // false on the server and until the page is live, so nothing shifts when the browser turns out to support sharing.
   const canShare = useSyncExternalStore(noSubscribe, canShareNow, () => false)
 
-  useEffect(() => () => clearTimeout(timer.current), [])
-
-  async function copyText() {
-    clearTimeout(timer.current)
-    try {
-      await navigator.clipboard.writeText(text)
-      setState('copied')
-    } catch {
-      // No clipboard here: open the preview with the text selected, so it can be copied by hand.
+  // No clipboard here: open the preview with the text selected, so it can be copied by hand.
+  const { state, copy } = useCopyText(preText, {
+    onFail: () => {
       if (dialog.current && !dialog.current.open) dialog.current.showModal()
-      const selection = window.getSelection()
-      if (preText.current && selection) {
-        const range = document.createRange()
-        range.selectNodeContents(preText.current)
-        selection.removeAllRanges()
-        selection.addRange(range)
-      }
-      setState('failed')
-    }
-    timer.current = setTimeout(() => setState('idle'), 2500)
+    },
+  })
+
+  function copyText() {
+    return copy(text)
   }
 
   async function shareText() {

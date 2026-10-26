@@ -40,7 +40,7 @@ const securityHeaders = [
   },
   {
     key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+    value: 'camera=(), microphone=(), geolocation=()',
   },
   {
     key: 'Cross-Origin-Opener-Policy',
@@ -101,7 +101,7 @@ const nextConfig = {
       // /en/privacy goes to /privacy and only then to /legal/privacy, a chain
       // search engines follow less willingly than one hop.
       ...moved.map((rule) => ({ ...rule, source: `/en${rule.source}` })),
-      // English is served at the plain paths (middleware.ts rewrites them),
+      // English is served at the plain paths (proxy.ts rewrites them),
       // so /en/... would be a second address for the same page.
       { source: '/en', destination: '/', permanent: true },
       { source: '/en/:path*', destination: '/:path*', permanent: true },
