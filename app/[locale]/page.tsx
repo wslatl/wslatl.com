@@ -42,16 +42,6 @@ export default async function Home({ params }: PageProps) {
   setLocale(locale)
   const faqs = localizedFaqs()
 
-  const faqJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqs.map((faq) => ({
-      '@type': 'Question',
-      name: faq.question,
-      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-    })),
-  }
-
   // The name Google shows for the site in results. It reads this from the
   // home page of the domain only, so the language home pages leave it out.
   const websiteJsonLd = {
@@ -68,7 +58,6 @@ export default async function Home({ params }: PageProps) {
     <>
       <SiteHeader />
       {locale === defaultLocale && <JsonLd data={websiteJsonLd} />}
-      <JsonLd data={faqJsonLd} />
       <Main>
         <Hero />
         <Clients />

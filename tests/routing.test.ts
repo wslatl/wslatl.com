@@ -40,6 +40,19 @@ describe('the files served from the site root', () => {
   })
 })
 
+describe('the picture folders at the root', () => {
+  it('serves only pictures from them, so a made-up path there is a 404, not a copy of a page', () => {
+    // /clients/pricing used to skip the language rewrite and render the
+    // English pricing page with a canonical pointing at itself: a duplicate
+    // anyone could get indexed by linking to it.
+    for (const path of ['/clients/pricing', '/owners/legal/privacy', '/owners/games/minecraft', '/clients/']) {
+      expect(isRootFile(path), path).toBe(false)
+      expect(rewriteTarget(path), path).toBe(`/en${path}`)
+    }
+    expect(isRootFile('/owners/someone.webp')).toBe(true)
+  })
+})
+
 describe('a directory shared with pages', () => {
   it('serves the pictures in public/partners/ as files', () => {
     expect(isRootFile('/partners/someone/avatar.webp')).toBe(true)

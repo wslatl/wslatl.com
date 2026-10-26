@@ -12,7 +12,7 @@ export const faqs: Faq[] = [
     id: 'getting-started',
     question: 'How do I get started?',
     answer:
-      'Head to billing.wslatl.com/register and request access. An admin reviews every application and approves it before you can access any services. Once approved, you can order a game server or VPS in the billing portal and pay online. For a dedicated server or web hosting, reach out to us on Discord or open a billing ticket and we will set it up with you.',
+      'Head to wslatl.com/register and request access. An admin reviews every application and approves it before you can access any services. Once approved, you can order a game server or VPS in the billing portal and pay online. For a dedicated server or web hosting, reach out to us on Discord or open a billing ticket and we will set it up with you.',
   },
   {
     id: 'what-makes-you-different',
@@ -56,7 +56,7 @@ export const faqs: Faq[] = [
     id: 'vps-vs-shared',
     question: 'Is VPS hosting better than shared hosting?',
     answer:
-      'For most people running a real project, yes. A VPS gives you dedicated CPU and RAM that nobody else touches, full root access, and no risk of a neighboring account tanking your performance. Shared hosting is cheaper, but you are sharing resources with strangers.',
+      'For most people running a real project, yes. A VPS gives you your own share of CPU and RAM, full root access and your choice of OS. Premium plans run on an AMD Ryzen 9 3900X; Budget plans run on an older, busier CPU, so they can be slower at busy times. Shared hosting is cheaper, but every site on the server draws on the same resources.',
   },
   {
     id: 'ddos-protection',

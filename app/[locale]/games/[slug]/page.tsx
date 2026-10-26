@@ -8,7 +8,6 @@ import { PageHeader } from '@/components/layout/page-header'
 import { PlanGroupTable } from '@/components/pricing/plan-group'
 import { ComparisonList, comparisonLine } from '@/components/pricing/comparisons'
 import { FaqList } from '@/components/sections/faq'
-import { JsonLd } from '@/components/seo/json-ld'
 import { ShareGameAd } from '@/components/share/ads'
 import { Button } from '@/components/ui/button'
 import { games, ramNeedGb, type RamRow } from '@/data/games'
@@ -42,7 +41,6 @@ function PlansThatFit({ row }: { row: RamRow }) {
   const t = copy().games.detail
   const perMonth = copy().pricing.perMonth
   const fits = smallestPlansWithRam('game', ramNeedGb(row))
-  const perMap = /per map/i.test(row.ram)
   if (fits.length === 0) {
     return (
       <Link
@@ -55,7 +53,7 @@ function PlansThatFit({ row }: { row: RamRow }) {
   }
   return fits.map(({ plan }, i) => (
     <span key={plan.name}>
-      {i === 0 && perMap && t.perMap}
+      {i === 0 && row.perMap && t.perMap}
       {i > 0 && t.or}
       <span className="whitespace-nowrap">
         <span className="font-medium text-foreground">{plan.name}</span> ({formatPrice(plan.price)}{perMonth})
@@ -108,19 +106,6 @@ export default async function GamePage({ params }: PageProps) {
   return (
     <>
       <SiteHeader />
-      {faqs.length > 0 && (
-        <JsonLd
-          data={{
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: faqs.map((faq) => ({
-              '@type': 'Question',
-              name: faq.question,
-              acceptedAnswer: { '@type': 'Answer', text: faq.answer },
-            })),
-          }}
-        />
-      )}
 
       <Main className="shell">
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-14 xl:gap-20">

@@ -10,8 +10,11 @@
  * just before a rebuild hit the same 404s.
  *
  * So `npm run build` runs this twice (package.json):
- *   save     before the build: copies .next/static into .next-static-history/,
- *            then drops anything there that no build has produced for 30 days.
+ *   save     before the build: drops anything in .next-static-history/ that
+ *            has not been live for 30 days, then copies .next/static in,
+ *            stamped with today's date. The date says when a file was last
+ *            live, not when it was built: a file built 40 days ago that the
+ *            site still serves today must survive this build.
  *   restore  after the build: copies those files back into .next/static,
  *            never over a file the new build wrote.
  *
@@ -21,7 +24,8 @@
 import { cpSync, existsSync, readdirSync, rmSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
-const root = join(import.meta.dirname, '..')
+// The project folder; tests pass a temporary one as the second argument.
+const root = process.argv[3] ?? join(import.meta.dirname, '..')
 const live = join(root, '.next', 'static')
 const history = join(root, '.next-static-history')
 const keepFor = 30 * 24 * 60 * 60 * 1000
@@ -41,8 +45,8 @@ function prune(dir, cutoff) {
 const mode = process.argv[2]
 
 if (mode === 'save') {
-  if (existsSync(live)) cpSync(live, history, { recursive: true, preserveTimestamps: true })
   if (existsSync(history)) prune(history, Date.now() - keepFor)
+  if (existsSync(live)) cpSync(live, history, { recursive: true })
 } else if (mode === 'restore') {
   if (existsSync(history) && existsSync(live)) {
     cpSync(history, live, { recursive: true, force: false, errorOnExist: false, preserveTimestamps: true })

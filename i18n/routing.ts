@@ -30,7 +30,12 @@ export const rootFiles: readonly string[] = [
   '/company.json',
 ]
 
-/** Directories under public/, served exactly as they are. */
+/**
+ * Directories under public/ that hold only pictures (client logos, team
+ * photos). Only a picture there is a file; any other path under them is a
+ * page and gets a language, so a made-up address like /clients/pricing is a
+ * 404 rather than a second copy of /pricing that a search engine could index.
+ */
 export const rootDirectories: readonly string[] = ['/clients/', '/owners/']
 
 /**
@@ -55,8 +60,7 @@ const sharedFile = new RegExp(`\\.(${partnerImageTypes.join('|')})$`)
 export function isRootFile(pathname: string): boolean {
   return (
     rootFiles.includes(pathname) ||
-    rootDirectories.some((dir) => pathname.startsWith(dir)) ||
-    sharedDirectories.some((dir) => pathname.startsWith(dir) && sharedFile.test(pathname))
+    [...rootDirectories, ...sharedDirectories].some((dir) => pathname.startsWith(dir) && sharedFile.test(pathname))
   )
 }
 

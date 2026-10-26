@@ -40,7 +40,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       // A translation is not the page people should land on first.
       priority: locale === defaultLocale ? priority : Math.round(priority * 0.8 * 10) / 10,
       alternates: {
-        languages: Object.fromEntries(locales.map((other) => [other, pageUrl(other, path)])),
+        // The same set the page's own hreflang tags list, x-default included:
+        // Google wants the two to agree.
+        languages: {
+          ...Object.fromEntries(locales.map((other) => [other, pageUrl(other, path)])),
+          'x-default': pageUrl(defaultLocale, path),
+        },
       },
     })),
   )

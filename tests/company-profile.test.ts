@@ -148,3 +148,29 @@ describe('/company.json', () => {
     expect(rewriteTarget('/company.json')).toBeNull()
   })
 })
+
+describe('the shape the billing panel reads', () => {
+  it('only changes on purpose', () => {
+    // Written out, not derived from the same files the profile is built from,
+    // so renaming a link, a legal document or a question fails here until the
+    // panel has been checked (and the version bumped if it would break).
+    const profile = buildCompanyProfile()
+    expect(profile.version).toBe(1)
+    expect(Object.keys(profile).toSorted()).toEqual([
+      'about', 'description', 'faqs', 'legal', 'legalName', 'links', 'location',
+      'name', 'shortDescription', 'team', 'updatedAt', 'version', 'website',
+    ])
+    expect(Object.keys(profile.links).toSorted()).toEqual([
+      'billing', 'cPanel', 'dedicated', 'discord', 'gamingPanel', 'github',
+      'register', 'status', 'trustpilot', 'vpsPanel',
+    ])
+    expect(Object.keys(profile.legal).toSorted()).toEqual([
+      'abuse', 'acceptable-use', 'account-credit', 'backups', 'dmca', 'privacy',
+      'refund', 'sla', 'subprocessors', 'terms',
+    ])
+    expect(profile.faqs.map((faq) => faq.id)).toEqual([
+      'getting-started', 'what-makes-you-different', 'supported-games', 'game-server-cost',
+      'response-time', 'managed-hosting', 'changes-later', 'vps-vs-shared', 'ddos-protection',
+    ])
+  })
+})

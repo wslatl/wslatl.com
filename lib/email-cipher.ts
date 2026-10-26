@@ -11,6 +11,9 @@ function key(index: number): number {
 }
 
 export function scrambleEmail(address: string): string {
+  // Each character becomes two hex digits, which only holds for ASCII: an
+  // accented or other letter past code 255 would not come back out intact.
+  if (!/^[\x20-\x7e]*$/.test(address)) throw new Error(`Email addresses must be plain ASCII: ${address}`)
   return Array.from(address, (char, i) => (char.charCodeAt(0) ^ key(i)).toString(16).padStart(2, '0')).join('')
 }
 

@@ -88,7 +88,7 @@ export default async function PricingPage({ params }: PageProps) {
       <SiteHeader />
       <Main>
         <div className="shell">
-          <PageHeader title={t.heading}>
+          <PageHeader title={t.heading} breadcrumbs={[]} crumbLabel={t.heading} path="/pricing">
             <p>{t.intro}</p>
             <p className="mt-3 text-base">
               {t.orderingPrefix}{' '}

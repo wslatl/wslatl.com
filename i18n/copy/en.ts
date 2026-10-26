@@ -18,6 +18,7 @@ export const en = {
     getStarted: 'Get started',
     openMenu: 'Menu',
     closeMenu: 'Close menu',
+    mainNav: 'Main',
     newTab: ' (opens in a new tab)',
     login: 'Login',
     clientPanels: 'Client panels',
@@ -43,7 +44,7 @@ export const en = {
     register: { label: 'Request access', description: 'New here? Apply for an account' },
   },
   footer: {
-    blurb: (location: string) => `Private hosting run by a small team in ${location}. Hosting that actually gives a damn.`,
+    blurb: (location: string) => `Private hosting run by a small team in ${location}.`,
     columns: {
       hosting: 'Hosting',
       company: 'Company',
@@ -79,7 +80,7 @@ export const en = {
       emphasis: 'actually',
       lineTwo: 'gives a damn.',
       intro:
-        'We have worked inside hosting companies. We know what goes wrong. WSLATL exists to fix that: affordable VPS hosting, Minecraft and game server hosting, and dedicated servers, backed by a team that actually picks up.',
+        'We have worked inside hosting companies. We know what goes wrong. WSLATL exists to fix that: VPS hosting with every price published, Minecraft and game server hosting, and dedicated servers, backed by a team that actually picks up.',
       seePlans: 'See plans and pricing',
       products: 'Products',
       entries: {
@@ -169,7 +170,7 @@ export const en = {
       heading: 'Common questions',
       stillNotSure: 'Still not sure?',
       askOnDiscord: 'Ask us on Discord',
-      alwaysAround: '. We are always around.',
+      alwaysAround: '. We usually reply within the hour during active hours.',
     },
     contact: {
       heading: 'A hosting company that treats you like a person. Imagine that.',
@@ -224,6 +225,8 @@ export const en = {
       ram: 'RAM',
       storage: 'Storage',
       traffic: 'Traffic',
+      popular: 'Popular',
+      notAvailable: 'n/a',
       price: 'Price',
       order: 'Order',
       orderPlan: (plan: string) => ` ${plan} (opens in a new tab)`,
@@ -322,7 +325,7 @@ export const en = {
   partners: {
     metaTitle: 'Official partners',
     metaDescription: (percent: string) =>
-      `Creators and communities we work with, each with their own referral code. Sign up with one to get ${percent} off the first invoice for your hosting, except dedicated servers.`,
+      `Creators and communities we work with. Sign up with a partner's code for ${percent} off your first invoice for hosting, except dedicated servers.`,
     metaDescriptionNoCodes:
       'Creators and communities we work with, approved by our team. See who they are and where to find them online.',
     emptyMetaDescription:
@@ -440,6 +443,7 @@ export const en = {
   },
   breadcrumbs: {
     home: 'Home',
+    label: 'Breadcrumb',
   },
 }
 

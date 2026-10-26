@@ -9,6 +9,7 @@ export const de: Copy = {
     getStarted: 'Loslegen',
     openMenu: 'Menü',
     closeMenu: 'Menü schließen',
+    mainNav: 'Hauptmenü',
     newTab: ' (öffnet in einem neuen Tab)',
     login: 'Login',
     clientPanels: 'Kundenpanels',
@@ -34,7 +35,7 @@ export const de: Copy = {
     register: { label: 'Zugang anfragen', description: 'Neu hier? Konto beantragen' },
   },
   footer: {
-    blurb: (location: string) => `Privat geführtes Hosting von einem kleinen Team in ${location}. Hosting that actually gives a damn.`,
+    blurb: (location: string) => `Privat geführtes Hosting von einem kleinen Team in ${location}.`,
     columns: {
       hosting: 'Hosting',
       company: 'Unternehmen',
@@ -70,7 +71,7 @@ export const de: Copy = {
       emphasis: 'actually',
       lineTwo: 'gives a damn.',
       intro:
-        'Wir haben in Hosting-Unternehmen gearbeitet. Wir wissen, was dort schiefläuft. WSLATL gibt es, um genau das zu beheben: bezahlbares VPS-Hosting, Minecraft- und Gameserver-Hosting und Dedicated Server, dahinter ein Team, das sich wirklich meldet.',
+        'Wir haben in Hosting-Unternehmen gearbeitet. Wir wissen, was dort schiefläuft. WSLATL gibt es, um genau das zu beheben: VPS-Hosting mit offen veröffentlichten Preisen, Minecraft- und Gameserver-Hosting und Dedicated Server, dahinter ein Team, das sich wirklich meldet.',
       seePlans: 'Tarife und Preise ansehen',
       products: 'Produkte',
       entries: {
@@ -160,7 +161,7 @@ export const de: Copy = {
       heading: 'Häufige Fragen',
       stillNotSure: 'Noch unsicher?',
       askOnDiscord: 'Frag uns auf Discord',
-      alwaysAround: '. Wir sind immer da.',
+      alwaysAround: '. In aktiven Zeiten antworten wir meist innerhalb einer Stunde.',
     },
     contact: {
       heading: 'Ein Hosting-Unternehmen, das dich wie einen Menschen behandelt. Stell dir das vor.',
@@ -215,6 +216,8 @@ export const de: Copy = {
       ram: 'RAM',
       storage: 'Speicher',
       traffic: 'Traffic',
+      popular: 'Beliebt',
+      notAvailable: 'k. A.',
       price: 'Preis',
       order: 'Bestellen',
       orderPlan: (plan: string) => ` ${plan} (öffnet in einem neuen Tab)`,
@@ -313,7 +316,7 @@ export const de: Copy = {
   partners: {
     metaTitle: 'Offizielle Partner',
     metaDescription: (percent: string) =>
-      `Creator und Communities, mit denen wir zusammenarbeiten, jeweils mit eigenem Empfehlungscode. Melde dich mit einem davon an und erhalte ${percent} Rabatt auf die erste Rechnung für dein Hosting, außer bei Dedicated Servern.`,
+      `Creator und Communities, mit denen wir arbeiten. Mit dem Code eines Partners ${percent} Rabatt auf deine erste Rechnung fürs Hosting, außer bei Dedicated Servern.`,
     metaDescriptionNoCodes:
       'Creator und Communities, mit denen wir zusammenarbeiten, von unserem Team freigegeben. Sieh, wer sie sind und wo du sie online findest.',
     emptyMetaDescription:
@@ -434,5 +437,6 @@ export const de: Copy = {
   },
   breadcrumbs: {
     home: 'Startseite',
+    label: 'Brotkrümelnavigation',
   },
 }
