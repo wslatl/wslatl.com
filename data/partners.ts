@@ -201,5 +201,6 @@ export const partners: Partner[] = [
       tiktok: 'https://www.tiktok.com/@notturtle821',
       website: 'https://www.turtlemafia.net',
     },
+    featured: true,
   },
 ]
