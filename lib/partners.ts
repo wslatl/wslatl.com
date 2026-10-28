@@ -4,6 +4,7 @@ import { defaultLocale, locales, type Locale } from '@/i18n/config'
 import type { Copy } from '@/i18n/copy/en'
 import { languageTag } from '@/i18n/dates'
 import { partnerImageTypes } from '@/i18n/routing'
+import { slugify } from '@/lib/utils'
 import {
   partnerTextLimits,
   referralCodePattern,
@@ -237,19 +238,25 @@ export function socialLinks(partner: Partner): SocialLink[] {
 }
 
 /**
- * The games a partner plays, in the order they list them, taken from the
- * games the page already has in its language. A slug with no game behind it
- * is left out.
+ * The games a partner plays, in the order they list them. A game with a page
+ * here comes from the games the page already has, so it carries its name in
+ * that language and its slug for the link. Any other keeps the name as the
+ * partner's entry wrote it and has no slug, so it is shown without a link
+ * until its game gets a page.
  */
-export function partnerGames<Game extends { slug: string }>(partner: Partner, games: readonly Game[]): Game[] {
-  return (partner.games ?? []).flatMap((slug) => games.filter((game) => game.slug === slug))
+export function partnerGames<Game extends { slug: string; name: string }>(
+  partner: Partner,
+  games: readonly Game[],
+): (Game | { slug: null; name: string })[] {
+  return (partner.games ?? []).map((entry) => {
+    const slug = slugify(entry)
+    return games.find((game) => game.slug === slug) ?? { slug: null, name: entry.trim() }
+  })
 }
 
 export interface PartnerCheckContext {
   /** Width and height of a file under public/, or null when there is no such image. */
   imageSize: (publicPath: string) => { width: number; height: number } | null
-  /** The slugs in data/games.ts. */
-  gameSlugs: readonly string[]
   /** This month as YYYY-MM, so no partner can start in the future. */
   thisMonth: string
 }
@@ -310,9 +317,11 @@ export function partnerProblems(list: readonly Partner[], context: PartnerCheckC
     if (!month) at(`since ${partner.since} must be YYYY-MM`)
     else if (partner.since > context.thisMonth) at(`since ${partner.since} is in the future`)
 
+    // A game without a page here is allowed: it shows without a link until it
+    // has one. The same game twice (by slug or by name) is a slip.
     const games = partner.games ?? []
-    for (const game of games) if (!context.gameSlugs.includes(game)) at(`game ${game} is not in data/games.ts`)
-    if (new Set(games).size !== games.length) at('a game is listed twice')
+    for (const game of games) if (!game.trim() || game.length > 60) at(`game "${game}" must be 1 to 60 characters`)
+    if (new Set(games.map(slugify)).size !== games.length) at('a game is listed twice')
 
     for (const platform of Object.keys(partner.socials) as SocialPlatform[]) {
       const href = partner.socials[platform]

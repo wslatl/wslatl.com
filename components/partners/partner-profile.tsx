@@ -170,16 +170,23 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
                 {words.profile.games}
               </h2>
               <ul className="mt-4 flex flex-wrap gap-2">
-                {games.map((game) => (
-                  <li key={game.slug}>
-                    <Link
-                      href={path(`/games/${game.slug}`)}
-                      className="inline-block rounded-full border px-3.5 py-1.5 text-sm text-foreground/85 transition-colors hover:border-foreground/30 hover:text-foreground"
-                    >
+                {games.map((game) =>
+                  game.slug ? (
+                    <li key={game.slug}>
+                      <Link
+                        href={path(`/games/${game.slug}`)}
+                        className="inline-block rounded-full border px-3.5 py-1.5 text-sm text-foreground/85 transition-colors hover:border-foreground/30 hover:text-foreground"
+                      >
+                        {game.name}
+                      </Link>
+                    </li>
+                  ) : (
+                    // No page for this game yet: the same pill, without a link.
+                    <li key={game.name} lang="en" className="inline-block rounded-full border px-3.5 py-1.5 text-sm text-foreground/85">
                       {game.name}
-                    </Link>
-                  </li>
-                ))}
+                    </li>
+                  ),
+                )}
               </ul>
             </section>
           )}

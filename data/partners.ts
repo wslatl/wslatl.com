@@ -53,7 +53,13 @@ export interface Partner {
   referralCode?: string
   /** The month they became a partner, as YYYY-MM. */
   since: string
-  /** Games they play, as slugs from data/games.ts. Each links to its page. */
+  /**
+   * Games they play, in their order. Each is a slug from data/games.ts
+   * ('fivem') or a game's name as it is usually written ('Among Us'). One
+   * with a page here links to it, in the page's language; any other shows as
+   * plain text. A name links by itself once its game gets a page, as long as
+   * the page's slug is the name in lowercase with hyphens ('among-us').
+   */
   games?: string[]
   /** Full https links. tests/partners.test.ts checks each one is on its platform's own site. */
   socials: Partial<Record<SocialPlatform, string>>
@@ -176,6 +182,24 @@ export const partners: Partner[] = [
     socials: {
       discord: 'https://discord.gg/NNgS5c2rb8',
       tiktok: 'https://www.tiktok.com/@cwgaming32',
+    },
+  },
+  {
+    slug: 'turtle',
+    name: 'Turtle',
+    tagline: 'Twitch streamer playing community games with anyone who wants to join',
+    description:
+      "My name is Turtle, a Twitch streamer who plays mostly community-style games with anyone who wants to join. I've been creating content since 2011 and love making people laugh.",
+    avatar: '/partners/turtle/avatar.webp',
+    referralCode: 'TURTLE',
+    since: '2026-10',
+    games: ['fivem', 'Farming Simulator', 'Among Us', 'American Truck Simulator'],
+    socials: {
+      discord: 'https://discord.gg/TurtleMafia',
+      twitch: 'https://www.twitch.tv/turtle821',
+      youtube: 'https://www.youtube.com/@Turtle821',
+      tiktok: 'https://www.tiktok.com/@notturtle821',
+      website: 'https://www.turtlemafia.net',
     },
   },
 ]

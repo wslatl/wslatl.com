@@ -23,6 +23,7 @@ import { en } from '@/i18n/copy/en'
 import {
   hasReferralCode,
   orderedPartners,
+  partnerGames,
   partnerInitials,
   partnerMetaDescription,
   partnerProblems,
@@ -46,7 +47,6 @@ vi.mock('@/components/layout/footer', () => ({ Footer: () => null }))
 
 const root = join(__dirname, '..')
 const thisMonth = new Date().toISOString().slice(0, 7)
-const gameSlugs = games.map((game) => game.slug)
 
 /** The real check: pictures are read from public/. */
 const realContext: PartnerCheckContext = {
@@ -54,7 +54,6 @@ const realContext: PartnerCheckContext = {
     const file = join(root, 'public', path)
     return existsSync(file) ? imageSize(readFileSync(file)) : null
   },
-  gameSlugs,
   thisMonth,
 }
 
@@ -170,11 +169,21 @@ describe('the partner checks', () => {
     expect(problemsWith({ since: '9999-01' }).join('\n')).toMatch(/in the future/)
   })
 
-  it('only list games that have a page', () => {
-    expect(problemsWith({ games: ['minecraft', 'not-a-game'] }).join('\n')).toMatch(
-      /not-a-game is not in data\/games\.ts/,
-    )
+  it('list games with or without a page, each once', () => {
+    expect(problemsWith({ games: ['minecraft', 'Among Us'] })).toEqual([])
     expect(problemsWith({ games: ['minecraft', 'minecraft'] }).join('\n')).toMatch(/listed twice/)
+    // The same game by slug and by name is still the same game.
+    expect(problemsWith({ games: ['minecraft', 'Minecraft'] }).join('\n')).toMatch(/listed twice/)
+    expect(problemsWith({ games: [''] }).join('\n')).toMatch(/1 to 60 characters/)
+  })
+
+  it('link a game that has a page, by slug or by name, and show any other as plain text', () => {
+    const shown = partnerGames({ ...examplePartner, games: ['minecraft', 'Valheim', 'Among Us'] }, games)
+    expect(shown.map((game) => [game.slug, game.name])).toEqual([
+      ['minecraft', 'Minecraft'],
+      ['valheim', 'Valheim'],
+      [null, 'Among Us'],
+    ])
   })
 
   it('check each picture that is given: where it is, its type and its shape', () => {
