@@ -8,8 +8,8 @@ const script = join(__dirname, '..', 'scripts', 'keep-old-assets.mjs')
 const day = 24 * 60 * 60 * 1000
 let project = ''
 
-function run(mode: 'save' | 'restore') {
-  execFileSync(process.execPath, [script, mode, project])
+function run(mode: 'save' | 'restore', env: Record<string, string> = {}) {
+  execFileSync(process.execPath, [script, mode, project], { env: { ...process.env, ...env } })
 }
 
 function file(path: string, ageInDays = 0) {
@@ -47,5 +47,20 @@ describe('keeping earlier builds’ files', () => {
     run('restore')
     expect(existsSync(join(project, '.next-static-history'))).toBe(false)
     expect(existsSync(join(project, '.next/static/chunks/new.css'))).toBe(true)
+  })
+
+  it('uses the history folder the updater names, so every release shares one', () => {
+    // scripts/serve.mjs builds each release in its own folder, and points
+    // them all at the history beside .env.
+    project = mkdtempSync(join(tmpdir(), 'keep-old-assets-'))
+    const shared = join(project, 'shared-history')
+    file('.next/static/chunks/live.css')
+    run('save', { STATIC_HISTORY_DIR: shared })
+    rmSync(join(project, '.next'), { recursive: true })
+    file('.next/static/chunks/new.css')
+    run('restore', { STATIC_HISTORY_DIR: shared })
+    expect(existsSync(join(shared, 'chunks/live.css'))).toBe(true)
+    expect(existsSync(join(project, '.next-static-history'))).toBe(false)
+    expect(existsSync(join(project, '.next/static/chunks/live.css'))).toBe(true)
   })
 })

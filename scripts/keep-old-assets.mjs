@@ -22,12 +22,14 @@
  * keeping them changes nothing for anyone on the current build.
  */
 import { cpSync, existsSync, readdirSync, rmSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 
 // The project folder; tests pass a temporary one as the second argument.
 const root = process.argv[3] ?? join(import.meta.dirname, '..')
 const live = join(root, '.next', 'static')
-const history = join(root, '.next-static-history')
+// The updater (scripts/serve.mjs) builds every release in a folder of its
+// own and points them all at the one history beside .env.
+const history = process.env.STATIC_HISTORY_DIR ? resolve(process.env.STATIC_HISTORY_DIR) : join(root, '.next-static-history')
 const keepFor = 30 * 24 * 60 * 60 * 1000
 
 function prune(dir, cutoff) {
