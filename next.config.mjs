@@ -1,4 +1,6 @@
+import { execFileSync } from 'node:child_process'
 import shortLinks from './config/links.json' with { type: 'json' }
+import { parseVersion } from './scripts/updater/release.mjs'
 
 const legalSlugs = [
   'privacy',
@@ -64,9 +66,46 @@ const securityHeaders = [
   },
 ]
 
+// The admin is for the owner only: never indexed, wherever a link to it
+// turns up. Its pages also carry a robots meta tag, and robots.txt
+// disallows it.
+const adminHeaders = [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]
+
+/**
+ * What this build is, for the admin dashboard (lib/admin/build-info.ts): the
+ * release the updater built it from, SITE_RELEASE, and its commit,
+ * SITE_COMMIT. A downloaded release has no git history, so the updater
+ * (scripts/serve.mjs) passes both; a build from a git checkout asks git for
+ * the commit. A folder uploaded by hand has no release, and the dashboard
+ * says so. Only server code in lib/admin reads them.
+ */
+function siteRelease() {
+  const tag = process.env.SITE_RELEASE ?? ''
+  return parseVersion(tag) ? tag : ''
+}
+
+function siteCommit() {
+  if (/^[0-9a-f]{40}$/.test(process.env.SITE_COMMIT ?? '')) return process.env.SITE_COMMIT
+  try {
+    return execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim()
+  } catch {
+    return ''
+  }
+}
+
 /** @satisfies {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  // This folder, always. The updater builds each release in a folder inside
+  // the uploaded copy of the site, and Next would otherwise take the outer
+  // package-lock.json as the workspace root (and warn about it).
+  turbopack: {
+    root: import.meta.dirname,
+  },
+  env: {
+    SITE_RELEASE: siteRelease(),
+    SITE_COMMIT: siteCommit(),
+  },
   images: {
     // Every image in /public is already exported at its display size (see
     // README), so there is nothing left for a runtime optimizer to do.
@@ -78,6 +117,8 @@ const nextConfig = {
         source: '/:path*',
         headers: securityHeaders,
       },
+      { source: '/admin', headers: adminHeaders },
+      { source: '/admin/:path*', headers: adminHeaders },
     ]
   },
   async redirects() {

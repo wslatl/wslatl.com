@@ -4,12 +4,14 @@ import { describe, expect, it, vi } from 'vitest'
 import { generateMetadata as homeMetadata } from '@/app/[locale]/page'
 import { generateMetadata as gameMetadata } from '@/app/[locale]/games/[slug]/page'
 import manifest from '@/app/manifest'
+import robots from '@/app/robots'
 import sitemap from '@/app/sitemap'
 import { siteConfig } from '@/config/site'
 import { games } from '@/data/games'
 import { locales } from '@/i18n/config'
 import { pageUrl } from '@/lib/metadata'
 import { imageSize } from './image-size'
+import nextConfig from '../next.config.mjs'
 
 vi.mock('@/components/layout/site-header', () => ({ SiteHeader: () => null }))
 vi.mock('@/components/layout/footer', () => ({ Footer: () => null }))
@@ -78,6 +80,25 @@ describe('what Google reads for the site and its pages', () => {
       const entry = sitemap().find((item) => item.url === pageUrl(locale, '/'))
       expect(entry?.alternates?.languages).toEqual(head)
       expect(head).toMatchObject({ 'x-default': siteConfig.siteUrl })
+    }
+  })
+})
+
+describe('the admin, which search engines must leave alone', () => {
+  it('is disallowed in robots.txt', () => {
+    const rules = [robots().rules].flat()
+    expect(rules.some((rule) => [rule.disallow].flat().includes('/admin'))).toBe(true)
+  })
+
+  it('is not in the sitemap', () => {
+    expect(sitemap().filter((entry) => new URL(entry.url).pathname.startsWith('/admin'))).toEqual([])
+  })
+
+  it('is sent with a noindex header on every page and route', async () => {
+    const rules = await nextConfig.headers()
+    for (const source of ['/admin', '/admin/:path*']) {
+      const rule = rules.find((r) => r.source === source)
+      expect(rule?.headers, source).toContainEqual({ key: 'X-Robots-Tag', value: 'noindex, nofollow' })
     }
   })
 })

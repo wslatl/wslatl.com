@@ -57,6 +57,33 @@ export const partnerImageTypes = ['webp', 'png', 'jpg', 'jpeg'] as const
 
 const sharedFile = new RegExp(`\\.(${partnerImageTypes.join('|')})$`)
 
+/**
+ * The admin (app/admin): English only, outside the languages, so its paths
+ * are never given one. /administrator and the like are not it.
+ */
+export function isAdminPath(pathname: string): boolean {
+  return pathname === '/admin' || pathname.startsWith('/admin/')
+}
+
+/**
+ * The admin's JSON routes that take a POST, the only paths on the site that
+ * do. Exact paths: a POST anywhere else under /admin/api/ would reach a page
+ * and bring back what the 405 is for. tests/proxy.test.ts keeps this list in
+ * step with the route handlers in app/admin/api/.
+ */
+export const adminPostRoutes: readonly string[] = ['/admin/api/login', '/admin/api/logout', '/admin/api/update']
+
+/**
+ * Which methods proxy.ts lets through. The site is read-only except for the
+ * admin's JSON routes, which take a POST to log in, log out and ask for an
+ * update. Every one of those checks the request came from this site
+ * (lib/admin/request.ts), and tests/proxy.test.ts makes sure of it.
+ */
+export function methodAllowed(method: string, pathname: string): boolean {
+  if (method === 'GET' || method === 'HEAD') return true
+  return method === 'POST' && adminPostRoutes.includes(pathname)
+}
+
 export function isRootFile(pathname: string): boolean {
   return (
     rootFiles.includes(pathname) ||
@@ -77,7 +104,7 @@ export function isRootFile(pathname: string): boolean {
  * for every bot that probed one.
  */
 export function rewriteTarget(pathname: string): string | null {
-  if (isRootFile(pathname)) return null
+  if (isRootFile(pathname) || isAdminPath(pathname)) return null
   const first = pathname.split('/')[1]
   if ((locales as readonly string[]).includes(first)) return null
   return `/${defaultLocale}${pathname}`
