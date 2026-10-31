@@ -138,11 +138,12 @@ async function answers(listen, child, timeoutMs = healthTimeoutMs) {
   return false
 }
 
+// On every interface, as the trial server will listen.
 function freePort() {
   return new Promise((resolve, reject) => {
     const server = createServer()
     server.once('error', reject)
-    server.listen(0, '127.0.0.1', () => {
+    server.listen(0, () => {
       const { port: free } = server.address()
       server.close(() => resolve(free))
     })
