@@ -13,7 +13,7 @@ The public website for WSLATL LLC. Private hosting based in Missouri: VPS hostin
 5. Shows our official referral partners on `/partners`, each with a profile page and, if they have one, their referral code.
 6. Does all of that in English, Spanish, French, German and Portuguese.
 
-Every page is static. There is no CMS and no database: content lives in `data/*.ts` and `content/legal/*.tsx`, so copy is one PR away.
+Every public page is static. There is no CMS and no database: content lives in `data/*.ts` and `content/legal/*.tsx`, so copy is one PR away.
 
 ---
 
@@ -25,6 +25,7 @@ app/
   sitemap.ts, robots.ts    Every page in every language, from the same data the pages use.
   manifest.ts              /manifest.webmanifest: the name and icons for a home-screen shortcut.
   company.json/route.ts    /company.json: the company profile for the billing panel, written at build time.
+  admin/                   The admin: log in and update the site from GitHub (see Admin and updates).
   [locale]/                Every page, once, for all five languages (see Languages).
     layout.tsx             Root layout: language, fonts, default metadata, Organization JSON-LD, skip link.
     page.tsx               Home page composition.
@@ -37,7 +38,7 @@ app/
     partners/[slug]/page.tsx  One profile per partner, statically generated from data/partners.ts.
     not-found.tsx, error.tsx  Branded 404 and error pages.
 
-proxy.ts                   Serves the English tree at the unprefixed URLs, and answers Server Action probes with a 400 (the site has none).
+proxy.ts                   Serves the English tree at the unprefixed URLs, and answers 405 to every method but GET and HEAD, apart from POST on the admin's JSON routes.
 
 components/
   ui/                      Primitives: button, dropdown-menu, section-header, site-link.
@@ -57,7 +58,7 @@ content/legal/             The text of each policy; index.ts maps each document 
 data/                      Everything else the pages render (see below).
 i18n/                      Languages: the current one, the dictionaries, the translations.
 lib/                       pricing helpers, pageMetadata(), cn() and slugify().
-scripts/                   Checks that need a build or a live site (see Automation), and keep-old-assets.mjs (see Deploying).
+scripts/                   Checks that need a build or a live site (see Automation), keep-old-assets.mjs (see Deploying), and serve.mjs, the updater (see Admin and updates).
 tests/                     Vitest suites for data, links, and house style.
 ```
 
@@ -214,9 +215,92 @@ The icons are all the white WSLATL mark on the site's near-black tile (`#050505`
 
 ## Deploying
 
-`npm run build` keeps the stylesheets and scripts of earlier builds for 30 days (`scripts/keep-old-assets.mjs`, run before and after `next build` as `prebuild` and `postbuild`). Every build renames them, because their names carry a hash of their content, and `next build` deletes the old ones. Google fetches a page's HTML on one day and renders it later with the files that HTML names, so without the old files it renders the page without its stylesheet. The kept files wait in `.next-static-history/` (gitignored); delete that folder only to start fresh.
+`npm run build` keeps the stylesheets and scripts of earlier builds for 30 days (`scripts/keep-old-assets.mjs`, run before and after `next build` as `prebuild` and `postbuild`). Every build renames them, because their names carry a hash of their content, and `next build` deletes the old ones. Google fetches a page's HTML on one day and renders it later with the files that HTML names, so without the old files it renders the page without its stylesheet. The kept files wait in `.next-static-history/` (gitignored); delete that folder only to start fresh. After each build they are put back beside the new build's own files, and listed in `.next/restored-assets.json`, so the next build counts only its own files as live and the old ones go 30 days after they were last live.
 
-This only works if the server builds with `npm run build`, not `npx next build`, and keeps `.next-static-history/` between restarts.
+Production runs `npm run serve` (see Admin and updates), which installs published GitHub releases (see Releasing) and builds each one with `npm run build`, every one sharing the `.next-static-history/` beside `.env` (`STATIC_HISTORY_DIR`). A build by hand must use `npm run build` too, not `npx next build`, and keep `.next-static-history/` between restarts.
+
+## Releasing
+
+The live site only ever runs a published GitHub release. Merging into `main` changes nothing on the server by itself.
+
+1. Merge the pull request into `main`.
+2. Publish a release of `main`, tagged with the next version in the form `vMAJOR.MINOR.PATCH`: a fix raises the last number (v1.4.1), something new the middle one (v1.5.0), a big change the first (v2.0.0). On GitHub: Releases, Draft a new release, type the new tag, pick `main` as the target, Generate release notes, Publish release. Or from a terminal: `gh release create v1.5.0 --target main --generate-notes`. The version lives in the tag alone; no commit is needed to bump it.
+3. Open `wslatl.com/admin` and press **Install v1.5.0**.
+
+The dashboard offers a release only when it is GitHub's latest release (never a draft or a pre-release), its tag is a version, and that version is newer than the installed one, compared as numbers (v1.10.0 is newer than v1.9.0). A tag in any other form is refused with a message saying so. To hold a release back from the site, publish it as a pre-release.
+
+When you press Install, the updater asks GitHub once which commit the tag points at and builds exactly that commit, so a tag moved halfway through an update changes nothing. If the repository's settings offer immutable releases (Settings, General, Releases), turn them on as well: a published release's tag can then never be moved at all.
+
+## Admin and updates
+
+`/admin` updates the site from GitHub, and that is all it does: log in, see which release is installed and which is the latest, press **Install**, and watch each step. It is English only, outside the language routing, never indexed (a robots meta tag and an `X-Robots-Tag` header), and not in the sitemap. robots.txt leaves it out on purpose: a line there would only point at it, and a disallowed page is never fetched, so its noindex would never be seen. There is no database: the settings are in `.env`, and the code comes from GitHub releases.
+
+### How an update works
+
+`npm run serve` (`scripts/serve.mjs`) is the server's startup command. It runs `next start`, starts it again if it stops, and does the updating, since a running Next server cannot replace itself. **Install** writes `.updater/request.json`, and within two seconds the supervisor:
+
+1. **Download**: asks GitHub for the latest release, checks that its tag is a version newer than the installed one (see Releasing), asks which commit the tag points at, and downloads exactly that commit into `.updater/releases/<tag>/` (named by tag, since two releases may tag the same commit).
+2. **Install**: runs `npm ci --ignore-scripts` there.
+3. **Build**: runs `npm run build` there, with the live build's own assets copied in (not the old ones put back beside them) and the one shared `.next-static-history/`, so old hashed assets survive exactly as they do in a build by hand (see Deploying).
+4. **Trial start**: starts the new build on a spare local port and waits for its home page to answer. Until here, the live site has not been touched.
+5. **Switch**: stops the live server and starts the new build on the real port. If it does not answer within two minutes, the release before it starts again (rolled back).
+
+A failure at any step leaves the site on the version it had, removes the half-built release, and shows the reason and the log on the dashboard. The install and the build each get 15 minutes, after which they are stopped together with everything they started. The build of the uploaded folder at start-up has no limit, as before the supervisor: stopped, it would only start over when the server starts again. The site is down only for the few seconds of the switch. `.env` and `.next-static-history/` are never touched.
+
+A new release is watched for ten minutes after its switch, across a restart of the server too: if it stops three times in that time, the supervisor goes back to the release before it by itself, and the dashboard says so. When there is none left (each update removes it to make room, so after an update the only earlier build is the uploaded folder), it goes back to the uploaded folder instead and says that this may be an older version. Otherwise the supervisor starts `next start` again whenever it stops, waiting a little longer each time.
+
+**Disk space.** The live release and the one before it are kept and older ones deleted, and when the next update starts, every release but the live one is removed (the one before it, and one a crash took back out). So at most three copies of the site are on the disk at once: the uploaded folder, the live release and the new one. Each holds its own `node_modules` and build, about 800 MB. npm's download cache lives in `.updater/npm-cache/` only while an update runs, and is deleted after it. Give the server a disk limit of at least 4 GB: Pterodactyl stops a server that goes over its limit, and does not start it again until it is back under.
+
+The supervisor reports through `.updater/state.json`, which the dashboard reads. The settings in `.env` are given to `next start`, and never to the updater's `npm ci` or its builds of a release; `npm ci` also skips install scripts, which is where a compromised package usually strikes (the site needs none: sharp and the compilers ship prebuilt). A build still runs the site's own code and its build tools, exactly as a build by hand does, and the build of the uploaded folder at start-up reads `.env` from that folder itself, as any build by hand does. The console logs each login and failed login with the visitor's address, each update request, and each step of an update.
+
+### One-time setup on Pterodactyl
+
+1. **Upload this version by hand, one last time**, the way you do now. Keep `.env` and `.next-static-history/`.
+2. **Make a GitHub token.** On GitHub: Settings, Developer settings, Personal access tokens, Fine-grained tokens, Generate new token. Resource owner `wslatl`. Repository access: Only select repositories, `wslatl/wslatl.com`. Repository permissions: Contents, Read-only (Metadata, Read-only comes with it). Nothing else. Give it an expiry and note the date: once it expires, the dashboard says GitHub refused the token, and you make a new one.
+3. **Make the password hash.** On your own computer, in a copy of this repository, run `npm run admin:hash`. It asks for the password twice (12 characters or more, not shown as you type) and prints an `ADMIN_PASSWORD_HASH=` line and an `ADMIN_SESSION_SECRET=` line.
+4. **Fill in `.env`** in the server's folder, beside `package.json`, with `.env.example` as the template: the two lines from step 3, `GITHUB_TOKEN=` with the token, and `GITHUB_REPO` only if it is not `wslatl/wslatl.com`.
+5. **Change the startup command** on the server's Startup tab, from `npm run build && npm start` to `npm run serve`. If the field is locked, a panel admin can change it under Admin, Servers, the server, Startup. It listens on `SERVER_PORT`, which Pterodactyl sets to the server's port (then `PORT`, then 3000).
+6. **Restart the server.** The console says `The admin is on at /admin.` and `Updates install the latest release of wslatl/wslatl.com.`, or which setting is missing. Until the first update, every start builds the uploaded folder first (a minute or two), as the old startup command did. Open `wslatl.com/admin` and log in.
+7. **Put `/admin` behind Cloudflare Access** (strongly recommended). The login allows 30 attempts per 15 minutes in all, which stops password guessing, but anyone with a handful of addresses can use them up and keep you locked out. With Access in front, nobody else reaches the login at all. In the Cloudflare dashboard: Zero Trust, Access, Applications, Add an application, Self-hosted. Application domain `wslatl.com`, path `admin` (everything under `/admin` is covered). Add a policy: action Allow, include Emails, your own address. Save. `/admin` then asks for a one-time code sent to that address before the login page appears. If you would rather not use Access, a WAF custom rule does most of it: Security, WAF, Custom rules, block when the URI path starts with `/admin` and the IP source address is not yours (this needs an address that does not change).
+
+From then on, a change reaches the site as a release: see Releasing.
+
+### When something goes wrong
+
+- **`/admin` answers 404.** The admin is off because a setting is missing or malformed. The console says which, at startup and on the first visit to `/admin`.
+- **The dashboard says the site was not started with `npm run serve`.** The startup command is still the old one (step 5).
+- **An update failed.** The dashboard shows the step, the reason and the log, and the site is unchanged. Fix the problem, publish a new release, and install that.
+- **Nothing to install.** The dashboard says why: no release is published yet, the latest release is the installed one, the release marked latest is older than the installed one, or its tag is not in the form `vMAJOR.MINOR.PATCH`.
+- **The dashboard says the updater itself changed.** `scripts/serve.mjs` and `scripts/updater/` always run from the uploaded folder, so a commit that changes them takes effect only once they are copied over: copy both from `.updater/releases/<tag>/scripts/` into the server's `scripts/` folder, then restart the server.
+- **Going back to uploading by hand.** Once an update has run, the site is served from `.updater/releases/`, so files uploaded to the server's folder are not served. Stop the server, delete the `.updater/` folder (never `.env` or `.next-static-history/`), and start it again: it builds the uploaded folder and serves it.
+- **Logging everyone out.** Change `ADMIN_SESSION_SECRET` or the password, and restart. A session lasts two hours anyway.
+- **A new release went back by itself.** It stopped three times within ten minutes of its switch; the dashboard says so, and the console has its errors. That release is not offered again: fix it, publish the fix as a newer release, and install that.
+- **`.updater/state.json` is damaged.** The console says so at start-up. The site then runs from the uploaded folder, and no release is deleted until an update writes the file again.
+
+**The server console** (Pterodactyl's Console tab) takes these commands: `status` (what is serving, and what the updater last did), `update` (install the latest release, as the dashboard does), `rollback` (back to the release before the live one), `rollback upload` (back to the uploaded folder, when no release before is left: it may be much older), `restart` (start the live server again) and `stop`. While the server starts (and builds the uploaded folder) and while an update or a rollback runs, the commands that move the site wait for it to finish.
+
+### How it is kept safe
+
+- **Login.** The password is checked against an scrypt hash in constant time. Each address gets 5 attempts and everyone together 30 per 15 minutes, counted before the password is checked, and at most two checks run at once. Your own successful logins give their attempt back.
+- **Only three routes take a POST:** `/admin/api/login`, `/admin/api/logout` and `/admin/api/update` (`adminPostRoutes` in `i18n/routing.ts`).
+- **Session.** A signed cookie, `wslatl_admin`: HttpOnly, Secure, SameSite=Strict, Path=/admin, two hours. Its key comes from the session secret and the password hash together.
+- **Every POST** must come from a page on this site (the `Origin` matches the host, and `Sec-Fetch-Site`, when sent, is `same-origin`), as JSON, and at most 4 KB. `proxy.ts` answers every other POST with a 405; `tests/proxy.test.ts` checks that each admin POST handler calls `checkPost()` before anything else.
+- **Secrets** are read on the server, on each request, in `server-only` modules. `tests/admin-secrets.test.ts` keeps them away from client components, and `npm run scan:build` fails if a secret from `.env`, a password hash or a GitHub token turns up in anything the site serves. CI builds with made-up values in `.env` to prove it.
+- **If any required setting is missing,** the admin is off. It never runs open.
+- **Lockouts.** The overall limit stops the password being guessed however many addresses are used, and its flip side is that anyone with a handful of addresses (one IPv6 network holds hundreds) can use it up and keep the login locked, through Cloudflare or not. The per-address limit cannot prevent that: it reads Cloudflare's `CF-Connecting-IP`, which anyone who reaches the server's port directly can make up, and Next keeps a client's own `X-Forwarded-For`. Cloudflare Access in front of `/admin` (setup step 7) closes it. Accepting connections to the server's port from Cloudflare's addresses only (or a Cloudflare Tunnel) keeps the address honest as well.
+
+| File | What it holds |
+| --- | --- |
+| `app/admin/` | The login page, the dashboard, and the JSON routes under `api/` (login, logout, update) |
+| `components/admin/` | The login form, the update panel, the log-out button |
+| `lib/admin/` | Settings, password hashing, sessions, rate limits, request checks, GitHub, and the dashboard's side of the updater |
+| `scripts/serve.mjs` | The supervisor, `npm run serve` |
+| `scripts/updater/` | The update steps and the `.updater/` layout (`lib.mjs`), the version rule (`release.mjs`), the live server and its crash watch (`live.mjs`) and child processes (`process.mjs`), each with tests in `tests/updater*.test.ts` |
+| `scripts/hash-password.mjs` | `npm run admin:hash` |
+| `.env.example` | Every setting, with what it does |
+
+The knowledge base (knowledge.wslatl.com) follows the same admin design, with the same settings and the same `npm run serve`, so the two are set up the same way.
+
 
 ## Local development
 
@@ -234,11 +318,13 @@ Then open [http://localhost:3000](http://localhost:3000). Pass a port with `npm 
 | `npm run dev` | Development server with hot reload |
 | `npm run build` | Production build (also type-checks) |
 | `npm run start` | Serve the production build |
+| `npm run serve` | Serve it under the updater, the server's startup command (see Admin and updates) |
+| `npm run admin:hash` | Make the admin password hash and session secret for `.env` |
 | `npm run lint` | Oxlint, then ESLint with the Next.js core-web-vitals and TypeScript rules |
 | `npm run lint:fix` | Same, applying the safe automatic fixes |
 | `npm test` | Vitest: pricing invariants, link integrity, redirects, legal data, and a no-em-dash check |
 | `npm run typecheck` | `tsc` (TypeScript 7) against the whole project; run after a build |
-| `npm run scan:build` | Fails if an email address reached the build output |
+| `npm run scan:build` | Fails if an email address or an admin secret reached the build output, or a page in the sitemap is no longer prerendered |
 | `npm run check:site <url>` | Checks a running site: pages, headers, redirects, short links, certificate |
 | `npm run check` | Lint, test, build, scan, typecheck, in the order CI runs them |
 
@@ -276,7 +362,7 @@ GitHub turns off scheduled workflows in a repository with no activity for 60 day
 
 ## Configuration
 
-Runtime site config lives in `config/site.ts`: company name and location, the site URL (used for canonical URLs and the sitemap), internal paths, the footer credit, and per-document legal effective dates. Link destinations are in `config/links.json` and email addresses in `config/emails.ts`. When you revise a policy, bump only that document's entry in `effectiveDates`. There are no environment variables.
+Runtime site config lives in `config/site.ts`: company name and location, the site URL (used for canonical URLs and the sitemap), internal paths, the footer credit, and per-document legal effective dates. Link destinations are in `config/links.json` and email addresses in `config/emails.ts`. When you revise a policy, bump only that document's entry in `effectiveDates`. The public site reads no environment variables; the admin's settings are in `.env`, listed in `.env.example` (see Admin and updates).
 
 ---
 

@@ -7,6 +7,8 @@ node_modules/
 .next/
 # earlier builds' hashed files, kept by scripts/keep-old-assets.mjs
 .next-static-history/
+# the updater's state and releases (scripts/serve.mjs)
+.updater/
 out/
 build/
 dist/

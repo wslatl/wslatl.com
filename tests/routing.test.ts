@@ -2,7 +2,9 @@ import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
+  isAdminPath,
   isRootFile,
+  methodAllowed,
   partnerImageTypes,
   rewriteTarget,
   rootDirectories,
@@ -123,5 +125,32 @@ describe('where a request is sent', () => {
     expect(rewriteTarget('/sw.js')).toBe('/en/sw.js')
     expect(rewriteTarget('/.env')).toBe('/en/.env')
     expect(rewriteTarget('/wp-login.php')).toBe('/en/wp-login.php')
+  })
+})
+
+describe('the admin', () => {
+  it('lives outside the languages, so its paths are never given one', () => {
+    for (const path of ['/admin', '/admin/', '/admin/login', '/admin/api/update']) {
+      expect(isAdminPath(path), path).toBe(true)
+      expect(rewriteTarget(path), path).toBeNull()
+    }
+    for (const path of ['/administrator', '/admin.php', '/adminer', '/es/admin']) {
+      expect(isAdminPath(path), path).toBe(false)
+    }
+    expect(rewriteTarget('/admin.php')).toBe('/en/admin.php')
+  })
+
+  it('is the only place a POST is allowed, and only on its JSON routes', () => {
+    for (const path of ['/', '/pricing', '/es/pricing', '/admin', '/admin/login', '/company.json']) {
+      expect(methodAllowed('GET', path), path).toBe(true)
+      expect(methodAllowed('HEAD', path), path).toBe(true)
+      expect(methodAllowed('POST', path), path).toBe(false)
+    }
+    expect(methodAllowed('POST', '/admin/api/login')).toBe(true)
+    // Only the routes that exist: anything else there would reach a page.
+    expect(methodAllowed('POST', '/admin/api/anything')).toBe(false)
+    expect(methodAllowed('POST', '/admin/api/login/')).toBe(false)
+    expect(methodAllowed('PUT', '/admin/api/login')).toBe(false)
+    expect(methodAllowed('DELETE', '/admin/api/update')).toBe(false)
   })
 })

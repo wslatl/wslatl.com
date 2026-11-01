@@ -27,9 +27,18 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
+      # Made-up admin settings, so the scan below can prove that no .env
+      # value reaches what the site serves. Nothing here starts the admin.
+      - name: Canary admin settings
+        run: |
+          {
+            echo "ADMIN_PASSWORD_HASH=scrypt:32768:8:1:Y2FuYXJ5LXNhbHQtY2FuYXJ5:Y2FuYXJ5LWtleS1jYW5hcnkta2V5LWNhbmFyeS1rZXk"
+            echo "ADMIN_SESSION_SECRET=ci-canary-session-secret-${GITHUB_RUN_ID}-0123456789"
+            echo "GITHUB_TOKEN=ci-canary-github-token-${GITHUB_RUN_ID}"
+          } > .env
       # The build generates the route types next-env.d.ts points at, so the
       # standalone typecheck runs after it.
       - run: npm run build
-      - name: No email address in what the site serves
+      - name: No email address, admin secret or dynamic page in what the site serves
         run: npm run scan:build
       - run: npm run typecheck

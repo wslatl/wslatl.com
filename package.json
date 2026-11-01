@@ -8,6 +8,8 @@
     "build": "next build",
     "postbuild": "node scripts/keep-old-assets.mjs restore",
     "start": "next start",
+    "serve": "node scripts/serve.mjs",
+    "admin:hash": "node scripts/hash-password.mjs",
     "lint": "oxlint && eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
