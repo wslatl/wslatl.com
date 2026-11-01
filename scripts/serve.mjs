@@ -29,14 +29,15 @@ import {
   liveDir,
   readState,
   recoverState,
+  releaseDir,
   rollBack,
   runUpdate,
   supervisorChanged,
   updaterPaths,
   writeState,
 } from './updater/lib.mjs'
-import { liveServer } from './updater/live.mjs'
-import { answers, eachLine, freePort, run, stopProcess } from './updater/process.mjs'
+import { crashWindowMs, liveServer } from './updater/live.mjs'
+import { answers, eachLine, freePort, run, stopProcess, waitForFreePort } from './updater/process.mjs'
 
 const root = join(import.meta.dirname, '..')
 const paths = updaterPaths(root)
@@ -97,7 +98,10 @@ function startNext(dir, { port: listen, env, onLine }) {
 
 // The panel's variables win over .env here too, as they do in Next.
 const serverEnv = { ...dotenv, ...process.env, ...(updatesOn && { UPDATER_DIR: paths.dir }) }
-let updating = false
+// One flag for everything that moves the live site: start-up (until its
+// build and clean-up are done), updates, rollbacks and restarts. Two at once
+// could start two servers on one port.
+let updating = true
 let shuttingDown = false
 
 const live = liveServer({
@@ -112,10 +116,20 @@ function ensureServing() {
   if (!shuttingDown && live.ensure(liveDir(paths, readState(paths)))) print('Nothing was serving, so the site was started again.')
 }
 
-async function switchTo(dir, onLine) {
+/**
+ * Makes dir the live server, and says whether it answers. A restart of the
+ * same folder keeps its crash watch (keepWatch).
+ */
+async function switchTo(dir, onLine, { keepWatch = false } = {}) {
   onLine(`Starting the site from ${dir === root ? 'the uploaded folder' : dir}`)
   await live.stop()
-  const entry = live.start(dir)
+  // Something outside this supervisor on the port would answer for the new
+  // server and be taken for it.
+  if (!(await waitForFreePort(port))) {
+    onLine(`Port ${port} is still taken by another process, so the site cannot start on it.`)
+    return false
+  }
+  const entry = await live.start(dir, { keepWatch })
   const ok = await answers(port, () => entry.ended || live.current !== entry)
   onLine(ok ? 'The site answers.' : 'The site did not answer.')
   return ok
@@ -124,8 +138,8 @@ async function switchTo(dir, onLine) {
 /** A new release stopped three times within ten minutes of its switch: back to the one before. */
 async function crashLoop(dir) {
   if (updating) {
-    print('An update is running, so the release was started again instead of rolled back.')
-    live.start(dir)
+    print('An update or a rollback is running, so the release was started again instead of rolled back.')
+    await live.start(dir)
     return
   }
   updating = true
@@ -136,8 +150,11 @@ async function crashLoop(dir) {
       reason: 'The new release stopped three times within ten minutes of being installed.',
       crashed: true,
       serving: dir,
+      // Better an older build than none: the message says it may be old.
+      allowUpload: true,
     })
     if (!result.ok) print(result.message)
+    noteSupervisorChanges()
   } finally {
     updating = false
     ensureServing()
@@ -287,7 +304,9 @@ function describe() {
 
 function requestUpdate() {
   if (!updatesOn) return print('Updates are off: GITHUB_TOKEN is not set in .env.')
-  if (updating || busyStatuses.includes(readState(paths).status)) return print('An update is already running.')
+  if (updating || busyStatuses.includes(readState(paths).status)) {
+    return print('The site is starting, or an update or a rollback is running; try again when it is done.')
+  }
   try {
     // Created only if no request is waiting, in one step (wx), so two
     // requests at once cannot both get through.
@@ -304,7 +323,7 @@ const servedDir = () => live.current?.dir ?? liveDir(paths, readState(paths))
 // One at a time: updates, rollbacks and restarts all move the live site, and
 // two at once could start two servers on one port.
 async function exclusively(action) {
-  if (updating) return print('An update or a rollback is running; try again when it is done.')
+  if (updating) return print('The site is starting, or an update or a rollback is running; try again when it is done.')
   updating = true
   try {
     await action()
@@ -314,20 +333,29 @@ async function exclusively(action) {
   }
 }
 
+function rollBackFromConsole(allowUpload) {
+  return exclusively(async () => {
+    const result = await rollBack({ paths, deps: { switchTo, print }, reason: 'Rolled back from the console.', serving: servedDir(), allowUpload })
+    if (!result.ok) print(result.message)
+    noteSupervisorChanges()
+  })
+}
+
 const commands = {
-  help: () => print('Commands: status, update (install the latest release), rollback (back to the release before), restart, stop.'),
+  help: () =>
+    print(
+      'Commands: status, update (install the latest release), rollback (back to the release before), rollback upload (back to the uploaded folder), restart, stop.',
+    ),
   status: () => print(describe()),
   update: requestUpdate,
-  rollback: () =>
-    exclusively(async () =>
-      print((await rollBack({ paths, deps: { switchTo, print }, reason: 'Rolled back from the console.', serving: servedDir() })).message),
-    ),
-  restart: () => exclusively(() => switchTo(servedDir(), print)),
+  rollback: () => rollBackFromConsole(false),
+  'rollback upload': () => rollBackFromConsole(true),
+  restart: () => exclusively(() => switchTo(servedDir(), print, { keepWatch: true })),
   stop: () => shutDown('stop'),
 }
 
 function command(line) {
-  const name = line.trim().toLowerCase()
+  const name = line.trim().toLowerCase().replace(/\s+/g, ' ')
   if (!name) return
   const action = commands[name]
   if (action) void action()
@@ -395,10 +423,16 @@ if (dir === root) {
 }
 
 print(`Starting the site on port ${port} from ${dir === root ? 'the uploaded folder' : dir}`)
-live.start(dir)
+await live.start(dir)
+// A release installed less than ten minutes ago is still watched, across a
+// restart of the supervisor.
+const installedAt = Date.parse(state.current?.deployedAt ?? '')
+if (state.current && dir === releaseDir(paths, state.current.tag) && Date.now() - installedAt < crashWindowMs) {
+  live.watchCrashes(installedAt)
+}
 // Only now, with the site starting: a half-built or old release can take a
-// while to delete. Updates wait until it is done.
-updating = true
+// while to delete. Everything else waits until it is done (updating has been
+// set since the top, so the console cannot move the site during the build).
 cleanUpAtStart(paths, state, print)
   .catch((error) => print(`Could not remove an old release: ${error.message}`))
   .finally(() => {

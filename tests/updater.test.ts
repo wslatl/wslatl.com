@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -408,6 +408,40 @@ describe('what an update leaves behind', () => {
     }
   })
 
+  it('tries the last state write again once the npm cache has freed some room', async () => {
+    // A full disk at the moment of the switch: the success could not be written.
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {
+      // The room the npm cache frees, as it were.
+      if (existsSync(paths.state) && statSync(paths.state).isDirectory()) rmSync(paths.state, { recursive: true })
+    })
+    const { deps } = fakeDeps({
+      switchTo: async () => {
+        rmSync(paths.state, { force: true })
+        mkdirSync(paths.state)
+        return true
+      },
+    })
+    await update(deps)
+    error.mockRestore()
+    expect(readState(paths)).toMatchObject({ status: 'idle', current: { tag: 'v1.1.0' } })
+  })
+
+  it('says so loudly when the last state cannot be written at all', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const lines: string[] = []
+    const { deps } = fakeDeps({
+      print: (line: string) => lines.push(line),
+      switchTo: async () => {
+        rmSync(paths.state, { force: true })
+        mkdirSync(paths.state)
+        return true
+      },
+    })
+    await update(deps)
+    error.mockRestore()
+    expect(lines.at(-1)).toMatch(/Could not save the updater's state .*is the disk full/)
+  })
+
   it('ignores lines from a build that outlived its update, so they never overwrite a later state', async () => {
     let late: ((line: string) => void) | undefined
     const { deps } = fakeDeps({
@@ -462,10 +496,17 @@ describe('going back to the release before', () => {
     expect(liveDir(paths, readState(paths))).toBe(releaseDir(paths, 'v1.0.0'))
   })
 
-  it('goes back to the uploaded folder after the first release', async () => {
+  it('goes back to the uploaded folder only on purpose, since it may be much older', async () => {
+    // After an update the release before is gone: only the uploaded folder is left.
     live('v1.1.0')
-    const result = await rollBack({ paths, deps: rollbackDeps(async () => true), reason: 'Crashed.' })
-    expect(result.message).toBe('Crashed. The site went back to the uploaded folder.')
+    const switches: string[] = []
+    const refused = await rollBack({ paths, deps: rollbackDeps(async (dir) => (switches.push(dir), true)), reason: 'Rolled back from the console.' })
+    expect(refused.ok).toBe(false)
+    expect(refused.message).toMatch(/rollback upload/)
+    expect(switches).toEqual([])
+
+    const result = await rollBack({ paths, deps: rollbackDeps(async () => true), reason: 'Crashed.', allowUpload: true })
+    expect(result.message).toBe('Crashed. With no release before it left, the site went back to the uploaded folder, which may be older than the last release.')
     expect(readState(paths).current).toBeNull()
   })
 
@@ -732,6 +773,12 @@ describe('starting up', () => {
     expect(stateIsDamaged(paths)).toBe(false)
     await cleanUpAtStart(paths, readState(paths), () => {})
     expect(readdirSync(paths.releases)).toEqual(['v1.1.0'])
+  })
+
+  it('removes an npm cache left by an update the server was stopped in', async () => {
+    mkdirSync(join(paths.dir, 'npm-cache', '_cacache'), { recursive: true })
+    await cleanUpAtStart(paths, readState(paths), () => {})
+    expect(existsSync(join(paths.dir, 'npm-cache'))).toBe(false)
   })
 
   it('reads a missing or broken state file as a fresh one', () => {

@@ -137,8 +137,43 @@ export function freePort() {
   })
 }
 
+const pause = (/** @type {number} */ ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
 /**
- * True once GET / answers 200; false if isGone() says the server ended, or the time runs out.
+ * True when nothing listens on port, on every interface, as `next start`
+ * will. A server outside the supervisor's control on the port would answer
+ * for the one being started.
+ * @param {number} port
+ * @returns {Promise<boolean>}
+ */
+export function portFree(port) {
+  return new Promise((resolve) => {
+    const server = createServer()
+    server.once('error', () => resolve(false))
+    server.listen(port, () => server.close(() => resolve(true)))
+  })
+}
+
+/**
+ * Waits up to timeoutMs for port to come free: a server that was just
+ * stopped can hold it for a moment.
+ * @param {number} port
+ * @param {number} [timeoutMs]
+ */
+export async function waitForFreePort(port, timeoutMs = 10_000) {
+  const deadline = Date.now() + timeoutMs
+  for (;;) {
+    if (await portFree(port)) return true
+    if (Date.now() >= deadline) return false
+    await pause(250)
+  }
+}
+
+/**
+ * True once GET / answers 200 and the server started for it is still
+ * running a moment later; false if isGone() says it ended, or the time runs
+ * out. A server that failed to bind leaves whatever else holds the port
+ * answering, so only a 200 from a live child counts.
  * @param {number} port
  * @param {() => boolean} isGone
  * @param {number} [timeoutMs]
@@ -151,11 +186,14 @@ export async function answers(port, isGone, timeoutMs = 120_000) {
     try {
       const response = await fetch(`http://127.0.0.1:${port}/`, { redirect: 'manual', signal: AbortSignal.timeout(10_000) })
       await response.body?.cancel()
-      if (response.status === 200) return true
+      if (response.status === 200) {
+        await pause(1000)
+        return !isGone()
+      }
     } catch {
       // Not listening yet.
     }
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await pause(1000)
   }
   return false
 }

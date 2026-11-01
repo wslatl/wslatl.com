@@ -60,9 +60,9 @@ function harness({ throwOnStart = false } = {}) {
 }
 
 describe('the live server', () => {
-  it('starts again after it stops, waiting longer each time it stops soon after starting', () => {
+  it('starts again after it stops, waiting longer each time it stops soon after starting', async () => {
     const { server, started, lines, advance } = harness()
-    server.start('/site')
+    await server.start('/site')
     started[0].crash()
     expect(lines.at(-1)).toMatch(/starting it again in 2 s/)
     advance(2000)
@@ -73,9 +73,9 @@ describe('the live server', () => {
     expect(started.map((child) => child.dir)).toEqual(['/site', '/site', '/site'])
   })
 
-  it('starts again when it fails to start at all, which reports an error and never an exit', () => {
+  it('starts again when it fails to start at all, which reports an error and never an exit', async () => {
     const { server, started, lines, advance } = harness()
-    server.start('/site')
+    await server.start('/site')
     started[0].failToSpawn()
     expect(lines.at(-1)).toMatch(/could not start: spawn EAGAIN/)
     advance(2000)
@@ -84,7 +84,7 @@ describe('the live server', () => {
 
   it('starts again when spawning throws outright', async () => {
     const { server, lines, timers } = harness({ throwOnStart: true })
-    server.start('/site')
+    await server.start('/site')
     await Promise.resolve()
     expect(lines.at(-1)).toMatch(/could not start: spawn ENOMEM/)
     expect(timers).toHaveLength(1)
@@ -92,7 +92,7 @@ describe('the live server', () => {
 
   it('stays stopped once stopped on purpose', async () => {
     const { server, started, stopped, timers } = harness()
-    server.start('/site')
+    await server.start('/site')
     await server.stop()
     started[0].crash()
     expect(stopped).toEqual([started[0]])
@@ -100,9 +100,9 @@ describe('the live server', () => {
     expect(server.idle()).toBe(true)
   })
 
-  it('goes back on the third stop within ten minutes of a switch, instead of starting it again', () => {
+  it('goes back on the third stop within ten minutes of a switch, instead of starting it again', async () => {
     const { server, started, loops, timers, advance } = harness()
-    server.start('/releases/v1.1.0')
+    await server.start('/releases/v1.1.0')
     server.watchCrashes()
     for (let i = 0; i < 2; i++) {
       started.at(-1)?.crash()
@@ -114,9 +114,9 @@ describe('the live server', () => {
     expect(timers).toHaveLength(0)
   })
 
-  it('counts no stops after the ten minutes, and none without a switch', () => {
+  it('counts no stops after the ten minutes, and none without a switch', async () => {
     const late = harness()
-    late.server.start('/releases/v1.1.0')
+    await late.server.start('/releases/v1.1.0')
     late.server.watchCrashes()
     late.advance(crashWindowMs)
     for (let i = 0; i < 3; i++) {
@@ -126,7 +126,7 @@ describe('the live server', () => {
     expect(late.loops).toEqual([])
 
     const unwatched = harness()
-    unwatched.server.start('/site')
+    await unwatched.server.start('/site')
     for (let i = 0; i < 3; i++) {
       unwatched.started.at(-1)?.crash()
       unwatched.advance(60_000)
@@ -147,5 +147,51 @@ describe('the live server', () => {
     await server.stop()
     expect(server.ensure('/site')).toBe(true)
     expect(started).toHaveLength(3)
+  })
+
+  it('stops a server that still runs before starting another, so two never share the port', async () => {
+    const { server, started, stopped } = harness()
+    await server.start('/uploaded')
+    await server.start('/uploaded')
+    expect(stopped).toEqual([started[0]])
+    expect(server.current?.child).toBe(started[1])
+  })
+
+  it('keeps the crash watch over a restart of the same folder, and only then', async () => {
+    const kept = harness()
+    await kept.server.start('/releases/v1.1.0')
+    kept.server.watchCrashes()
+    kept.started.at(-1)?.crash()
+    kept.advance(60_000)
+    kept.started.at(-1)?.crash()
+    kept.advance(60_000)
+    await kept.server.start('/releases/v1.1.0', { keepWatch: true })
+    kept.started.at(-1)?.crash()
+    expect(kept.loops).toEqual(['/releases/v1.1.0'])
+
+    const reset = harness()
+    await reset.server.start('/releases/v1.1.0')
+    reset.server.watchCrashes()
+    reset.started.at(-1)?.crash()
+    reset.advance(60_000)
+    reset.started.at(-1)?.crash()
+    reset.advance(60_000)
+    await reset.server.start('/releases/v1.1.0')
+    reset.started.at(-1)?.crash()
+    expect(reset.loops).toEqual([])
+  })
+
+  it('counts from the install time it is given, as after a restart of the supervisor', async () => {
+    const { server, started, loops, advance } = harness()
+    advance(crashWindowMs)
+    await server.start('/releases/v1.1.0')
+    // Installed at 0:30 and it is now 10:00: thirty seconds of watch left, so
+    // only two of the three stops below fall inside it.
+    server.watchCrashes(30_000)
+    for (let i = 0; i < 3; i++) {
+      started.at(-1)?.crash()
+      advance(20_000)
+    }
+    expect(loops).toEqual([])
   })
 })

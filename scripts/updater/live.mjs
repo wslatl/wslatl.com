@@ -70,26 +70,36 @@ export function liveServer({
     return current
   }
 
+  /** Stops the live server, and keeps it stopped. */
+  async function stopLive() {
+    const current = entry
+    if (!current) return
+    current.wanted = false
+    clearTimer(current.timer)
+    if (current.child) await stop(current.child)
+  }
+
   return {
     /**
-     * Starts dir as the live server, in place of none.
+     * Starts dir as the live server, after stopping any that still runs: two
+     * servers would fight over one port. A restart of the same folder can
+     * keep its crash watch (keepWatch); anything else ends it.
      * @param {string} dir
+     * @param {{ keepWatch?: boolean }} [options]
      */
-    start(dir) {
-      watch = null
+    async start(dir, { keepWatch = false } = {}) {
+      await stopLive()
+      if (!(keepWatch && watch?.dir === dir)) watch = null
       return launch(dir)
     },
-    /** Stops the live server, and keeps it stopped. */
-    async stop() {
-      const current = entry
-      if (!current) return
-      current.wanted = false
-      clearTimer(current.timer)
-      if (current.child) await stop(current.child)
-    },
-    /** Counts the live release's stops from now on: called right after a switch to it. */
-    watchCrashes() {
-      if (entry) watch = { dir: entry.dir, since: now(), crashes: 0 }
+    stop: stopLive,
+    /**
+     * Counts the live release's stops from since on: called right after a
+     * switch to it, or at start-up with the time it was installed.
+     * @param {number} [since]
+     */
+    watchCrashes(since = now()) {
+      if (entry) watch = { dir: entry.dir, since, crashes: 0 }
     },
     /**
      * Starts dir unless a server is running or about to be started again.

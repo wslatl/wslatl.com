@@ -243,6 +243,8 @@ export async function pruneReleases(paths, state, spare = []) {
  * @param {OnLine} print
  */
 export async function cleanUpAtStart(paths, state, print) {
+  // Left by an update the server was stopped in the middle of.
+  await rm(paths.npmCache, { recursive: true, force: true, maxRetries: 3 }).catch(() => {})
   if (stateIsDamaged(paths)) {
     print('.updater/state.json is damaged, so no release was removed. The site runs from the uploaded folder until the next update writes the file again.')
     return
@@ -353,9 +355,10 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
       // A closed stdout is no reason to give up.
     }
   }
+  let saved = true
   const save = (/** @type {Partial<State>} */ patch) => {
     state = { ...state, ...patch }
-    writeState(paths, state)
+    saved = writeState(paths, state)
   }
   const log = (/** @type {string} */ line) => {
     print(line)
@@ -533,6 +536,14 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
   } finally {
     finished = true
     await rm(paths.npmCache, { recursive: true, force: true, maxRetries: 3 }).catch(() => {})
+    // The last state could not be written (a full disk, most likely); the
+    // npm cache just freed some room, so it is tried once more. Left as it
+    // is, the file would still say the update runs: the dashboard would
+    // wait on it and refuse another, and a restart would take it for
+    // interrupted and serve the release from before.
+    if (!saved && !writeState(paths, state)) {
+      print(`Could not save the updater's state to ${paths.state} (is the disk full?). Free some space and restart the server: until it is saved, the dashboard and the next start see the state from before this update.`)
+    }
   }
 }
 
@@ -545,11 +556,15 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
  * release answers; if it does not, the folder that was served starts again
  * and the state stays as it was. A crash rollback also remembers the tag it
  * left, which is then never installed again (publish the fix as a newer
- * release). deps: switchTo and print, as for runUpdate.
- * @param {{ paths: Paths, deps: Pick<Deps, 'switchTo' | 'print'>, reason: string, crashed?: boolean, serving?: string | null }} options
+ * release). Each update removes the release before the live one to make
+ * room, so after one the only earlier build may be the uploaded folder,
+ * which can be months old: that is used only with allowUpload (the
+ * console's "rollback upload", and a crash rollback, which says so).
+ * deps: switchTo and print, as for runUpdate.
+ * @param {{ paths: Paths, deps: Pick<Deps, 'switchTo' | 'print'>, reason: string, crashed?: boolean, serving?: string | null, allowUpload?: boolean }} options
  * @returns {Promise<{ ok: boolean, message: string }>}
  */
-export async function rollBack({ paths, deps, reason, crashed = false, serving = null }) {
+export async function rollBack({ paths, deps, reason, crashed = false, serving = null, allowUpload = false }) {
   const state = readState(paths)
   if (busyStatuses.includes(state.status)) return { ok: false, message: 'An update is running, so nothing was rolled back.' }
   const from = serving && existsSync(serving) ? serving : liveDir(paths, state)
@@ -558,6 +573,13 @@ export async function rollBack({ paths, deps, reason, crashed = false, serving =
   const previous = state.previous && parseVersion(state.previous.tag) ? releaseDir(paths, state.previous.tag) : null
   const target = previous && built(previous) ? previous : built(paths.root) ? paths.root : null
   if (!target) return { ok: false, message: 'There is no earlier build to go back to.' }
+  if (target === paths.root && !allowUpload) {
+    return {
+      ok: false,
+      message:
+        'The release before this one is gone (each update removes it to make room), so the only earlier build is the uploaded folder, which may be much older. Type "rollback upload" to go back to it anyway.',
+    }
+  }
 
   const say = (/** @type {string} */ line) => {
     try {
@@ -585,7 +607,9 @@ export async function rollBack({ paths, deps, reason, crashed = false, serving =
     return { ok: false, message }
   }
   const now = new Date().toISOString()
-  const message = `${reason} The site went back to ${name}.`
+  const message = back
+    ? `${reason} The site went back to ${name}.`
+    : `${reason} With no release before it left, the site went back to the uploaded folder, which may be older than the last release.`
   writeState(paths, {
     ...state,
     status: 'rolled-back',

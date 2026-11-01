@@ -247,7 +247,7 @@ When you press Install, the updater asks GitHub once which commit the tag points
 
 A failure at any step leaves the site on the version it had, removes the half-built release, and shows the reason and the log on the dashboard. The install and the build each get 15 minutes, after which they are stopped together with everything they started. The site is down only for the few seconds of the switch. `.env` and `.next-static-history/` are never touched.
 
-A new release is watched for ten minutes after its switch: if it stops three times in that time, the supervisor goes back to the release before it by itself (or to the uploaded folder, after the first release), and the dashboard says so. Otherwise the supervisor starts `next start` again whenever it stops, waiting a little longer each time.
+A new release is watched for ten minutes after its switch, across a restart of the server too: if it stops three times in that time, the supervisor goes back to the release before it by itself, and the dashboard says so. When there is none left (each update removes it to make room, so after an update the only earlier build is the uploaded folder), it goes back to the uploaded folder instead and says that this may be an older version. Otherwise the supervisor starts `next start` again whenever it stops, waiting a little longer each time.
 
 **Disk space.** The live release and the one before it are kept and older ones deleted, and when the next update starts, every release but the live one is removed (the one before it, and one a crash took back out). So at most three copies of the site are on the disk at once: the uploaded folder, the live release and the new one. Each holds its own `node_modules` and build, about 800 MB. npm's download cache lives in `.updater/npm-cache/` only while an update runs, and is deleted after it. Give the server a disk limit of at least 4 GB: Pterodactyl stops a server that goes over its limit, and does not start it again until it is back under.
 
@@ -277,7 +277,7 @@ From then on, a change reaches the site as a release: see Releasing.
 - **A new release went back by itself.** It stopped three times within ten minutes of its switch; the dashboard says so, and the console has its errors. That release is not offered again: fix it, publish the fix as a newer release, and install that.
 - **`.updater/state.json` is damaged.** The console says so at start-up. The site then runs from the uploaded folder, and no release is deleted until an update writes the file again.
 
-**The server console** (Pterodactyl's Console tab) takes these commands: `status` (what is serving, and what the updater last did), `update` (install the latest release, as the dashboard does), `rollback` (back to the release before the live one), `restart` (start the live server again) and `stop`.
+**The server console** (Pterodactyl's Console tab) takes these commands: `status` (what is serving, and what the updater last did), `update` (install the latest release, as the dashboard does), `rollback` (back to the release before the live one), `rollback upload` (back to the uploaded folder, when no release before is left: it may be much older), `restart` (start the live server again) and `stop`. While the server starts (and builds the uploaded folder) and while an update or a rollback runs, the commands that move the site wait for it to finish.
 
 ### How it is kept safe
 

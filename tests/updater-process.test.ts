@@ -3,7 +3,8 @@ import { createServer } from 'node:net'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { answers, freePort, run } from '../scripts/updater/process.mjs'
+import { createServer as createHttpServer } from 'node:http'
+import { answers, freePort, portFree, run, waitForFreePort } from '../scripts/updater/process.mjs'
 
 let dir = ''
 
@@ -73,6 +74,32 @@ describe('waiting for a server', () => {
     server.close()
     expect(port).toBeGreaterThan(0)
   })
+
+  it('knows whether the port is taken, and waits for it to come free', async () => {
+    const port = await freePort()
+    expect(await portFree(port)).toBe(true)
+    const holder = createServer()
+    await new Promise<void>((resolve) => holder.listen(port, resolve))
+    expect(await portFree(port)).toBe(false)
+    expect(await waitForFreePort(port, 300)).toBe(false)
+    setTimeout(() => holder.close(), 200)
+    expect(await waitForFreePort(port, 5000)).toBe(true)
+  }, 15_000)
+
+  it('counts a 200 only while the server started for it is still running', async () => {
+    // Another process answers on the port while ours has already failed.
+    const port = await freePort()
+    const other = createHttpServer((_request, response) => response.end('someone else'))
+    await new Promise<void>((resolve) => other.listen(port, resolve))
+    try {
+      let alive = true
+      setTimeout(() => (alive = false), 300)
+      expect(await answers(port, () => !alive, 10_000)).toBe(false)
+      expect(await answers(port, () => false, 10_000)).toBe(true)
+    } finally {
+      other.close()
+    }
+  }, 30_000)
 
   it('gives up at once when the server is gone', async () => {
     const started = Date.now()
