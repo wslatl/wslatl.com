@@ -6,8 +6,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      // The admin (app/admin). Also noindex in its headers and meta tags.
-      disallow: '/admin',
+      // No line for the admin: it would only point at it, and a disallowed
+      // page is one a search engine never fetches, so it would never see the
+      // noindex the admin sends in its headers and meta tags.
     },
     sitemap: `${siteConfig.siteUrl}/sitemap.xml`,
   }

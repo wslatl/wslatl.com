@@ -6,20 +6,37 @@
 // only one tagged vMAJOR.MINOR.PATCH), installs and builds it in a folder of
 // its own, starts it once on a spare local port to be sure it answers, and
 // only then restarts the site on it. A failure at any step leaves the site
-// as it was. The steps and the folders are in scripts/updater/lib.mjs; the
-// setup is in the README, "Admin and updates" and "Releasing".
+// as it was, and a new release that stops three times within ten minutes of
+// its switch is replaced by the one before. The steps and the folders are in
+// scripts/updater/lib.mjs; the setup is in the README, "Admin and updates"
+// and "Releasing".
+//
+// The server console takes commands: status, update, rollback, restart,
+// stop and help.
 //
 // Settings come from .env beside this repository (the same file Next
 // reads). Only `next start` is given them; npm never is.
 import { spawn } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync } from 'node:fs'
-import { createServer } from 'node:net'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createInterface } from 'node:readline'
 import { Readable, Transform } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { parseEnv } from 'node:util'
-import { liveDir, pruneReleases, readState, recoverState, runUpdate, updaterPaths, writeState } from './updater/lib.mjs'
+import {
+  busyStatuses,
+  cleanUpAtStart,
+  liveDir,
+  readState,
+  recoverState,
+  rollBack,
+  runUpdate,
+  supervisorChanged,
+  updaterPaths,
+  writeState,
+} from './updater/lib.mjs'
+import { liveServer } from './updater/live.mjs'
+import { answers, eachLine, freePort, run, stopProcess } from './updater/process.mjs'
 
 const root = join(import.meta.dirname, '..')
 const paths = updaterPaths(root)
@@ -36,7 +53,6 @@ const github = {
 }
 const secretNames = [...new Set(['ADMIN_PASSWORD_HASH', 'ADMIN_SESSION_SECRET', 'GITHUB_TOKEN', ...Object.keys(dotenv)])]
 const updatesOn = Boolean(github.token)
-const healthTimeoutMs = 120_000
 
 function print(line) {
   console.log(`${new Date().toISOString()} [updater] ${line}`)
@@ -48,50 +64,20 @@ const children = new Set()
 
 function track(child) {
   children.add(child)
-  child.once('exit', () => children.delete(child))
+  const forget = () => children.delete(child)
+  child.once('exit', forget)
+  child.once('error', forget)
   return child
-}
-
-function eachLine(stream, onLine) {
-  // oxlint-disable-next-line no-control-regex -- the colour codes npm and Next print on Windows
-  if (stream) createInterface({ input: stream }).on('line', (line) => onLine(line.replace(/\u001b\[[0-9;]*m/g, '')))
-}
-
-const stepTimeoutMs = 15 * 60 * 1000
-
-/** Runs a command to the end; rejects with its exit code, or after 15 minutes. */
-function run(command, args, { cwd, env, shell = false, onLine }) {
-  // Run through npm's own script on this Node, npm is named as npm.
-  const label = command === process.execPath ? ['npm', ...args.slice(1)].join(' ') : [command, ...args].join(' ')
-  return new Promise((resolve, reject) => {
-    const child = track(spawn(command, args, { cwd, env, shell, stdio: ['ignore', 'pipe', 'pipe'] }))
-    let timedOut = false
-    const timer = setTimeout(() => {
-      timedOut = true
-      child.kill('SIGKILL')
-    }, stepTimeoutMs)
-    eachLine(child.stdout, onLine)
-    eachLine(child.stderr, onLine)
-    child.once('error', (error) => {
-      clearTimeout(timer)
-      reject(error)
-    })
-    child.once('exit', (code, signal) => {
-      clearTimeout(timer)
-      if (code === 0) resolve()
-      else if (timedOut) reject(new Error(`${label} took longer than ${stepTimeoutMs / 60_000} minutes and was stopped.`))
-      else reject(new Error(`${label} failed (${signal ?? `exit code ${code}`}).`))
-    })
-  })
 }
 
 // `npm run serve` names npm's own script, which runs on this same Node.
 // Started some other way, fall back to npm on the PATH (a shell on Windows,
-// where npm is a .cmd).
+// where npm is a .cmd). Each run is stopped with everything it started after
+// 15 minutes (scripts/updater/process.mjs).
 function npm(args, options) {
   const cli = process.env.npm_execpath
-  if (cli && /\.c?js$/.test(cli)) return run(process.execPath, [cli, ...args], options)
-  return run('npm', args, { ...options, shell: process.platform === 'win32' })
+  if (cli && /\.c?js$/.test(cli)) return run(process.execPath, [cli, ...args], { ...options, onSpawn: track })
+  return run('npm', args, { ...options, onSpawn: track, shell: process.platform === 'win32' })
 }
 
 // Started exactly like the live server: no -H. Bound to 127.0.0.1, Next
@@ -102,82 +88,58 @@ function startNext(dir, { port: listen, env, onLine }) {
   const child = track(
     spawn(process.execPath, args, { cwd: dir, env, stdio: ['ignore', onLine ? 'pipe' : 'inherit', onLine ? 'pipe' : 'inherit'] }),
   )
-  if (onLine) {
-    eachLine(child.stdout, onLine)
-    eachLine(child.stderr, onLine)
-  }
+  eachLine(child.stdout, onLine)
+  eachLine(child.stderr, onLine)
   return child
-}
-
-function stop(child) {
-  if (!child || child.exitCode !== null || child.signalCode !== null) return Promise.resolve()
-  return new Promise((resolve) => {
-    const force = setTimeout(() => child.kill('SIGKILL'), 10_000)
-    child.once('exit', () => {
-      clearTimeout(force)
-      resolve()
-    })
-    child.kill('SIGTERM')
-  })
-}
-
-/** True once GET / answers 200; false if the server exits or the time runs out. */
-async function answers(listen, child, timeoutMs = healthTimeoutMs) {
-  const deadline = Date.now() + timeoutMs
-  while (Date.now() < deadline) {
-    if (child.exitCode !== null || child.signalCode !== null) return false
-    try {
-      const response = await fetch(`http://127.0.0.1:${listen}/`, { redirect: 'manual', signal: AbortSignal.timeout(10_000) })
-      await response.body?.cancel()
-      if (response.status === 200) return true
-    } catch {
-      // Not listening yet.
-    }
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-  }
-  return false
-}
-
-// On every interface, as the trial server will listen.
-function freePort() {
-  return new Promise((resolve, reject) => {
-    const server = createServer()
-    server.once('error', reject)
-    server.listen(0, () => {
-      const { port: free } = server.address()
-      server.close(() => resolve(free))
-    })
-  })
 }
 
 // ----- The live server -----
 
 // The panel's variables win over .env here too, as they do in Next.
 const serverEnv = { ...dotenv, ...process.env, ...(updatesOn && { UPDATER_DIR: paths.dir }) }
-let live = null
-let backoff = 1000
+let updating = false
+let shuttingDown = false
 
-/** Starts the live server from dir, and starts it again if it exits on its own. */
-function startLive(dir) {
-  const entry = { dir, child: startNext(dir, { port, env: serverEnv }), wanted: true, startedAt: Date.now(), timer: null }
-  entry.child.once('exit', (code, signal) => {
-    if (live !== entry || !entry.wanted) return
-    backoff = Date.now() - entry.startedAt < 60_000 ? Math.min(backoff * 2, 30_000) : 1000
-    print(`next start stopped (${signal ?? `exit code ${code}`}); starting it again in ${backoff / 1000} s`)
-    entry.timer = setTimeout(() => {
-      if (live === entry && entry.wanted) startLive(entry.dir)
-    }, backoff)
-  })
-  live = entry
-  return entry
+const live = liveServer({
+  start: (dir) => startNext(dir, { port, env: serverEnv }),
+  stop: (child) => stopProcess(child),
+  print,
+  onCrashLoop: (dir) => void crashLoop(dir),
+})
+
+/** Starts the live server again when nothing serves: after an update or a rollback that ended that way. */
+function ensureServing() {
+  if (!shuttingDown && live.ensure(liveDir(paths, readState(paths)))) print('Nothing was serving, so the site was started again.')
 }
 
-async function stopLive() {
-  const entry = live
-  if (!entry) return
-  entry.wanted = false
-  clearTimeout(entry.timer)
-  await stop(entry.child)
+async function switchTo(dir, onLine) {
+  onLine(`Starting the site from ${dir === root ? 'the uploaded folder' : dir}`)
+  await live.stop()
+  const entry = live.start(dir)
+  const ok = await answers(port, () => entry.ended || live.current !== entry)
+  onLine(ok ? 'The site answers.' : 'The site did not answer.')
+  return ok
+}
+
+/** A new release stopped three times within ten minutes of its switch: back to the one before. */
+async function crashLoop(dir) {
+  if (updating) {
+    print('An update is running, so the release was started again instead of rolled back.')
+    live.start(dir)
+    return
+  }
+  updating = true
+  try {
+    const result = await rollBack({
+      paths,
+      deps: { switchTo, print },
+      reason: 'The new release stopped three times within ten minutes of being installed.',
+    })
+    if (!result.ok) print(result.message)
+  } finally {
+    updating = false
+    ensureServing()
+  }
 }
 
 // ----- GitHub -----
@@ -261,77 +223,113 @@ async function trial(dir, onLine) {
   const listen = await freePort()
   onLine(`Trial start on port ${listen}`)
   const child = startNext(dir, { port: listen, env: serverEnv, onLine })
+  let failed = false
+  child.once('error', (error) => {
+    failed = true
+    onLine(`The trial could not start: ${error.message}`)
+  })
   try {
-    return await answers(listen, child)
+    return await answers(listen, () => failed || child.exitCode !== null || child.signalCode !== null)
   } finally {
-    await stop(child)
+    await stopProcess(child)
   }
-}
-
-async function switchTo(dir, onLine) {
-  onLine(`Starting the site from ${dir === root ? 'the uploaded folder' : dir}`)
-  await stopLive()
-  const entry = startLive(dir)
-  const ok = await answers(port, entry.child)
-  onLine(ok ? 'The site answers.' : 'The site did not answer.')
-  return ok
 }
 
 /**
  * This supervisor always runs from the uploaded folder, never from a
- * release, so a release that changes it changes nothing until its files are
- * copied over by hand. The dashboard says so when that is the case.
+ * release, so a release that changes it (scripts/serve.mjs or anything in
+ * scripts/updater/) changes nothing until its files are copied over by hand.
+ * The dashboard says so when that is the case.
  */
-const supervisorFiles = ['scripts/serve.mjs', 'scripts/updater/lib.mjs']
-// Line endings aside: a copy uploaded from Windows has CRLF, GitHub's has LF.
-const contents = (file) => readFileSync(file, 'utf8').replaceAll('\r\n', '\n')
-
 function noteSupervisorChanges() {
   const state = readState(paths)
   const dir = liveDir(paths, state)
-  const changed =
-    dir !== root &&
-    supervisorFiles.some((file) => {
-      const release = join(dir, file)
-      return !existsSync(release) || contents(release) !== contents(join(root, file))
-    })
-  if (changed) print(`The updater itself changed in this release. Copy ${supervisorFiles.join(' and ')} from ${dir} over the ones in the uploaded folder, then restart.`)
+  const changed = supervisorChanged(root, dir)
+  if (changed) print(`The updater itself changed in this release. Copy scripts/serve.mjs and scripts/updater/ from ${dir} over the ones in the uploaded folder, then restart.`)
   if (Boolean(state.updaterChanged) !== changed) writeState(paths, { ...state, updaterChanged: changed })
 }
-
-let updating = false
-let shuttingDown = false
 
 async function checkForRequest() {
   if (updating || shuttingDown || !existsSync(paths.request)) return
   updating = true
   print('Update requested')
+  const before = readState(paths).current?.tag
   try {
-    await runUpdate({
+    const result = await runUpdate({
       paths,
       deps: { latest, resolve: resolveTag, download, npm, trial, switchTo, print },
       baseEnv: process.env,
       secretNames,
     })
+    // A new release is watched for ten minutes (scripts/updater/live.mjs).
+    if (result.status === 'idle' && result.current && result.current.tag !== before) live.watchCrashes()
     noteSupervisorChanges()
   } catch (error) {
     print(`The update stopped: ${error.message}`)
   } finally {
     updating = false
+    ensureServing()
   }
+}
+
+// ----- The console -----
+
+function describe() {
+  const state = readState(paths)
+  const dir = liveDir(paths, state)
+  const serving = dir === root ? 'the uploaded folder' : state.current?.tag
+  return `Serving ${serving}. Updater: ${state.status}${state.message ? `. ${state.message}` : '.'}`
+}
+
+function requestUpdate() {
+  if (!updatesOn) return print('Updates are off: GITHUB_TOKEN is not set in .env.')
+  if (updating || busyStatuses.includes(readState(paths).status) || existsSync(paths.request)) {
+    return print('An update is already running or waiting.')
+  }
+  writeFileSync(paths.request, JSON.stringify({ requestedAt: new Date().toISOString(), by: 'console' }))
+  print('Update requested; it starts within two seconds.')
+}
+
+async function exclusively(action) {
+  if (updating) return print('An update or a rollback is running; try again when it is done.')
+  updating = true
+  try {
+    await action()
+  } finally {
+    updating = false
+    ensureServing()
+  }
+}
+
+const commands = {
+  help: () => print('Commands: status, update (install the latest release), rollback (back to the release before), restart, stop.'),
+  status: () => print(describe()),
+  update: requestUpdate,
+  rollback: () => exclusively(async () => print((await rollBack({ paths, deps: { switchTo, print }, reason: 'Rolled back from the console.' })).message)),
+  restart: () => exclusively(() => switchTo(liveDir(paths, readState(paths)), print)),
+  stop: () => shutDown('stop'),
+}
+
+function command(line) {
+  const name = line.trim().toLowerCase()
+  if (!name) return
+  const action = commands[name]
+  if (action) void action()
+  else print(`Unknown command "${name.slice(0, 40)}". Try help.`)
 }
 
 // ----- Start -----
 
 let poller = null
 
-async function shutDown(signal) {
+async function shutDown(reason) {
   if (shuttingDown) return
   shuttingDown = true
-  print(`${signal}: stopping`)
+  print(`${reason}: stopping`)
   clearInterval(poller)
-  await stopLive()
-  await Promise.all([...children].map(stop))
+  await live.stop()
+  // Builds and installs too, with everything they started.
+  await Promise.all([...children].map((child) => stopProcess(child)))
   process.exit(0)
 }
 
@@ -360,6 +358,7 @@ reportSettings()
 const state = recoverState(paths)
 const dir = liveDir(paths, state)
 noteSupervisorChanges()
+createInterface({ input: process.stdin }).on('line', command)
 
 // The uploaded folder is built at every start, as the old startup command
 // did: a build left over from an earlier upload would otherwise be served
@@ -380,11 +379,11 @@ if (dir === root) {
 }
 
 print(`Starting the site on port ${port} from ${dir === root ? 'the uploaded folder' : dir}`)
-startLive(dir)
+live.start(dir)
 // Only now, with the site starting: a half-built or old release can take a
 // while to delete. Updates wait until it is done.
 updating = true
-pruneReleases(paths, state)
+cleanUpAtStart(paths, state, print)
   .catch((error) => print(`Could not remove an old release: ${error.message}`))
   .finally(() => {
     updating = false

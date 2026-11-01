@@ -52,7 +52,7 @@ function request(path: string, init: { method?: string; body?: unknown; headers?
   return new NextRequest(`https://wslatl.com${path}`, {
     method,
     headers,
-    body: method === 'GET' ? undefined : JSON.stringify(init.body ?? {}),
+    body: method === 'GET' ? undefined : JSON.stringify(init.body === undefined ? {} : init.body),
   })
 }
 
@@ -135,6 +135,25 @@ describe('logging in', () => {
     // Empty attempts count too, and skip the slow password check.
     for (let i = 0; i < 30; i++) await login.POST(request('/admin/api/login', { body: {} }))
     expect((await login.POST(request('/admin/api/login', { body: { password } }))).status).toBe(429)
+  })
+
+  it('answers 400 to a JSON body that is not an object, before counting it', async () => {
+    for (const body of [null, [], 'password']) {
+      const response = await login.POST(request('/admin/api/login', { body, headers: { 'cf-connecting-ip': '192.0.2.9' } }))
+      expect(response.status, JSON.stringify(body)).toBe(400)
+    }
+    for (let i = 0; i < 4; i++) {
+      await login.POST(request('/admin/api/login', { body: { password: 'wrong' }, headers: { 'cf-connecting-ip': '192.0.2.9' } }))
+    }
+    expect((await login.POST(request('/admin/api/login', { body: { password }, headers: { 'cf-connecting-ip': '192.0.2.9' } }))).status).toBe(200)
+  })
+
+  it('never counts the owner\'s own logins toward the overall limit', async () => {
+    for (let i = 0; i < 29; i++) await login.POST(request('/admin/api/login', { body: {} }))
+    expect((await login.POST(request('/admin/api/login', { body: { password } }))).status).toBe(200)
+    // Had the login counted, this one would be the 31st and refused.
+    expect((await login.POST(request('/admin/api/login', { body: {} }))).status).toBe(401)
+    expect((await login.POST(request('/admin/api/login', { body: {} }))).status).toBe(429)
   })
 
   it('lets a successful login clear its own address', async () => {

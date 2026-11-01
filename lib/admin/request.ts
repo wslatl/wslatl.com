@@ -92,9 +92,15 @@ export async function checkPost(request: Request): Promise<PostCheck> {
   }
   const text = await readLimited(request)
   if (text === null) return { ok: false, response: json({ error: 'Too large.' }, { status: 413 }) }
+  let body: unknown
   try {
-    return { ok: true, body: text ? JSON.parse(text) : {} }
+    body = text ? JSON.parse(text) : {}
   } catch {
     return { ok: false, response: json({ error: 'That is not valid JSON.' }, { status: 400 }) }
   }
+  // Every admin route reads named fields, so anything but an object is refused here.
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) {
+    return { ok: false, response: json({ error: 'Send a JSON object.' }, { status: 400 }) }
+  }
+  return { ok: true, body }
 }

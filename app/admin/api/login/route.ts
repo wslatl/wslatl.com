@@ -37,7 +37,9 @@ export async function POST(request: NextRequest) {
     return json({ error: 'That password is not right.' }, { status: 401 })
   }
 
+  // The owner's own logins never use up the overall limit.
   limits.perIp.reset(key)
+  limits.overall.refund('all')
   adminLog(`login from ${ip}`)
   const response = json({ ok: true })
   response.cookies.set(sessionCookie(createSession(settings)))

@@ -212,6 +212,16 @@ describe('login rate limits', () => {
     expect(limiter.hit('1.2.3.4', start + 15 * 60 * 1000)).toBe(true)
   })
 
+  it('gives back an attempt on refund', () => {
+    const limiter = rateLimiter({ limit: 2, windowMs: 60_000 })
+    limiter.hit('all', 0)
+    limiter.hit('all', 0)
+    limiter.refund('all')
+    expect(limiter.hit('all', 1)).toBe(true)
+    expect(limiter.hit('all', 1)).toBe(false)
+    limiter.refund('nobody')
+  })
+
   it('starts a key over on reset', () => {
     const limiter = rateLimiter({ limit: 2, windowMs: 60_000 })
     limiter.hit('a', 0)
@@ -294,5 +304,13 @@ describe('admin requests', () => {
     expect(!large.ok && large.response.status).toBe(413)
     const broken = await checkPost(post(sameOrigin, '{"password":'))
     expect(!broken.ok && broken.response.status).toBe(400)
+  })
+
+  it('refuses JSON that is not an object, which no admin route can read', async () => {
+    for (const body of ['null', '[]', '1', '"x"', 'true']) {
+      const result = await checkPost(post(sameOrigin, body))
+      expect(!result.ok && result.response.status, body).toBe(400)
+    }
+    expect(await checkPost(post(sameOrigin, ''))).toEqual({ ok: true, body: {} })
   })
 })

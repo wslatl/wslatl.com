@@ -3,13 +3,17 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  cleanUpAtStart,
   emptyState,
   liveDir,
   pruneReleases,
   readState,
   recoverState,
   releaseDir,
+  rollBack,
   runUpdate,
+  stateIsDamaged,
+  supervisorChanged,
   updaterPaths,
   writeState,
 } from '../scripts/updater/lib.mjs'
@@ -316,6 +320,116 @@ describe('an update that works', () => {
   })
 })
 
+describe('what an update leaves behind', () => {
+  it('keeps npm\'s cache under .updater/ and removes it afterwards, however the update ends', async () => {
+    for (const fails of [false, true]) {
+      const caches: string[] = []
+      const { deps } = fakeDeps({
+        npm: async (args, { cwd, env }) => {
+          caches.push(String(env.npm_config_cache))
+          mkdirSync(String(env.npm_config_cache), { recursive: true })
+          if (args[1] === 'build') {
+            if (fails) throw new Error('npm run build failed (exit code 1).')
+            file(join(cwd, '.next', 'BUILD_ID'), 'new-build')
+          }
+        },
+      })
+      await update(deps)
+      expect(new Set(caches)).toEqual(new Set([join(root, '.updater', 'npm-cache')]))
+      expect(existsSync(join(root, '.updater', 'npm-cache')), `fails: ${fails}`).toBe(false)
+      rmSync(paths.releases, { recursive: true, force: true })
+      writeState(paths, emptyState())
+    }
+  })
+
+  it('ignores lines from a build that outlived its update, so they never overwrite a later state', async () => {
+    let late: ((line: string) => void) | undefined
+    const { deps } = fakeDeps({
+      npm: async (args, { onLine }) => {
+        late = onLine
+        if (args[1] === 'build') throw new Error('npm run build took longer than 15 minutes and was stopped.')
+      },
+    })
+    await update(deps)
+    // A later update finished since; then a straggling line arrives.
+    const later = { ...emptyState(), current: installed('v1.1.0'), message: 'Installed v1.1.0.' }
+    writeState(paths, later)
+    late?.('a late line from the old build')
+    expect(readState(paths)).toEqual(later)
+  })
+
+  it('rolls back when the switch itself throws, rather than leaving nothing running', async () => {
+    live('v1.0.0')
+    const tried: string[] = []
+    const { deps } = fakeDeps({
+      switchTo: async (dir) => {
+        tried.push(dir)
+        if (dir === releaseDir(paths, 'v1.1.0')) throw new Error('spawn EAGAIN')
+        return true
+      },
+    })
+    const state = await update(deps)
+    expect(tried).toEqual([releaseDir(paths, 'v1.1.0'), releaseDir(paths, 'v1.0.0')])
+    expect(state).toMatchObject({ status: 'rolled-back', current: { tag: 'v1.0.0' } })
+    expect(state.log.join('\n')).toContain('The switch failed: spawn EAGAIN')
+  })
+})
+
+/** v1.1.0 is live and v1.0.0 is the release before it, both built. */
+function installedPair() {
+  writeState(paths, { ...emptyState(), current: installed('v1.1.0'), previous: installed('v1.0.0') })
+  file(join(releaseDir(paths, 'v1.1.0'), '.next', 'BUILD_ID'))
+  file(join(releaseDir(paths, 'v1.0.0'), '.next', 'BUILD_ID'))
+}
+
+const rollbackDeps = (switchTo: (dir: string) => Promise<boolean>) => ({ switchTo, print: () => {} })
+
+describe('going back to the release before', () => {
+
+  it('switches to the previous release and records it as installed', async () => {
+    installedPair()
+    const tried: string[] = []
+    const result = await rollBack({ paths, deps: rollbackDeps(async (dir) => (tried.push(dir), true)), reason: 'Rolled back from the console.' })
+    expect(result).toEqual({ ok: true, message: 'Rolled back from the console. The site went back to v1.0.0.' })
+    expect(tried).toEqual([releaseDir(paths, 'v1.0.0')])
+    expect(readState(paths)).toMatchObject({ status: 'rolled-back', current: { tag: 'v1.0.0' }, previous: null })
+    expect(liveDir(paths, readState(paths))).toBe(releaseDir(paths, 'v1.0.0'))
+  })
+
+  it('goes back to the uploaded folder after the first release', async () => {
+    live('v1.1.0')
+    const result = await rollBack({ paths, deps: rollbackDeps(async () => true), reason: 'Crashed.' })
+    expect(result.message).toBe('Crashed. The site went back to the uploaded folder.')
+    expect(readState(paths).current).toBeNull()
+  })
+
+  it('keeps the live release when going back fails', async () => {
+    installedPair()
+    const tried: string[] = []
+    const result = await rollBack({
+      paths,
+      deps: rollbackDeps(async (dir) => (tried.push(dir), dir === releaseDir(paths, 'v1.1.0'))),
+      reason: 'Rolled back from the console.',
+    })
+    expect(result.ok).toBe(false)
+    expect(result.message).toMatch(/failed, so v1.1.0 is still live/)
+    expect(tried).toEqual([releaseDir(paths, 'v1.0.0'), releaseDir(paths, 'v1.1.0')])
+    expect(readState(paths).current?.tag).toBe('v1.1.0')
+  })
+
+  it('does nothing during an update, or when the uploaded folder is what runs', async () => {
+    installedPair()
+    writeState(paths, { ...readState(paths), status: 'building' })
+    const switches: string[] = []
+    const busy = await rollBack({ paths, deps: rollbackDeps(async (dir) => (switches.push(dir), true)), reason: 'x' })
+    expect(busy.ok).toBe(false)
+    writeState(paths, emptyState())
+    const fromRoot = await rollBack({ paths, deps: rollbackDeps(async (dir) => (switches.push(dir), true)), reason: 'x' })
+    expect(fromRoot.message).toMatch(/nothing to go back to/)
+    expect(switches).toEqual([])
+  })
+})
+
 describe('nothing to install', () => {
   it('when no release is published yet', async () => {
     const { deps, calls } = fakeDeps({ latest: async () => null })
@@ -492,9 +606,67 @@ describe('starting up', () => {
     error.mockRestore()
   })
 
+  it('leaves state.json as it was when the new state cannot even be written', () => {
+    // A full disk: the temporary file fails, and writing in place would
+    // have truncated the good state.json.
+    writeFileSync(paths.state, JSON.stringify({ ...emptyState(), current: installed('v1.0.0') }))
+    mkdirSync(`${paths.state}.${process.pid}.tmp`)
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    expect(writeState(paths, emptyState())).toBe(false)
+    expect(readState(paths).current?.tag).toBe('v1.0.0')
+    error.mockRestore()
+  })
+
+  it('keeps every release when state.json is damaged, since it no longer says which one is live', async () => {
+    live('v1.0.0')
+    file(join(releaseDir(paths, 'v1.1.0'), '.next', 'BUILD_ID'))
+    writeFileSync(paths.state, '')
+    expect(stateIsDamaged(paths)).toBe(true)
+    const lines: string[] = []
+    await cleanUpAtStart(paths, recoverState(paths), (line: string) => lines.push(line))
+    expect(readdirSync(paths.releases).toSorted()).toEqual(['v1.0.0', 'v1.1.0'])
+    expect(lines.join('\n')).toMatch(/damaged/)
+    // A readable one is cleaned up as usual.
+    live('v1.1.0')
+    expect(stateIsDamaged(paths)).toBe(false)
+    await cleanUpAtStart(paths, readState(paths), () => {})
+    expect(readdirSync(paths.releases)).toEqual(['v1.1.0'])
+  })
+
   it('reads a missing or broken state file as a fresh one', () => {
     expect(readState(paths)).toEqual(emptyState())
     writeFileSync(paths.state, '{not json')
     expect(readState(paths)).toEqual(emptyState())
+  })
+})
+
+function copy(base: string, files: Record<string, string>) {
+  for (const [name, text] of Object.entries(files)) file(join(base, name), text)
+}
+
+describe('noticing that the updater itself changed', () => {
+  const updater = {
+    'scripts/serve.mjs': 'serve\n',
+    'scripts/updater/lib.mjs': 'lib\n',
+    'scripts/updater/release.mjs': 'release\n',
+  }
+
+  it('compares serve.mjs and every file in scripts/updater/, line endings aside', () => {
+    const release = releaseDir(paths, 'v1.1.0')
+    copy(root, updater)
+    copy(release, Object.fromEntries(Object.entries(updater).map(([name, text]) => [name, text.replace('\n', '\r\n')])))
+    expect(supervisorChanged(root, release)).toBe(false)
+    expect(supervisorChanged(root, root)).toBe(false)
+
+    // Only the version rule changed: the dashboard and the supervisor would disagree.
+    copy(release, { 'scripts/updater/release.mjs': 'release, changed\n' })
+    expect(supervisorChanged(root, release)).toBe(true)
+  })
+
+  it('notices a file added to scripts/updater/ in the release', () => {
+    const release = releaseDir(paths, 'v1.1.0')
+    copy(root, updater)
+    copy(release, { ...updater, 'scripts/updater/new.mjs': 'new\n' })
+    expect(supervisorChanged(root, release)).toBe(true)
   })
 })

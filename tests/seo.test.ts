@@ -85,9 +85,8 @@ describe('what Google reads for the site and its pages', () => {
 })
 
 describe('the admin, which search engines must leave alone', () => {
-  it('is disallowed in robots.txt', () => {
-    const rules = [robots().rules].flat()
-    expect(rules.some((rule) => [rule.disallow].flat().includes('/admin'))).toBe(true)
+  it('is not named in robots.txt, which would only point at it and hide its noindex', () => {
+    expect(JSON.stringify(robots())).not.toContain('admin')
   })
 
   it('is not in the sitemap', () => {

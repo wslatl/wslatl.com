@@ -12,8 +12,9 @@ const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
  * site's look comes from the same stylesheet; nothing else from the public
  * layout (header, structured data) belongs here.
  *
- * Never indexed: this meta tag, the X-Robots-Tag header (next.config.mjs)
- * and robots.txt all say so. The README's "Admin and updates" has the rest.
+ * Never indexed: this meta tag and the X-Robots-Tag header (next.config.mjs)
+ * both say so, and the sitemap leaves it out. The README's "Admin and
+ * updates" has the rest.
  */
 export const dynamic = 'force-dynamic'
 

@@ -233,7 +233,7 @@ When you press Install, the updater asks GitHub once which commit the tag points
 
 ## Admin and updates
 
-`/admin` updates the site from GitHub, and that is all it does: log in, see which release is installed and which is the latest, press **Install**, and watch each step. It is English only, outside the language routing, never indexed (a robots meta tag, an `X-Robots-Tag` header and `Disallow: /admin` in robots.txt), and not in the sitemap. There is no database: the settings are in `.env`, and the code comes from GitHub releases.
+`/admin` updates the site from GitHub, and that is all it does: log in, see which release is installed and which is the latest, press **Install**, and watch each step. It is English only, outside the language routing, never indexed (a robots meta tag and an `X-Robots-Tag` header), and not in the sitemap. robots.txt leaves it out on purpose: a line there would only point at it, and a disallowed page is never fetched, so its noindex would never be seen. There is no database: the settings are in `.env`, and the code comes from GitHub releases.
 
 ### How an update works
 
@@ -245,11 +245,13 @@ When you press Install, the updater asks GitHub once which commit the tag points
 4. **Trial start**: starts the new build on a spare local port and waits for its home page to answer. Until here, the live site has not been touched.
 5. **Switch**: stops the live server and starts the new build on the real port. If it does not answer within two minutes, the release before it starts again (rolled back).
 
-A failure at any step leaves the site on the version it had, removes the half-built release, and shows the reason and the log on the dashboard. The install and the build each get 15 minutes. The site is down only for the few seconds of the switch. `.env` and `.next-static-history/` are never touched.
+A failure at any step leaves the site on the version it had, removes the half-built release, and shows the reason and the log on the dashboard. The install and the build each get 15 minutes, after which they are stopped together with everything they started. The site is down only for the few seconds of the switch. `.env` and `.next-static-history/` are never touched.
 
-**Disk space.** The live release and the one before it are kept and older ones deleted, and the one before is removed as soon as the next update starts. So at most three copies of the site are on the disk at once: the uploaded folder, the live release and the new one. Each holds its own `node_modules` and build, about 800 MB, and npm keeps its download cache in the server's folder too. Give the server a disk limit of at least 4 GB: Pterodactyl stops a server that goes over its limit, and does not start it again until it is back under.
+A new release is watched for ten minutes after its switch: if it stops three times in that time, the supervisor goes back to the release before it by itself (or to the uploaded folder, after the first release), and the dashboard says so. Otherwise the supervisor starts `next start` again whenever it stops, waiting a little longer each time.
 
-The supervisor reports through `.updater/state.json`, which the dashboard reads. The settings in `.env` are passed to `next start` only, not to `npm ci` or `npm run build`, and `npm ci` skips install scripts, which is where a compromised package usually strikes (the site needs none: sharp and the compilers ship prebuilt). The build still runs the site's own code and its build tools, exactly as a build by hand does. The console logs each login and failed login with the visitor's address, each update request, and each step of an update.
+**Disk space.** The live release and the one before it are kept and older ones deleted, and the one before is removed as soon as the next update starts. So at most three copies of the site are on the disk at once: the uploaded folder, the live release and the new one. Each holds its own `node_modules` and build, about 800 MB. npm's download cache lives in `.updater/npm-cache/` only while an update runs, and is deleted after it. Give the server a disk limit of at least 4 GB: Pterodactyl stops a server that goes over its limit, and does not start it again until it is back under.
+
+The supervisor reports through `.updater/state.json`, which the dashboard reads. The settings in `.env` are given to `next start`, and never to the updater's `npm ci` or its builds of a release; `npm ci` also skips install scripts, which is where a compromised package usually strikes (the site needs none: sharp and the compilers ship prebuilt). A build still runs the site's own code and its build tools, exactly as a build by hand does, and the build of the uploaded folder at start-up reads `.env` from that folder itself, as any build by hand does. The console logs each login and failed login with the visitor's address, each update request, and each step of an update.
 
 ### One-time setup on Pterodactyl
 
@@ -259,6 +261,7 @@ The supervisor reports through `.updater/state.json`, which the dashboard reads.
 4. **Fill in `.env`** in the server's folder, beside `package.json`, with `.env.example` as the template: the two lines from step 3, `GITHUB_TOKEN=` with the token, and `GITHUB_REPO` only if it is not `wslatl/wslatl.com`.
 5. **Change the startup command** on the server's Startup tab, from `npm run build && npm start` to `npm run serve`. If the field is locked, a panel admin can change it under Admin, Servers, the server, Startup. It listens on `SERVER_PORT`, which Pterodactyl sets to the server's port (then `PORT`, then 3000).
 6. **Restart the server.** The console says `The admin is on at /admin.` and `Updates install the latest release of wslatl/wslatl.com.`, or which setting is missing. Until the first update, every start builds the uploaded folder first (a minute or two), as the old startup command did. Open `wslatl.com/admin` and log in.
+7. **Put `/admin` behind Cloudflare Access** (strongly recommended). The login allows 30 attempts per 15 minutes in all, which stops password guessing, but anyone with a handful of addresses can use them up and keep you locked out. With Access in front, nobody else reaches the login at all. In the Cloudflare dashboard: Zero Trust, Access, Applications, Add an application, Self-hosted. Application domain `wslatl.com`, path `admin` (everything under `/admin` is covered). Add a policy: action Allow, include Emails, your own address. Save. `/admin` then asks for a one-time code sent to that address before the login page appears. If you would rather not use Access, a WAF custom rule does most of it: Security, WAF, Custom rules, block when the URI path starts with `/admin` and the IP source address is not yours (this needs an address that does not change).
 
 From then on, a change reaches the site as a release: see Releasing.
 
@@ -271,16 +274,20 @@ From then on, a change reaches the site as a release: see Releasing.
 - **The dashboard says the updater itself changed.** `scripts/serve.mjs` and `scripts/updater/` always run from the uploaded folder, so a commit that changes them takes effect only once they are copied over: copy both from `.updater/releases/<tag>/scripts/` into the server's `scripts/` folder, then restart the server.
 - **Going back to uploading by hand.** Once an update has run, the site is served from `.updater/releases/`, so files uploaded to the server's folder are not served. Stop the server, delete the `.updater/` folder (never `.env` or `.next-static-history/`), and start it again: it builds the uploaded folder and serves it.
 - **Logging everyone out.** Change `ADMIN_SESSION_SECRET` or the password, and restart. A session lasts two hours anyway.
+- **A new release went back by itself.** It stopped three times within ten minutes of its switch; the dashboard says so, and the console has its errors. Fix it, publish a new release, and install that.
+- **`.updater/state.json` is damaged.** The console says so at start-up. The site then runs from the uploaded folder, and no release is deleted until an update writes the file again.
+
+**The server console** (Pterodactyl's Console tab) takes these commands: `status` (what is serving, and what the updater last did), `update` (install the latest release, as the dashboard does), `rollback` (back to the release before the live one), `restart` (start the live server again) and `stop`.
 
 ### How it is kept safe
 
-- **Login.** The password is checked against an scrypt hash in constant time. Each address gets 5 attempts and everyone together 30 per 15 minutes, counted before the password is checked, and at most two checks run at once.
+- **Login.** The password is checked against an scrypt hash in constant time. Each address gets 5 attempts and everyone together 30 per 15 minutes, counted before the password is checked, and at most two checks run at once. Your own successful logins give their attempt back.
 - **Only three routes take a POST:** `/admin/api/login`, `/admin/api/logout` and `/admin/api/update` (`adminPostRoutes` in `i18n/routing.ts`).
 - **Session.** A signed cookie, `wslatl_admin`: HttpOnly, Secure, SameSite=Strict, Path=/admin, two hours. Its key comes from the session secret and the password hash together.
 - **Every POST** must come from a page on this site (the `Origin` matches the host, and `Sec-Fetch-Site`, when sent, is `same-origin`), as JSON, and at most 4 KB. `proxy.ts` answers every other POST with a 405; `tests/proxy.test.ts` checks that each admin POST handler calls `checkPost()` before anything else.
 - **Secrets** are read on the server, on each request, in `server-only` modules. `tests/admin-secrets.test.ts` keeps them away from client components, and `npm run scan:build` fails if a secret from `.env`, a password hash or a GitHub token turns up in anything the site serves. CI builds with made-up values in `.env` to prove it.
 - **If any required setting is missing,** the admin is off. It never runs open.
-- **Behind Cloudflare.** The per-address limit reads the address from Cloudflare's `CF-Connecting-IP`, which anyone who reaches the server's port directly can make up (an IPv6 address counts by its /64). The overall limit still holds, so the password cannot be guessed that way, but such a visitor could keep the login locked for 15 minutes at a time (Next keeps a client's own `X-Forwarded-For`, so the app cannot see an address that cannot be made up). Two settings at Cloudflare close both: accept connections to the server's port from Cloudflare's addresses only (or use a Cloudflare Tunnel), and put `/admin` behind Cloudflare Access, or a WAF rule that lets only your own address reach it.
+- **Lockouts.** The overall limit stops the password being guessed however many addresses are used, and its flip side is that anyone with a handful of addresses (one IPv6 network holds hundreds) can use it up and keep the login locked, through Cloudflare or not. The per-address limit cannot prevent that: it reads Cloudflare's `CF-Connecting-IP`, which anyone who reaches the server's port directly can make up, and Next keeps a client's own `X-Forwarded-For`. Cloudflare Access in front of `/admin` (setup step 7) closes it. Accepting connections to the server's port from Cloudflare's addresses only (or a Cloudflare Tunnel) keeps the address honest as well.
 
 | File | What it holds |
 | --- | --- |
@@ -288,7 +295,7 @@ From then on, a change reaches the site as a release: see Releasing.
 | `components/admin/` | The login form, the update panel, the log-out button |
 | `lib/admin/` | Settings, password hashing, sessions, rate limits, request checks, GitHub, and the dashboard's side of the updater |
 | `scripts/serve.mjs` | The supervisor, `npm run serve` |
-| `scripts/updater/lib.mjs` | The update steps and the `.updater/` layout, tested in `tests/updater.test.ts` |
+| `scripts/updater/` | The update steps and the `.updater/` layout (`lib.mjs`), the version rule (`release.mjs`), the live server and its crash watch (`live.mjs`) and child processes (`process.mjs`), each with tests in `tests/updater*.test.ts` |
 | `scripts/hash-password.mjs` | `npm run admin:hash` |
 | `.env.example` | Every setting, with what it does |
 

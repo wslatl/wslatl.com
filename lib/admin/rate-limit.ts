@@ -35,6 +35,11 @@ export function rateLimiter({ limit, windowMs, maxKeys = 10_000 }: { limit: numb
     reset(key: string) {
       windows.delete(key)
     },
+    /** Gives back one attempt: a login that turned out to be the owner's own. */
+    refund(key: string) {
+      const window = windows.get(key)
+      if (window && window.count > 0) window.count--
+    },
     retryAfterSeconds(key: string, now = Date.now()): number {
       const window = windows.get(key)
       return window ? Math.max(1, Math.ceil((window.resetAt - now) / 1000)) : 0

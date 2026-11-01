@@ -67,8 +67,9 @@ const securityHeaders = [
 ]
 
 // The admin is for the owner only: never indexed, wherever a link to it
-// turns up. Its pages also carry a robots meta tag, and robots.txt
-// disallows it.
+// turns up. Its pages also carry a robots meta tag. robots.txt leaves it
+// out on purpose: a disallowed page is never fetched, so its noindex would
+// never be seen.
 const adminHeaders = [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]
 
 /**
