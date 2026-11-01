@@ -23,6 +23,7 @@ import { createInterface } from 'node:readline'
 import { Readable, Transform } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
 import { parseEnv } from 'node:util'
+import { busyFlag } from './updater/busy.mjs'
 import {
   busyStatuses,
   cleanUpAtStart,
@@ -98,10 +99,6 @@ function startNext(dir, { port: listen, env, onLine }) {
 
 // The panel's variables win over .env here too, as they do in Next.
 const serverEnv = { ...dotenv, ...process.env, ...(updatesOn && { UPDATER_DIR: paths.dir }) }
-// One flag for everything that moves the live site: start-up (until its
-// build and clean-up are done), updates, rollbacks and restarts. Two at once
-// could start two servers on one port.
-let updating = true
 let shuttingDown = false
 
 const live = liveServer({
@@ -111,9 +108,26 @@ const live = liveServer({
   onCrashLoop: (dir) => void crashLoop(dir),
 })
 
-/** Starts the live server again when nothing serves: after an update or a rollback that ended that way. */
+// Held by start-up (until its build and clean-up are done), updates,
+// rollbacks and restarts: whatever holds it owns the live server
+// (scripts/updater/busy.mjs).
+const busy = busyFlag({
+  // A release that kept stopping while the site was busy goes back now, if
+  // it is still what runs: an update may have replaced it.
+  onCrashLoopDue: (dir) => {
+    if (!shuttingDown && live.current?.dir === dir) void crashLoop(dir)
+  },
+  ensureServing,
+})
+
+/**
+ * Starts the live server again when nothing serves: after an update or a
+ * rollback that ended that way. Never while the busy flag is held, since its
+ * holder owns the live server and may be stopping it on purpose.
+ */
 function ensureServing() {
-  if (!shuttingDown && live.ensure(liveDir(paths, readState(paths)))) print('Nothing was serving, so the site was started again.')
+  if (shuttingDown || busy.held) return
+  if (live.ensure(liveDir(paths, readState(paths)))) print('Nothing was serving, so the site was started again.')
 }
 
 /**
@@ -135,29 +149,19 @@ async function switchTo(dir, onLine, { keepWatch = false } = {}) {
   return ok
 }
 
-// A release that keeps stopping while the site is busy (start-up clean-up,
-// an update, a rollback) is started again for the moment, and rolled back
-// as soon as the busy work is done.
-let crashedWhileBusy = null
-
-/** Ends the busy work, and rolls back a release that kept stopping meanwhile. */
-function notBusy() {
-  updating = false
-  const dir = crashedWhileBusy
-  crashedWhileBusy = null
-  // Only while that release is still what runs: an update may have replaced it.
-  if (dir && !shuttingDown && live.current?.dir === dir) void crashLoop(dir)
-}
-
-/** A new release stopped three times within ten minutes of its switch: back to the one before. */
+/**
+ * A new release stopped three times within ten minutes of its switch: back
+ * to the one before. While the site is busy (start-up clean-up, an update, a
+ * rollback) it is started again for the moment, and goes back as soon as the
+ * busy flag comes free.
+ */
 async function crashLoop(dir) {
-  if (updating) {
+  if (!busy.take()) {
     print('The site is busy, so the release that keeps stopping was started again; it goes back once the busy work is done.')
-    crashedWhileBusy = dir
+    busy.deferCrash(dir)
     await live.start(dir)
     return
   }
-  updating = true
   try {
     const result = await rollBack({
       paths,
@@ -171,8 +175,7 @@ async function crashLoop(dir) {
     if (!result.ok) print(result.message)
     noteSupervisorChanges()
   } finally {
-    notBusy()
-    ensureServing()
+    busy.release()
   }
 }
 
@@ -284,8 +287,7 @@ function noteSupervisorChanges() {
 }
 
 async function checkForRequest() {
-  if (updating || shuttingDown || !existsSync(paths.request)) return
-  updating = true
+  if (shuttingDown || !existsSync(paths.request) || !busy.take()) return
   print('Update requested')
   const before = readState(paths).current?.tag
   try {
@@ -303,8 +305,7 @@ async function checkForRequest() {
   } catch (error) {
     print(`The update stopped: ${error.message}`)
   } finally {
-    notBusy()
-    ensureServing()
+    busy.release()
   }
 }
 
@@ -319,7 +320,7 @@ function describe() {
 
 function requestUpdate() {
   if (!updatesOn) return print('Updates are off: GITHUB_TOKEN is not set in .env.')
-  if (updating || busyStatuses.includes(readState(paths).status)) {
+  if (busy.held || busyStatuses.includes(readState(paths).status)) {
     return print('The site is starting, or an update or a rollback is running; try again when it is done.')
   }
   try {
@@ -338,13 +339,11 @@ const servedDir = () => live.current?.dir ?? liveDir(paths, readState(paths))
 // One at a time: updates, rollbacks and restarts all move the live site, and
 // two at once could start two servers on one port.
 async function exclusively(action) {
-  if (updating) return print('The site is starting, or an update or a rollback is running; try again when it is done.')
-  updating = true
+  if (!busy.take()) return print('The site is starting, or an update or a rollback is running; try again when it is done.')
   try {
     await action()
   } finally {
-    notBusy()
-    ensureServing()
+    busy.release()
   }
 }
 
@@ -444,11 +443,11 @@ await live.start(dir)
 const watchSince = crashWatchSince(paths, state, dir, crashWindowMs)
 if (watchSince !== null) live.watchCrashes(watchSince)
 // Only now, with the site starting: a half-built or old release can take a
-// while to delete. Everything else waits until it is done (updating has been
-// set since the top, so the console cannot move the site during the build).
+// while to delete. Everything else waits until it is done (the busy flag is
+// held from the top, so the console cannot move the site during the build).
 cleanUpAtStart(paths, state, print)
   .catch((error) => print(`Could not remove an old release: ${error.message}`))
   .finally(() => {
-    notBusy()
+    busy.release()
   })
 if (updatesOn) poller = setInterval(checkForRequest, 2000)
