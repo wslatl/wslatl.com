@@ -654,7 +654,7 @@ describe('noticing that the updater itself changed', () => {
   it('compares serve.mjs and every file in scripts/updater/, line endings aside', () => {
     const release = releaseDir(paths, 'v1.1.0')
     copy(root, updater)
-    copy(release, Object.fromEntries(Object.entries(updater).map(([name, text]) => [name, text.replace('\n', '\r\n')])))
+    copy(release, Object.fromEntries(Object.entries(updater).map(([name, text]) => [name, text.replaceAll('\n', '\r\n')])))
     expect(supervisorChanged(root, release)).toBe(false)
     expect(supervisorChanged(root, root)).toBe(false)
 

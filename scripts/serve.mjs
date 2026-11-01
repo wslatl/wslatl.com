@@ -283,10 +283,14 @@ function describe() {
 
 function requestUpdate() {
   if (!updatesOn) return print('Updates are off: GITHUB_TOKEN is not set in .env.')
-  if (updating || busyStatuses.includes(readState(paths).status) || existsSync(paths.request)) {
-    return print('An update is already running or waiting.')
+  if (updating || busyStatuses.includes(readState(paths).status)) return print('An update is already running.')
+  try {
+    // Created only if no request is waiting, in one step (wx), so two
+    // requests at once cannot both get through.
+    writeFileSync(paths.request, JSON.stringify({ requestedAt: new Date().toISOString(), by: 'console' }), { flag: 'wx' })
+  } catch (error) {
+    return print(error.code === 'EEXIST' ? 'An update is already waiting to start.' : `Could not ask for an update: ${error.message}`)
   }
-  writeFileSync(paths.request, JSON.stringify({ requestedAt: new Date().toISOString(), by: 'console' }))
   print('Update requested; it starts within two seconds.')
 }
 
