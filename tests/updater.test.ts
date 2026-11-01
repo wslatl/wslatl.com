@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   cleanUpAtStart,
+  crashWatchSince,
   emptyState,
   liveDir,
   pruneReleases,
@@ -325,7 +326,7 @@ describe('the folder actually served', () => {
     // After a crash rollback: v1.0.0 runs again, v1.1.0's folder is still there.
     live('v1.0.0')
     file(join(releaseDir(paths, 'v1.1.0'), '.next', 'BUILD_ID'))
-    writeState(paths, { ...readState(paths), rolledBackFrom: 'v1.1.0' })
+    writeState(paths, { ...readState(paths), withdrawn: ['v1.1.0'] })
     const seen: string[] = []
     const { deps } = fakeDeps({
       latest: async () => published('v1.2.0'),
@@ -337,12 +338,12 @@ describe('the folder actually served', () => {
     })
     const state = await update(deps)
     expect(seen).toEqual(['v1.0.0', 'v1.2.0'])
-    expect(state).toMatchObject({ status: 'idle', current: { tag: 'v1.2.0' }, previous: { tag: 'v1.0.0' }, rolledBackFrom: null })
+    expect(state).toMatchObject({ status: 'idle', current: { tag: 'v1.2.0' }, previous: { tag: 'v1.0.0' }, withdrawn: [] })
   })
 
   it('does not install again the release a crash took back out', async () => {
     live('v1.0.0')
-    writeState(paths, { ...readState(paths), rolledBackFrom: 'v1.1.0' })
+    writeState(paths, { ...readState(paths), withdrawn: ['v1.1.0'] })
     const { deps, calls } = fakeDeps()
     const state = await update(deps)
     expect(state.message).toBe('v1.1.0 was taken back out after it kept stopping, so it is not installed again. Publish the fix as a newer release.')
@@ -383,6 +384,42 @@ describe('the folder actually served', () => {
     const state = await runUpdate({ paths, deps, baseEnv, secretNames, serving: releaseDir(paths, 'v1.0.0') })
     expect(calls.resolved).toEqual(['v1.1.0'])
     expect(state).toMatchObject({ status: 'idle', current: { tag: 'v1.1.0' }, previous: { tag: 'v1.0.0' } })
+  })
+})
+
+describe('the crash watch across a restart', () => {
+  const window = 10 * 60_000
+
+  it('is kept for a release an update installed, for the rest of its ten minutes', async () => {
+    const { deps } = fakeDeps()
+    const state = await update(deps)
+    const since = Date.parse(String(state.watchSince))
+    expect(Number.isFinite(since)).toBe(true)
+    const dir = releaseDir(paths, 'v1.1.0')
+    expect(crashWatchSince(paths, state, dir, window, since + 60_000)).toBe(since)
+    expect(crashWatchSince(paths, state, dir, window, since + window)).toBeNull()
+    // Not when something else is what runs.
+    expect(crashWatchSince(paths, state, root, window, since + 60_000)).toBeNull()
+  })
+
+  it('is never armed for a release a rollback went back to', async () => {
+    // v1.1.0 kept stopping and the site went back to v1.0.0. A restart a few
+    // minutes later used to watch v1.0.0 as if just installed, and three of
+    // its stops then took the site to the uploaded folder.
+    installedPair()
+    writeState(paths, { ...readState(paths), watchSince: new Date().toISOString() })
+    await rollBack({ paths, deps: rollbackDeps(async () => true), reason: 'It kept stopping.', crashed: true })
+    const state = readState(paths)
+    expect(state.watchSince).toBeNull()
+    expect(crashWatchSince(paths, state, releaseDir(paths, 'v1.0.0'), window)).toBeNull()
+  })
+
+  it('forgets only the withdrawn releases older than one it installs', async () => {
+    live('v1.0.0')
+    writeState(paths, { ...readState(paths), withdrawn: ['v1.1.0', 'v1.3.0'] })
+    const { deps } = fakeDeps({ latest: async () => published('v1.2.0') })
+    const state = await update(deps)
+    expect(state).toMatchObject({ status: 'idle', current: { tag: 'v1.2.0' }, withdrawn: ['v1.3.0'] })
   })
 })
 
@@ -538,17 +575,25 @@ describe('going back to the release before', () => {
     expect(readState(paths)).toMatchObject({
       status: 'rolled-back',
       current: { tag: 'v1.0.0' },
-      rolledBackFrom: 'v1.1.0',
+      withdrawn: ['v1.1.0'],
+      watchSince: null,
       steps: { download: 'pending', switch: 'pending' },
       startedAt: null,
       log: [],
     })
   })
 
+  it('remembers every release a crash took back out, not only the last', async () => {
+    installedPair()
+    writeState(paths, { ...readState(paths), withdrawn: ['v1.2.0'] })
+    await rollBack({ paths, deps: rollbackDeps(async () => true), reason: 'It kept stopping.', crashed: true })
+    expect(readState(paths).withdrawn).toEqual(['v1.2.0', 'v1.1.0'])
+  })
+
   it('remembers nothing after a rollback from the console', async () => {
     installedPair()
     await rollBack({ paths, deps: rollbackDeps(async () => true), reason: 'Rolled back from the console.' })
-    expect(readState(paths).rolledBackFrom).toBeNull()
+    expect(readState(paths).withdrawn ?? []).toEqual([])
   })
 
   it('goes back from the folder actually served, which a stale state may not name', async () => {

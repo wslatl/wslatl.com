@@ -59,7 +59,7 @@ export default async function AdminPage() {
   const commit = deployedCommit()
   const updater = await updaterStatus()
   // A release a crash took back out is never offered again.
-  const withdrawn = updater.state?.rolledBackFrom ?? null
+  const withdrawn = updater.state?.withdrawn ?? []
   const github = await releaseOverview(settings.github, installedTag, fetch, 10_000, withdrawn).then(
     (overview) => ({ ok: true as const, overview }),
     (error: Error) => ({ ok: false as const, error: error.message }),

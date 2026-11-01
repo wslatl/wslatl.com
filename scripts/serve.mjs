@@ -26,10 +26,10 @@ import { parseEnv } from 'node:util'
 import {
   busyStatuses,
   cleanUpAtStart,
+  crashWatchSince,
   liveDir,
   readState,
   recoverState,
-  releaseDir,
   rollBack,
   runUpdate,
   supervisorChanged,
@@ -135,10 +135,25 @@ async function switchTo(dir, onLine, { keepWatch = false } = {}) {
   return ok
 }
 
+// A release that keeps stopping while the site is busy (start-up clean-up,
+// an update, a rollback) is started again for the moment, and rolled back
+// as soon as the busy work is done.
+let crashedWhileBusy = null
+
+/** Ends the busy work, and rolls back a release that kept stopping meanwhile. */
+function notBusy() {
+  updating = false
+  const dir = crashedWhileBusy
+  crashedWhileBusy = null
+  // Only while that release is still what runs: an update may have replaced it.
+  if (dir && !shuttingDown && live.current?.dir === dir) void crashLoop(dir)
+}
+
 /** A new release stopped three times within ten minutes of its switch: back to the one before. */
 async function crashLoop(dir) {
   if (updating) {
-    print('An update or a rollback is running, so the release was started again instead of rolled back.')
+    print('The site is busy, so the release that keeps stopping was started again; it goes back once the busy work is done.')
+    crashedWhileBusy = dir
     await live.start(dir)
     return
   }
@@ -156,7 +171,7 @@ async function crashLoop(dir) {
     if (!result.ok) print(result.message)
     noteSupervisorChanges()
   } finally {
-    updating = false
+    notBusy()
     ensureServing()
   }
 }
@@ -288,7 +303,7 @@ async function checkForRequest() {
   } catch (error) {
     print(`The update stopped: ${error.message}`)
   } finally {
-    updating = false
+    notBusy()
     ensureServing()
   }
 }
@@ -328,7 +343,7 @@ async function exclusively(action) {
   try {
     await action()
   } finally {
-    updating = false
+    notBusy()
     ensureServing()
   }
 }
@@ -424,18 +439,16 @@ if (dir === root) {
 
 print(`Starting the site on port ${port} from ${dir === root ? 'the uploaded folder' : dir}`)
 await live.start(dir)
-// A release installed less than ten minutes ago is still watched, across a
-// restart of the supervisor.
-const installedAt = Date.parse(state.current?.deployedAt ?? '')
-if (state.current && dir === releaseDir(paths, state.current.tag) && Date.now() - installedAt < crashWindowMs) {
-  live.watchCrashes(installedAt)
-}
+// A release an update installed less than ten minutes ago is still watched,
+// across a restart of the supervisor. One a rollback went back to is not.
+const watchSince = crashWatchSince(paths, state, dir, crashWindowMs)
+if (watchSince !== null) live.watchCrashes(watchSince)
 // Only now, with the site starting: a half-built or old release can take a
 // while to delete. Everything else waits until it is done (updating has been
 // set since the top, so the console cannot move the site during the build).
 cleanUpAtStart(paths, state, print)
   .catch((error) => print(`Could not remove an old release: ${error.message}`))
   .finally(() => {
-    updating = false
+    notBusy()
   })
 if (updatesOn) poller = setInterval(checkForRequest, 2000)

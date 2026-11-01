@@ -34,8 +34,10 @@ export type UpdaterState = {
   log: string[]
   /** The live release carries a different scripts/serve.mjs than the one running it. */
   updaterChanged?: boolean
-  /** The release a crash rollback took back out, never offered again. */
-  rolledBackFrom?: string | null
+  /** Every release a crash rollback took back out, never offered again. */
+  withdrawn?: string[]
+  /** When the crash watch of the live release started; set by an install, cleared by a rollback. */
+  watchSince?: string | null
 }
 
 export const busyStatuses: readonly UpdaterState['status'][] = ['downloading', 'installing', 'building', 'checking', 'swapping']

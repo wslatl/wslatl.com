@@ -48,7 +48,8 @@ import { isNewer, parseVersion, tagRule } from './release.mjs'
  *   message: string,
  *   log: string[],
  *   updaterChanged?: boolean,
- *   rolledBackFrom?: string | null,
+ *   withdrawn?: string[],
+ *   watchSince?: string | null,
  * }} State
  * @typedef {ReturnType<typeof updaterPaths>} Paths
  * @typedef {Record<string, string | undefined>} Env
@@ -280,6 +281,24 @@ export function supervisorChanged(root, dir) {
 }
 
 /**
+ * When the crash watch for the live release started, if it still runs: only
+ * for a release an update installed (watchSince, which a rollback clears),
+ * only while it is what dir serves, and only within windowMs of its install.
+ * Null otherwise. Used at start-up, so a restart keeps the watch.
+ * @param {Paths} paths
+ * @param {State} state
+ * @param {string} dir the folder served
+ * @param {number} windowMs
+ * @param {number} [now]
+ * @returns {number | null}
+ */
+export function crashWatchSince(paths, state, dir, windowMs, now = Date.now()) {
+  const since = Date.parse(state.watchSince ?? '')
+  if (!state.current || !parseVersion(state.current.tag ?? '') || dir !== releaseDir(paths, state.current.tag)) return null
+  return Number.isFinite(since) && now - since < windowMs ? since : null
+}
+
+/**
  * Run at start-up, before the site starts. An update the server was
  * restarted in the middle of is over: the site starts on the release it had.
  * The half-built release is left to pruneReleases, once the site is up.
@@ -422,7 +441,7 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
       if (!parseVersion(latest.tag)) {
         throw new Error(`The latest release is tagged "${latest.tag.slice(0, 60)}", not ${tagRule}, so it was not installed.`)
       }
-      if (state.rolledBackFrom && latest.tag === state.rolledBackFrom) {
+      if ((state.withdrawn ?? []).includes(latest.tag)) {
         step('download', 'skipped')
         return finish('idle', `${latest.tag} was taken back out after it kept stopping, so it is not installed again. Publish the fix as a newer release.`)
       }
@@ -524,7 +543,10 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
       previous: runningRelease,
       current: { ...target, deployedAt: now },
       target: null,
-      rolledBackFrom: null,
+      // Watched for crashes from now, across a restart of the server too.
+      watchSince: now,
+      // A withdrawn release older than this one can no longer be offered.
+      withdrawn: (state.withdrawn ?? []).filter((tag) => isNewer(tag, target.tag)),
     })
     print(message)
     await pruneReleases(paths, state).catch((error) => print(`Could not remove an old release: ${error.message}`))
@@ -615,9 +637,13 @@ export async function rollBack({ paths, deps, reason, crashed = false, serving =
     status: 'rolled-back',
     message,
     current: back ? { ...back, deployedAt: now } : null,
+    // Only a release an update installed is watched for crashes: what a
+    // rollback goes back to is not, so a restart cannot arm the watch for it.
     previous: null,
     target: null,
-    rolledBackFrom: crashed ? leaving.tag : null,
+    watchSince: null,
+    // Every release a crash took back out, not only the last one.
+    withdrawn: crashed ? [...new Set([...(state.withdrawn ?? []), leaving.tag])] : (state.withdrawn ?? []),
     // The steps and log were the update that installed what was left: not this.
     steps: emptyState().steps,
     startedAt: null,
