@@ -211,6 +211,20 @@ describe('an update that works', () => {
     expect(seen).toEqual(['live.js'])
   })
 
+  it('hands over none of the old files put back after the live build, so the history can let them go', async () => {
+    // Put back by the uploaded folder's build, and listed by it (scripts/keep-old-assets.mjs).
+    file(join(root, '.next', 'static', 'chunks', 'put-back.js'))
+    file(join(root, '.next', 'restored-assets.json'), JSON.stringify(['chunks/put-back.js']))
+    const seen: string[] = []
+    const { deps } = fakeDeps({
+      npm: async (args, { cwd }) => {
+        if (args[1] === 'build') seen.push(...readdirSync(join(cwd, '.next', 'static', 'chunks')))
+      },
+    })
+    await update(deps)
+    expect(seen).toEqual(['live.js'])
+  })
+
   it('never touches .env, the asset history or the folder the owner uploaded', async () => {
     const { deps } = fakeDeps()
     await update(deps)

@@ -86,7 +86,7 @@ const minutes = (ms) => (ms >= 60_000 ? `${ms / 60_000} minutes` : `${ms / 1000}
 
 /**
  * Runs a command to the end. Rejects with its exit code, or once timeoutMs
- * has passed, after stopping it and everything it started.
+ * has passed (Infinity: never), after stopping it and everything it started.
  * @param {string} command
  * @param {string[]} args
  * @param {RunOptions} [options]
@@ -105,10 +105,13 @@ export function run(command, args, { cwd, env, shell = false, onLine, onSpawn, t
     }
     onSpawn?.(child)
     let timedOut = false
-    const timer = setTimeout(() => {
-      timedOut = true
-      killTree(child, 'SIGKILL')
-    }, timeoutMs)
+    // Never set for Infinity, which setTimeout would take for one millisecond.
+    const timer = Number.isFinite(timeoutMs)
+      ? setTimeout(() => {
+          timedOut = true
+          killTree(child, 'SIGKILL')
+        }, timeoutMs)
+      : undefined
     eachLine(child.stdout, onLine)
     eachLine(child.stderr, onLine)
     child.once('error', (error) => {

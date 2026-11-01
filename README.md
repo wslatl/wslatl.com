@@ -215,7 +215,7 @@ The icons are all the white WSLATL mark on the site's near-black tile (`#050505`
 
 ## Deploying
 
-`npm run build` keeps the stylesheets and scripts of earlier builds for 30 days (`scripts/keep-old-assets.mjs`, run before and after `next build` as `prebuild` and `postbuild`). Every build renames them, because their names carry a hash of their content, and `next build` deletes the old ones. Google fetches a page's HTML on one day and renders it later with the files that HTML names, so without the old files it renders the page without its stylesheet. The kept files wait in `.next-static-history/` (gitignored); delete that folder only to start fresh.
+`npm run build` keeps the stylesheets and scripts of earlier builds for 30 days (`scripts/keep-old-assets.mjs`, run before and after `next build` as `prebuild` and `postbuild`). Every build renames them, because their names carry a hash of their content, and `next build` deletes the old ones. Google fetches a page's HTML on one day and renders it later with the files that HTML names, so without the old files it renders the page without its stylesheet. The kept files wait in `.next-static-history/` (gitignored); delete that folder only to start fresh. After each build they are put back beside the new build's own files, and listed in `.next/restored-assets.json`, so the next build counts only its own files as live and the old ones go 30 days after they were last live.
 
 Production runs `npm run serve` (see Admin and updates), which installs published GitHub releases (see Releasing) and builds each one with `npm run build`, every one sharing the `.next-static-history/` beside `.env` (`STATIC_HISTORY_DIR`). A build by hand must use `npm run build` too, not `npx next build`, and keep `.next-static-history/` between restarts.
 
@@ -241,11 +241,11 @@ When you press Install, the updater asks GitHub once which commit the tag points
 
 1. **Download**: asks GitHub for the latest release, checks that its tag is a version newer than the installed one (see Releasing), asks which commit the tag points at, and downloads exactly that commit into `.updater/releases/<tag>/` (named by tag, since two releases may tag the same commit).
 2. **Install**: runs `npm ci --ignore-scripts` there.
-3. **Build**: runs `npm run build` there, with the live build's assets copied in and the one shared `.next-static-history/`, so old hashed assets survive exactly as they do in a build by hand (see Deploying).
+3. **Build**: runs `npm run build` there, with the live build's own assets copied in (not the old ones put back beside them) and the one shared `.next-static-history/`, so old hashed assets survive exactly as they do in a build by hand (see Deploying).
 4. **Trial start**: starts the new build on a spare local port and waits for its home page to answer. Until here, the live site has not been touched.
 5. **Switch**: stops the live server and starts the new build on the real port. If it does not answer within two minutes, the release before it starts again (rolled back).
 
-A failure at any step leaves the site on the version it had, removes the half-built release, and shows the reason and the log on the dashboard. The install and the build each get 15 minutes, after which they are stopped together with everything they started. The site is down only for the few seconds of the switch. `.env` and `.next-static-history/` are never touched.
+A failure at any step leaves the site on the version it had, removes the half-built release, and shows the reason and the log on the dashboard. The install and the build each get 15 minutes, after which they are stopped together with everything they started. The build of the uploaded folder at start-up has no limit, as before the supervisor: stopped, it would only start over when the server starts again. The site is down only for the few seconds of the switch. `.env` and `.next-static-history/` are never touched.
 
 A new release is watched for ten minutes after its switch, across a restart of the server too: if it stops three times in that time, the supervisor goes back to the release before it by itself, and the dashboard says so. When there is none left (each update removes it to make room, so after an update the only earlier build is the uploaded folder), it goes back to the uploaded folder instead and says that this may be an older version. Otherwise the supervisor starts `next start` again whenever it stops, waiting a little longer each time.
 

@@ -29,7 +29,7 @@
 // the old release starts again.
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { rm } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, relative, sep } from 'node:path'
 import { isNewer, parseVersion, tagRule } from './release.mjs'
 
 /**
@@ -327,6 +327,23 @@ export function recoverState(paths) {
 }
 
 /**
+ * The old assets a build's history step put back into its .next/static
+ * after the build (scripts/keep-old-assets.mjs lists them in
+ * .next/restored-assets.json), as paths relative to .next/static with
+ * forward slashes. None when the build left no list.
+ * @param {string} dir
+ * @returns {Set<string>}
+ */
+export function restoredAssets(dir) {
+  try {
+    const list = JSON.parse(readFileSync(join(dir, '.next', 'restored-assets.json'), 'utf8'))
+    return new Set(Array.isArray(list) ? list.filter((name) => typeof name === 'string') : [])
+  } catch {
+    return new Set()
+  }
+}
+
+/**
  * Settings from .env never reach npm: any package's install script can read the environment.
  * @param {Env} env
  * @param {string[]} secretNames
@@ -478,10 +495,18 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
       await rm(release, { recursive: true, force: true, maxRetries: 3 })
       mkdirSync(release, { recursive: true })
       await deps.download(head.sha, release)
-      // The live build's assets, so the build's history step stamps them as
-      // still live (scripts/keep-old-assets.mjs).
+      // The live build's own assets, so the build's history step stamps them
+      // as still live (scripts/keep-old-assets.mjs). Not the old ones put
+      // back beside them: stamped as live, those would never reach their 30
+      // days, and the history would grow with every release.
       const liveStatic = join(live, '.next', 'static')
-      if (existsSync(liveStatic)) cpSync(liveStatic, join(release, '.next', 'static'), { recursive: true })
+      if (existsSync(liveStatic)) {
+        const putBack = restoredAssets(live)
+        cpSync(liveStatic, join(release, '.next', 'static'), {
+          recursive: true,
+          filter: (from) => !putBack.has(relative(liveStatic, from).split(sep).join('/')),
+        })
+      }
       step('download', 'done')
 
       // No install scripts: they are where a compromised package strikes, and

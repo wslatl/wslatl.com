@@ -75,7 +75,7 @@ function track(child) {
 // `npm run serve` names npm's own script, which runs on this same Node.
 // Started some other way, fall back to npm on the PATH (a shell on Windows,
 // where npm is a .cmd). Each run is stopped with everything it started after
-// 15 minutes (scripts/updater/process.mjs).
+// 15 minutes (scripts/updater/process.mjs), unless it says otherwise.
 function npm(args, options) {
   const cli = process.env.npm_execpath
   if (cli && /\.c?js$/.test(cli)) return run(process.execPath, [cli, ...args], { ...options, onSpawn: track })
@@ -429,6 +429,9 @@ if (dir === root) {
       cwd: root,
       env: { ...process.env, STATIC_HISTORY_DIR: paths.history },
       onLine: (line) => console.log(line),
+      // No limit, as before the supervisor: a build stopped here ends this
+      // process, and the restart that follows would only start it over.
+      timeoutMs: Infinity,
     })
   } catch (error) {
     print(`The build failed, so the site cannot start: ${error.message}`)

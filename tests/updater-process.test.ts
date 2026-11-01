@@ -33,6 +33,11 @@ describe('running a command', () => {
     expect((error as Error).message).toMatch(/took longer than 0.5 seconds and was stopped/)
   }, 30_000)
 
+  it('runs a command with no time limit to its end', async () => {
+    // setTimeout would take Infinity for one millisecond.
+    await expect(run(node, ['-e', 'setTimeout(() => {}, 300)'], { timeoutMs: Infinity })).resolves.toBeUndefined()
+  })
+
   // npm ci and npm run build start processes of their own: killing npm
   // alone left next build writing into the release folder after its update
   // had given up on it. On Linux, where the site runs, the command leads a
