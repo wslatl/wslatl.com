@@ -35,10 +35,11 @@ describe('running a command', () => {
   // npm ci and npm run build start processes of their own: killing npm
   // alone left next build writing into the release folder after its update
   // had given up on it. On Linux, where the site runs, the command leads a
-  // process group and the whole group is killed at once. Windows has no
-  // groups; taskkill /T does its best, but under load it can miss a process
-  // that is still starting, so this is checked on Linux (CI) only.
-  it.skipIf(process.platform === 'win32')('stops everything it started along with it', async () => {
+  // process group and the whole group is killed at once; Windows ends the
+  // tree with taskkill /T. There the grandchild is detached, since libuv
+  // otherwise puts it in a job that dies with its parent, and the test
+  // would pass without taskkill.
+  it('stops everything it started along with it', async () => {
     const marker = join(dir, 'grandchild-still-running')
     const grandchild = join(dir, 'grandchild.cjs')
     const child = join(dir, 'child.cjs')
@@ -47,7 +48,7 @@ describe('running a command', () => {
     writeFileSync(
       child,
       [
-        "const grandchild = require('node:child_process').spawn(process.execPath, [process.argv[2], process.argv[3]], { stdio: 'ignore' })",
+        "const grandchild = require('node:child_process').spawn(process.execPath, [process.argv[2], process.argv[3]], { stdio: 'ignore', detached: process.platform === 'win32' })",
         "grandchild.once('spawn', () => console.log('grandchild running'))",
         'setInterval(() => {}, 1000)',
         '',

@@ -320,6 +320,72 @@ describe('an update that works', () => {
   })
 })
 
+describe('the folder actually served', () => {
+  it('removes every release but the live one before building, the one a crash took back out too', async () => {
+    // After a crash rollback: v1.0.0 runs again, v1.1.0's folder is still there.
+    live('v1.0.0')
+    file(join(releaseDir(paths, 'v1.1.0'), '.next', 'BUILD_ID'))
+    writeState(paths, { ...readState(paths), rolledBackFrom: 'v1.1.0' })
+    const seen: string[] = []
+    const { deps } = fakeDeps({
+      latest: async () => published('v1.2.0'),
+      npm: async (args, { cwd }) => {
+        if (args[1] !== 'build') return
+        seen.push(...readdirSync(paths.releases).toSorted())
+        file(join(cwd, '.next', 'BUILD_ID'), 'new-build')
+      },
+    })
+    const state = await update(deps)
+    expect(seen).toEqual(['v1.0.0', 'v1.2.0'])
+    expect(state).toMatchObject({ status: 'idle', current: { tag: 'v1.2.0' }, previous: { tag: 'v1.0.0' }, rolledBackFrom: null })
+  })
+
+  it('does not install again the release a crash took back out', async () => {
+    live('v1.0.0')
+    writeState(paths, { ...readState(paths), rolledBackFrom: 'v1.1.0' })
+    const { deps, calls } = fakeDeps()
+    const state = await update(deps)
+    expect(state.message).toBe('v1.1.0 was taken back out after it kept stopping, so it is not installed again. Publish the fix as a newer release.')
+    expect(calls.resolved).toEqual([])
+    expect(calls.npm).toEqual([])
+  })
+
+  it('goes back to the folder served, and keeps it, when the state was lost', async () => {
+    // v1.0.0 runs, but state.json was lost: nothing names it.
+    file(join(releaseDir(paths, 'v1.0.0'), '.next', 'BUILD_ID'))
+    const tried: string[] = []
+    const { deps } = fakeDeps({
+      switchTo: async (dir) => {
+        tried.push(dir)
+        return dir === releaseDir(paths, 'v1.0.0')
+      },
+    })
+    const state = await runUpdate({ paths, deps, baseEnv, secretNames, serving: releaseDir(paths, 'v1.0.0') })
+    expect(tried).toEqual([releaseDir(paths, 'v1.1.0'), releaseDir(paths, 'v1.0.0')])
+    expect(state.status).toBe('rolled-back')
+    expect(existsSync(join(releaseDir(paths, 'v1.0.0'), '.next', 'BUILD_ID'))).toBe(true)
+  })
+
+  it('never builds into the folder being served, which a lost state could make look new', async () => {
+    file(join(releaseDir(paths, 'v1.1.0'), '.next', 'BUILD_ID'), 'live-build')
+    const { deps, calls } = fakeDeps()
+    const state = await runUpdate({ paths, deps, baseEnv, secretNames, serving: releaseDir(paths, 'v1.1.0') })
+    expect(state.message).toBe('v1.1.0 is the release already running, so nothing was installed.')
+    expect(calls.npm).toEqual([])
+    expect(readFileSync(join(releaseDir(paths, 'v1.1.0'), '.next', 'BUILD_ID'), 'utf8')).toBe('live-build')
+  })
+
+  it('counts the release before as installed when that is the folder served', async () => {
+    // A rollback that could not be recorded: the state still names v1.1.0,
+    // but v1.0.0 is what runs.
+    installedPair()
+    const { deps, calls } = fakeDeps({ latest: async () => published('v1.1.0') })
+    const state = await runUpdate({ paths, deps, baseEnv, secretNames, serving: releaseDir(paths, 'v1.0.0') })
+    expect(calls.resolved).toEqual(['v1.1.0'])
+    expect(state).toMatchObject({ status: 'idle', current: { tag: 'v1.1.0' }, previous: { tag: 'v1.0.0' } })
+  })
+})
+
 describe('what an update leaves behind', () => {
   it('keeps npm\'s cache under .updater/ and removes it afterwards, however the update ends', async () => {
     for (const fails of [false, true]) {
@@ -403,8 +469,9 @@ describe('going back to the release before', () => {
     expect(readState(paths).current).toBeNull()
   })
 
-  it('keeps the live release when going back fails', async () => {
+  it('keeps the live release, and the state as it was, when the older one does not answer', async () => {
     installedPair()
+    const before = readState(paths)
     const tried: string[] = []
     const result = await rollBack({
       paths,
@@ -412,9 +479,43 @@ describe('going back to the release before', () => {
       reason: 'Rolled back from the console.',
     })
     expect(result.ok).toBe(false)
-    expect(result.message).toMatch(/failed, so v1.1.0 is still live/)
+    expect(result.message).toMatch(/v1.0.0 did not answer, so v1.1.0 is still live/)
     expect(tried).toEqual([releaseDir(paths, 'v1.0.0'), releaseDir(paths, 'v1.1.0')])
-    expect(readState(paths).current?.tag).toBe('v1.1.0')
+    // Recorded only once the older release answers: nothing was.
+    expect(readState(paths)).toEqual(before)
+  })
+
+  it('remembers a release a crash took back out, and clears the steps of the update that installed it', async () => {
+    installedPair()
+    writeState(paths, {
+      ...readState(paths),
+      steps: { download: 'done', install: 'done', build: 'done', check: 'done', switch: 'done' },
+      startedAt: '2026-10-31T12:00:00Z',
+      log: ['npm run build output'],
+    })
+    await rollBack({ paths, deps: rollbackDeps(async () => true), reason: 'It kept stopping.', crashed: true })
+    expect(readState(paths)).toMatchObject({
+      status: 'rolled-back',
+      current: { tag: 'v1.0.0' },
+      rolledBackFrom: 'v1.1.0',
+      steps: { download: 'pending', switch: 'pending' },
+      startedAt: null,
+      log: [],
+    })
+  })
+
+  it('remembers nothing after a rollback from the console', async () => {
+    installedPair()
+    await rollBack({ paths, deps: rollbackDeps(async () => true), reason: 'Rolled back from the console.' })
+    expect(readState(paths).rolledBackFrom).toBeNull()
+  })
+
+  it('goes back from the folder actually served, which a stale state may not name', async () => {
+    installedPair()
+    // The state says v1.1.0 runs, but the supervisor serves the uploaded folder.
+    const result = await rollBack({ paths, deps: rollbackDeps(async () => true), reason: 'x', serving: root })
+    expect(result.ok).toBe(false)
+    expect(result.message).toMatch(/does not run an installed release/)
   })
 
   it('does nothing during an update, or when the uploaded folder is what runs', async () => {

@@ -48,6 +48,7 @@ import { isNewer, parseVersion, tagRule } from './release.mjs'
  *   message: string,
  *   log: string[],
  *   updaterChanged?: boolean,
+ *   rolledBackFrom?: string | null,
  * }} State
  * @typedef {ReturnType<typeof updaterPaths>} Paths
  * @typedef {Record<string, string | undefined>} Env
@@ -207,25 +208,30 @@ export function liveDir(paths, state) {
 /**
  * Deleted without blocking: a release holds hundreds of megabytes of
  * node_modules, and the supervisor has a site to keep running meanwhile.
- * Never the installed release or the one before it.
+ * Never the installed release, the one before it, or a folder in spare (the
+ * one actually served, which a stale state.json may not name).
  * @param {Paths} paths
  * @param {State} state
  * @param {string | undefined} name a folder name in releases/, which is a tag
+ * @param {string[]} [spare]
  */
-async function removeRelease(paths, state, name) {
+async function removeRelease(paths, state, name, spare = []) {
   if (!name) return
   const kept = [state.current?.tag, state.previous?.tag]
-  if (!kept.includes(name)) await rm(join(paths.releases, name), { recursive: true, force: true, maxRetries: 3 })
+  const dir = join(paths.releases, name)
+  if (!kept.includes(name) && !spare.includes(dir)) await rm(dir, { recursive: true, force: true, maxRetries: 3 })
 }
 
 /**
- * Removes every release but the current and the previous one.
+ * Removes every release but the current one, the previous one, and any
+ * folder in spare.
  * @param {Paths} paths
  * @param {State} state
+ * @param {string[]} [spare]
  */
-export async function pruneReleases(paths, state) {
+export async function pruneReleases(paths, state, spare = []) {
   if (!existsSync(paths.releases)) return
-  for (const name of readdirSync(paths.releases)) await removeRelease(paths, state, name)
+  for (const name of readdirSync(paths.releases)) await removeRelease(paths, state, name, spare)
 }
 
 /**
@@ -318,15 +324,26 @@ export function withoutSecrets(env, secretNames) {
  *   trial(dir, onLine)            start dir on a spare port: did it answer?
  *   switchTo(dir, onLine)         make dir the live server: did it answer?
  *   print(line)                   the server log
+ * serving is the folder the supervisor actually serves from: a failed
+ * switch goes back to it, nothing deletes it, and a release counts as
+ * installed only when its folder is the one served, so a lost or stale
+ * state.json is never taken for the truth about what runs.
  * Returns the final state, which is also on disk.
- * @param {{ paths: Paths, deps: Deps, baseEnv: Env, secretNames: string[] }} options
+ * @param {{ paths: Paths, deps: Deps, baseEnv: Env, secretNames: string[], serving?: string | null }} options
  * @returns {Promise<State>}
  */
-export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
+export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = null }) {
   let state = readState(paths)
   if (busyStatuses.includes(state.status)) return state
 
-  const live = liveDir(paths, state)
+  const live = serving && existsSync(serving) ? serving : liveDir(paths, state)
+  // The release running now: the state's current one, or the one before when
+  // a rollback could not be recorded, but only if its folder is the one
+  // served. A folder the state does not describe (uploaded by hand, or a
+  // lost state.json) is none.
+  const runningRelease =
+    [state.current, state.previous].find((release) => release && parseVersion(release.tag ?? '') && releaseDir(paths, release.tag) === live) ??
+    null
   let finished = false
   // Neither the log nor the state file may stop an update.
   const print = (/** @type {string} */ line) => {
@@ -373,7 +390,7 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
     return state
   }
   const discard = (/** @type {string | undefined} */ tag) =>
-    removeRelease(paths, state, tag).catch((error) => print(`Could not remove a release: ${error.message}`))
+    removeRelease(paths, state, tag, [live]).catch((error) => print(`Could not remove a release: ${error.message}`))
   // A switch that throws is a switch that failed: the rollback still runs.
   const switchTo = async (/** @type {string} */ dir) => {
     try {
@@ -387,9 +404,8 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
   async function attempt() {
     /** @type {string | null} */
     let release = null
-    let running = 'download'
-    /** @type {Installed | null} */
-    let installed = null
+    let stage = 'download'
+    const installed = runningRelease
     try {
       step('download', 'running')
       const latest = await deps.latest()
@@ -403,8 +419,10 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
       if (!parseVersion(latest.tag)) {
         throw new Error(`The latest release is tagged "${latest.tag.slice(0, 60)}", not ${tagRule}, so it was not installed.`)
       }
-      // What runs now, as a release; a folder uploaded by hand is none.
-      installed = live !== paths.root && state.current && parseVersion(state.current.tag ?? '') ? state.current : null
+      if (state.rolledBackFrom && latest.tag === state.rolledBackFrom) {
+        step('download', 'skipped')
+        return finish('idle', `${latest.tag} was taken back out after it kept stopping, so it is not installed again. Publish the fix as a newer release.`)
+      }
       if (installed && !isNewer(latest.tag, installed.tag)) {
         step('download', 'skipped')
         return finish(
@@ -413,6 +431,12 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
             ? `Already on ${installed.tag}, the latest release.`
             : `The latest release, ${latest.tag}, is older than ${installed.tag}, so nothing was installed.`,
         )
+      }
+      // Never build into the folder being served, which a lost or stale
+      // state.json could make look like a release still to install.
+      if (releaseDir(paths, latest.tag) === live) {
+        step('download', 'skipped')
+        return finish('idle', `${latest.tag} is the release already running, so nothing was installed.`)
       }
       // Pinned here, once: from now on only this commit is used, wherever the
       // tag points later.
@@ -424,12 +448,10 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
       // Room first. While this one builds, only it, the live release and the
       // uploaded folder are on the disk: a server over its disk limit is
       // stopped by Pterodactyl. Rollback goes to the live release, never to
-      // the previous one.
-      if (state.previous) {
-        const previous = state.previous.tag
-        save({ previous: null })
-        await discard(previous)
-      }
+      // the one before it, which goes now, along with any other folder (one
+      // taken back out after it kept stopping, say).
+      if (state.previous) save({ previous: null })
+      await pruneReleases(paths, state, [live]).catch((error) => print(`Could not remove an old release: ${error.message}`))
       release = releaseDir(paths, head.tag)
       await rm(release, { recursive: true, force: true, maxRetries: 3 })
       mkdirSync(release, { recursive: true })
@@ -445,12 +467,12 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
       // npm's cache lives under .updater/ and goes after the update, so it
       // never grows into the server's disk limit.
       const env = { ...withoutSecrets(baseEnv, secretNames), npm_config_cache: paths.npmCache }
-      running = 'install'
+      stage = 'install'
       step('install', 'running', 'installing')
       await deps.npm(['ci', '--include=dev', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: release, env, onLine: log })
       step('install', 'done')
 
-      running = 'build'
+      stage = 'build'
       step('build', 'running', 'building')
       await deps.npm(['run', 'build'], {
         cwd: release,
@@ -459,14 +481,14 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
       })
       step('build', 'done')
 
-      running = 'check'
+      stage = 'check'
       step('check', 'running', 'checking')
       if (!(await deps.trial(release, log))) {
         throw new Error(`The new build did not start on its trial run, so the site stays on ${installed ? installed.tag : 'the version it had'}.`)
       }
       step('check', 'done')
 
-      running = 'switch'
+      stage = 'switch'
       step('switch', 'running', 'swapping')
       if (!(await switchTo(release))) {
         step('switch', 'failed')
@@ -481,7 +503,7 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
         )
       }
     } catch (error) {
-      step(running, 'failed')
+      step(stage, 'failed')
       if (release) await discard(state.target?.tag)
       return finish('failed', error instanceof Error ? error.message : String(error))
     }
@@ -496,9 +518,10 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
       message,
       finishedAt: now,
       steps: { ...state.steps, switch: 'done' },
-      previous: state.current,
+      previous: runningRelease,
       current: { ...target, deployedAt: now },
       target: null,
+      rolledBackFrom: null,
     })
     print(message)
     await pruneReleases(paths, state).catch((error) => print(`Could not remove an old release: ${error.message}`))
@@ -516,18 +539,22 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
 /**
  * Goes back to the release before the live one, or to the uploaded folder
  * when the live release was the first: after a new release stopped three
- * times within ten minutes of its switch (scripts/updater/live.mjs), or from
- * the console's rollback command. deps: switchTo and print, as for runUpdate.
- * @param {{ paths: Paths, deps: Pick<Deps, 'switchTo' | 'print'>, reason: string }} options
+ * times within ten minutes of its switch (crashed: true), or from the
+ * console's rollback command. serving is the folder actually served (what
+ * runs, crashing or not). The rollback is recorded only once the older
+ * release answers; if it does not, the folder that was served starts again
+ * and the state stays as it was. A crash rollback also remembers the tag it
+ * left, which is then never installed again (publish the fix as a newer
+ * release). deps: switchTo and print, as for runUpdate.
+ * @param {{ paths: Paths, deps: Pick<Deps, 'switchTo' | 'print'>, reason: string, crashed?: boolean, serving?: string | null }} options
  * @returns {Promise<{ ok: boolean, message: string }>}
  */
-export async function rollBack({ paths, deps, reason }) {
+export async function rollBack({ paths, deps, reason, crashed = false, serving = null }) {
   const state = readState(paths)
   if (busyStatuses.includes(state.status)) return { ok: false, message: 'An update is running, so nothing was rolled back.' }
-  const live = liveDir(paths, state)
-  if (live === paths.root || !state.current) {
-    return { ok: false, message: 'The site runs the uploaded folder, so there is nothing to go back to.' }
-  }
+  const from = serving && existsSync(serving) ? serving : liveDir(paths, state)
+  const leaving = state.current && parseVersion(state.current.tag ?? '') && releaseDir(paths, state.current.tag) === from ? state.current : null
+  if (!leaving) return { ok: false, message: 'The site does not run an installed release, so there is nothing to go back to.' }
   const previous = state.previous && parseVersion(state.previous.tag) ? releaseDir(paths, state.previous.tag) : null
   const target = previous && built(previous) ? previous : built(paths.root) ? paths.root : null
   if (!target) return { ok: false, message: 'There is no earlier build to go back to.' }
@@ -547,21 +574,32 @@ export async function rollBack({ paths, deps, reason }) {
       return false
     }
   }
-  const from = state.current.tag
   const back = target === paths.root ? null : state.previous
   const name = back ? back.tag : 'the uploaded folder'
-  const finishedAt = new Date().toISOString()
   if (!(await switchTo(target))) {
-    const restored = await switchTo(live)
+    const restored = await switchTo(from)
     const message = restored
-      ? `${reason} Going back to ${name} failed, so ${from} is still live.`
-      : `${reason} Going back to ${name} failed, and ${from} did not come back either. Restart the server.`
-    writeState(paths, { ...state, message, finishedAt })
+      ? `${reason} ${name} did not answer, so ${leaving.tag} is still live.`
+      : `${reason} ${name} did not answer, and ${leaving.tag} did not come back either. Restart the server.`
     say(message)
     return { ok: false, message }
   }
+  const now = new Date().toISOString()
   const message = `${reason} The site went back to ${name}.`
-  writeState(paths, { ...state, status: 'rolled-back', current: back, previous: null, message, finishedAt })
+  writeState(paths, {
+    ...state,
+    status: 'rolled-back',
+    message,
+    current: back ? { ...back, deployedAt: now } : null,
+    previous: null,
+    target: null,
+    rolledBackFrom: crashed ? leaving.tag : null,
+    // The steps and log were the update that installed what was left: not this.
+    steps: emptyState().steps,
+    startedAt: null,
+    log: [],
+    finishedAt: now,
+  })
   say(message)
   return { ok: true, message }
 }

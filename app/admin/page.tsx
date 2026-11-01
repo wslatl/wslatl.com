@@ -38,6 +38,8 @@ function summary({ status, latest }: Overview, installed: string | null): string
       return 'The site runs the latest release.'
     case 'older':
       return `The release marked latest, ${latest?.tag}, is older than the installed ${installed}, so there is nothing to install.`
+    case 'withdrawn':
+      return `${latest?.tag} was taken back out after it kept stopping, so it is not offered again. Publish the fix as a newer release.`
     default:
       return installed
         ? `${latest?.tag} is ready to install.`
@@ -55,13 +57,13 @@ export default async function AdminPage() {
   const { repo } = settings.github
   const installedTag = installedRelease()
   const commit = deployedCommit()
-  const [github, updater] = await Promise.all([
-    releaseOverview(settings.github, installedTag).then(
-      (overview) => ({ ok: true as const, overview }),
-      (error: Error) => ({ ok: false as const, error: error.message }),
-    ),
-    updaterStatus(),
-  ])
+  const updater = await updaterStatus()
+  // A release a crash took back out is never offered again.
+  const withdrawn = updater.state?.rolledBackFrom ?? null
+  const github = await releaseOverview(settings.github, installedTag, fetch, 10_000, withdrawn).then(
+    (overview) => ({ ok: true as const, overview }),
+    (error: Error) => ({ ok: false as const, error: error.message }),
+  )
   const current = updater.state?.current?.tag === installedTag ? updater.state?.current : null
   // The installed release as GitHub has it, or as the build names it when
   // GitHub cannot say (a deleted release, GitHub out of reach).

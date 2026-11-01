@@ -134,6 +134,8 @@ async function crashLoop(dir) {
       paths,
       deps: { switchTo, print },
       reason: 'The new release stopped three times within ten minutes of being installed.',
+      crashed: true,
+      serving: dir,
     })
     if (!result.ok) print(result.message)
   } finally {
@@ -260,6 +262,8 @@ async function checkForRequest() {
       deps: { latest, resolve: resolveTag, download, npm, trial, switchTo, print },
       baseEnv: process.env,
       secretNames,
+      // What actually runs, which a lost or stale state.json may not name.
+      serving: live.current?.dir ?? null,
     })
     // A new release is watched for ten minutes (scripts/updater/live.mjs).
     if (result.status === 'idle' && result.current && result.current.tag !== before) live.watchCrashes()
@@ -294,6 +298,11 @@ function requestUpdate() {
   print('Update requested; it starts within two seconds.')
 }
 
+/** The folder actually served, or the state's idea of it before anything started. */
+const servedDir = () => live.current?.dir ?? liveDir(paths, readState(paths))
+
+// One at a time: updates, rollbacks and restarts all move the live site, and
+// two at once could start two servers on one port.
 async function exclusively(action) {
   if (updating) return print('An update or a rollback is running; try again when it is done.')
   updating = true
@@ -309,8 +318,11 @@ const commands = {
   help: () => print('Commands: status, update (install the latest release), rollback (back to the release before), restart, stop.'),
   status: () => print(describe()),
   update: requestUpdate,
-  rollback: () => exclusively(async () => print((await rollBack({ paths, deps: { switchTo, print }, reason: 'Rolled back from the console.' })).message)),
-  restart: () => exclusively(() => switchTo(liveDir(paths, readState(paths)), print)),
+  rollback: () =>
+    exclusively(async () =>
+      print((await rollBack({ paths, deps: { switchTo, print }, reason: 'Rolled back from the console.', serving: servedDir() })).message),
+    ),
+  restart: () => exclusively(() => switchTo(servedDir(), print)),
   stop: () => shutDown('stop'),
 }
 

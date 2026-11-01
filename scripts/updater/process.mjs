@@ -44,6 +44,20 @@ export function killTree(child, signal = 'SIGKILL') {
   }
 }
 
+/**
+ * Kills what is left of a process group once its leader has gone: workers
+ * whose own parent died first. Linux only; Windows has no groups.
+ * @param {number | undefined} pid
+ */
+function killGroupLeftovers(pid) {
+  if (windows || !pid) return
+  try {
+    process.kill(-pid, 'SIGKILL')
+  } catch {
+    // Nothing left: the usual case.
+  }
+}
+
 /** Asks a child and everything it started to stop, then makes sure after ten seconds. */
 export function stopProcess(child, graceMs = 10_000) {
   if (!child || gone(child)) return Promise.resolve()
@@ -103,6 +117,7 @@ export function run(command, args, { cwd, env, shell = false, onLine, onSpawn, t
     })
     child.once('exit', (code, signal) => {
       clearTimeout(timer)
+      killGroupLeftovers(child.pid)
       if (code === 0 && !timedOut) resolve()
       else if (timedOut) reject(new Error(`${label} took longer than ${minutes(timeoutMs)} and was stopped.`))
       else reject(new Error(`${label} failed (${signal ?? `exit code ${code}`}).`))

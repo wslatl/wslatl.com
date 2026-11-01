@@ -21,8 +21,10 @@ export type Overview = {
    * update:      the latest release is newer, or the site was uploaded by hand.
    * up-to-date:  the latest release is the installed one.
    * older:       the release marked latest is older than the installed one.
+   * withdrawn:   the latest release is the one a crash took back out
+   *              (never installed again: the fix comes as a newer release).
    */
-  status: 'no-releases' | 'bad-tag' | 'update' | 'up-to-date' | 'older'
+  status: 'no-releases' | 'bad-tag' | 'update' | 'up-to-date' | 'older' | 'withdrawn'
 }
 
 export class GitHubError extends Error {
@@ -90,11 +92,16 @@ function toRelease(raw: RawRelease): Release {
   }
 }
 
+/**
+ * withdrawn names the release the updater took back out after it kept
+ * stopping (the updater state's rolledBackFrom), which is never offered.
+ */
 export async function releaseOverview(
   gh: GitHubSettings,
   installedTag: string | null,
   fetchImpl: Fetch = fetch,
   timeoutMs = 10_000,
+  withdrawn: string | null = null,
 ): Promise<Overview> {
   const [latestRaw, installedRaw] = await Promise.all([
     api<RawRelease>(gh, '/releases/latest', fetchImpl, timeoutMs),
@@ -111,6 +118,7 @@ export async function releaseOverview(
     return { latest: null, installed, status: 'no-releases' }
   }
   if (!parseVersion(latest.tag)) return { latest, installed, status: 'bad-tag' }
+  if (latest.tag === withdrawn) return { latest, installed, status: 'withdrawn' }
   if (!installedTag || isNewer(latest.tag, installedTag)) return { latest, installed, status: 'update' }
   return { latest, installed, status: latest.tag === installedTag ? 'up-to-date' : 'older' }
 }

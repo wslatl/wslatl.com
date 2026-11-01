@@ -81,6 +81,19 @@ describe('what the dashboard asks GitHub', () => {
     }
   })
 
+  it('never offers the release a crash took back out, but does offer the fix published after it', async () => {
+    const { fetchImpl } = fakeGitHub({
+      [`${repo}/releases/latest`]: { body: rawRelease('v1.1.0') },
+      [`${repo}/releases/tags/v1.0.0`]: { body: rawRelease('v1.0.0') },
+    })
+    expect((await releaseOverview(gh, 'v1.0.0', fetchImpl, 10_000, 'v1.1.0')).status).toBe('withdrawn')
+    const fixed = fakeGitHub({
+      [`${repo}/releases/latest`]: { body: rawRelease('v1.1.1') },
+      [`${repo}/releases/tags/v1.0.0`]: { body: rawRelease('v1.0.0') },
+    })
+    expect((await releaseOverview(gh, 'v1.0.0', fixed.fetchImpl, 10_000, 'v1.1.0')).status).toBe('update')
+  })
+
   it('says no releases are published yet, rather than failing, when there are none', async () => {
     const { fetchImpl } = fakeGitHub(withRepo)
     expect(await releaseOverview(gh, null, fetchImpl)).toEqual({ status: 'no-releases', latest: null, installed: null })
