@@ -239,7 +239,7 @@ When you press Install, the updater asks GitHub once which commit the tag points
 
 `npm run serve` (`scripts/serve.mjs`) is the server's startup command. It runs `next start`, starts it again if it stops, and does the updating, since a running Next server cannot replace itself. **Install** writes `.updater/request.json`, and within two seconds the supervisor:
 
-1. **Download**: asks GitHub for the latest release, checks that its tag is a version newer than the installed one (see Releasing), asks which commit the tag points at, and downloads exactly that commit into `.updater/releases/<commit>/`.
+1. **Download**: asks GitHub for the latest release, checks that its tag is a version newer than the installed one (see Releasing), asks which commit the tag points at, and downloads exactly that commit into `.updater/releases/<tag>/` (named by tag, since two releases may tag the same commit).
 2. **Install**: runs `npm ci --ignore-scripts` there.
 3. **Build**: runs `npm run build` there, with the live build's assets copied in and the one shared `.next-static-history/`, so old hashed assets survive exactly as they do in a build by hand (see Deploying).
 4. **Trial start**: starts the new build on a spare local port and waits for its home page to answer. Until here, the live site has not been touched.
@@ -268,7 +268,7 @@ From then on, a change reaches the site as a release: see Releasing.
 - **The dashboard says the site was not started with `npm run serve`.** The startup command is still the old one (step 5).
 - **An update failed.** The dashboard shows the step, the reason and the log, and the site is unchanged. Fix the problem, publish a new release, and install that.
 - **Nothing to install.** The dashboard says why: no release is published yet, the latest release is the installed one, the release marked latest is older than the installed one, or its tag is not in the form `vMAJOR.MINOR.PATCH`.
-- **The dashboard says the updater itself changed.** `scripts/serve.mjs` and `scripts/updater/` always run from the uploaded folder, so a commit that changes them takes effect only once they are copied over: copy both from `.updater/releases/<commit>/scripts/` into the server's `scripts/` folder, then restart the server.
+- **The dashboard says the updater itself changed.** `scripts/serve.mjs` and `scripts/updater/` always run from the uploaded folder, so a commit that changes them takes effect only once they are copied over: copy both from `.updater/releases/<tag>/scripts/` into the server's `scripts/` folder, then restart the server.
 - **Going back to uploading by hand.** Once an update has run, the site is served from `.updater/releases/`, so files uploaded to the server's folder are not served. Stop the server, delete the `.updater/` folder (never `.env` or `.next-static-history/`), and start it again: it builds the uploaded folder and serves it.
 - **Logging everyone out.** Change `ADMIN_SESSION_SECRET` or the password, and restart. A session lasts two hours anyway.
 

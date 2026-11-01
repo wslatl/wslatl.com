@@ -19,6 +19,8 @@ const sha = (c: string) => c.repeat(40)
 // The releases these tests publish, and the commit each tag points at.
 const commits: Record<string, string> = {
   'v1.0.0': sha('a'),
+  // A release needs no commit of its own: v1.0.1 tags v1.0.0's commit.
+  'v1.0.1': sha('a'),
   'v1.1.0': sha('b'),
   'v1.2.0': sha('c'),
   'v1.3.0': sha('d'),
@@ -52,7 +54,7 @@ function file(path: string, text = path) {
 /** The site runs release `tag`, built in its own folder. */
 function live(tag: string) {
   writeState(paths, { ...emptyState(), current: installed(tag) })
-  file(join(releaseDir(paths, commits[tag]), '.next', 'BUILD_ID'))
+  file(join(releaseDir(paths, tag), '.next', 'BUILD_ID'))
 }
 
 beforeEach(() => {
@@ -138,9 +140,9 @@ describe('an update that works', () => {
   it('builds the latest release beside the live site, switches to it, and records it', async () => {
     const { deps, calls } = fakeDeps()
     const state = await update(deps)
-    const release = releaseDir(paths, sha('b'))
+    const release = releaseDir(paths, 'v1.1.0')
 
-    expect(release).toBe(join(root, '.updater', 'releases', 'bbbbbbbbbbbb'))
+    expect(release).toBe(join(root, '.updater', 'releases', 'v1.1.0'))
     expect(calls.npm.map((call) => call.args.join(' '))).toEqual(['ci --include=dev --ignore-scripts --no-audit --no-fund', 'run build'])
     expect(calls.npm.every((call) => call.cwd === release)).toBe(true)
     expect(calls.trials).toEqual([release])
@@ -220,7 +222,7 @@ describe('an update that works', () => {
     const state = readState(paths)
     expect(state.current?.tag).toBe('v1.3.0')
     expect(state.previous?.tag).toBe('v1.2.0')
-    expect(readdirSync(paths.releases).toSorted()).toEqual(['cccccccccccc', 'dddddddddddd'])
+    expect(readdirSync(paths.releases).toSorted()).toEqual(['v1.2.0', 'v1.3.0'])
   })
 
   it('removes the previous release before building, so at most three copies of the site are on the disk', async () => {
@@ -240,8 +242,45 @@ describe('an update that works', () => {
     })
     const state = await update(deps)
     // v1.1.0 (previous) is gone while v1.3.0 builds; v1.2.0 (live) stays.
-    expect(seen).toEqual(['cccccccccccc', 'dddddddddddd'])
+    expect(seen).toEqual(['v1.2.0', 'v1.3.0'])
     expect(state).toMatchObject({ status: 'idle', current: { tag: 'v1.3.0' }, previous: { tag: 'v1.2.0' } })
+  })
+
+  it('builds a release that points at the live release\'s commit in a folder of its own', async () => {
+    // Folders named by commit put v1.0.1 in the folder v1.0.0 was serving
+    // from, and the update deleted it before downloading.
+    live('v1.0.0')
+    const liveBuild = join(releaseDir(paths, 'v1.0.0'), '.next', 'BUILD_ID')
+    const seen: { cwd: string; liveStillThere: boolean }[] = []
+    const { deps } = fakeDeps({
+      latest: async () => published('v1.0.1'),
+      npm: async (args, { cwd }) => {
+        if (args[1] !== 'build') return
+        seen.push({ cwd, liveStillThere: existsSync(liveBuild) })
+        file(join(cwd, '.next', 'BUILD_ID'), 'new-build')
+      },
+    })
+    const state = await update(deps)
+    expect(seen).toEqual([{ cwd: releaseDir(paths, 'v1.0.1'), liveStillThere: true }])
+    expect(state).toMatchObject({
+      status: 'idle',
+      current: { tag: 'v1.0.1', sha: sha('a') },
+      previous: { tag: 'v1.0.0', sha: sha('a') },
+    })
+    expect(readdirSync(paths.releases).toSorted()).toEqual(['v1.0.0', 'v1.0.1'])
+  })
+
+  it('forgets a release whose build is gone, so a failed build of the same tag is never served', async () => {
+    // v1.1.0 is recorded as installed, but its build has gone, so the site
+    // runs from the uploaded folder. Installing v1.1.0 again fails its trial.
+    writeState(paths, { ...emptyState(), current: installed('v1.1.0') })
+    mkdirSync(releaseDir(paths, 'v1.1.0'), { recursive: true })
+    const { deps } = fakeDeps({ trial: async () => false })
+    const state = await update(deps)
+    expect(state).toMatchObject({ status: 'failed', current: null })
+    expect(existsSync(releaseDir(paths, 'v1.1.0'))).toBe(false)
+    // The next start serves the uploaded folder, not the failed build.
+    expect(liveDir(paths, recoverState(paths))).toBe(root)
   })
 
   it('installs the latest release over a folder uploaded by hand, and over a live release whose folder is gone', async () => {
@@ -249,7 +288,7 @@ describe('an update that works', () => {
     const { deps } = fakeDeps()
     const state = await update(deps)
     expect(state).toMatchObject({ status: 'idle', current: { tag: 'v1.1.0' } })
-    expect(existsSync(join(releaseDir(paths, sha('b')), '.next', 'BUILD_ID'))).toBe(true)
+    expect(existsSync(join(releaseDir(paths, 'v1.1.0'), '.next', 'BUILD_ID'))).toBe(true)
   })
 
   it('keeps going when the server log cannot be written', async () => {
@@ -260,7 +299,7 @@ describe('an update that works', () => {
     })
     const state = await update(deps)
     expect(state).toMatchObject({ status: 'idle', current: { tag: 'v1.1.0' } })
-    expect(existsSync(releaseDir(paths, sha('b')))).toBe(true)
+    expect(existsSync(releaseDir(paths, 'v1.1.0'))).toBe(true)
   })
 
   it('takes the request only once it has said it is busy', async () => {
@@ -361,8 +400,8 @@ describe('an update that fails', () => {
       steps: { download: 'done', install: 'done', build: 'failed', check: 'skipped', switch: 'skipped' },
     })
     expect(state.message).toMatch(/build failed/)
-    expect(existsSync(releaseDir(paths, sha('b')))).toBe(false)
-    expect(existsSync(releaseDir(paths, sha('a')))).toBe(true)
+    expect(existsSync(releaseDir(paths, 'v1.1.0'))).toBe(false)
+    expect(existsSync(releaseDir(paths, 'v1.0.0'))).toBe(true)
     expect(calls.trials).toEqual([])
     expect(calls.switched).toEqual([])
   })
@@ -372,7 +411,7 @@ describe('an update that fails', () => {
     expect(state).toMatchObject({ status: 'failed', current: { tag: 'v1.0.0' }, steps: { check: 'failed', switch: 'skipped' } })
     expect(state.message).toBe('The new build did not start on its trial run, so the site stays on v1.0.0.')
     expect(calls.switched).toEqual([])
-    expect(existsSync(releaseDir(paths, sha('b')))).toBe(false)
+    expect(existsSync(releaseDir(paths, 'v1.1.0'))).toBe(false)
   })
 
   it('goes back to the release it had when the new one fails after the switch', async () => {
@@ -380,13 +419,13 @@ describe('an update that fails', () => {
     const { state } = await failing({
       switchTo: async (dir) => {
         tried.push(dir)
-        return dir === releaseDir(paths, sha('a'))
+        return dir === releaseDir(paths, 'v1.0.0')
       },
     })
-    expect(tried).toEqual([releaseDir(paths, sha('b')), releaseDir(paths, sha('a'))])
+    expect(tried).toEqual([releaseDir(paths, 'v1.1.0'), releaseDir(paths, 'v1.0.0')])
     expect(state).toMatchObject({ status: 'rolled-back', current: { tag: 'v1.0.0' }, steps: { switch: 'failed' } })
     expect(state.message).toBe('The new build stopped answering after the switch, so the site went back to v1.0.0.')
-    expect(existsSync(releaseDir(paths, sha('b')))).toBe(false)
+    expect(existsSync(releaseDir(paths, 'v1.1.0'))).toBe(false)
   })
 
   it('goes back to the uploaded folder when the very first update fails after the switch', async () => {
@@ -398,7 +437,7 @@ describe('an update that fails', () => {
       },
     })
     const state = await update(deps)
-    expect(tried).toEqual([releaseDir(paths, sha('b')), root])
+    expect(tried).toEqual([releaseDir(paths, 'v1.1.0'), root])
     expect(state.status).toBe('rolled-back')
     expect(liveDir(paths, state)).toBe(root)
   })
@@ -421,26 +460,26 @@ describe('starting up', () => {
       target: { tag: 'v1.1.0', sha: sha('b'), name: 'New', publishedAt: '2026-10-31T12:00:00Z' },
       steps: { download: 'done', install: 'done', build: 'running', check: 'pending', switch: 'pending' },
     })
-    mkdirSync(releaseDir(paths, sha('a')), { recursive: true })
-    mkdirSync(releaseDir(paths, sha('b')), { recursive: true })
+    mkdirSync(releaseDir(paths, 'v1.0.0'), { recursive: true })
+    mkdirSync(releaseDir(paths, 'v1.1.0'), { recursive: true })
     writeFileSync(join(paths.dir, 'state.json.1056.tmp'), '{')
     const state = recoverState(paths)
     expect(readdirSync(paths.dir).filter((name) => name.endsWith('.tmp'))).toEqual([])
     expect(state).toMatchObject({ status: 'failed', steps: { build: 'failed', check: 'skipped' }, current: { tag: 'v1.0.0' } })
     expect(state.message).toMatch(/restarted/)
     // Left for after the site has started, since deleting it can take a while.
-    expect(existsSync(releaseDir(paths, sha('b')))).toBe(true)
+    expect(existsSync(releaseDir(paths, 'v1.1.0'))).toBe(true)
     await pruneReleases(paths, state)
-    expect(existsSync(releaseDir(paths, sha('b')))).toBe(false)
-    expect(existsSync(releaseDir(paths, sha('a')))).toBe(true)
+    expect(existsSync(releaseDir(paths, 'v1.1.0'))).toBe(false)
+    expect(existsSync(releaseDir(paths, 'v1.0.0'))).toBe(true)
   })
 
   it('serves the uploaded folder until there is a release, or when the release is gone', () => {
     expect(liveDir(paths, emptyState())).toBe(root)
     const state = { ...emptyState(), current: installed('v1.0.0') }
     expect(liveDir(paths, state)).toBe(root)
-    file(join(releaseDir(paths, sha('a')), '.next', 'BUILD_ID'))
-    expect(liveDir(paths, state)).toBe(releaseDir(paths, sha('a')))
+    file(join(releaseDir(paths, 'v1.0.0'), '.next', 'BUILD_ID'))
+    expect(liveDir(paths, state)).toBe(releaseDir(paths, 'v1.0.0'))
   })
 
   it('never throws when the state file cannot be written, so the site keeps running', () => {

@@ -13,8 +13,12 @@
 //   .next-static-history/    earlier builds' assets; shared by every build
 //   .updater/state.json      what the updater is doing (read by /admin)
 //   .updater/request.json    written by /admin to ask for an update
-//   .updater/releases/<sha>  one folder per installed release: its files,
-//                            node_modules and .next, built where it runs
+//   .updater/releases/<tag>  one folder per installed release: its files,
+//                            node_modules and .next, built where it runs.
+//                            Named by tag, not commit: two releases may tag
+//                            the same commit, and an installed tag is never
+//                            installed again, so a new folder never lands on
+//                            the live one or the one before it.
 //
 // Until the first update, the site runs from the uploaded folder itself.
 // After that it runs from the current release, and the previous one is kept
@@ -77,12 +81,13 @@ export function updaterPaths(root) {
 }
 
 /**
- * Twelve characters of the commit: unique enough, and short for Windows paths.
+ * A release's folder, named by its tag. Only ever called with a tag that
+ * parseVersion accepted, so it cannot name a path outside the folder.
  * @param {Paths} paths
- * @param {string} sha
+ * @param {string} tag
  */
-export function releaseDir(paths, sha) {
-  return join(paths.releases, sha.slice(0, 12))
+export function releaseDir(paths, tag) {
+  return join(paths.releases, tag)
 }
 
 const short = (/** @type {string} */ sha) => sha.slice(0, 7)
@@ -159,8 +164,9 @@ export function writeState(paths, state) {
  * @param {State} state
  */
 export function liveDir(paths, state) {
-  if (state.current) {
-    const dir = releaseDir(paths, state.current.sha)
+  const tag = state.current?.tag
+  if (tag && parseVersion(tag)) {
+    const dir = releaseDir(paths, tag)
     if (existsSync(join(dir, '.next', 'BUILD_ID'))) return dir
   }
   return paths.root
@@ -169,14 +175,15 @@ export function liveDir(paths, state) {
 /**
  * Deleted without blocking: a release holds hundreds of megabytes of
  * node_modules, and the supervisor has a site to keep running meanwhile.
+ * Never the installed release or the one before it.
  * @param {Paths} paths
  * @param {State} state
- * @param {string | undefined} sha
+ * @param {string | undefined} name a folder name in releases/, which is a tag
  */
-async function removeRelease(paths, state, sha) {
-  if (!sha) return
-  const kept = [state.current?.sha, state.previous?.sha].filter(Boolean).map((s) => s.slice(0, 12))
-  if (!kept.includes(sha.slice(0, 12))) await rm(releaseDir(paths, sha), { recursive: true, force: true, maxRetries: 3 })
+async function removeRelease(paths, state, name) {
+  if (!name) return
+  const kept = [state.current?.tag, state.previous?.tag]
+  if (!kept.includes(name)) await rm(join(paths.releases, name), { recursive: true, force: true, maxRetries: 3 })
 }
 
 /**
@@ -271,6 +278,10 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
     finishedAt: null,
     message: '',
     log: [],
+    // A release whose build is gone is no longer installed: the site runs
+    // from the uploaded folder, and a failed build of the same tag must not
+    // be taken for it at the next start.
+    ...(live === paths.root && { current: null }),
   })
   // Taken only now, so /admin never sees the request gone and the state idle.
   rmSync(paths.request, { force: true })
@@ -284,7 +295,7 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
     print(message)
     return state
   }
-  const discard = (sha) => removeRelease(paths, state, sha).catch((error) => print(`Could not remove a release: ${error.message}`))
+  const discard = (tag) => removeRelease(paths, state, tag).catch((error) => print(`Could not remove a release: ${error.message}`))
 
   try {
     step('download', 'running')
@@ -322,11 +333,11 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
     // stopped by Pterodactyl. Rollback goes to the live release, never to
     // the previous one.
     if (state.previous) {
-      const previous = state.previous.sha
+      const previous = state.previous.tag
       save({ previous: null })
       await discard(previous)
     }
-    release = releaseDir(paths, head.sha)
+    release = releaseDir(paths, head.tag)
     await rm(release, { recursive: true, force: true, maxRetries: 3 })
     mkdirSync(release, { recursive: true })
     await deps.download(head.sha, release)
@@ -365,7 +376,7 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
     if (!(await deps.switchTo(release, log))) {
       step('switch', 'failed')
       const back = await deps.switchTo(live, log)
-      await discard(head.sha)
+      await discard(head.tag)
       const before = installed ? installed.tag : 'the version it had'
       return finish(
         'rolled-back',
@@ -376,7 +387,7 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames }) {
     }
   } catch (error) {
     step(running, 'failed')
-    if (release) await discard(state.target?.sha)
+    if (release) await discard(state.target?.tag)
     return finish('failed', error instanceof Error ? error.message : String(error))
   }
 
