@@ -9,6 +9,7 @@ import { HowItWorks } from '@/components/sections/how-it-works'
 import { WhyUs } from '@/components/sections/why-us'
 import { About } from '@/components/sections/about'
 import { Reviews } from '@/components/sections/reviews'
+import { Partners } from '@/components/sections/partners'
 import { FAQ } from '@/components/sections/faq'
 import { Contact } from '@/components/sections/contact'
 import { pageMetadata } from '@/lib/metadata'
@@ -58,6 +59,7 @@ export default async function Home({ params }: PageProps) {
         <WhyUs />
         <About />
         <Reviews />
+        <Partners />
         <FAQ faqs={faqs} />
         <Contact />
       </Main>

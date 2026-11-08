@@ -116,6 +116,20 @@ export function orderedPartners(list: readonly Partner[]): Partner[] {
   return list.filter((partner) => partner.featured).concat(list.filter((partner) => !partner.featured))
 }
 
+/**
+ * The partners the home page shows as cards, `count` at most: the featured
+ * ones first, then the newest (by `since`, and later in data/partners.ts
+ * first within a month), so a partner is on the home page from the day they
+ * are added.
+ */
+export function homePartners(list: readonly Partner[], count = 3): Partner[] {
+  const newestFirst = list
+    .map((partner, index) => ({ partner, index }))
+    .toSorted((a, b) => b.partner.since.localeCompare(a.partner.since) || b.index - a.index)
+    .map(({ partner }) => partner)
+  return orderedPartners(newestFirst).slice(0, count)
+}
+
 interface PlatformRule {
   /** The platform's own name. Brand names are the same in every language. */
   name: string
@@ -284,6 +298,18 @@ export function partnerCardBanner(partner: Pick<Partner, 'slug' | 'banner'>): st
 }
 
 /**
+ * The trusted clients strip on the home page shows a partner's picture at
+ * 40px at most, near the top of the page, so it loads a small copy made
+ * beside the avatar (npm run partners:cards), twice that across.
+ */
+export const stripAvatarSize = 80
+
+/** The small copy of a partner's avatar that the strip loads, or undefined when they have no avatar. */
+export function partnerStripAvatar(partner: Pick<Partner, 'slug' | 'avatar'>): string | undefined {
+  return partner.avatar === undefined ? undefined : `/partners/${partner.slug}/avatar-strip.webp`
+}
+
+/**
  * Everything wrong with a list of partners, one line each, so a failing test
  * names every problem at once. tests/partners.test.ts runs it on
  * data/partners.ts.
@@ -386,6 +412,16 @@ export function partnerProblems(list: readonly Partner[], context: PartnerCheckC
       if (!size) at(`${card} is missing from public/: run npm run partners:cards`)
       else if (size.width !== width || size.height !== height) {
         at(`${card} is ${size.width}x${size.height}, not ${width}x${height}: run npm run partners:cards`)
+      }
+    }
+
+    // The small copy the trusted clients strip loads (stripAvatarSize), made the same way.
+    const strip = partnerStripAvatar(partner)
+    if (strip && partner.avatar?.startsWith(folder)) {
+      const size = context.imageSize(strip)
+      if (!size) at(`${strip} is missing from public/: run npm run partners:cards`)
+      else if (size.width !== stripAvatarSize || size.height !== stripAvatarSize) {
+        at(`${strip} is ${size.width}x${size.height}, not ${stripAvatarSize}x${stripAvatarSize}: run npm run partners:cards`)
       }
     }
   }

@@ -94,8 +94,8 @@ export const en = {
       quoted: 'Quoted for your build',
     },
     clients: {
-      heading: 'Trusted by our clients',
-      pause: 'Pause the scrolling client logos',
+      heading: 'Trusted by our clients and partners',
+      pause: 'Pause the scrolling logos',
     },
     services: {
       heading: 'What we host',
@@ -338,6 +338,7 @@ export const en = {
       'We are choosing our first official partners. Make videos, stream, or run a community? See how our partner program works and how to join.',
     heading: 'Official partners',
     crumb: 'Partners',
+    seeAll: (count: number) => `See all ${count} partners`,
     intro: (percent: string) =>
       `Creators and communities our team has approved. Sign up with one of their referral codes and you get ${percent} off the first invoice for your hosting, except dedicated servers.`,
     introNoCodes: 'Creators and communities our team has approved.',
