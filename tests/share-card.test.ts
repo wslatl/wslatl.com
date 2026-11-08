@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Metadata } from 'next'
@@ -16,7 +17,7 @@ import sitemap from '@/app/sitemap'
 import { partners } from '@/data/partners'
 import { defaultLocale, locales, stripLocale, type Locale } from '@/i18n/config'
 import { copyFor } from '@/i18n/copy'
-import { shareCardUrl } from '@/lib/metadata'
+import { ogImage, shareCardUrl } from '@/lib/metadata'
 import { shareCardText } from '@/lib/share-card'
 import { imageSize } from './image-size'
 
@@ -127,6 +128,11 @@ describe('the address of a share card', () => {
     expect(shareCardUrl('/games/minecraft', 'es')).toBe('/og?path=%2Fgames%2Fminecraft&locale=es')
   })
 
+  it("is new whenever the home page's picture is, so apps that kept the old one fetch it again", () => {
+    const fingerprint = createHash('sha256').update(readFileSync(join(root, 'public', 'og-image.png'))).digest('hex').slice(0, 8)
+    expect(ogImage.url).toBe(`/og-image.png?v=${fingerprint}`)
+  })
+
   it('is what every page shares itself with: its own card, apart from the home page and a partner with a banner', async () => {
     const wrong: string[] = []
     for (const { path, locale } of pages) {
@@ -134,7 +140,7 @@ describe('the address of a share card', () => {
       const card = shareCardText(path, locale)
       const banner = partners.find((partner) => `/partners/${partner.slug}` === path)?.banner
       const own = `/og?path=${encodeURIComponent(path)}&locale=${locale}`
-      const want = path === '/' ? '/og-image.png' : (banner ?? own)
+      const want = path === '/' ? ogImage.url : (banner ?? own)
 
       const images = shareImages(head)
       if (images.length !== 1 || images[0].url !== want) {

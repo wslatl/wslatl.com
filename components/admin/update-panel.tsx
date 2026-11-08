@@ -218,9 +218,10 @@ export function UpdatePanel({
       {state?.updaterChanged && (
         <Notice tone="warning" title="The updater itself changed" className="mt-4">
           This release changes the updater, which keeps running from the uploaded folder. Copy{' '}
-          <code className="font-mono">scripts/serve.mjs</code> and <code className="font-mono">scripts/updater/</code>{' '}
-          from the release folder over the uploaded ones, then restart the server. The README, &ldquo;Admin and
-          updates&rdquo;, has the steps.
+          <code className="font-mono">serve.mjs</code> and the <code className="font-mono">updater</code> folder from{' '}
+          <code className="font-mono break-all">.updater/releases/{state.current?.tag}/scripts/</code> into the
+          server&rsquo;s <code className="font-mono">scripts/</code> folder, then restart the server. The README,
+          &ldquo;Admin and updates&rdquo;, has the steps.
         </Notice>
       )}
 
