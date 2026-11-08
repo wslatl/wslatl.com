@@ -13,3 +13,19 @@ export function formatWhen(iso: string | null | undefined): string {
 }
 
 export const shortSha = (sha: string) => sha.slice(0, 7)
+
+/**
+ * A Retry-After header in words, rounded up: "15 minutes" for 900, "2
+ * seconds" for 2. Null when it holds no number of seconds (the login route
+ * always sends one, but a proxy in between may not).
+ */
+export function formatWait(retryAfter: string | null): string | null {
+  const seconds = Number(retryAfter)
+  if (!retryAfter || !Number.isFinite(seconds) || seconds <= 0) return null
+  if (seconds < 60) {
+    const whole = Math.ceil(seconds)
+    return whole === 1 ? '1 second' : `${whole} seconds`
+  }
+  const minutes = Math.ceil(seconds / 60)
+  return minutes === 1 ? '1 minute' : `${minutes} minutes`
+}

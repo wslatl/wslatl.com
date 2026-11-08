@@ -1,8 +1,13 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { LoaderCircle } from 'lucide-react'
+import { formatWait } from '@/components/admin/format'
+import { Notice } from '@/components/admin/notice'
 import { Button } from '@/components/ui/button'
+
+type Problem = { title: string; detail: string }
 
 /**
  * Sends the password as JSON, which is all /admin/api/login accepts. The
@@ -12,30 +17,49 @@ import { Button } from '@/components/ui/button'
  */
 export function LoginForm() {
   const router = useRouter()
-  const [error, setError] = useState('')
+  const field = useRef<HTMLInputElement>(null)
+  const [problem, setProblem] = useState<Problem | null>(null)
   const [busy, setBusy] = useState(false)
+
+  function fail(next: Problem) {
+    setProblem(next)
+    setBusy(false)
+    // Back in the field with its text selected, ready to type it again.
+    field.current?.focus()
+    field.current?.select()
+  }
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setBusy(true)
-    setError('')
+    setProblem(null)
     const password = new FormData(event.currentTarget).get('password')
+    let response: Response
     try {
-      const response = await fetch('/admin/api/login', {
+      response = await fetch('/admin/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
       })
-      if (response.ok) {
-        router.replace('/admin')
-        return
-      }
-      const body = await response.json().catch(() => ({}))
-      setError(body.error ?? `Login failed (${response.status}).`)
     } catch {
-      setError('Could not reach the server.')
+      fail({ title: 'Could not reach the server', detail: 'Check the connection and try again.' })
+      return
     }
-    setBusy(false)
+    if (response.ok) {
+      router.replace('/admin')
+      return
+    }
+    const body = await response.json().catch(() => ({}))
+    const said = typeof body.error === 'string' ? body.error : ''
+    if (response.status === 401) {
+      fail({ title: 'Wrong password', detail: 'Check it and try again.' })
+    } else if (response.status === 429) {
+      // Too many attempts, from this address or from everyone: Retry-After says for how long.
+      const wait = formatWait(response.headers.get('retry-after'))
+      fail({ title: 'Too many attempts', detail: wait ? `Try again in ${wait}.` : said || 'Try again in a few minutes.' })
+    } else {
+      fail({ title: 'Could not sign in', detail: said || `The server answered ${response.status}.` })
+    }
   }
 
   return (
@@ -45,19 +69,28 @@ export function LoginForm() {
           Password
         </label>
         <input
+          ref={field}
           id="admin-password"
           name="password"
           type="password"
           autoComplete="current-password"
           required
-          className="mt-1.5 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          aria-invalid={problem ? true : undefined}
+          aria-describedby={problem ? 'admin-login-problem' : undefined}
+          className="mt-1.5 block h-11 w-full rounded-md border border-input bg-background px-3 text-base text-foreground transition-colors hover:border-muted-foreground focus-visible:border-ring aria-invalid:border-danger"
         />
       </div>
-      <p role="alert" className="min-h-5 text-sm text-red-400">
-        {error}
-      </p>
-      <Button type="submit" disabled={busy} className="w-full">
-        {busy ? 'Checking' : 'Log in'}
+      {/* Always in the page, so a screen reader announces each problem as it appears. */}
+      <div id="admin-login-problem" role="alert">
+        {problem && (
+          <Notice tone="danger" title={problem.title}>
+            {problem.detail}
+          </Notice>
+        )}
+      </div>
+      <Button type="submit" disabled={busy} className="h-11 w-full">
+        {busy && <LoaderCircle aria-hidden="true" className="animate-spin" />}
+        {busy ? 'Signing in' : 'Sign in'}
       </Button>
     </form>
   )

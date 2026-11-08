@@ -25,7 +25,7 @@ app/
   sitemap.ts, robots.ts    Every page in every language, from the same data the pages use.
   manifest.ts              /manifest.webmanifest: the name and icons for a home-screen shortcut.
   company.json/route.ts    /company.json: the company profile for the billing panel, written at build time.
-  admin/                   The admin: log in and update the site from GitHub (see Admin and updates).
+  admin/                   The admin: sign in and update the site from GitHub (see Admin and updates).
   [locale]/                Every page, once, for all five languages (see Languages).
     layout.tsx             Root layout: language, fonts, default metadata, Organization JSON-LD, skip link.
     page.tsx               Home page composition.
@@ -235,7 +235,7 @@ When you press Install, the updater asks GitHub once which commit the tag points
 
 ## Admin and updates
 
-`/admin` updates the site from GitHub, and that is all it does: log in, see which release is installed and which is the latest, press **Install**, and watch each step. It is English only, outside the language routing, never indexed (a robots meta tag and an `X-Robots-Tag` header), and not in the sitemap. robots.txt leaves it out on purpose: a line there would only point at it, and a disallowed page is never fetched, so its noindex would never be seen. There is no database: the settings are in `.env`, and the code comes from GitHub releases.
+`/admin` updates the site from GitHub, and that is all it does: sign in, see which release is installed and which is the latest, read what the latest one brings, press **Install**, and watch each step. It looks like the brand kit: its exact colours (`app/admin/admin.css`), Geist with Geist Mono for tags and the log, the mark once at the top, and every state in words as well as colour. It is English only, outside the language routing, never indexed (a robots meta tag and an `X-Robots-Tag` header), and not in the sitemap. robots.txt leaves it out on purpose: a line there would only point at it, and a disallowed page is never fetched, so its noindex would never be seen. There is no database: the settings are in `.env`, and the code comes from GitHub releases.
 
 ### How an update works
 
@@ -262,7 +262,7 @@ The supervisor reports through `.updater/state.json`, which the dashboard reads.
 3. **Make the password hash.** On your own computer, in a copy of this repository, run `npm run admin:hash`. It asks for the password twice (12 characters or more, not shown as you type) and prints an `ADMIN_PASSWORD_HASH=` line and an `ADMIN_SESSION_SECRET=` line.
 4. **Fill in `.env`** in the server's folder, beside `package.json`, with `.env.example` as the template: the two lines from step 3, `GITHUB_TOKEN=` with the token, and `GITHUB_REPO` only if it is not `wslatl/wslatl.com`.
 5. **Change the startup command** on the server's Startup tab, from `npm run build && npm start` to `npm run serve`. If the field is locked, a panel admin can change it under Admin, Servers, the server, Startup. It listens on `SERVER_PORT`, which Pterodactyl sets to the server's port (then `PORT`, then 3000).
-6. **Restart the server.** The console says `The admin is on at /admin.` and `Updates install the latest release of wslatl/wslatl.com.`, or which setting is missing. Until the first update, every start builds the uploaded folder first (a minute or two), as the old startup command did. Open `wslatl.com/admin` and log in.
+6. **Restart the server.** The console says `The admin is on at /admin.` and `Updates install the latest release of wslatl/wslatl.com.`, or which setting is missing. Until the first update, every start builds the uploaded folder first (a minute or two), as the old startup command did. Open `wslatl.com/admin` and sign in.
 7. **Put `/admin` behind Cloudflare Access** (strongly recommended). The login allows 30 attempts per 15 minutes in all, which stops password guessing, but anyone with a handful of addresses can use them up and keep you locked out. With Access in front, nobody else reaches the login at all. In the Cloudflare dashboard: Zero Trust, Access, Applications, Add an application, Self-hosted. Application domain `wslatl.com`, path `admin` (everything under `/admin` is covered). Add a policy: action Allow, include Emails, your own address. Save. `/admin` then asks for a one-time code sent to that address before the login page appears. If you would rather not use Access, a WAF custom rule does most of it: Security, WAF, Custom rules, block when the URI path starts with `/admin` and the IP source address is not yours (this needs an address that does not change).
 
 From then on, a change reaches the site as a release: see Releasing.
@@ -288,13 +288,14 @@ From then on, a change reaches the site as a release: see Releasing.
 - **Session.** A signed cookie, `wslatl_admin`: HttpOnly, Secure, SameSite=Strict, Path=/admin, two hours. Its key comes from the session secret and the password hash together.
 - **Every POST** must come from a page on this site (the `Origin` matches the host, and `Sec-Fetch-Site`, when sent, is `same-origin`), as JSON, and at most 4 KB. `proxy.ts` answers every other POST with a 405; `tests/proxy.test.ts` checks that each admin POST handler calls `checkPost()` before anything else.
 - **Secrets** are read on the server, on each request, in `server-only` modules. `tests/admin-secrets.test.ts` keeps them away from client components, and `npm run scan:build` fails if a secret from `.env`, a password hash or a GitHub token turns up in anything the site serves. CI builds with made-up values in `.env` to prove it.
+- **Release notes** come from GitHub and show on a page that holds the session, so they are never taken as HTML. `components/admin/release-notes.tsx` reads their Markdown itself and builds React elements from it: every piece of text reaches the page escaped, raw HTML included, and a link goes only to an https, http or mailto address. Any other link (`javascript:`, `data:`, a relative path) shows as its text, and an image as its alt text. `tests/admin-release-notes.test.ts` renders our own notes, GitHub's generated ones, and a list of attacks.
 - **If any required setting is missing,** the admin is off. It never runs open.
 - **Lockouts.** The overall limit stops the password being guessed however many addresses are used, and its flip side is that anyone with a handful of addresses (one IPv6 network holds hundreds) can use it up and keep the login locked, through Cloudflare or not. The per-address limit cannot prevent that: it reads Cloudflare's `CF-Connecting-IP`, which anyone who reaches the server's port directly can make up, and Next keeps a client's own `X-Forwarded-For`. Cloudflare Access in front of `/admin` (setup step 7) closes it. Accepting connections to the server's port from Cloudflare's addresses only (or a Cloudflare Tunnel) keeps the address honest as well.
 
 | File | What it holds |
 | --- | --- |
-| `app/admin/` | The login page, the dashboard, and the JSON routes under `api/` (login, logout, update) |
-| `components/admin/` | The login form, the update panel, the log-out button |
+| `app/admin/` | The login page, the dashboard, the admin's colours (`admin.css`), and the JSON routes under `api/` (login, logout, update) |
+| `components/admin/` | The login form, the update panel, the sign-out button, the release notes renderer, and the notices and badges that show each state |
 | `lib/admin/` | Settings, password hashing, sessions, rate limits, request checks, GitHub, and the dashboard's side of the updater |
 | `scripts/serve.mjs` | The supervisor, `npm run serve` |
 | `scripts/updater/` | The update steps and the `.updater/` layout (`lib.mjs`), the version rule (`release.mjs`), the live server and its crash watch (`live.mjs`) and child processes (`process.mjs`), each with tests in `tests/updater*.test.ts` |
