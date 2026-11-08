@@ -64,9 +64,13 @@ function clamp(text: string, max: number): string {
 /**
  * Ties the last two words together with a no-break space, so a text never
  * ends on a word alone on its line: a game's title breaks before "from
- * $8.18/mo" rather than leaving the price by itself.
+ * $8.18/mo" rather than leaving the price by itself. A text of two words
+ * keeps its one place to break: tied, two words too wide for one line could
+ * not break at all. The knowledge base's cards found that first, and the two
+ * sites draw their cards the same way.
  */
 function tieEnd(text: string): string {
+  if (text.trim().split(/\s+/).length < 3) return text
   return text.replace(/ (\S+)$/, '\u00a0$1')
 }
 
@@ -157,7 +161,10 @@ function drawCard(card: ShareCardText): ImageResponse {
 
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 40 }}>
           <div style={{ fontSize: 26, lineHeight: 1.4, color: MUTED, maxWidth: 820 }}>{description}</div>
-          <div style={{ fontSize: 26, lineHeight: 1.4, fontWeight: 700, color: PAPER }}>
+          {/* The address cannot wrap, so it never shrinks: the description
+              gives way. The same as the knowledge base's cards, whose longer
+              address squeezed into the margin before. */}
+          <div style={{ fontSize: 26, lineHeight: 1.4, fontWeight: 700, color: PAPER, flexShrink: 0 }}>
             {siteConfig.siteUrl.replace('https://', '')}
           </div>
         </div>
