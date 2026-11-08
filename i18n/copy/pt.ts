@@ -85,8 +85,8 @@ export const pt: Copy = {
       quoted: 'Orçamento para a sua configuração',
     },
     clients: {
-      heading: 'Com a confiança dos nossos clientes',
-      pause: 'Pausar a rolagem dos logos de clientes',
+      heading: 'Com a confiança dos nossos clientes e parceiros',
+      pause: 'Pausar a rolagem dos logos',
     },
     services: {
       heading: 'O que hospedamos',
@@ -329,6 +329,7 @@ export const pt: Copy = {
       'Estamos escolhendo nossos primeiros parceiros oficiais. Faz vídeos, lives ou cuida de uma comunidade? Veja como funciona nosso programa de parceiros e como participar.',
     heading: 'Parceiros oficiais',
     crumb: 'Parceiros',
+    seeAll: (count: number) => `Ver os ${count} parceiros`,
     intro: (percent: string) =>
       `Criadores e comunidades aprovados pela nossa equipe. Cadastre-se com um dos códigos de indicação deles e ganhe ${percent} de desconto na primeira fatura da sua hospedagem, exceto em servidores dedicados.`,
     introNoCodes: 'Criadores e comunidades aprovados pela nossa equipe.',

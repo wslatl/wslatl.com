@@ -48,4 +48,5 @@ export const exampleImages: Record<string, { width: number; height: number }> = 
   '/partners/example-creator/avatar.webp': { width: 512, height: 512 },
   '/partners/example-creator/banner.webp': { width: 1500, height: 500 },
   '/partners/example-creator/banner-card.webp': { width: 720, height: 240 },
+  '/partners/example-creator/avatar-strip.webp': { width: 80, height: 80 },
 }

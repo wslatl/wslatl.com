@@ -85,8 +85,8 @@ export const es: Copy = {
       quoted: 'Presupuesto según tu configuración',
     },
     clients: {
-      heading: 'Nuestros clientes confían en nosotros',
-      pause: 'Pausar los logos de clientes en movimiento',
+      heading: 'Nuestros clientes y socios confían en nosotros',
+      pause: 'Pausar los logos en movimiento',
     },
     services: {
       heading: 'Qué alojamos',
@@ -329,6 +329,7 @@ export const es: Copy = {
       'Estamos eligiendo a nuestros primeros socios oficiales. ¿Haces vídeos, directos o llevas una comunidad? Descubre cómo funciona nuestro programa de socios y cómo unirte.',
     heading: 'Socios oficiales',
     crumb: 'Socios',
+    seeAll: (count: number) => `Ver los ${count} socios`,
     intro: (percent: string) =>
       `Creadores y comunidades que nuestro equipo ha aprobado. Regístrate con uno de sus códigos de referido y tendrás un ${percent} de descuento en la primera factura de tu hosting, salvo en servidores dedicados.`,
     introNoCodes: 'Creadores y comunidades que nuestro equipo ha aprobado.',

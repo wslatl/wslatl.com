@@ -85,8 +85,8 @@ export const de: Copy = {
       quoted: 'Angebot für dein Setup',
     },
     clients: {
-      heading: 'Unsere Kunden vertrauen uns',
-      pause: 'Die laufenden Kundenlogos anhalten',
+      heading: 'Unsere Kunden und Partner vertrauen uns',
+      pause: 'Die laufenden Logos anhalten',
     },
     services: {
       heading: 'Was wir hosten',
@@ -329,6 +329,7 @@ export const de: Copy = {
       'Wir wählen gerade unsere ersten offiziellen Partner aus. Du machst Videos, streamst oder leitest eine Community? Erfahre, wie unser Partnerprogramm funktioniert und wie du mitmachst.',
     heading: 'Offizielle Partner',
     crumb: 'Partner',
+    seeAll: (count: number) => `Alle ${count} Partner ansehen`,
     intro: (percent: string) =>
       `Creator und Communities, die unser Team freigegeben hat. Melde dich mit einem ihrer Empfehlungscodes an und du erhältst ${percent} Rabatt auf die erste Rechnung für dein Hosting, außer bei Dedicated Servern.`,
     introNoCodes: 'Creator und Communities, die unser Team freigegeben hat.',

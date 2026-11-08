@@ -86,7 +86,7 @@ export const fr: Copy = {
     },
     clients: {
       heading: "Ils nous font confiance",
-      pause: "Mettre en pause le défilement des logos clients",
+      pause: "Mettre en pause le défilement des logos",
     },
     services: {
       heading: "Ce que nous hébergeons",
@@ -329,6 +329,7 @@ export const fr: Copy = {
       'Nous choisissons nos premiers partenaires officiels. Vous faites des vidéos, du streaming ou vous animez une communauté ? Découvrez comment fonctionne notre programme partenaire et comment le rejoindre.',
     heading: 'Partenaires officiels',
     crumb: 'Partenaires',
+    seeAll: (count: number) => `Voir les ${count} partenaires`,
     intro: (percent: string) =>
       `Des créateurs et des communautés approuvés par notre équipe. Inscrivez-vous avec l'un de leurs codes de parrainage et obtenez ${percent} de réduction sur la première facture de votre hébergement, sauf sur les serveurs dédiés.`,
     introNoCodes: 'Des créateurs et des communautés approuvés par notre équipe.',
