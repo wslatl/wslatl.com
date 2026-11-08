@@ -148,7 +148,11 @@ describe('an update that works', () => {
     const release = releaseDir(paths, 'v1.1.0')
 
     expect(release).toBe(join(root, '.updater', 'releases', 'v1.1.0'))
-    expect(calls.npm.map((call) => call.args.join(' '))).toEqual(['ci --include=dev --ignore-scripts --no-audit --no-fund', 'run build'])
+    expect(calls.npm.map((call) => call.args.join(' '))).toEqual([
+      'ci --include=dev --ignore-scripts --no-audit --no-fund',
+      'run build',
+      'prune --omit=dev --ignore-scripts --no-audit --no-fund',
+    ])
     expect(calls.npm.every((call) => call.cwd === release)).toBe(true)
     expect(calls.trials).toEqual([release])
     expect(calls.switched).toEqual([release])
@@ -156,7 +160,7 @@ describe('an update that works', () => {
       status: 'idle',
       current: { tag: 'v1.1.0', sha: sha('b'), name: 'Release v1.1.0', publishedAt: '2026-10-31T12:00:00Z', deployedAt: expect.any(String) },
       previous: null,
-      steps: { download: 'done', install: 'done', build: 'done', check: 'done', switch: 'done' },
+      steps: { download: 'done', install: 'done', build: 'done', prune: 'done', check: 'done', switch: 'done' },
       message: 'Installed v1.1.0 (commit bbbbbbb).',
     })
     expect(readState(paths)).toEqual(state)
@@ -190,6 +194,64 @@ describe('an update that works', () => {
       SITE_COMMIT: sha('b'),
       STATIC_HISTORY_DIR: join(root, '.next-static-history'),
     })
+  })
+
+  it('prunes the release after its build and before its trial start, which sees it pruned', async () => {
+    const order: string[] = []
+    const envs: Record<string, Env> = {}
+    const seen: Record<string, Record<string, boolean>> = {}
+    let stepsAtTrial = {}
+    const watched = ['tests', '.github', 'eslint.config.mjs', '.next/cache', 'node_modules/vitest', '.next/BUILD_ID', 'node_modules/next', 'next.config.mjs', 'scripts/serve.mjs']
+    const look = (dir: string) => Object.fromEntries(watched.map((path) => [path, existsSync(join(dir, path))]))
+    const { deps } = fakeDeps({
+      download: async (_commit, dest) => {
+        for (const path of ['package.json', 'next.config.mjs', 'scripts/serve.mjs', 'tests/site.test.ts', '.github/workflows/ci.yml', 'eslint.config.mjs']) {
+          file(join(dest, path))
+        }
+      },
+      npm: async (args, { cwd, env }) => {
+        order.push(`npm ${args[0]}`)
+        envs[args[0]] = env
+        if (args[0] === 'ci') for (const name of ['next', 'vitest']) file(join(cwd, 'node_modules', name, 'package.json'), '{}')
+        if (args[1] === 'build') {
+          seen.build = look(cwd)
+          file(join(cwd, '.next', 'BUILD_ID'), 'new-build')
+          file(join(cwd, '.next', 'cache', 'turbopack', 'entry'))
+        }
+        if (args[0] === 'prune') {
+          seen.prune = look(cwd)
+          // What npm prune --omit=dev does here: vitest is a devDependency.
+          rmSync(join(cwd, 'node_modules', 'vitest'), { recursive: true })
+        }
+      },
+      trial: async (dir) => {
+        order.push('trial')
+        seen.trial = look(dir)
+        stepsAtTrial = readState(paths).steps
+        return true
+      },
+    })
+    const state = await update(deps)
+
+    expect(order).toEqual(['npm ci', 'npm run', 'npm prune', 'trial'])
+    // The build has every file. The files go before npm prune, the devDependencies with it.
+    expect(seen.build).toMatchObject({ tests: true, '.github': true, 'eslint.config.mjs': true })
+    expect(seen.prune).toMatchObject({ tests: false, '.github': false, 'eslint.config.mjs': false, '.next/cache': false, 'node_modules/vitest': true })
+    expect(seen.trial).toEqual({
+      tests: false,
+      '.github': false,
+      'eslint.config.mjs': false,
+      '.next/cache': false,
+      'node_modules/vitest': false,
+      '.next/BUILD_ID': true,
+      'node_modules/next': true,
+      'next.config.mjs': true,
+      'scripts/serve.mjs': true,
+    })
+    expect(stepsAtTrial).toMatchObject({ build: 'done', prune: 'done', check: 'running' })
+    expect(envs.prune).toEqual(envs.ci)
+    expect(state).toMatchObject({ status: 'idle', current: { tag: 'v1.1.0' }, steps: { prune: 'done', check: 'done', switch: 'done' } })
+    expect(state.log).toContain('Deleted what production never uses: tests, .github, eslint.config.mjs, .next/cache')
   })
 
   it('compares versions as numbers', async () => {
@@ -712,11 +774,29 @@ describe('an update that fails', () => {
     expect(state).toMatchObject({
       status: 'failed',
       current: { tag: 'v1.0.0' },
-      steps: { download: 'done', install: 'done', build: 'failed', check: 'skipped', switch: 'skipped' },
+      steps: { download: 'done', install: 'done', build: 'failed', prune: 'skipped', check: 'skipped', switch: 'skipped' },
     })
     expect(state.message).toMatch(/build failed/)
     expect(existsSync(releaseDir(paths, 'v1.1.0'))).toBe(false)
     expect(existsSync(releaseDir(paths, 'v1.0.0'))).toBe(true)
+    expect(calls.trials).toEqual([])
+    expect(calls.switched).toEqual([])
+  })
+
+  it('leaves the site alone and cleans up when npm prune fails', async () => {
+    const { state, calls } = await failing({
+      npm: async (args, { cwd }) => {
+        if (args[1] === 'build') file(join(cwd, '.next', 'BUILD_ID'), 'new-build')
+        if (args[0] === 'prune') throw new Error('npm prune --omit=dev --ignore-scripts --no-audit --no-fund failed (exit code 1).')
+      },
+    })
+    expect(state).toMatchObject({
+      status: 'failed',
+      current: { tag: 'v1.0.0' },
+      steps: { build: 'done', prune: 'failed', check: 'skipped', switch: 'skipped' },
+    })
+    expect(state.message).toMatch(/npm prune .* failed/)
+    expect(existsSync(releaseDir(paths, 'v1.1.0'))).toBe(false)
     expect(calls.trials).toEqual([])
     expect(calls.switched).toEqual([])
   })

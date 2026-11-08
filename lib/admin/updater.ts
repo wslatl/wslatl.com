@@ -18,7 +18,7 @@ import { join } from 'node:path'
  */
 
 /** Mirrors what scripts/updater/lib.mjs writes. */
-export type StepId = 'download' | 'install' | 'build' | 'check' | 'switch'
+export type StepId = 'download' | 'install' | 'build' | 'prune' | 'check' | 'switch'
 export type StepState = 'pending' | 'running' | 'done' | 'failed' | 'skipped'
 export type ReleaseBuild = { tag: string; sha: string; name: string; publishedAt: string }
 export type InstalledRelease = ReleaseBuild & { deployedAt: string }
