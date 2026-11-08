@@ -11,7 +11,8 @@ The public website for WSLATL LLC. Private hosting based in Missouri: VPS hostin
 3. Routes visitors to the right panel (billing, game panel, VPS panel, dedicated portal, cPanel) through the header Login menu and the footer.
 4. Hosts the full legal library (ten policies) under `/legal`.
 5. Shows our official referral partners on `/partners`, each with a profile page and, if they have one, their referral code.
-6. Does all of that in English, Spanish, French, German and Portuguese.
+6. Gives partners and designers the brand kit on `/brand`: the logo to download, the colors to copy, the type, the voice and the rules for using them, with the full kit on Google Drive.
+7. Does all of that in English, Spanish, French, German and Portuguese.
 
 Every public page is static. There is no CMS and no database: content lives in `data/*.ts` and `content/legal/*.tsx`, so copy is one PR away.
 
@@ -37,6 +38,7 @@ app/
     legal/[slug]/page.tsx  Every policy, at /legal/privacy, /legal/terms, and so on.
     partners/page.tsx      Official partners: their cards, the "This could be you" card, the partner program.
     partners/[slug]/page.tsx  One profile per partner, statically generated from data/partners.ts.
+    brand/page.tsx         The brand kit: logo and downloads, colors, type, voice, do and don't, and the full kit on Google Drive (see Brand kit).
     not-found.tsx, error.tsx  Branded 404 and error pages.
 
 proxy.ts                   Serves the English tree at the unprefixed URLs, and answers 405 to every method but GET and HEAD, apart from POST on the admin's JSON routes.
@@ -51,6 +53,7 @@ components/
   games/                   Game directory (the only client-side search on the site).
   legal/                   The blocks every legal document is built from, and the SLA uptime table.
   partners/                Partner cards, the copy-code button, platform icons, the partner program section.
+  brand/                   The sections of the brand kit page, and the logo and icons the header uses.
   seo/json-ld.tsx          Structured data.
 
 config/site.ts             Company details, paths, credits, legal metadata and effective dates.
@@ -61,7 +64,7 @@ content/legal/             The text of each policy; index.ts maps each document 
 data/                      Everything else the pages render (see below).
 i18n/                      Languages: the current one, the dictionaries, the translations.
 lib/                       pricing helpers, pageMetadata(), what each page says about itself (page-text.ts) and the share card's words (share-card.ts), cn() and slugify().
-scripts/                   Checks that need a build or a live site (see Automation), keep-old-assets.mjs (see Deploying), and serve.mjs, the updater (see Admin and updates).
+scripts/                   Checks that need a build or a live site (see Automation), keep-old-assets.mjs (see Deploying), home-card.mjs (see Images), brand-kit.mjs (see Brand kit), and serve.mjs, the updater (see Admin and updates).
 tests/                     Vitest suites for data, links, and house style.
 ```
 
@@ -89,6 +92,7 @@ Some facts appear on many pages. Each one is defined exactly once, and everythin
 | Legal document titles and dates | `data/legal.ts` and `config/site.ts` | Legal pages, `/legal`, footer, sitemap |
 | Games | `data/games.ts` | `/games`, game pages, sitemap |
 | Official partners | `data/partners.ts`, with their pictures in `public/partners/<slug>/` | `/partners`, partner profiles, sitemap |
+| Brand kit colors, files and Drive folder | `data/brand.ts`, with the files in `public/brand/` | `/brand` |
 | Referral discount, and what the partner program may promise | `config/referral.ts` (the percent must match the billing panel) | `/partners`, partner profiles |
 | Panel, portal, and profile URLs | `config/links.json` | Every button and link (through short links), redirects, structured data |
 | Email addresses | `config/emails.ts` | Every address on the site, through `<Email>` |
@@ -201,6 +205,24 @@ Taking someone down is two steps on the same day: delete their entry and their f
 
 ---
 
+## Brand kit
+
+`/brand` is our own page for the WSLATL brand kit, in all five languages: the logo to download, the colors to copy, the type, the voice, and the do and don't, with the full kit one click away on Google Drive (`fullKitUrl` in `data/brand.ts`). It follows the kit's guide: the mark once near the top, on a solid surface, which is the header's (the page adds only the four specimens on white and on Ink that it is about), the brand gradient only as a bar, and no color on its own.
+
+**Where the files come from.** The kit is a folder, `Brand Kit/`, with the guide, its diagrams in `assets/` and the logo files in `assets/logo-png/`. Nothing on the page is drawn by hand:
+
+- `public/brand/downloads/`: eight PNGs copied byte for byte from `assets/logo-png/` (the mark at 64, 128, 256, 512 and 1024 px, the lockup at 1500x500, 1200x630 and 960x540).
+- `public/brand/kit-*.webp`: WebP at twice the size they show at. The mark and the lockup are the kit's PNGs, resized. The clear space, minimum size and do-and-don't diagrams are cropped to the figure: the guide's titles and captions are English text inside the picture and cannot be translated, so the page says the same in words, and the do-and-don't diagram is its six pictures with their labels written under them.
+- `data/brand.ts` and `i18n/copy/*.ts` (under `brand`): the guide's colors, examples and words.
+
+The kit's two SVG files only wrap pictures, so they stay on Drive (`i18n/routing.ts` serves no SVG from `public/`, because one opened directly can carry script), and `logo-png/profile/` is not used.
+
+**When the kit changes:** download it and run `npm run brand:images -- "path/to/Brand Kit"` (`scripts/brand-kit.mjs`), which copies the downloads and makes the WebP files again. If a color, a size or an example changed in the guide, change `data/brand.ts` and the words in every `i18n/copy/<locale>.ts`; if the Drive folder moved, change `fullKitUrl`; if a diagram changed shape, adjust its crop in the script and its size in `data/brand.ts`. `tests/brand.test.ts` fails until each file is twice the size it shows at. Then run `npm run check`.
+
+Two of the voice examples hold figures, so they come from `data/pricing.ts` and `data/sla.ts` like every other figure on the site. The guide's line for new VPS plans says "$5.91/mo" beside the Ryzen 9 and NVMe, but $5.91 is the cheapest Budget plan (Intel i7, SATA SSD), so the page quotes what the Premium plans cost.
+
+---
+
 ## Search engines
 
 - **Site name.** Google shows "WSLATL" as the site's name in results. It reads that from the `WebSite` structured data, which only the English home page carries (Google ignores it anywhere else), and from `application-name` and `og:site_name`. All three come from `siteConfig.brand`, and every title ends with it. The `Organization` data on every page has the legal name, "WSLATL LLC", with "WSLATL" as an `alternateName`, so the two read as one brand.
@@ -211,7 +233,7 @@ Taking someone down is two steps on the same day: delete their entry and their f
 
 ## Images
 
-`images.unoptimized` is on, so every file in `public/` is served as-is. Export images at twice their display size before adding them: client logos are trimmed WebP at 96px tall, team photos are 192px square WebP. Partner pictures go in `public/partners/<slug>/` (see Partners). `public/og-image.png` (1200x630) is the home page's share picture, drawn by `npm run home:card` (`scripts/home-card.mjs`) from the share cards' fonts and lockup in `assets/`; run it again after a change to the slogan or the branding. Every other page has a card drawn on request (see Share cards below).
+`images.unoptimized` is on, so every file in `public/` is served as-is. Export images at twice their display size before adding them: client logos are trimmed WebP at 96px tall, team photos are 192px square WebP. Partner pictures go in `public/partners/<slug>/` (see Partners), and the brand kit page's pictures in `public/brand/` (see Brand kit). `public/og-image.png` (1200x630) is the home page's share picture, drawn by `npm run home:card` (`scripts/home-card.mjs`) from the share cards' fonts and lockup in `assets/`; run it again after a change to the slogan or the branding. Every other page has a card drawn on request (see Share cards below).
 
 The icons are the WSLATL mark from the brand kit (`assets/logo-png/logo/`), used as it ships: three panels, cyan to violet, on a transparent background. Its colours read on a white results page, in a light browser tab and on dark, so the icons need no tile. `favicon.ico` holds the kit's own 16, 32 and 48px marks as classic 32-bit bitmaps (the form every ICO reader takes, rather than PNGs inside the ICO), `favicon.png` is its 64px one, `icon-192.png` is the one Google uses beside results (it takes PNG or ICO, not SVG, square and larger than 48px), and `icon-512.png` is for the web app manifest. Two icons may not be transparent, so they put the mark on the brand's Ink tile (`#0F090B`) with room around it: `apple-icon.png` (180px; iOS fills transparency with black and rounds the corners) and `icon-maskable-512.png` (the mark inside the centre 80% that Android's masks keep). The logo ships as pictures only (its SVG files just wrap pictures), so there is no `favicon.svg`; its old address redirects to `icon-192.png`. `logo.png` (the 512px mark) is the logo in the `Organization` data. `tests/seo.test.ts` checks their sizes and that the two tiles have no transparency. Each one must also be listed in `rootFiles` in `i18n/routing.ts`.
 
@@ -338,6 +360,7 @@ Then open [http://localhost:3000](http://localhost:3000). Pass a port with `npm 
 | `npm run start` | Serve the production build |
 | `npm run serve` | Serve it under the updater, the server's startup command (see Admin and updates) |
 | `npm run admin:hash` | Make the admin password hash and session secret for `.env` |
+| `npm run brand:images -- "<kit folder>"` | Bring the brand kit's logo downloads and page pictures into `public/brand/` (see Brand kit) |
 | `npm run lint` | Oxlint, then ESLint with the Next.js core-web-vitals and TypeScript rules |
 | `npm run lint:fix` | Same, applying the safe automatic fixes |
 | `npm test` | Vitest: pricing invariants, link integrity, redirects, legal data, and a no-em-dash check |

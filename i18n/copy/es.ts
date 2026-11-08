@@ -51,6 +51,7 @@ export const es: Copy = {
       web: 'Hosting web',
       about: 'Sobre nosotros',
       partners: 'Socios',
+      brandKit: 'Kit de marca',
       howItWorks: 'Cómo funciona el pedido',
       contact: 'Contacto',
       reviews: 'Opiniones en Trustpilot',
@@ -394,6 +395,280 @@ export const es: Copy = {
       avatarAlt: (name: string) => `Foto de perfil de ${name}`,
       bannerAlt: (name: string) => `Banner de ${name}`,
       allPartners: 'Todos los socios',
+    },
+  },
+  brand: {
+    metaTitle: 'Kit de marca: logo, colores, tipografías y voz',
+    metaDescription:
+      'Descarga el logo de WSLATL en PNG, copia los colores de marca y consulta tipografías, voz y reglas de uso. El kit completo está en Google Drive.',
+    heading: 'Kit de marca',
+    crumb: 'Kit de marca',
+    intro:
+      'Todo lo que necesitas para presentar WSLATL ante la gente: el logo, los colores, la tipografía y la voz. Léelo una vez y lo que hagas se verá como debe.',
+    audience:
+      'Es para cualquiera que ponga material gráfico o textos de WSLATL delante de una persona: nuestro propio equipo, un socio, un diseñador o una agencia.',
+    getFullKit: 'Consigue el kit completo',
+    getLogo: 'Descarga el logo',
+    shortVersion: {
+      heading: 'La versión corta',
+      items: [
+        'Usa el logo tal como se entrega.',
+        'Usa estos colores y ningún otro.',
+        'Geist para todo, Instrument Serif para los acentos y Geist Mono para el código.',
+        'Escribe como una persona que lleva servidores, no como un departamento de marketing.',
+      ],
+    },
+    onThisPage: 'En esta página',
+    nav: {
+      logo: 'Logo',
+      colors: 'Colores',
+      type: 'Tipografía',
+      voice: 'Voz',
+      rules: 'Qué sí y qué no',
+      fullKit: 'Kit completo',
+    },
+    logo: {
+      heading: 'El logo',
+      intro: 'Usa el material exactamente como se entrega. Cambiar el tamaño está bien. Todo lo demás, no.',
+      partsHeading: 'El símbolo y el logo completo',
+      parts:
+        'El símbolo son tres paneles inclinados, del cian al violeta. El logo completo es el símbolo con el nombre "WSLATL" y la línea "{0}". Usa el símbolo cuando falta espacio y el logo completo cuando hay sitio.',
+      specimens: {
+        markWhite: 'El símbolo sobre blanco',
+        markInk: 'El símbolo sobre Ink',
+        lockupWhite: 'El logo completo sobre blanco',
+        lockupInk: 'El logo completo sobre Ink',
+      },
+      surfaces:
+        'Blanco, gris claro e Ink (#0F090B) funcionan bien. Las fotos recargadas, no. Si no puedes leer el nombre de un vistazo, el fondo está demasiado cargado: pon el logo sobre un panel liso.',
+      violetLead: 'Ojo con el panel violeta.',
+      violet:
+        'El panel derecho del símbolo es violeta, #5000F8, y desaparece sobre un degradado violeta o azul violáceo. Un degradado sirve como barra de acento, borde o línea bajo el logo, pero el logo en sí va sobre una superficie lisa.',
+      clearSpace: {
+        heading: 'Espacio libre',
+        body: 'X es la altura de las mayúsculas del nombre "WSLATL", más o menos el 18 % de la altura del símbolo. Deja al menos X de espacio vacío por los cuatro lados. Nada entra en la zona azul: ni texto, ni icono, ni borde, ni el extremo de la página.',
+        lockup:
+          'El logo completo usa el mismo X por los cuatro lados, y X crece o se reduce con el logo. Mantén juntos el símbolo, el nombre y la línea.',
+        markCaption: 'Alrededor del símbolo',
+        lockupCaption: 'Alrededor del logo completo',
+      },
+      minimum: {
+        heading: 'Tamaños mínimos',
+        body: 'Por debajo del mínimo, el logo deja de leerse. Con menos de 190 px de ancho, la línea "{0}" ya no se lee bien: usa solo el símbolo.',
+        artwork: 'Versión',
+        columnScreen: 'Pantalla',
+        columnPrint: 'Impresión',
+        mark: 'Símbolo',
+        lockup: 'Logo completo',
+        markScreen: '16 px',
+        markPrint: '5 mm',
+        lockupScreen: '190 px de ancho',
+        lockupPrint: '45 mm de ancho',
+        shipped: (sizes: string) =>
+          `Entregamos el símbolo en ${sizes} px. Usa el tamaño más cercano por encima del que necesitas.`,
+      },
+      downloads: {
+        heading: 'Descargas',
+        intro: 'PNG con fondo transparente, tal como los entrega el kit.',
+        download: 'Descargar',
+        markHeading: 'El símbolo',
+        markBody:
+          'Usa el tamaño más cercano por encima del que necesitas. Para el icono de un servidor de Discord, usa el de 512 o el de 1024.',
+        lockupHeading: 'El logo completo',
+        uses: {
+          social: 'Cabecera para redes sociales',
+          preview: 'Vistas previas de enlaces y publicaciones',
+          discord: 'Banner de servidor de Discord',
+        },
+        morePrefix: '¿Necesitas otro tamaño o los archivos SVG? Están en',
+        moreLink: 'el kit completo',
+        moreSuffix: '.',
+      },
+      which: {
+        heading: '¿Qué archivo necesito?',
+        rows: [
+          { space: 'Un espacio pequeño y cuadrado', examples: 'Favicon, avatar, icono de app', pick: 'El símbolo' },
+          {
+            space: 'Un espacio ancho',
+            examples: 'Cabecera, firma de correo, banner para redes',
+            pick: 'El logo completo',
+          },
+          {
+            space: 'Algo grande o impreso',
+            examples: 'Impresión y merchandising',
+            pick: 'Los archivos SVG del kit completo',
+          },
+        ],
+      },
+      alt: {
+        markWhite:
+          'El símbolo de WSLATL sobre blanco: tres paneles inclinados, del cian a la izquierda al violeta a la derecha.',
+        markInk:
+          'El símbolo de WSLATL sobre Ink: tres paneles inclinados, del cian a la izquierda al violeta a la derecha.',
+        lockupWhite:
+          'El logo completo de WSLATL sobre blanco: el símbolo, el nombre WSLATL y debajo la línea Private Hosting.',
+        lockupInk:
+          'El logo completo de WSLATL sobre Ink: el símbolo, el nombre WSLATL y debajo la línea Private Hosting.',
+        clearSpaceMark:
+          'Diagrama del espacio libre alrededor del símbolo: una banda de espacio vacío, de ancho X, rodea los cuatro lados y nada puede entrar en ella.',
+        clearSpaceLockup:
+          'Diagrama del espacio libre alrededor del logo completo: el mismo X de espacio vacío por los cuatro lados.',
+        minimumSizes: 'El símbolo a 256, 192, 160, 128, 96, 64, 48 y 32 píxeles, cada uno más pequeño que el anterior.',
+      },
+    },
+    colors: {
+      heading: 'Colores',
+      intro:
+        'Usa estos y ninguno más. Los colores del logo se tomaron del material tal como se entrega, y los de interfaz son los que ya usan nuestras webs.',
+      copy: 'Copiar',
+      copied: 'Copiado',
+      copyFailed: 'El código hexadecimal está seleccionado. Cópialo con el teclado o el menú.',
+      logoHeading: 'Colores del logo',
+      logoIntro: 'Los únicos colores del propio logo.',
+      gradientsHeading: 'Degradados',
+      gradientsIntro:
+        'Un recurso de marca, no decoración. Úsalos en superficies grandes o en líneas finas, y nunca pongas texto de cuerpo encima.',
+      from: 'Desde',
+      to: 'Hasta',
+      interfaceHeading: 'Colores de interfaz',
+      interfaceIntro: 'Sacados de wslatl.com, la base de conocimiento y el portal de facturación.',
+      rulesHeading: 'Reglas de color',
+      rules: [
+        'Nunca cambies el color del logo. Ni a negro, ni a blanco, ni a un color de marca que te guste más. El degradado forma parte del arte.',
+        'Un solo acento por pantalla. Azul primario para acciones, colores semánticos para estados, degradados para superficies grandes. No los tres a la vez.',
+        `Nunca dependas solo del color. Un estado también tiene que decir "En línea" o "Degradado" con palabras, o llevar un icono. Mucha gente no distingue el ámbar del rojo.`,
+        'El texto de cuerpo es Ink o Paper. Nunca un degradado, nunca un azul de panel intermedio.',
+        'Los enlaces son #0079CE sobre claro y #48C5FF sobre oscuro, y siempre van subrayados en el texto de cuerpo. En botones y menús, sin subrayado.',
+      ],
+      uses: {
+        violet: 'Panel derecho del símbolo, extremo del degradado del nombre',
+        cyan: 'Extremo cercano del degradado del nombre',
+        brandCyan: 'Panel izquierdo del símbolo',
+        brandBlue: 'Panel central del símbolo',
+        primary: 'Botones, enlaces, estados activos, anillos de foco',
+        primarySite: 'El color del tema de wslatl.com, interfaces grandes',
+        lightAccent: 'Estados al pasar el cursor, brillo, datos destacados',
+        paleAccent: 'Paneles informativos, rellenos suaves',
+        secondaryBlue: 'Acciones secundarias',
+        ink: 'Fondo oscuro principal',
+        inkAlt: 'Fondo del portal de facturación',
+        surface: 'Tarjetas, paneles elevados',
+        surfaceAlt: 'Bordes, separadores, campos',
+        paper: 'Texto principal sobre oscuro',
+        muted: 'Texto secundario, metadatos',
+        success: 'En línea, activo, sano',
+        successAlt: 'Confirmaciones',
+        warning: 'Degradado, pendiente, mantenimiento',
+        danger: 'Errores, caídas, acciones destructivas',
+        info: 'Insignias informativas',
+      },
+      gradientUses: {
+        wordmark: 'Paneles de portada, cabeceras de sección, subrayados de enlaces, barras de progreso y de estado',
+        subline: 'Acentos secundarios, fondos de etiquetas, bordes de paneles',
+      },
+    },
+    type: {
+      heading: 'Tipografía',
+      intro: 'Tres tipografías, cada una con su trabajo.',
+      sans: {
+        role: 'Sin serifa',
+        use: 'Todo lo estructural: títulos, texto de cuerpo, interfaz, botones y tablas.',
+        size: 'El cuerpo va de 16 a 18 px con peso 400 y un interlineado de 1,5 a 1,7. Los títulos, con peso 600.',
+      },
+      serif: {
+        role: 'Con serifa',
+        use: 'Solo para momentos de acento: la línea "{0}", las citas destacadas y el énfasis en portadas. Con moderación.',
+        size: 'De 28 a 56 px con peso 400.',
+      },
+      mono: {
+        role: 'Monoespaciada',
+        use: 'Código, comandos, IP, puertos, valores del panel, nombres de archivo y registros de cambios.',
+        size: 'De 14 a 16 px con peso 400.',
+        noSample: 'Sin muestra aquí: esta web no carga Geist Mono.',
+      },
+      rules: [
+        'En los títulos, mayúscula solo al principio.',
+        'Cifras grandes, etiquetas pequeñas.',
+        'Mayúsculas solo en etiquetas cortas, de tres palabras o menos.',
+      ],
+    },
+    voice: {
+      heading: 'Voz',
+      intro:
+        'Nuestra voz es el producto. La gente se queda con un hosting pequeño porque alguien contesta, así que lo que escribimos debe sonar como esa persona.',
+      scope:
+        'Estas son las reglas que siguen nuestros textos en inglés. Los ejemplos son frases reales de ellos, así que se quedan en inglés.',
+      areHeading: 'Somos',
+      are: ['directos', 'concretos', 'cercanos', 'con un punto de humor', 'sin complejos'],
+      notHeading: 'No somos',
+      not: ['corporativos', 'exagerados', 'vagos', 'desagradables'],
+      rulesHeading: 'Las reglas',
+      rules: [
+        {
+          title: 'Habla como una persona.',
+          body: 'Usa contracciones y frases cortas. Una palabrota suave de vez en cuando va con la marca (está literalmente en nuestro lema), pero nunca al hablar de facturación o de temas legales.',
+        },
+        { title: 'Sé concreto.', body: `"{0}" gana a "{1}". "{2}" gana a "{3}". Da la cifra.` },
+        {
+          title: 'Asúmelo.',
+          body: 'Creamos WSLATL porque los grandes hostings eran malos. Dilo sin nombrarlos.',
+        },
+        { title: 'Nada de relleno.', body: `Fuera "{0}", "{1}", "{2}", "{3}" y "{4}".` },
+        { title: 'No grites en mayúsculas.', body: 'Una palabra en mayúsculas para enfatizar está bien.' },
+        { title: 'Respeta el tiempo de quien lee.', body: 'Responde la pregunta en la primera frase.' },
+      ],
+      examplesHeading: 'Ejemplos reales',
+      insteadOf: 'En vez de',
+      write: 'Escribe',
+    },
+    dos: {
+      heading: 'Qué sí y qué no',
+      intro: 'Estos son los errores que más vemos.',
+      doHeading: 'Sí',
+      dontHeading: 'No',
+      doItems: [
+        'Usar el material exactamente como se entrega.',
+        'Mantener juntos el símbolo, el nombre y la línea, con el espaciado con el que se entregan.',
+        'Dejarle espacio (ver espacio libre).',
+      ],
+      dontItems: [
+        'Estirarlo, aplastarlo o girarlo.',
+        'Cambiarle el color, teñirlo o ponerle sombra o contorno.',
+        'Ponerlo sobre fotos, ruido o un degradado recargado.',
+        'Reconstruirlo a partir de las piezas.',
+      ],
+      rebuild:
+        'Nunca reconstruyas el logo completo con piezas, no vuelvas a espaciar el nombre a mano ni lo escribas con una tipografía que solo se le parezca. El nombre es un gráfico, no texto.',
+      tiles: {
+        original: 'Material original',
+        dark: 'Sobre una superficie oscura',
+        lockup: 'Logo completo, sin tocar',
+        stretch: 'Estirar o aplastar',
+        recolor: 'Cambiar el color',
+        shadow: 'Sombra o contorno',
+      },
+      alt: {
+        original: 'El símbolo sobre blanco, tal como se entrega.',
+        dark: 'El símbolo sobre un panel oscuro Ink.',
+        lockup: 'El logo completo sobre blanco, sin tocar.',
+        stretch: 'El símbolo aplastado, más ancho que alto.',
+        recolor: 'El símbolo pintado de rojo liso.',
+        shadow: 'El símbolo con una sombra difusa alrededor.',
+      },
+    },
+    fullKit: {
+      heading: 'El kit completo',
+      body: 'Todos los tamaños de logo y de banner, los archivos SVG y la guía en PDF, en una sola carpeta de Google Drive.',
+      items: (n: { smallest: number; largest: number; sizes: number; banners: number; pages: number }) => [
+        `El símbolo en PNG en ${n.sizes} tamaños, de ${n.smallest} a ${n.largest} px`,
+        `El logo completo en PNG en ${n.banners} tamaños de banner`,
+        'Los dos archivos SVG',
+        `La guía en PDF, de ${n.pages} páginas`,
+      ],
+      cta: 'Abre el kit completo en Google Drive',
+      questionPrefix: '¿Te falta un tamaño o no sabes si una regla cubre lo que estás haciendo?',
+      questionLink: 'Pregúntanos en Discord',
+      questionSuffix: '. Solemos contestar rápido.',
     },
   },
   share: {

@@ -25,6 +25,16 @@ function cover(name: string, ids: string[], entries: Record<string, unknown> | u
 /** The {price} tokens in a written answer, sorted. */
 const tokens = (text = '') => [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).toSorted()
 
+/** The texts on the brand kit page that have a {0} where a line of English goes, besides the voice rules. */
+const markedTexts = (copy: ReturnType<typeof copyFor>) => [
+  copy.brand.logo.parts,
+  copy.brand.logo.minimum.body,
+  copy.brand.type.serif.use,
+]
+
+/** The numbers in a text, as English writes them: 1,5 is 1.5. */
+const figures = (text: string) => [...text.matchAll(/\d+(?:[.,]\d+)?/g)].map((match) => match[0].replace(',', '.'))
+
 /** Every string in a dictionary, as "path: value" pairs. Functions are skipped. */
 function strings(value: unknown, path = ''): [string, string][] {
   if (typeof value === 'string') return [[path, value]]
@@ -97,6 +107,28 @@ describe('site copy', () => {
       expect(directory.noMatch, locale).toContain('{query}')
       expect(directory.toStart, locale).toContain('{ram}')
       expect(directory.fromPrice, locale).toContain('{price}')
+    }
+  })
+
+  it('keeps every mark where the brand kit page puts a line of English, in every language', () => {
+    // {0} is the "Private Hosting" in the logo; the voice rules quote more
+    // (tests/brand.test.ts checks those). A translation that drops one would
+    // read fine and quietly lose the English.
+    const english = markedTexts(copyFor(defaultLocale)).map(tokens)
+    expect(english.every((marks) => marks.length === 1)).toBe(true)
+    for (const locale of others) {
+      expect(markedTexts(copyFor(locale)).map(tokens), locale).toEqual(english)
+    }
+  })
+
+  it('writes the minimum sizes on the brand kit page with the same numbers in every language', () => {
+    // They are the guide's rules: a translation puts them in its own words, never in other numbers.
+    const english = copyFor(defaultLocale).brand.logo.minimum
+    for (const locale of others) {
+      const t = copyFor(locale).brand.logo.minimum
+      for (const key of ['markScreen', 'markPrint', 'lockupScreen', 'lockupPrint'] as const) {
+        expect(figures(t[key]), `${locale} ${key}`).toEqual(figures(english[key]))
+      }
     }
   })
 
