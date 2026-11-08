@@ -21,8 +21,10 @@ import { defaultLocale, locales } from '@/i18n/config'
 import { copyFor } from '@/i18n/copy'
 import { en } from '@/i18n/copy/en'
 import {
+  cardBannerSize,
   hasReferralCode,
   orderedPartners,
+  partnerCardBanner,
   partnerGames,
   partnerInitials,
   partnerMetaDescription,
@@ -70,7 +72,18 @@ const problemsWith = (change: Partial<Partner>) => partnerProblems([{ ...example
 function shapes(avatar: { width: number; height: number }, banner: { width: number; height: number }) {
   return partnerProblems([examplePartner], {
     ...exampleContext,
-    imageSize: (path) => (path.endsWith('avatar.webp') ? avatar : banner),
+    imageSize: (path) => {
+      if (path.endsWith('avatar.webp')) return avatar
+      return path.endsWith('banner-card.webp') ? cardBannerSize : banner
+    },
+  }).join('\n')
+}
+
+/** A partner's problems when the small copy of their banner measures as given, or is missing. */
+function cardCopy(size: { width: number; height: number } | null) {
+  return partnerProblems([examplePartner], {
+    ...exampleContext,
+    imageSize: (path) => (path.endsWith('banner-card.webp') ? size : exampleContext.imageSize(path)),
   }).join('\n')
 }
 
@@ -195,6 +208,18 @@ describe('the partner checks', () => {
     expect(shapes({ width: 128, height: 128 }, { width: 1500, height: 500 })).toMatch(/at least 256px/)
     expect(shapes({ width: 512, height: 512 }, { width: 1500, height: 1000 })).toMatch(/about 3:1/)
     expect(shapes({ width: 512, height: 512 }, { width: 900, height: 300 })).toMatch(/at least 1200px/)
+  })
+
+  it('need the small copy of a banner that the card loads, at its size', () => {
+    expect(cardCopy(null)).toMatch(/banner-card\.webp is missing from public\/: run npm run partners:cards/)
+    expect(cardCopy({ width: 1500, height: 500 })).toMatch(/is 1500x500, not 720x240/)
+    expect(cardCopy(cardBannerSize)).toBe('')
+  })
+
+  it('make the card copies at the size the check asks for', () => {
+    const script = readFileSync(join(root, 'scripts', 'partner-cards.mjs'), 'utf8')
+    expect(script).toContain(`const width = ${cardBannerSize.width}`)
+    expect(script).toContain(`const height = ${cardBannerSize.height}`)
   })
 
   it('accept a partner with no pictures, and still check any picture that is given', () => {
@@ -561,7 +586,7 @@ describe('the partners page', () => {
     expect(html).not.toContain('bg-background/50')
     expect(html).toContain(`>${partnerWithoutCode.name}</h2>`)
     expect(html).toContain(partnerText(partnerWithoutCode.tagline, 'en'))
-    expect(html).toContain(encodeURIComponent(partnerWithoutCode.banner ?? ''))
+    expect(html).toContain(encodeURIComponent(partnerCardBanner(partnerWithoutCode) ?? ''))
     expect(html).toContain(encodeURIComponent(partnerWithoutCode.avatar ?? ''))
     expect(html).toContain(en.partners.featured)
     expect(html).toContain(`href="/partners/${partnerWithoutCode.slug}"`)
@@ -588,13 +613,17 @@ describe('the partners page', () => {
     expect(profile).toContain('data-plain-banner')
   })
 
-  it('keeps the pictures of a partner who has them', () => {
-    for (const html of [renderCard(examplePartner), renderProfile(examplePartner)]) {
+  it('keeps the pictures of a partner who has them: the small banner on the card, the full one on the profile', () => {
+    const card = renderCard(examplePartner)
+    const profile = renderProfile(examplePartner)
+    for (const html of [card, profile]) {
       expect(html).toContain('<img')
       expect(html).toContain(encodeURIComponent(examplePartner.avatar ?? ''))
-      expect(html).toContain(encodeURIComponent(examplePartner.banner ?? ''))
       expect(html).not.toContain('data-plain-banner')
     }
+    expect(card).toContain(encodeURIComponent(partnerCardBanner(examplePartner) ?? ''))
+    expect(card).not.toContain(encodeURIComponent(examplePartner.banner ?? ''))
+    expect(profile).toContain(encodeURIComponent(examplePartner.banner ?? ''))
   })
 
   it('shares a profile with their banner, or the site picture when they have none', async () => {

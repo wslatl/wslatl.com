@@ -270,6 +270,20 @@ export interface PartnerCheckContext {
 const imageFileName = new RegExp(`^[a-z0-9]+(-[a-z0-9]+)*\\.(${partnerImageTypes.join('|')})$`)
 
 /**
+ * The cards on /partners show a banner at most 22rem wide on a desktop (720px
+ * covers that twice over) and across the screen on a phone, so they load a
+ * small copy made beside it (npm run partners:cards) rather than the banner
+ * itself: with full banners on every card, the page went over its 600 KB
+ * budget. Profiles and their share pictures still use the full banner.
+ */
+export const cardBannerSize = { width: 720, height: 240 } as const
+
+/** The small copy of a partner's banner that their card loads, or undefined when they have no banner. */
+export function partnerCardBanner(partner: Pick<Partner, 'slug' | 'banner'>): string | undefined {
+  return partner.banner === undefined ? undefined : `/partners/${partner.slug}/banner-card.webp`
+}
+
+/**
  * Everything wrong with a list of partners, one line each, so a failing test
  * names every problem at once. tests/partners.test.ts runs it on
  * data/partners.ts.
@@ -361,6 +375,17 @@ export function partnerProblems(list: readonly Partner[], context: PartnerCheckC
       const ratio = size.width / size.height
       if (kind === 'banner' && (ratio < 2.5 || ratio > 3.5 || size.width < 1200)) {
         at(`banner is ${size.width}x${size.height}; it must be about 3:1 and at least 1200px wide`)
+      }
+    }
+
+    // The small copy the card loads (cardBannerSize), made by npm run partners:cards.
+    const card = partnerCardBanner(partner)
+    if (card && partner.banner?.startsWith(folder)) {
+      const size = context.imageSize(card)
+      const { width, height } = cardBannerSize
+      if (!size) at(`${card} is missing from public/: run npm run partners:cards`)
+      else if (size.width !== width || size.height !== height) {
+        at(`${card} is ${size.width}x${size.height}, not ${width}x${height}: run npm run partners:cards`)
       }
     }
   }

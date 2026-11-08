@@ -9,7 +9,7 @@ import { localePath } from '@/i18n/config'
 import { copy } from '@/i18n/copy'
 import type { Copy } from '@/i18n/copy/en'
 import { getLocale } from '@/i18n/locale'
-import { hasReferralCode, partnerText, partnerTextLang, platformName, socialLinks } from '@/lib/partners'
+import { hasReferralCode, partnerCardBanner, partnerText, partnerTextLang, platformName, socialLinks } from '@/lib/partners'
 import { cn } from '@/lib/utils'
 
 /** Where the "This could be you" card leads: the program, on /partners. */
@@ -39,9 +39,14 @@ export function PartnerCard({ partner }: { partner: Partner }) {
         partner.featured && 'border-primary/40 bg-primary/[0.04]',
       )}
     >
-      {/* overflow-hidden holds the box at 3:1 when a banner is a little taller than that. */}
+      {/* overflow-hidden holds the box at 3:1 when a banner is a little taller than that.
+          The card loads the banner's small copy (lib/partners.ts, partnerCardBanner). */}
       <div className="relative aspect-[3/1] overflow-hidden bg-card">
-        <PartnerBanner src={partner.banner} alt="" sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 50vw, 100vw" />
+        <PartnerBanner
+          src={partnerCardBanner(partner)}
+          alt=""
+          sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 50vw, 100vw"
+        />
         {partner.featured && (
           <span className="absolute top-3 right-3 rounded-full border border-primary/40 bg-background/85 px-2.5 py-0.5 text-xs font-medium text-foreground">
             {t.partners.featured}
