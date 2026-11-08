@@ -56,8 +56,8 @@ describe('the icons search results and browsers show', () => {
     })
   })
 
-  it('has the header mark at three times its 36px display', () => {
-    expect(imageSize(publicFile('brand/wslatl-mark.webp'))).toEqual({ width: 108, height: 108 })
+  it('has the header mark at three times its 32px display', () => {
+    expect(imageSize(publicFile('brand/wslatl-mark.webp'))).toEqual({ width: 96, height: 96 })
   })
 
   it('stores favicon.ico as classic bitmaps, the form every ICO reader takes', () => {
