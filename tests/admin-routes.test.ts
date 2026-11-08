@@ -1,14 +1,16 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { NextRequest } from 'next/server'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { hashPassword } from '@/lib/admin/password'
 import { loginLimitsKey } from '@/lib/admin/rate-limit'
 import { createSession, SESSION_COOKIE } from '@/lib/admin/session'
+import * as adopt from '@/app/admin/api/adopt-updater/route'
 import * as login from '@/app/admin/api/login/route'
 import * as logout from '@/app/admin/api/logout/route'
 import * as update from '@/app/admin/api/update/route'
+import { supervisorChanged } from '../scripts/updater/lib.mjs'
 
 vi.mock('server-only', () => ({}))
 
@@ -66,6 +68,7 @@ describe('a disabled admin', () => {
       expect((await logout.POST(request('/admin/api/logout'))).status, name).toBe(404)
       expect((await update.GET(request('/admin/api/update', { method: 'GET', session: session() }))).status, name).toBe(404)
       expect((await update.POST(request('/admin/api/update', { session: session() }))).status, name).toBe(404)
+      expect((await adopt.POST(request('/admin/api/adopt-updater', { session: session() }))).status, name).toBe(404)
       vi.stubEnv(name, name === 'GITHUB_TOKEN' ? 'test-token' : name === 'ADMIN_SESSION_SECRET' ? secret : passwordHash)
     }
   })
@@ -223,5 +226,108 @@ describe('the update route', () => {
     expect(response.status).toBe(503)
     const status = await update.GET(request('/admin/api/update', { method: 'GET', session: session() }))
     expect(await status.json()).toEqual({ available: false, pending: false, state: null })
+  })
+})
+
+function write(file: string, text: string) {
+  mkdirSync(dirname(file), { recursive: true })
+  writeFileSync(file, text)
+}
+
+describe('copying the updater over from the live release', () => {
+  const path = '/admin/api/adopt-updater'
+  let root = ''
+  let dir = ''
+  let release = ''
+
+  const read =(file: string) => readFileSync(join(root, file), 'utf8')
+  const current = { tag: 'v1.2.0', sha: 'a'.repeat(40), name: 'v1.2.0', publishedAt: '', deployedAt: '' }
+  const setState = (state: object) => writeFileSync(join(dir, 'state.json'), JSON.stringify({ status: 'idle', current, log: [], ...state }))
+  const post = () => adopt.POST(request(path, { session: session() }))
+
+  beforeEach(() => {
+    root = join(updaterDir, 'site')
+    dir = join(root, '.updater')
+    release = join(dir, 'releases', 'v1.2.0')
+    vi.stubEnv('UPDATER_DIR', dir)
+    write(join(release, 'scripts', 'serve.mjs'), 'new serve')
+    write(join(release, 'scripts', 'updater', 'lib.mjs'), 'new lib')
+    write(join(release, 'scripts', 'updater', 'dev-files.mjs'), 'new file')
+    write(join(root, 'scripts', 'serve.mjs'), 'old serve')
+    write(join(root, 'scripts', 'updater', 'lib.mjs'), 'old lib')
+    write(join(root, 'scripts', 'updater', 'gone.mjs'), 'not in the release')
+    write(join(root, 'scripts', 'hash-password.mjs'), 'not part of the updater')
+    setState({})
+  })
+
+  it('needs a session, and refuses a post from another site even with one', async () => {
+    expect((await adopt.POST(request(path))).status).toBe(401)
+    const other = await adopt.POST(request(path, { session: session(), headers: { origin: 'https://evil.example' } }))
+    expect(other.status).toBe(403)
+    expect(read('scripts/serve.mjs')).toBe('old serve')
+  })
+
+  it('leaves the uploaded folder matching the release, so the supervisor stops asking', async () => {
+    expect(supervisorChanged(root, release)).toBe(true)
+    const response = await post()
+    expect(response.status).toBe(200)
+    expect(read('scripts/serve.mjs')).toBe('new serve')
+    expect(read('scripts/updater/lib.mjs')).toBe('new lib')
+    expect(read('scripts/updater/dev-files.mjs')).toBe('new file')
+    expect(existsSync(join(root, 'scripts', 'updater', 'gone.mjs'))).toBe(false)
+    expect(read('scripts/hash-password.mjs')).toBe('not part of the updater')
+    expect(supervisorChanged(root, release)).toBe(false)
+    expect(readdirSync(join(root, 'scripts', 'updater')).toSorted()).toEqual(['dev-files.mjs', 'lib.mjs'])
+    expect(console.log).toHaveBeenCalledWith(expect.stringMatching(/\[admin\] updater copied from v1\.2\.0, requested from 10\.0\.0\.\d+$/))
+  })
+
+  it('keeps what was there, so a bad updater can be put back by hand', async () => {
+    expect((await post()).status).toBe(200)
+    const backup = join('.updater', 'updater-backup')
+    expect(read(join(backup, 'serve.mjs'))).toBe('old serve')
+    expect(read(join(backup, 'updater', 'lib.mjs'))).toBe('old lib')
+    expect(read(join(backup, 'updater', 'gone.mjs'))).toBe('not in the release')
+  })
+
+  it('can be pressed twice, and the second press keeps the backup of what was there', async () => {
+    expect((await post()).status).toBe(200)
+    expect((await post()).status).toBe(200)
+    expect(supervisorChanged(root, release)).toBe(false)
+    expect(read(join('.updater', 'updater-backup', 'serve.mjs'))).toBe('old serve')
+  })
+
+  it('refuses while an update waits or runs', async () => {
+    writeFileSync(join(dir, 'request.json'), '{}')
+    expect((await post()).status).toBe(409)
+    rmSync(join(dir, 'request.json'))
+    setState({ status: 'building' })
+    expect((await post()).status).toBe(409)
+    expect(read('scripts/serve.mjs')).toBe('old serve')
+  })
+
+  it('refuses when no release is installed, or its name is not a version', async () => {
+    setState({ current: null })
+    expect((await post()).status).toBe(409)
+    setState({ current: { ...current, tag: '../../..' } })
+    expect((await post()).status).toBe(409)
+    expect(read('scripts/serve.mjs')).toBe('old serve')
+  })
+
+  it('says so when the site is not running under npm run serve, or the folder is not the updater\'s', async () => {
+    vi.stubEnv('UPDATER_DIR', '')
+    expect((await post()).status).toBe(503)
+    vi.stubEnv('UPDATER_DIR', updaterDir)
+    expect((await post()).status).toBe(503)
+    expect(read('scripts/serve.mjs')).toBe('old serve')
+  })
+
+  it('changes nothing when the release has no updater to copy, and says why', async () => {
+    rmSync(join(release, 'scripts', 'serve.mjs'))
+    const response = await post()
+    expect(response.status).toBe(500)
+    expect((await response.json()).error).toMatch(/^Could not copy the updater: /)
+    expect(read('scripts/serve.mjs')).toBe('old serve')
+    expect(read('scripts/updater/lib.mjs')).toBe('old lib')
+    expect(readdirSync(join(root, 'scripts', 'updater')).filter((name) => name.endsWith('.tmp'))).toEqual([])
   })
 })

@@ -78,12 +78,17 @@ export function isAdminPath(pathname: string): boolean {
  * and bring back what the 405 is for. tests/proxy.test.ts keeps this list in
  * step with the route handlers in app/admin/api/.
  */
-export const adminPostRoutes: readonly string[] = ['/admin/api/login', '/admin/api/logout', '/admin/api/update']
+export const adminPostRoutes: readonly string[] = [
+  '/admin/api/login',
+  '/admin/api/logout',
+  '/admin/api/update',
+  '/admin/api/adopt-updater',
+]
 
 /**
  * Which methods proxy.ts lets through. The site is read-only except for the
- * admin's JSON routes, which take a POST to log in, log out and ask for an
- * update. Every one of those checks the request came from this site
+ * admin's JSON routes, which take a POST to log in, log out, ask for an
+ * update and copy the updater over. Every one of those checks the request came from this site
  * (lib/admin/request.ts), and tests/proxy.test.ts makes sure of it.
  */
 export function methodAllowed(method: string, pathname: string): boolean {

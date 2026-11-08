@@ -294,6 +294,47 @@ export function supervisorChanged(root, dir) {
 }
 
 /**
+ * Writes the live release's version into the uploaded folder's package.json,
+ * the one people see when they open the server's files. Releases install into
+ * folders of their own, so it would otherwise go on saying whichever version
+ * was uploaded by hand. Only the top-level version value changes. It never
+ * throws: a number in a file is no reason to stop the site.
+ * @param {string} root the uploaded folder
+ * @param {string} dir the live folder
+ * @param {OnLine} print
+ */
+export function syncUploadedVersion(root, dir, print) {
+  if (dir === root) return
+  const file = join(root, 'package.json')
+  const temporary = `${file}.${process.pid}.tmp`
+  try {
+    const { version } = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
+    if (!parseVersion(`v${version}`)) throw new Error(`the release says its version is ${JSON.stringify(version)}`)
+    const text = readFileSync(file, 'utf8')
+    const uploaded = JSON.parse(text)
+    if (uploaded.version === version) return
+    // The first "version" in the file may be a nested one, so each is tried
+    // until the only thing that differs is the top-level value.
+    const wanted = JSON.stringify({ ...uploaded, version })
+    for (const match of text.matchAll(/("version"\s*:\s*")[^"]*"/g)) {
+      const start = match.index + match[1].length
+      const updated = `${text.slice(0, start)}${version}${text.slice(match.index + match[0].length - 1)}`
+      if (JSON.stringify(JSON.parse(updated)) === wanted) {
+        writeFileSync(temporary, updated)
+        renameSync(temporary, file)
+        print(`The uploaded folder's package.json now says version ${version}.`)
+        return
+      }
+    }
+    throw new Error('it has no version to change')
+  } catch (error) {
+    print(`Could not update the version in the uploaded folder's package.json: ${error instanceof Error ? error.message : error}`)
+  } finally {
+    quietly(() => rmSync(temporary, { force: true }))
+  }
+}
+
+/**
  * When the crash watch for the live release started, if it still runs: only
  * for a release an update installed (watchSince, which a rollback clears),
  * only while it is what dir serves, and only within windowMs of its install.

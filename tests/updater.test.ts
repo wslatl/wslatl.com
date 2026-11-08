@@ -15,6 +15,7 @@ import {
   runUpdate,
   stateIsDamaged,
   supervisorChanged,
+  syncUploadedVersion,
   updaterPaths,
   writeState,
 } from '../scripts/updater/lib.mjs'
@@ -955,5 +956,69 @@ describe('noticing that the updater itself changed', () => {
     copy(root, updater)
     copy(release, { ...updater, 'scripts/updater/new.mjs': 'new\n' })
     expect(supervisorChanged(root, release)).toBe(true)
+  })
+})
+
+/** A print function, and what it was given. */
+function printer() {
+  const printed: string[] = []
+  return { printed, print: (line: string) => printed.push(line) }
+}
+
+describe('the version in the uploaded folder', () => {
+  const uploaded = '{\r\n  "name": "site",\r\n  "version": "0.3.0",\r\n  "scripts": { "start": "next start -p 25586" }\r\n}\r\n'
+
+  it('follows the live release, and nothing else in the file changes', () => {
+    const release = releaseDir(paths, 'v1.3.0')
+    copy(root, { 'package.json': uploaded })
+    copy(release, { 'package.json': '{ "name": "site", "version": "1.3.0" }' })
+    const { printed, print } = printer()
+    syncUploadedVersion(root, release, print)
+    expect(readFileSync(join(root, 'package.json'), 'utf8')).toBe(uploaded.replace('0.3.0', '1.3.0'))
+    expect(printed).toEqual(["The uploaded folder's package.json now says version 1.3.0."])
+    expect(readdirSync(root).filter((name) => name.endsWith('.tmp'))).toEqual([])
+  })
+
+  it('takes the version from the top of the file, not from something nested that comes first', () => {
+    const release = releaseDir(paths, 'v1.3.0')
+    const nestedFirst = '{\n  "engines": { "version": "9.9.9" },\n  "version": "0.3.0"\n}\n'
+    copy(root, { 'package.json': nestedFirst })
+    copy(release, { 'package.json': '{ "version": "1.3.0" }' })
+    syncUploadedVersion(root, release, () => {})
+    expect(JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'))).toEqual({ engines: { version: '9.9.9' }, version: '1.3.0' })
+  })
+
+  it('leaves the file alone when it already matches, or when the uploaded folder is what serves', () => {
+    const release = releaseDir(paths, 'v1.3.0')
+    copy(root, { 'package.json': uploaded })
+    copy(release, { 'package.json': '{ "version": "0.3.0" }' })
+    const { printed, print } = printer()
+    syncUploadedVersion(root, release, print)
+    syncUploadedVersion(root, root, print)
+    expect(readFileSync(join(root, 'package.json'), 'utf8')).toBe(uploaded)
+    expect(printed).toEqual([])
+  })
+
+  it('never stops the supervisor: a file that is missing or broken is logged and left', () => {
+    const release = releaseDir(paths, 'v1.3.0')
+    const { printed, print } = printer()
+    syncUploadedVersion(root, release, print)
+    expect(printed).toEqual([expect.stringMatching(/^Could not update the version in the uploaded folder's package\.json: /)])
+
+    copy(root, { 'package.json': 'not json' })
+    copy(release, { 'package.json': '{ "version": "1.3.0" }' })
+    syncUploadedVersion(root, release, print)
+    expect(readFileSync(join(root, 'package.json'), 'utf8')).toBe('not json')
+    expect(printed).toHaveLength(2)
+  })
+
+  it('refuses a version that is not a plain version number', () => {
+    const release = releaseDir(paths, 'v1.3.0')
+    copy(root, { 'package.json': uploaded })
+    copy(release, { 'package.json': '{ "version": "1.3.0\\", \\"evil\\": \\"x" }' })
+    const { printed, print } = printer()
+    syncUploadedVersion(root, release, print)
+    expect(readFileSync(join(root, 'package.json'), 'utf8')).toBe(uploaded)
+    expect(printed).toHaveLength(1)
   })
 })

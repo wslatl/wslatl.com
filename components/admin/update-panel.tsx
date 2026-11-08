@@ -99,6 +99,58 @@ function Log({ lines, open }: { lines: string[]; open: boolean }) {
 }
 
 /**
+ * A release changed the updater, which keeps running from the uploaded
+ * folder until its files are copied over: the button does that
+ * (lib/admin/adopt-updater.ts), and the new files are used from the next
+ * restart. This notice goes when the supervisor sees they match, at that
+ * restart.
+ */
+function UpdaterChanged({ tag }: { tag?: string }) {
+  const [phase, setPhase] = useState<'ready' | 'copying' | 'copied'>('ready')
+  const [error, setError] = useState('')
+
+  async function copyOver() {
+    setPhase('copying')
+    setError('')
+    try {
+      const response = await fetch('/admin/api/adopt-updater', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: '{}',
+      })
+      if (response.ok) {
+        setPhase('copied')
+        return
+      }
+      const body = await response.json().catch(() => ({}))
+      setError(response.status === 401 ? 'Your session ran out. Sign in again.' : (body.error ?? `It could not be copied (${response.status}).`))
+    } catch {
+      setError('Could not reach the server.')
+    }
+    setPhase('ready')
+  }
+
+  if (phase === 'copied') {
+    return (
+      <Notice tone="success" title="Updater copied" className="mt-4">
+        Now restart the server from the panel to finish. This message goes away after the restart.
+      </Notice>
+    )
+  }
+  return (
+    <Notice tone="warning" title="The updater itself changed" className="mt-4">
+      This release changes the updater, which keeps running from the uploaded folder. Press the button to copy the new
+      one over from <code className="font-mono break-all">.updater/releases/{tag}/scripts/</code>, then restart the
+      server from the panel.
+      {error && <span className="mt-2 block font-medium text-danger">{error}</span>}
+      <Button onClick={copyOver} disabled={phase === 'copying'} size="sm" className="mt-3 flex">
+        {phase === 'copying' ? 'Copying' : 'Copy the new updater'}
+      </Button>
+    </Notice>
+  )
+}
+
+/**
  * `offer` is the release to install, or null when there is none to offer
  * (up to date, nothing published, an older or malformed release); `blocked`
  * then labels the button. `summary` says where the site stands against
@@ -215,15 +267,7 @@ export function UpdatePanel({
         </Notice>
       )}
 
-      {state?.updaterChanged && (
-        <Notice tone="warning" title="The updater itself changed" className="mt-4">
-          This release changes the updater, which keeps running from the uploaded folder. Copy{' '}
-          <code className="font-mono">serve.mjs</code> and the <code className="font-mono">updater</code> folder from{' '}
-          <code className="font-mono break-all">.updater/releases/{state.current?.tag}/scripts/</code> into the
-          server&rsquo;s <code className="font-mono">scripts/</code> folder, then restart the server. The README,
-          &ldquo;Admin and updates&rdquo;, has the steps.
-        </Notice>
-      )}
+      {state?.updaterChanged && <UpdaterChanged tag={state.current?.tag} />}
 
       <div aria-live="polite" className="mt-4 space-y-2 empty:mt-0">
         {notice && (
