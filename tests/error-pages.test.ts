@@ -67,7 +67,7 @@ describe('a crash in a root layout', () => {
     for (const path of ['/admin/updates', '/pricing', '/']) {
       const html = renderGlobalError(path)
       expect(html, path).toContain('<html lang="en"')
-      expect(html, path).toContain(errorCopy.en.heading.replace("'", '&#x27;'))
+      expect(html, path).toContain(errorCopy.en.heading.replaceAll("'", '&#x27;'))
       expect(html, path).not.toContain(crash.error.message)
     }
   })
