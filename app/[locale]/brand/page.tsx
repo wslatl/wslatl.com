@@ -4,9 +4,9 @@ import { Footer } from '@/components/layout/footer'
 import { Main } from '@/components/layout/main'
 import { SiteHeader } from '@/components/layout/site-header'
 import type { Locale } from '@/i18n/config'
-import { copy } from '@/i18n/copy'
 import { setLocale } from '@/i18n/locale'
 import { pageMetadata } from '@/lib/metadata'
+import { brandText } from '@/lib/page-text'
 
 interface PageProps {
   params: Promise<{ locale: Locale }>
@@ -15,8 +15,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params
   setLocale(locale)
-  const t = copy().brand
-  return pageMetadata({ title: t.metaTitle, description: t.metaDescription, path: '/brand', locale })
+  return pageMetadata({ ...brandText(locale), path: '/brand', locale })
 }
 
 export default async function BrandPage({ params }: PageProps) {

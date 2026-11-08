@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Metadata } from 'next'
 import { describe, expect, it, vi } from 'vitest'
+import { generateMetadata as brandMetadata } from '@/app/[locale]/brand/page'
 import { generateMetadata as gamesMetadata } from '@/app/[locale]/games/page'
 import { generateMetadata as gameMetadata } from '@/app/[locale]/games/[slug]/page'
 import { generateMetadata as legalIndexMetadata } from '@/app/[locale]/legal/page'
@@ -57,6 +58,7 @@ function metadataOf(path: string, locale: Locale): Promise<Metadata> {
   if (section === 'games') return slug ? gameMetadata({ params }) : gamesMetadata({ params })
   if (section === 'legal') return slug ? legalMetadata({ params }) : legalIndexMetadata({ params })
   if (section === 'partners') return slug ? partnerMetadata({ params }) : partnersMetadata({ params })
+  if (section === 'brand') return brandMetadata({ params })
   throw new Error(`The sitemap has ${path}, which this test does not know a page for`)
 }
 
