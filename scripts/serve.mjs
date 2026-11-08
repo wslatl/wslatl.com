@@ -4,12 +4,12 @@
 // update the site from GitHub: the admin writes .updater/request.json, and
 // this process downloads the latest GitHub release (only a newer one, and
 // only one tagged vMAJOR.MINOR.PATCH), installs and builds it in a folder of
-// its own, starts it once on a spare local port to be sure it answers, and
-// only then restarts the site on it. A failure at any step leaves the site
-// as it was, and a new release that stops three times within ten minutes of
-// its switch is replaced by the one before. The steps and the folders are in
-// scripts/updater/lib.mjs; the setup is in the README, "Admin and updates"
-// and "Releasing".
+// its own, deletes from it what production never uses, starts it once on a
+// spare local port to be sure it answers, and only then restarts the site
+// on it. A failure at any step leaves the site as it was, and a new release
+// that stops three times within ten minutes of its switch is replaced by the
+// one before. The steps and the folders are in scripts/updater/lib.mjs; the
+// setup is in the README, "Admin and updates" and "Releasing".
 //
 // The server console takes commands: status, update, rollback, restart,
 // stop and help.

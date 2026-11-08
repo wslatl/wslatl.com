@@ -11,7 +11,8 @@ The public website for WSLATL LLC. Private hosting based in Missouri: VPS hostin
 3. Routes visitors to the right panel (billing, game panel, VPS panel, dedicated portal, cPanel) through the header Login menu and the footer.
 4. Hosts the full legal library (ten policies) under `/legal`.
 5. Shows our official referral partners on `/partners`, each with a profile page and, if they have one, their referral code.
-6. Does all of that in English, Spanish, French, German and Portuguese.
+6. Gives partners and designers the brand kit on `/brand`: the logo to download, the colors to copy, the type, the voice and the rules for using them, with the full kit on Google Drive.
+7. Does all of that in English, Spanish, French, German and Portuguese.
 
 Every public page is static. There is no CMS and no database: content lives in `data/*.ts` and `content/legal/*.tsx`, so copy is one PR away.
 
@@ -25,6 +26,7 @@ app/
   sitemap.ts, robots.ts    Every page in every language, from the same data the pages use.
   manifest.ts              /manifest.webmanifest: the name and icons for a home-screen shortcut.
   company.json/route.ts    /company.json: the company profile for the billing panel, written at build time.
+  og/route.tsx             /og: the share card of every page but the home page, drawn on request (see Images).
   admin/                   The admin: sign in and update the site from GitHub (see Admin and updates).
   [locale]/                Every page, once, for all five languages (see Languages).
     layout.tsx             Root layout: language, fonts, default metadata, Organization JSON-LD, skip link.
@@ -36,9 +38,12 @@ app/
     legal/[slug]/page.tsx  Every policy, at /legal/privacy, /legal/terms, and so on.
     partners/page.tsx      Official partners: their cards, the "This could be you" card, the partner program.
     partners/[slug]/page.tsx  One profile per partner, statically generated from data/partners.ts.
+    brand/page.tsx         The brand kit: logo and downloads, colors, type, voice, do and don't, and the full kit on Google Drive (see Brand kit).
     not-found.tsx, error.tsx  Branded 404 and error pages.
 
 proxy.ts                   Serves the English tree at the unprefixed URLs, and answers 405 to every method but GET and HEAD, apart from POST on the admin's JSON routes.
+
+assets/                    Files the server reads from disk rather than serves: the share card's fonts and the WSLATL lockup (see Images, and CREDITS.md for the fonts).
 
 components/
   ui/                      Primitives: button, dropdown-menu, section-header, site-link.
@@ -48,6 +53,7 @@ components/
   games/                   Game directory (the only client-side search on the site).
   legal/                   The blocks every legal document is built from, and the SLA uptime table.
   partners/                Partner cards, the copy-code button, platform icons, the partner program section.
+  brand/                   The sections of the brand kit page, and the logo and icons the header uses.
   seo/json-ld.tsx          Structured data.
 
 config/site.ts             Company details, paths, credits, legal metadata and effective dates.
@@ -57,8 +63,8 @@ config/referral.ts         The referral discount percent (first invoice only), w
 content/legal/             The text of each policy; index.ts maps each document and language to its text.
 data/                      Everything else the pages render (see below).
 i18n/                      Languages: the current one, the dictionaries, the translations.
-lib/                       pricing helpers, pageMetadata(), cn() and slugify().
-scripts/                   Checks that need a build or a live site (see Automation), keep-old-assets.mjs (see Deploying), and serve.mjs, the updater (see Admin and updates).
+lib/                       pricing helpers, pageMetadata(), what each page says about itself (page-text.ts) and the share card's words (share-card.ts), cn() and slugify().
+scripts/                   Checks that need a build or a live site (see Automation), keep-old-assets.mjs (see Deploying), home-card.mjs (see Images), brand-kit.mjs (see Brand kit), and serve.mjs, the updater (see Admin and updates).
 tests/                     Vitest suites for data, links, and house style.
 ```
 
@@ -86,6 +92,7 @@ Some facts appear on many pages. Each one is defined exactly once, and everythin
 | Legal document titles and dates | `data/legal.ts` and `config/site.ts` | Legal pages, `/legal`, footer, sitemap |
 | Games | `data/games.ts` | `/games`, game pages, sitemap |
 | Official partners | `data/partners.ts`, with their pictures in `public/partners/<slug>/` | `/partners`, partner profiles, sitemap |
+| Brand kit colors, files and Drive folder | `data/brand.ts`, with the files in `public/brand/` | `/brand` |
 | Referral discount, and what the partner program may promise | `config/referral.ts` (the percent must match the billing panel) | `/partners`, partner profiles |
 | Panel, portal, and profile URLs | `config/links.json` | Every button and link (through short links), redirects, structured data |
 | Email addresses | `config/emails.ts` | Every address on the site, through `<Email>` |
@@ -97,7 +104,7 @@ Never type a price, a plan spec, or an uptime figure anywhere else. Format price
 
 ## Pages and metadata
 
-Use `pageMetadata({ title, description, path })` from `lib/metadata.ts` for every new page. It sets the canonical URL and the full Open Graph and Twitter set. Next.js replaces a nested `openGraph` object instead of merging it, so hand-written page metadata silently loses the share image.
+Use `pageMetadata({ title, description, path })` from `lib/metadata.ts` for every new page. It sets the canonical URL and the full Open Graph and Twitter set, share card included (see Images). Next.js replaces a nested `openGraph` object instead of merging it, so hand-written page metadata silently loses the share image. What a page says about itself is written once, in `lib/page-text.ts`, and its `generateMetadata` and its share card both read it from there.
 
 Retired URLs get a permanent redirect in `next.config.mjs`, in the same change that moves the page. The link tests check that every redirect lands on a page that exists. The legal documents moved from the site root to `/legal/...` in September 2026; their old paths (`/privacy`, `/terms`, and so on) redirect, and a test fails if any document loses its redirect. Always link to a legal document through `siteConfig.paths`, never a typed-out path (a test enforces this too).
 
@@ -156,6 +163,8 @@ Documents are built from a handful of blocks in `components/legal/blocks.tsx`, s
 
 `/partners` shows our official referral partners. Each one has a profile at `/partners/<slug>` with their banner, picture, description, links, the games they play, and their referral code with a "Sign up with this code" button that opens the billing panel's sign-up page with the code filled in. The code is optional: a partner who is not in the referral program, or who does not want a code shown, is listed without one, and then their card and profile have no code box, no sign-up button and no discount line. The list lives in `data/partners.ts` and starts empty: with no partners, the page leads with a "This could be you" card beside the partner program, and once there are partners that card stays as the last one in the grid.
 
+Every partner is on the home page too, with no step of its own. They are in the trusted clients strip near the top (`clientStrip` in `lib/clients.ts`), as their picture and name, and the featured ones and then the newest get a card in the partners section further down (`homePartners` in `lib/partners.ts`), so a new partner is on the home page from the day they are added. A client in `data/clients.ts` who is also a partner names them with `partner: '<slug>'` and shows once, with their logo. The strip says "Trusted by our clients and partners", which stays true for a partner who is not a client.
+
 The program text only says what the billing panel actually does. Those facts, and the discount percent, are in `config/referral.ts`. The percent must match the referral discount in the billing panel (Settings, Orders), so change both on the same day.
 
 The referral deal, as the site words it: the person who signs up with a code gets the percent off their first invoice for hosting (not dedicated servers) and nothing after that; the person who referred them gets a one-time account credit once that first invoice is paid. Do not write that the discount lasts, applies to every invoice or renewal, or depends on the partner staying in the program. `tests/referral-copy.test.ts` fails if any language says so.
@@ -167,10 +176,10 @@ Only with the partner's written OK to be shown here. Keep that message (a ticket
 Taking someone down is two steps on the same day: delete their entry and their folder here, and revoke them as a referrer in the billing panel. Revoking is what stops their code from giving the first-invoice discount and the referral credit from then on. The site does not promise the discount for as long as a partner stays, so no page text changes when someone is taken down.
 
 1. Get from them: their name (60 characters at most), a one-line tagline (80 characters at most), a short description (600 at most), optionally a square picture and a wide banner, the links they want shown, the games they play, and their referral code from the billing panel. The code is optional: skip it for a partner who is not in the referral program or does not want one shown.
-2. Pictures are optional: skip steps 2 and 3 for a partner who has none yet. Without a picture their card and profile show a circle in our primary blue with their initials, without a banner a plain branded banner of the same shape, and a shared link to their profile shows the site's own picture. A picture that is given must still pass the checks in step 5. Export the picture as a square WebP, 512px (at least 256px), and the banner as a WebP about 3:1, ideally 1500x500 (at least 1200px wide). PNG and JPEG work too; nothing else is served from `public/partners/` (no SVG, which can carry script). Two things to tell them about the banner:
+2. Pictures are optional: skip steps 2 and 3 for a partner who has none yet. Without a picture their card and profile show a circle in our primary blue with their initials, without a banner a plain branded banner of the same shape, and a shared link to their profile shows a share card made for it (see Images). A picture that is given must still pass the checks in step 5. Export the picture as a square WebP, 512px (at least 256px), and the banner as a WebP about 3:1, ideally 1500x500 (at least 1200px wide). PNG and JPEG work too; nothing else is served from `public/partners/` (no SVG, which can carry script). Two things to tell them about the banner:
    - On their profile, their picture sits over the bottom-left corner of the banner, so nothing important should be there.
    - The banner is also the picture a shared link to their profile shows. Many link previews (Facebook, LinkedIn, X) are made for pictures of about 2:1 and crop the left and right ends off a 3:1 banner, so names and logos belong in the middle.
-3. Put them in `public/partners/<slug>/`, for example `public/partners/pixel-forge/avatar.webp` and `banner.webp`. The slug and the file names are lowercase letters, digits and hyphens, and the slug becomes the address of their profile. With a banner, also run `npm run partners:cards` once the entry in step 4 is in: it makes `banner-card.webp`, the small 720x240 copy of the banner that their card on `/partners` loads. Their profile and shared links keep the full banner; full banners on every card would take the page over its 600 KB budget. The tests fail until the copy exists.
+3. Put them in `public/partners/<slug>/`, for example `public/partners/pixel-forge/avatar.webp` and `banner.webp`. The slug and the file names are lowercase letters, digits and hyphens, and the slug becomes the address of their profile. Then run `npm run partners:cards` once the entry in step 4 is in. It makes `avatar-strip.webp`, the 80px copy of the picture that the trusted clients strip on the home page loads, and `banner-card.webp`, the 720x240 copy of the banner that their card on `/partners` and on the home page loads. Their profile and shared links keep the full pictures; full banners on every card would take the page over its 600 KB budget. The tests fail until the copies exist.
 4. Add their entry to `partners` in `data/partners.ts`:
 
    ```ts
@@ -198,20 +207,51 @@ Taking someone down is two steps on the same day: delete their entry and their f
 
 ---
 
+## Brand kit
+
+`/brand` is our own page for the WSLATL brand kit, in all five languages: the logo to download, the colors to copy, the type, the voice, and the do and don't, with the full kit one click away on Google Drive (`fullKitUrl` in `data/brand.ts`). It follows the kit's guide: the mark once near the top, on a solid surface, which is the header's (the page adds only the four specimens on white and on Ink that it is about), the brand gradient only as a bar, and no color on its own.
+
+**Where the files come from.** The kit is a folder, `Brand Kit/`, with the guide, its diagrams in `assets/` and the logo files in `assets/logo-png/`. Nothing on the page is drawn by hand:
+
+- `public/brand/downloads/`: eight PNGs copied byte for byte from `assets/logo-png/` (the mark at 64, 128, 256, 512 and 1024 px, the lockup at 1500x500, 1200x630 and 960x540).
+- `public/brand/kit-*.webp`: WebP at twice the size they show at. The mark and the lockup are the kit's PNGs, resized. The clear space, minimum size and do-and-don't diagrams are cropped to the figure: the guide's titles and captions are English text inside the picture and cannot be translated, so the page says the same in words, and the do-and-don't diagram is its six pictures with their labels written under them.
+- `data/brand.ts` and `i18n/copy/*.ts` (under `brand`): the guide's colors, examples and words.
+
+The kit's two SVG files only wrap pictures, so they stay on Drive (`i18n/routing.ts` serves no SVG from `public/`, because one opened directly can carry script), and `logo-png/profile/` is not used.
+
+**When the kit changes:** download it and run `npm run brand:images -- "path/to/Brand Kit"` (`scripts/brand-kit.mjs`), which copies the downloads and makes the WebP files again. If a color, a size or an example changed in the guide, change `data/brand.ts` and the words in every `i18n/copy/<locale>.ts`; if the Drive folder moved, change `fullKitUrl`; if a diagram changed shape, adjust its crop in the script and its size in `data/brand.ts`. `tests/brand.test.ts` fails until each file is twice the size it shows at. Then run `npm run check`.
+
+Two of the voice examples hold figures, so they come from `data/pricing.ts` and `data/sla.ts` like every other figure on the site. The guide's line for new VPS plans says "$5.91/mo" beside the Ryzen 9 and NVMe, but $5.91 is the cheapest Budget plan (Intel i7, SATA SSD), so the page quotes what the Premium plans cost.
+
+---
+
 ## Search engines
 
 - **Site name.** Google shows "WSLATL" as the site's name in results. It reads that from the `WebSite` structured data, which only the English home page carries (Google ignores it anywhere else), and from `application-name` and `og:site_name`. All three come from `siteConfig.brand`, and every title ends with it. The `Organization` data on every page has the legal name, "WSLATL LLC", with "WSLATL" as an `alternateName`, so the two read as one brand.
 - **Titles and descriptions.** The home page title starts with the brand. Game pages say the game and the real starting price, in the words people search with in each language ("DayZ Server mieten", "hébergement de serveur"). Prices come from `data/pricing.ts`, never typed. `tests/seo.test.ts` checks the brand and that no two game pages share a title.
 - **Sitemap.** It has no `lastmod`. Google only trusts that date when it is accurate every time, and a build date on every page teaches it to ignore the field. Add one back only with a real per-page date.
+- **Link previews.** Every page but the home page is shared with a card of its own, drawn by `/og` in the page's language from the same title and description the page gives search engines. The home page keeps `public/og-image.png`, and a partner with a banner is shared with the banner. See Images.
 - **Icons.** See Images.
 
 ## Images
 
-`images.unoptimized` is on, so every file in `public/` is served as-is. Export images at twice their display size before adding them: client logos are trimmed WebP at 96px tall, team photos are 192px square WebP. Partner pictures go in `public/partners/<slug>/` (see Partners). `public/og-image.png` (1200x630) is rendered from the site's own fonts and logo; re-export it if the slogan or branding changes.
+`images.unoptimized` is on, so every file in `public/` is served as-is. Export images at twice their display size before adding them: client logos are trimmed WebP at 96px tall, team photos are 192px square WebP. Partner pictures go in `public/partners/<slug>/` (see Partners), and the brand kit page's pictures in `public/brand/` (see Brand kit). `public/og-image.png` (1200x630) is the home page's share picture, drawn by `npm run home:card` (`scripts/home-card.mjs`) from the share cards' fonts and lockup in `assets/`; run it again after a change to the slogan or the branding. Every other page has a card drawn on request (see Share cards below).
 
 The icons are the WSLATL mark from the brand kit (`assets/logo-png/logo/`), used as it ships: three panels, cyan to violet, on a transparent background. Its colours read on a white results page, in a light browser tab and on dark, so the icons need no tile. `favicon.ico` holds the kit's own 16, 32 and 48px marks as classic 32-bit bitmaps (the form every ICO reader takes, rather than PNGs inside the ICO), `favicon.png` is its 64px one, `icon-192.png` is the one Google uses beside results (it takes PNG or ICO, not SVG, square and larger than 48px), and `icon-512.png` is for the web app manifest. Two icons may not be transparent, so they put the mark on the brand's Ink tile (`#0F090B`) with room around it: `apple-icon.png` (180px; iOS fills transparency with black and rounds the corners) and `icon-maskable-512.png` (the mark inside the centre 80% that Android's masks keep). The logo ships as pictures only (its SVG files just wrap pictures), so there is no `favicon.svg`; its old address redirects to `icon-192.png`. `logo.png` (the 512px mark) is the logo in the `Organization` data. `tests/seo.test.ts` checks their sizes and that the two tiles have no transparency. Each one must also be listed in `rootFiles` in `i18n/routing.ts`.
 
-The header shows the mark alone at 32px, the smallest the kit allows in a header: `public/brand/wslatl-mark.webp` is the kit's own 96px mark, three times that (`components/brand/logo.tsx`). The brand kit asks for the mark once per page, near the top, on a solid surface, so the header is opaque and the footer has no logo. The share image carries the full lockup (the mark, "WSLATL" and "Private Hosting", from `assets/logo-png/banner/`) on solid Ink, with the brand gradient only as an accent bar along the bottom. The kit's other rules: the name is artwork, so never set "WSLATL" in type beside the mark; keep clear space of about 18% of the mark's height on every side; the lockup is never under 190px wide; and never recolour, stretch, outline or rebuild the logo.
+The header shows the mark alone at 32px, the smallest the kit allows in a header: `public/brand/wslatl-mark.webp` is the kit's own 96px mark, three times that (`components/brand/logo.tsx`). The brand kit asks for the mark once per page, near the top, on a solid surface, so the header is opaque and the footer has no logo. The share images carry the full lockup (the mark, "WSLATL" and "Private Hosting", from `assets/logo-png/banner/`) on solid Ink, with the brand gradient only as an accent bar along the bottom. The kit's other rules: the name is artwork, so never set "WSLATL" in type beside the mark; keep clear space of about 18% of the mark's height on every side; the lockup is never under 190px wide; and never recolour, stretch, outline or rebuild the logo.
+
+### Share cards
+
+Every page but the home page has a share card of its own, drawn by `app/og/route.tsx` and addressed by page: `/og?path=/games/minecraft&locale=es`. `pageMetadata()` points the page's Open Graph and Twitter image at it, with the page's title as the alt text, so a link on Discord, X or Slack shows that page's title and description in its language, and a game page also shows the game's name above its title. The home page keeps `public/og-image.png`, and a partner who gave a banner is shared with it.
+
+- **It can only say what the site says.** The route looks the words up from the page itself (`lib/share-card.ts`), through the same functions the page's `generateMetadata` reads its title and description from (`lib/page-text.ts`). So a card and its page cannot disagree, a link cannot be made to show other words, and a path that is not a page, or a language that is not ours, is a 404. Cards are kept for a day (`Cache-Control: public, max-age=86400`), so a changed title or price shows on its card within a day. A preview Discord or X already made keeps the old card until they refresh it.
+- **To give a new page its words,** add a function for it to `lib/page-text.ts` (it takes the language), build the page's metadata from it (`pageMetadata({ ...pricingText(locale), path: '/pricing', locale })`), and add a line for its path to `shareCardText()` in `lib/share-card.ts`. `tests/share-card.test.ts` fails for any page in the sitemap that has no words or does not point at its card, and for a page it has no metadata function for, which is added to `metadataOf()` there.
+- **The lockup comes from the brand kit.** `assets/brand/wslatl-lockup.png` is the kit's `assets/logo-png/banner/wslatl-banner-1920x600.png`, trimmed of its transparent margin and resized to 448x128, twice the 224x64 it is drawn at. Make it again from a checkout with `node -e "require('sharp')('<brand kit>/assets/logo-png/banner/wslatl-banner-1920x600.png').trim().resize(448, 128).toFile('assets/brand/wslatl-lockup.png')"`. It lives in `assets/`, not `public/`, because only the route reads it. Never recolour or stretch it.
+- **The rest follows the kit too:** 1200x630 on solid Ink `#0F090B`, the title in Geist 700 (Paper `#F1EDEE`), an optional line above it in Instrument Serif italic (`#48C5FF`), the description in Geist 400 (Muted `#9A8A8F`), `wslatl.com` bottom right, and the gradient as an 8px bar along the very bottom edge with nothing on it. The fonts are static instances in `assets/fonts/`, credited in `CREDITS.md`; the renderer cannot read the variable Geist. They are cut down to Latin letters, and a test fails if a page's words need a character they lack.
+- **Keep the knowledge base's cards the same.** knowledge.wslatl.com draws its own cards, to this design: the same layout, sizes, colours, fonts and lockup, so a link to either site looks alike. A change to the design on one site goes to the other too.
+- **Each card is drawn once per server start.** The route keeps every card it draws in memory, by language and page, and answers later requests from there. Only a real page gets that far, so that is at most one card per page in the sitemap. A new release starts a new process, so it draws its cards again with its own words.
+- **`npm run check:site` checks them on the live site:** one page of each kind has to name a share picture that loads.
 
 ---
 
@@ -244,16 +284,19 @@ When you press Install, the updater asks GitHub once which commit the tag points
 1. **Download**: asks GitHub for the latest release, checks that its tag is a version newer than the installed one (see Releasing), asks which commit the tag points at, and downloads exactly that commit into `.updater/releases/<tag>/` (named by tag, since two releases may tag the same commit).
 2. **Install**: runs `npm ci --ignore-scripts` there.
 3. **Build**: runs `npm run build` there, with the live build's own assets copied in (not the old ones put back beside them) and the one shared `.next-static-history/`, so old hashed assets survive exactly as they do in a build by hand (see Deploying).
-4. **Trial start**: starts the new build on a spare local port and waits for its home page to answer. Until here, the live site has not been touched.
-5. **Switch**: stops the live server and starts the new build on the real port. If it does not answer within two minutes, the release before it starts again (rolled back).
+4. **Prune**: deletes from the release what production never uses (`devOnlyPaths` in `scripts/updater/dev-files.mjs`): `tests/`, `.github/`, `.vscode/`, `coverage/`, `lighthouse-reports/`, the Vitest, ESLint, Oxlint, Lighthouse and lychee configs, `tsconfig.tsbuildinfo` and `.next/cache/`. Then `npm prune --omit=dev --ignore-scripts` removes the devDependencies (Tailwind, PostCSS, TypeScript, ESLint, Oxlint, Vitest and what they pull in), which only the build and the checks use. Everything the site and the updater read stays: the rest of `.next/`, `public/`, `package.json`, `package-lock.json`, the production packages, `next.config.mjs` with the two files it imports (`next start` loads it too), `config/links.json` and `scripts/updater/release.mjs`, and all of `scripts/`, which the updater compares with the uploaded folder's. A file that cannot be deleted is logged and left.
+5. **Trial start**: starts the pruned build on a spare local port and waits for its home page to answer, so a release that still needs something the prune removed never goes live. Until here, the live site has not been touched.
+6. **Switch**: stops the live server and starts the new build on the real port. If it does not answer within two minutes, the release before it starts again (rolled back).
 
-A failure at any step leaves the site on the version it had, removes the half-built release, and shows the reason and the log on the dashboard. The install and the build each get 15 minutes, after which they are stopped together with everything they started. The build of the uploaded folder at start-up has no limit, as before the supervisor: stopped, it would only start over when the server starts again. The site is down only for the few seconds of the switch. `.env` and `.next-static-history/` are never touched.
+A failure at any step leaves the site on the version it had, removes the half-built release, and shows the reason and the log on the dashboard. The install, the build and `npm prune` each get 15 minutes, after which they are stopped together with everything they started. The build of the uploaded folder at start-up has no limit, as before the supervisor: stopped, it would only start over when the server starts again. The site is down only for the few seconds of the switch. `.env` and `.next-static-history/` are never touched.
+
+At every start, the supervisor also deletes the same files from the uploaded folder, apart from `.next/cache/`. It never touches that folder's `node_modules`, `.next`, `.env`, `.next-static-history/`, `scripts/` or `.updater/`: the build at start-up needs the devDependencies, and the uploaded folder may be what serves. A folder that is a git checkout (it holds `.git`), such as a clone you try `npm run serve` in, keeps every file: its releases are still pruned.
 
 A new release is watched for ten minutes after its switch, across a restart of the server too: if it stops three times in that time, the supervisor goes back to the release before it by itself, and the dashboard says so. When there is none left (each update removes it to make room, so after an update the only earlier build is the uploaded folder), it goes back to the uploaded folder instead and says that this may be an older version. Otherwise the supervisor starts `next start` again whenever it stops, waiting a little longer each time.
 
-**Disk space.** The live release and the one before it are kept and older ones deleted, and when the next update starts, every release but the live one is removed (the one before it, and one a crash took back out). So at most three copies of the site are on the disk at once: the uploaded folder, the live release and the new one. Each holds its own `node_modules` and build, about 800 MB. npm's download cache lives in `.updater/npm-cache/` only while an update runs, and is deleted after it. Give the server a disk limit of at least 4 GB: Pterodactyl stops a server that goes over its limit, and does not start it again until it is back under.
+**Disk space.** The live release and the one before it are kept and older ones deleted, and when the next update starts, every release but the live one is removed (the one before it, and one a crash took back out). So at most three copies of the site are on the disk at once: the uploaded folder, the live release and the new one. A release holds about 750 MB once it is built, and about 530 MB after the prune step (step 4), which runs before its trial start, so the trial proves the pruned release still starts. The uploaded folder keeps its full `node_modules` and build, about 750 MB, since it is built at start-up while no release is installed and the build tools are devDependencies; at every start it loses only the files on the same list (see above). npm's download cache, about 140 MB, lives in `.updater/npm-cache/` only while an update runs, and is deleted after it. That makes about 1.8 GB between updates, and about 2.2 GB at the most, while a new release builds beside the live one. Give the server a disk limit of at least 4 GB: Pterodactyl stops a server that goes over its limit, and does not start it again until it is back under.
 
-The supervisor reports through `.updater/state.json`, which the dashboard reads. The settings in `.env` are given to `next start`, and never to the updater's `npm ci` or its builds of a release; `npm ci` also skips install scripts, which is where a compromised package usually strikes (the site needs none: sharp and the compilers ship prebuilt). A build still runs the site's own code and its build tools, exactly as a build by hand does, and the build of the uploaded folder at start-up reads `.env` from that folder itself, as any build by hand does. The console logs each login and failed login with the visitor's address, each update request, and each step of an update.
+The supervisor reports through `.updater/state.json`, which the dashboard reads. The settings in `.env` are given to `next start`, and never to the updater's `npm ci`, its builds of a release or its `npm prune`; `npm ci` also skips install scripts, which is where a compromised package usually strikes (the site needs none: sharp and the compilers ship prebuilt). A build still runs the site's own code and its build tools, exactly as a build by hand does, and the build of the uploaded folder at start-up reads `.env` from that folder itself, as any build by hand does. The console logs each login and failed login with the visitor's address, each update request, and each step of an update.
 
 ### One-time setup on Pterodactyl
 
@@ -298,7 +341,7 @@ From then on, a change reaches the site as a release: see Releasing.
 | `components/admin/` | The login form, the update panel, the sign-out button, the release notes renderer, and the notices and badges that show each state |
 | `lib/admin/` | Settings, password hashing, sessions, rate limits, request checks, GitHub, and the dashboard's side of the updater |
 | `scripts/serve.mjs` | The supervisor, `npm run serve` |
-| `scripts/updater/` | The update steps and the `.updater/` layout (`lib.mjs`), the version rule (`release.mjs`), the live server and its crash watch (`live.mjs`) and child processes (`process.mjs`), each with tests in `tests/updater*.test.ts` |
+| `scripts/updater/` | The update steps and the `.updater/` layout (`lib.mjs`), the version rule (`release.mjs`), what production never uses and its deleting (`dev-files.mjs`), the live server and its crash watch (`live.mjs`) and child processes (`process.mjs`), each with tests in `tests/updater*.test.ts` |
 | `scripts/hash-password.mjs` | `npm run admin:hash` |
 | `.env.example` | Every setting, with what it does |
 
@@ -323,6 +366,7 @@ Then open [http://localhost:3000](http://localhost:3000). Pass a port with `npm 
 | `npm run start` | Serve the production build |
 | `npm run serve` | Serve it under the updater, the server's startup command (see Admin and updates) |
 | `npm run admin:hash` | Make the admin password hash and session secret for `.env` |
+| `npm run brand:images -- "<kit folder>"` | Bring the brand kit's logo downloads and page pictures into `public/brand/` (see Brand kit) |
 | `npm run lint` | Oxlint, then ESLint with the Next.js core-web-vitals and TypeScript rules |
 | `npm run lint:fix` | Same, applying the safe automatic fixes |
 | `npm test` | Vitest: pricing invariants, link integrity, redirects, legal data, and a no-em-dash check |
@@ -371,7 +415,7 @@ Runtime site config lives in `config/site.ts`: company name and location, the si
 
 ## Credits
 
-Designed and built by [RejectModders](https://rejectmodders.dev).
+Designed and built by [RejectModders](https://rejectmodders.dev). The fonts the share cards are drawn in are credited in `CREDITS.md`.
 
 The site footer also displays "Made by RejectModders" with a link to the same place. If you fork this project, please keep the credit or replace it with your own.
 

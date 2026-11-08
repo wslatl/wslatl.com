@@ -29,6 +29,7 @@ export function footerColumns(t: Copy, locale: Locale, legalPages: LegalPage[]):
       links: [
         { label: t.footer.links.about, href: path('/#about') },
         { label: t.footer.links.partners, href: path('/partners') },
+        { label: t.footer.links.brandKit, href: path('/brand') },
         { label: t.footer.links.howItWorks, href: path('/#how-it-works') },
         { label: t.footer.links.contact, href: path(siteConfig.paths.contact) },
         { label: t.footer.links.reviews, href: siteConfig.links.trustpilot },

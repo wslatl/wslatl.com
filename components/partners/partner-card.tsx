@@ -24,12 +24,17 @@ export function copyLabels(t: Copy) {
   }
 }
 
-/** One partner on /partners: banner, picture, name, links, their code if they show one, and the way to their profile. */
-export function PartnerCard({ partner }: { partner: Partner }) {
+/**
+ * One partner on /partners and on the home page: banner, picture, name,
+ * links, their code if they show one, and the way to their profile.
+ * `headingLevel` is 3 where the cards sit under a section's own heading.
+ */
+export function PartnerCard({ partner, headingLevel = 2 }: { partner: Partner; headingLevel?: 2 | 3 }) {
   const locale = getLocale()
   const t = copy()
   const links = socialLinks(partner)
   const headingId = `partner-${partner.slug}`
+  const Heading = headingLevel === 3 ? 'h3' : 'h2'
 
   return (
     <article
@@ -56,9 +61,9 @@ export function PartnerCard({ partner }: { partner: Partner }) {
 
       <div className="flex flex-1 flex-col px-5 pb-5">
         <PartnerAvatar name={partner.name} src={partner.avatar} alt="" className="-mt-8 size-16 text-xs" />
-        <h2 id={headingId} className="mt-3 text-lg font-semibold tracking-tight text-foreground">
+        <Heading id={headingId} className="mt-3 text-lg font-semibold tracking-tight text-foreground">
           {partner.name}
-        </h2>
+        </Heading>
         <p
           lang={partnerTextLang(partner.tagline, locale)}
           className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground"

@@ -36,6 +36,7 @@ import {
   referralSignupUrl,
   socialLinkProblem,
   socialLinks,
+  stripAvatarSize,
   type PartnerCheckContext,
 } from '@/lib/partners'
 import { examplePartner, exampleImages, partnerWithoutCode } from './fixtures/partners'
@@ -74,18 +75,20 @@ function shapes(avatar: { width: number; height: number }, banner: { width: numb
     ...exampleContext,
     imageSize: (path) => {
       if (path.endsWith('avatar.webp')) return avatar
+      if (path.endsWith('avatar-strip.webp')) return { width: stripAvatarSize, height: stripAvatarSize }
       return path.endsWith('banner-card.webp') ? cardBannerSize : banner
     },
   }).join('\n')
 }
 
-/** A partner's problems when the small copy of their banner measures as given, or is missing. */
-function cardCopy(size: { width: number; height: number } | null) {
+/** A partner's problems when the small copy of one of their pictures measures as given, or is missing. */
+function smallCopy(file: 'banner-card.webp' | 'avatar-strip.webp', size: { width: number; height: number } | null) {
   return partnerProblems([examplePartner], {
     ...exampleContext,
-    imageSize: (path) => (path.endsWith('banner-card.webp') ? size : exampleContext.imageSize(path)),
+    imageSize: (path) => (path.endsWith(file) ? size : exampleContext.imageSize(path)),
   }).join('\n')
 }
+const cardCopy = (size: { width: number; height: number } | null) => smallCopy('banner-card.webp', size)
 
 /** The share pictures of a partner's English profile, as text. */
 async function shareImages(slug: string) {
@@ -216,10 +219,20 @@ describe('the partner checks', () => {
     expect(cardCopy(cardBannerSize)).toBe('')
   })
 
-  it('make the card copies at the size the check asks for', () => {
+  it('need the small copy of an avatar that the home page strip loads, at its size', () => {
+    expect(smallCopy('avatar-strip.webp', null)).toMatch(
+      /avatar-strip\.webp is missing from public\/: run npm run partners:cards/,
+    )
+    expect(smallCopy('avatar-strip.webp', { width: 512, height: 512 })).toMatch(/is 512x512, not 80x80/)
+    expect(smallCopy('avatar-strip.webp', { width: stripAvatarSize, height: stripAvatarSize })).toBe('')
+    expect(problemsWith({ avatar: undefined }).join('\n')).not.toMatch(/avatar-strip/)
+  })
+
+  it('make the small copies at the sizes the check asks for', () => {
     const script = readFileSync(join(root, 'scripts', 'partner-cards.mjs'), 'utf8')
     expect(script).toContain(`const width = ${cardBannerSize.width}`)
     expect(script).toContain(`const height = ${cardBannerSize.height}`)
+    expect(script).toContain(`const stripSize = ${stripAvatarSize}`)
   })
 
   it('accept a partner with no pictures, and still check any picture that is given', () => {
@@ -626,10 +639,12 @@ describe('the partners page', () => {
     expect(profile).toContain(encodeURIComponent(examplePartner.banner ?? ''))
   })
 
-  it('shares a profile with their banner, or the site picture when they have none', async () => {
+  it('shares a profile with their banner, or with a share card of its own when they have none', async () => {
     // Everyone listed today, so taking a partner down never breaks this.
     for (const partner of partners) {
-      expect(await shareImages(partner.slug), partner.slug).toContain(partner.banner ?? '/og-image.png')
+      expect(await shareImages(partner.slug), partner.slug).toContain(
+        partner.banner ?? encodeURIComponent(`/partners/${partner.slug}`),
+      )
     }
   })
 

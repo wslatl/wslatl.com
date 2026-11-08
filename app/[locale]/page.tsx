@@ -9,15 +9,15 @@ import { HowItWorks } from '@/components/sections/how-it-works'
 import { WhyUs } from '@/components/sections/why-us'
 import { About } from '@/components/sections/about'
 import { Reviews } from '@/components/sections/reviews'
+import { Partners } from '@/components/sections/partners'
 import { FAQ } from '@/components/sections/faq'
 import { Contact } from '@/components/sections/contact'
 import { pageMetadata } from '@/lib/metadata'
-import { formatPrice, startingPrice } from '@/lib/pricing'
+import { homeText } from '@/lib/page-text'
 import { siteConfig } from '@/config/site'
 import { Main } from '@/components/layout/main'
 import { defaultLocale, type Locale } from '@/i18n/config'
 import { setLocale } from '@/i18n/locale'
-import { copy } from '@/i18n/copy'
 import { localizedFaqs } from '@/i18n/content'
 
 interface PageProps {
@@ -27,14 +27,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params
   setLocale(locale)
-  const t = copy().home
-  return pageMetadata({
-    title: t.metaTitle,
-    description: t.metaDescription(formatPrice(startingPrice('game')), formatPrice(startingPrice('vps'))),
-    path: '/',
-    absoluteTitle: true,
-    locale,
-  })
+  return pageMetadata({ ...homeText(locale), path: '/', absoluteTitle: true, locale })
 }
 
 export default async function Home({ params }: PageProps) {
@@ -66,6 +59,7 @@ export default async function Home({ params }: PageProps) {
         <WhyUs />
         <About />
         <Reviews />
+        <Partners />
         <FAQ faqs={faqs} />
         <Contact />
       </Main>

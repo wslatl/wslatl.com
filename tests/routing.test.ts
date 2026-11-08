@@ -31,14 +31,22 @@ describe('the files served from the site root', () => {
     expect(isRootFile('/clients/example.png')).toBe(true)
   })
 
-  it('lists every file the app generates at the root', () => {
-    // app/company.json/route.ts is served at /company.json. Added there and
-    // forgotten in rootFiles, it would be given a language and answer 404.
-    const generated = readdirSync(join(root, 'app')).filter(
-      (name) => name.includes('.') && statSync(join(root, 'app', name)).isDirectory(),
+  it('lists every route handler the app serves at the root', () => {
+    // app/company.json/route.ts is served at /company.json and app/og/route.tsx
+    // at /og. Added there and forgotten in rootFiles, a handler would be given
+    // a language and answer 404.
+    const handlers = readdirSync(join(root, 'app')).filter((name) =>
+      ['route.ts', 'route.tsx'].some((file) => existsSync(join(root, 'app', name, file))),
     )
-    expect(generated.length).toBeGreaterThan(0)
-    for (const name of generated) expect(rootFiles, `/${name}`).toContain(`/${name}`)
+    expect(handlers).toEqual(expect.arrayContaining(['company.json', 'og']))
+    for (const name of handlers) expect(rootFiles, `/${name}`).toContain(`/${name}`)
+  })
+
+  it('leaves the share card route without a language, so /og?path=... is not looked up as a page', () => {
+    expect(isRootFile('/og')).toBe(true)
+    expect(rewriteTarget('/og')).toBeNull()
+    // Only that exact path: /og/ is a page that does not exist.
+    expect(rewriteTarget('/og/')).toBe('/en/og/')
   })
 })
 
@@ -86,15 +94,17 @@ describe('a directory shared with pages', () => {
     }
   })
 
-  it('holds nothing in public/partners/ but those pictures', () => {
-    const dir = join(root, 'public', 'partners')
-    const files = existsSync(dir)
-      ? readdirSync(dir, { recursive: true, withFileTypes: true })
-          .filter((entry) => entry.isFile())
-          .map((entry) => join(entry.parentPath, entry.name))
-      : []
+  it('holds nothing in a shared directory but those pictures', () => {
     const picture = new RegExp(`\\.(${partnerImageTypes.join('|')})$`)
-    expect(files.filter((file) => !picture.test(file))).toEqual([])
+    for (const shared of sharedDirectories) {
+      const dir = join(root, 'public', shared.replaceAll('/', ''))
+      const files = existsSync(dir)
+        ? readdirSync(dir, { recursive: true, withFileTypes: true })
+            .filter((entry) => entry.isFile())
+            .map((entry) => join(entry.parentPath, entry.name))
+        : []
+      expect(files.filter((file) => !picture.test(file)), shared).toEqual([])
+    }
   })
 
   it('has no page sharing its name with a plain root directory', () => {
@@ -102,6 +112,37 @@ describe('a directory shared with pages', () => {
     const pages = readdirSync(join(root, 'app', '[locale]'))
     expect(rootDirectories.filter((dir) => pages.includes(dir.replaceAll('/', '')))).toEqual([])
     expect(sharedDirectories.every((dir) => pages.includes(dir.replaceAll('/', '')))).toBe(true)
+  })
+})
+
+describe('the brand kit page and the pictures beside it', () => {
+  it('serves the pictures and the logo downloads in public/brand/ as files', () => {
+    for (const path of [
+      '/brand/wslatl-mark.webp',
+      '/brand/kit-mark.webp',
+      '/brand/downloads/wslatl-logo-64x64.png',
+      '/brand/downloads/wslatl-banner-1500x500.png',
+    ]) {
+      expect(isRootFile(path), path).toBe(true)
+      expect(rewriteTarget(path), path).toBeNull()
+    }
+  })
+
+  it('still gives /brand, the page, a language in every language', () => {
+    // A directory of pictures at the same address must not turn the page into
+    // a file: it would skip app/[locale] and answer 404.
+    expect(isRootFile('/brand')).toBe(false)
+    expect(rewriteTarget('/brand')).toBe('/en/brand')
+    expect(rewriteTarget('/brand/')).toBe('/en/brand/')
+    expect(rewriteTarget('/es/brand')).toBeNull()
+    expect(rewriteTarget('/pt/brand')).toBeNull()
+  })
+
+  it('treats anything else under /brand/ as a page, so a probe gets our 404, and never serves an SVG', () => {
+    for (const path of ['/brand/wp-login.php', '/brand/downloads/', '/brand/downloads/wslatl-logo.svg', '/brand/kit.WEBP']) {
+      expect(isRootFile(path), path).toBe(false)
+      expect(rewriteTarget(path), path).toBe(`/en${path}`)
+    }
   })
 })
 

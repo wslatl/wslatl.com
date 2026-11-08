@@ -39,8 +39,8 @@ export interface Partner {
   /**
    * Wide picture about 3:1 (1500x500 is ideal), at /partners/<slug>/<file>.
    * It is also the picture shown when someone shares the profile. Optional:
-   * without one they get a plain branded banner, and a shared link shows the
-   * site's own picture.
+   * without one they get a plain branded banner, and a shared link shows a
+   * card made for their profile (/og, see lib/share-card.ts).
    */
   banner?: string
   /**

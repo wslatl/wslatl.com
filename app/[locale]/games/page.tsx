@@ -5,18 +5,15 @@ import { ShareGamesIndexAd } from '@/components/share/ads'
 import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
 import { GameDirectory, type GameListing } from '@/components/games/game-directory'
-import { games } from '@/data/games'
 import { siteConfig } from '@/config/site'
-import { formatPrice, gameEntryPlan, pricingHref, startingPrice } from '@/lib/pricing'
+import { formatPrice, gameEntryPlan, pricingHref } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
+import { gamesText } from '@/lib/page-text'
 import { Main } from '@/components/layout/main'
 import { localePath, type Locale } from '@/i18n/config'
 import { setLocale } from '@/i18n/locale'
 import { copy } from '@/i18n/copy'
 import { localizedGameCategories, localizedGames } from '@/i18n/content'
-
-// The four named in the title, plus the rest rounded down to a tidy "40+".
-const moreCount = Math.floor((games.length - 4) / 10) * 10
 
 interface PageProps {
   params: Promise<{ locale: Locale }>
@@ -25,13 +22,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params
   setLocale(locale)
-  const t = copy().games
-  return pageMetadata({
-    title: t.metaTitle(moreCount),
-    description: t.metaDescription(formatPrice(startingPrice('game'))),
-    path: '/games',
-    locale,
-  })
+  return pageMetadata({ ...gamesText(locale), path: '/games', locale })
 }
 
 export default async function GamesPage({ params }: PageProps) {

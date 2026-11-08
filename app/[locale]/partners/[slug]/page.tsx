@@ -6,10 +6,10 @@ import { Main } from '@/components/layout/main'
 import { PartnerProfile } from '@/components/partners/partner-profile'
 import { partners } from '@/data/partners'
 import type { Locale } from '@/i18n/config'
-import { copy } from '@/i18n/copy'
+import { copyFor } from '@/i18n/copy'
 import { setLocale } from '@/i18n/locale'
 import { pageMetadata } from '@/lib/metadata'
-import { partnerMetaDescription } from '@/lib/partners'
+import { partnerProfileText } from '@/lib/page-text'
 
 interface PageProps {
   params: Promise<{ locale: Locale; slug: string }>
@@ -28,15 +28,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   setLocale(locale)
   const partner = findPartner(slug)
   if (!partner) return {}
-  const t = copy().partners.profile
 
   return pageMetadata({
-    title: t.metaTitle(partner.name),
-    description: partnerMetaDescription(partner, t, locale),
+    ...partnerProfileText(partner, locale),
     path: `/partners/${partner.slug}`,
     locale,
-    // Their banner is the picture a shared link shows, rather than ours; with none, ours.
-    image: partner.banner ? { url: partner.banner, alt: t.bannerAlt(partner.name) } : undefined,
+    // Their banner is the picture a shared link shows; with none, the page's own card.
+    image: partner.banner
+      ? { url: partner.banner, alt: copyFor(locale).partners.profile.bannerAlt(partner.name) }
+      : undefined,
   })
 }
 

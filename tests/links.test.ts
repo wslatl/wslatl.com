@@ -5,6 +5,7 @@ import { mainNav, portalLinks, requestAccessLink } from '@/data/nav'
 import { footerColumns } from '@/data/footer'
 import { legalPages, legalSlug } from '@/data/legal'
 import { games } from '@/data/games'
+import { fullKitUrl } from '@/data/brand'
 import { partners } from '@/data/partners'
 import { productLines } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
@@ -100,6 +101,8 @@ const allLinks = [
   ...footerColumns(en, defaultLocale, legalPages).flatMap((c) => c.links),
   ...legalPages.map((p) => ({ label: p.label, href: p.href })),
   ...contactOptions,
+  // The brand kit page sends people to the full kit on Google Drive.
+  { label: en.brand.getFullKit, href: fullKitUrl },
 ]
 
 // Every check collects all failures and asserts once, so a broken link

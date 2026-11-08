@@ -7,6 +7,7 @@
         "http://localhost:3100/games",
         "http://localhost:3100/games/minecraft",
         "http://localhost:3100/partners",
+        "http://localhost:3100/brand",
         "http://localhost:3100/legal/privacy"
       ],
       "numberOfRuns": 3

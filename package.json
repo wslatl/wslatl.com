@@ -1,6 +1,6 @@
 {
   "name": "WSLATL-SITE",
-  "version": "0.3.0",
+  "version": "1.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,6 +11,8 @@
     "serve": "node scripts/serve.mjs",
     "admin:hash": "node scripts/hash-password.mjs",
     "partners:cards": "node scripts/partner-cards.mjs",
+    "home:card": "node scripts/home-card.mjs",
+    "brand:images": "node scripts/brand-kit.mjs",
     "lint": "oxlint && eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

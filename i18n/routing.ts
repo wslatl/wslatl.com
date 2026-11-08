@@ -1,15 +1,15 @@
 import { defaultLocale, locales } from '@/i18n/config'
 
 /**
- * The paths served from the site root that are files rather than pages.
- * They have no language, so they are left alone; everything else is given
- * one. That is what lets app/[locale] trust that it has a real language,
- * rather than the framework rejecting an unknown first segment and serving
- * its own bare 404 page.
+ * The paths served from the site root that are files or endpoints rather
+ * than pages. They have no language, so they are left alone; everything else
+ * is given one. That is what lets app/[locale] trust that it has a real
+ * language, rather than the framework rejecting an unknown first segment and
+ * serving its own bare 404 page.
  *
- * tests/routing.test.ts keeps this in step with public/ and with the
- * app/<name>.<ext>/route.ts handlers, so adding a file there and forgetting
- * it here fails the tests rather than the site.
+ * tests/routing.test.ts keeps this in step with public/ and with the route
+ * handlers directly under app/ (app/<name>/route.ts), so adding a file or a
+ * handler there and forgetting it here fails the tests rather than the site.
  */
 export const rootFiles: readonly string[] = [
   // public/
@@ -27,31 +27,38 @@ export const rootFiles: readonly string[] = [
   '/sitemap.xml',
   '/manifest.webmanifest',
   '/company.json',
+  // The share card of every page, in every language, drawn by app/og/route.tsx
+  // from its query string. Given a language prefix, it would be looked up as a
+  // page called "og" and answer 404 instead of an image.
+  '/og',
 ]
 
 /**
- * Directories under public/ that hold only pictures (the WSLATL logo, client
- * logos, team photos). Only a picture there is a file; any other path under
- * them is a page and gets a language, so a made-up address like
- * /clients/pricing is a 404 rather than a second copy of /pricing that a
- * search engine could index.
+ * Directories under public/ that hold only pictures (client logos, team
+ * photos). Only a picture there is a file; any other path under them is a
+ * page and gets a language, so a made-up address like /clients/pricing is a
+ * 404 rather than a second copy of /pricing that a search engine could index.
  */
-export const rootDirectories: readonly string[] = ['/brand/', '/clients/', '/owners/']
+export const rootDirectories: readonly string[] = ['/clients/', '/owners/']
 
 /**
  * Directories under public/ that share their name with pages. /partners and
  * /partners/<slug> are pages, while each partner's pictures sit beside them
- * at /partners/<slug>/avatar.webp. In here only a picture of one of the
- * types below is a file; every other path is a page and is given a language
- * like any other.
+ * at /partners/<slug>/avatar.webp. The same goes for /brand, the brand kit
+ * page: the pictures on it and the logo files to download sit beside it, at
+ * /brand/wslatl-mark.webp and /brand/downloads/wslatl-logo-64x64.png. In here
+ * only a picture of one of the types below is a file; every other path is a
+ * page and is given a language like any other.
  */
-export const sharedDirectories: readonly string[] = ['/partners/']
+export const sharedDirectories: readonly string[] = ['/brand/', '/partners/']
 
 /**
- * The picture types a partner's folder may hold, and so the only files
- * served from it. lib/partners.ts checks partner pictures against this same
- * list. SVG stays out on purpose: an SVG can carry script, and one opened
- * directly would run it on our own address.
+ * The picture types a shared folder may hold, and so the only files served
+ * from it: a partner's pictures, and the brand kit's pictures and downloads.
+ * lib/partners.ts checks partner pictures against this same list. SVG stays
+ * out on purpose: an SVG can carry script, and one opened directly would run
+ * it on our own address. (The kit's SVG files are in the full kit on Google
+ * Drive, not here.)
  */
 export const partnerImageTypes = ['webp', 'png', 'jpg', 'jpeg'] as const
 

@@ -3,13 +3,28 @@ import { siteConfig } from '@/config/site'
 import { defaultLocale, localePath, locales, openGraphLocales, type Locale } from '@/i18n/config'
 import { getLocale } from '@/i18n/locale'
 
-/** The site's share picture, used by the layout and by any page without one of its own. */
+/**
+ * The site's own share picture: the home page's, and the layout's for
+ * anything that has none. Every other page has a card of its own (see
+ * shareCardUrl).
+ */
 export const ogImage = {
   url: '/og-image.png',
   width: 1200,
   height: 630,
   alt: 'WSLATL LLC: hosting that actually gives a damn',
   type: 'image/png',
+}
+
+/**
+ * The address of one page's own share card, drawn by app/og/route.tsx at the
+ * size of ogImage. `path` is the page's path without a language, as it is
+ * given to pageMetadata(). The card is keyed by page, not by its words: the
+ * route looks those up (lib/share-card.ts), so each page has one address to
+ * cache and the route never draws text that is not on the site.
+ */
+export function shareCardUrl(path: string, locale: Locale): string {
+  return `/og?${new URLSearchParams({ path, locale })}`
 }
 
 /** The full URL of a page in one language. */
@@ -41,8 +56,8 @@ interface PageMetadataInput {
   /** Defaults to the language of the page being rendered. */
   locale?: Locale
   /**
-   * A share picture of the page's own (a partner's banner), in place of the
-   * site's. A path under public/ is fine: the layout sets metadataBase.
+   * A share picture for the page to use in place of its card (a partner's
+   * banner). A path under public/ is fine: the layout sets metadataBase.
    */
   image?: { url: string; alt: string; width?: number; height?: number }
 }
@@ -52,13 +67,20 @@ interface PageMetadataInput {
  * nested `openGraph` object from the layout, so every page builds its full
  * Open Graph and Twitter set here instead of losing the share image.
  *
+ * The share image is the page's own card (shareCardUrl), with the page's
+ * title as its alt text. The home page keeps the site's picture instead, and
+ * a page given an `image` keeps that. A page needs its words in
+ * lib/share-card.ts to have a card; tests/share-card.test.ts checks every
+ * page in the sitemap has them.
+ *
  * Every page also points at itself in the other languages, so a search engine
  * can offer a reader the version in their own language (hreflang), with the
  * English one as the fallback for everyone else (x-default).
  */
 export function pageMetadata({ title, description, path, absoluteTitle = false, locale, image }: PageMetadataInput): Metadata {
   const language = locale ?? getLocale()
-  const shareImage = image ?? ogImage
+  // The home page keeps the site's picture; every other page gets its own card.
+  const shareImage = image ?? (path === '/' ? ogImage : { ...ogImage, url: shareCardUrl(path, language), alt: title })
   const url = pageUrl(language, path)
   const fullTitle = absoluteTitle ? title : `${title} | ${siteConfig.brand}`
 

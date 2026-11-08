@@ -1,15 +1,53 @@
 import Image from 'next/image'
 import { Pause } from 'lucide-react'
-import { clients } from '@/data/clients'
+import { PartnerAvatar } from '@/components/partners/partner-pictures'
+import type { Partner } from '@/data/partners'
+import { clientStrip, stripName, type StripEntry } from '@/lib/clients'
+import { partnerStripAvatar, stripAvatarSize } from '@/lib/partners'
 import { cn } from '@/lib/utils'
 import { copy } from '@/i18n/copy'
 
-/** Two copies make one seamless loop; each copy repeats the list so it is wider than any screen. */
+/** Two copies make one seamless loop. */
 const LOOP_COPIES = 2
-const REPEATS_PER_COPY = 2
+/** Each copy holds at least this many logos, repeating the list if it has to, so it is wider than the strip on any screen. */
+const MIN_PER_COPY = 10
+/** How long each logo takes to pass, so the strip keeps its pace however many clients and partners it holds. */
+const SECONDS_PER_LOGO = 4.5
+
+const entryKey = (entry: StripEntry) => (entry.kind === 'client' ? `client-${entry.client.name}` : `partner-${entry.partner.slug}`)
+
+/**
+ * A partner has a square picture rather than a wordmark, so the strip shows
+ * it small and round beside their name, in the same tone as the logos. It
+ * loads the picture's small copy (partnerStripAvatar), or shows their
+ * initials when they gave none.
+ */
+function PartnerMark({ partner }: { partner: Partner }) {
+  const picture = partnerStripAvatar(partner)
+  return (
+    <span className="flex items-center gap-2.5 opacity-75 grayscale sm:gap-3">
+      {picture ? (
+        <Image
+          src={picture}
+          alt=""
+          width={stripAvatarSize}
+          height={stripAvatarSize}
+          className="size-7 rounded-full sm:size-10"
+        />
+      ) : (
+        <PartnerAvatar name={partner.name} alt="" className="size-7 text-[0.5rem] ring-0 sm:size-10 sm:text-[0.625rem]" />
+      )}
+      <span className="text-lg font-semibold tracking-tight whitespace-nowrap text-foreground sm:text-2xl">{partner.name}</span>
+    </span>
+  )
+}
 
 export function Clients() {
   const t = copy().home.clients
+  const strip = clientStrip()
+  if (strip.length === 0) return null
+  const repeats = Math.ceil(MIN_PER_COPY / strip.length)
+  const duration = `${strip.length * repeats * SECONDS_PER_LOGO}s`
 
   return (
     <section aria-labelledby="clients-heading" className="marquee shell pb-6">
@@ -27,28 +65,32 @@ export function Clients() {
 
       {/* Announced once as a list; the moving strip below is decorative. */}
       <ul className="sr-only">
-        {clients.map((client) => (
-          <li key={client.name}>{client.name}</li>
+        {strip.map((entry) => (
+          <li key={entryKey(entry)}>{stripName(entry)}</li>
         ))}
       </ul>
 
       <div aria-hidden="true" className="marquee-viewport mt-7 overflow-hidden">
-        <div className="marquee-track flex w-max">
+        <div className="marquee-track flex w-max" style={{ animationDuration: duration }}>
           {Array.from({ length: LOOP_COPIES }, (_slot, loop) => (
             <div key={loop} className={cn('flex shrink-0 items-center', loop > 0 && 'marquee-dup')}>
-              {Array.from({ length: REPEATS_PER_COPY }, (_set, repeat) =>
-                clients.map((client) => (
+              {Array.from({ length: repeats }, (_set, repeat) =>
+                strip.map((entry) => (
                   <div
-                    key={`${repeat}-${client.name}`}
+                    key={`${repeat}-${entryKey(entry)}`}
                     className={cn('flex shrink-0 items-center px-7 sm:px-10', repeat > 0 && 'marquee-dup')}
                   >
-                    <Image
-                      src={client.logo}
-                      alt=""
-                      width={client.width}
-                      height={client.height}
-                      className={cn(client.heightClass, 'w-auto opacity-75 grayscale')}
-                    />
+                    {entry.kind === 'client' ? (
+                      <Image
+                        src={entry.client.logo}
+                        alt=""
+                        width={entry.client.width}
+                        height={entry.client.height}
+                        className={cn(entry.client.heightClass, 'w-auto opacity-75 grayscale')}
+                      />
+                    ) : (
+                      <PartnerMark partner={entry.partner} />
+                    )}
                   </div>
                 )),
               )}

@@ -99,6 +99,13 @@ describe('what Google reads for the site and its pages', () => {
     expect(sitemap().filter((entry) => entry.lastModified !== undefined)).toEqual([])
   })
 
+  it('lists every page in the sitemap in every language, English as the fallback, so none is left out', () => {
+    const everywhere = [...locales, 'x-default'].toSorted()
+    for (const entry of sitemap()) {
+      expect(Object.keys(entry.alternates?.languages ?? {}).toSorted(), entry.url).toEqual(everywhere)
+    }
+  })
+
   it('lists the same translations in the sitemap as in the page head, English as the fallback', async () => {
     for (const locale of locales) {
       const head = (await homeMetadata({ params: Promise.resolve({ locale }) })).alternates?.languages

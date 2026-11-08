@@ -17,22 +17,22 @@ export function generateStaticParams() {
 }
 
 /** The document, with its title and summary in the page's language. */
-function localizedPage(slug: string) {
+function localizedPage(slug: string, locale: Locale) {
   const english = legalPageBySlug(slug)
-  return english && localizedLegalPages().find((page) => page.key === english.key)
+  return english && localizedLegalPages(locale).find((page) => page.key === english.key)
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params
   setLocale(locale)
-  const page = localizedPage(slug)
+  const page = localizedPage(slug, locale)
   return page ? legalMetadata(page, locale) : {}
 }
 
 export default async function LegalDocumentPage({ params }: PageProps) {
   const { locale, slug } = await params
   setLocale(locale)
-  const page = localizedPage(slug)
+  const page = localizedPage(slug, locale)
   if (!page) notFound()
   return <LegalLayout page={page} content={legalContent(locale, page.key)} />
 }

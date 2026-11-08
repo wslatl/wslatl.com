@@ -6,6 +6,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { legalEffectiveDate } from '@/config/site'
 import { formatLegalDate } from '@/i18n/dates'
 import { pageMetadata } from '@/lib/metadata'
+import { legalIndexText } from '@/lib/page-text'
 import { Main } from '@/components/layout/main'
 import { localePath, type Locale } from '@/i18n/config'
 import { setLocale } from '@/i18n/locale'
@@ -19,8 +20,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params
   setLocale(locale)
-  const t = copy().legal
-  return pageMetadata({ title: t.metaTitle, description: t.metaDescription, path: '/legal', locale })
+  return pageMetadata({ ...legalIndexText(locale), path: '/legal', locale })
 }
 
 export default async function LegalIndexPage({ params }: PageProps) {

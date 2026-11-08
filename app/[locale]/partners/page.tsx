@@ -9,6 +9,7 @@ import type { Locale } from '@/i18n/config'
 import { copy } from '@/i18n/copy'
 import { setLocale } from '@/i18n/locale'
 import { pageMetadata } from '@/lib/metadata'
+import { partnersText } from '@/lib/page-text'
 import { hasReferralCode, partnersPageText } from '@/lib/partners'
 
 interface PageProps {
@@ -21,14 +22,7 @@ const codeCount = partners.filter(hasReferralCode).length
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params
   setLocale(locale)
-  const t = copy().partners
-  return pageMetadata({
-    title: t.metaTitle,
-    // Search results and link previews say what the page says.
-    description: partnersPageText(t, partners.length, locale, codeCount).description,
-    path: '/partners',
-    locale,
-  })
+  return pageMetadata({ ...partnersText(locale), path: '/partners', locale })
 }
 
 export default async function PartnersPage({ params }: PageProps) {

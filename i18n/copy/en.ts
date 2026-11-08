@@ -60,6 +60,7 @@ export const en = {
       web: 'Web hosting',
       about: 'About us',
       partners: 'Partners',
+      brandKit: 'Brand kit',
       howItWorks: 'How ordering works',
       contact: 'Contact',
       reviews: 'Reviews on Trustpilot',
@@ -93,8 +94,8 @@ export const en = {
       quoted: 'Quoted for your build',
     },
     clients: {
-      heading: 'Trusted by our clients',
-      pause: 'Pause the scrolling client logos',
+      heading: 'Trusted by our clients and partners',
+      pause: 'Pause the scrolling logos',
     },
     services: {
       heading: 'What we host',
@@ -337,6 +338,7 @@ export const en = {
       'We are choosing our first official partners. Make videos, stream, or run a community? See how our partner program works and how to join.',
     heading: 'Official partners',
     crumb: 'Partners',
+    seeAll: (count: number) => `See all ${count} partners`,
     intro: (percent: string) =>
       `Creators and communities our team has approved. Sign up with one of their referral codes and you get ${percent} off the first invoice for your hosting, except dedicated servers.`,
     introNoCodes: 'Creators and communities our team has approved.',
@@ -402,6 +404,272 @@ export const en = {
       avatarAlt: (name: string) => `Profile picture of ${name}`,
       bannerAlt: (name: string) => `Banner of ${name}`,
       allPartners: 'All partners',
+    },
+  },
+  /**
+   * The brand kit page. It follows the kit's own guide (BRAND-GUIDELINES.md).
+   * Two things are not translated: the examples of English copy (data/brand.ts),
+   * which stay English and are marked lang="en" wherever they appear, and the
+   * names of the colors, which are the names the kit gives them. A `{0}`, `{1}`
+   * in a text marks where one of those English examples goes, and every
+   * language keeps them all (tests/i18n.test.ts).
+   */
+  brand: {
+    metaTitle: 'Brand kit: logo files, colors, fonts and voice',
+    metaDescription:
+      'Download the WSLATL logo as PNG, copy our brand colors, and see our fonts, our voice and the rules for using them. The full kit is on Google Drive.',
+    heading: 'Brand kit',
+    crumb: 'Brand kit',
+    intro:
+      'Everything you need to put WSLATL in front of people: the logo, the colors, the type and the voice. Read it once and what you make will look right.',
+    audience:
+      "It's for anyone putting WSLATL artwork or copy in front of a person: our own team, a partner, a designer or an agency.",
+    getFullKit: 'Get the full kit',
+    getLogo: 'Download the logo',
+    shortVersion: {
+      heading: 'The short version',
+      items: [
+        'Use the logo as it ships.',
+        'Use these colors and nothing else.',
+        'Geist for everything, Instrument Serif for accents, Geist Mono for code.',
+        'Write like a human who runs servers, not like a marketing department.',
+      ],
+    },
+    onThisPage: 'On this page',
+    nav: {
+      logo: 'Logo',
+      colors: 'Colors',
+      type: 'Type',
+      voice: 'Voice',
+      rules: "Do and don't",
+      fullKit: 'Full kit',
+    },
+    logo: {
+      heading: 'The logo',
+      intro: "Use the artwork exactly as it ships. Resizing is fine. Everything else isn't.",
+      partsHeading: 'The mark and the lockup',
+      parts:
+        `The mark is three angled panels, cyan through violet. The lockup is the mark with the name "WSLATL" and the line "{0}". Use the mark when space is tight and the lockup when there's room.`,
+      specimens: {
+        markWhite: 'The mark on white',
+        markInk: 'The mark on Ink',
+        lockupWhite: 'The lockup on white',
+        lockupInk: 'The lockup on Ink',
+      },
+      surfaces:
+        "White, light gray and Ink (#0F090B) all work. Busy photography doesn't. If you can't read the name at a glance, the background is too busy: put the logo on a solid panel instead.",
+      violetLead: 'Watch the violet panel.',
+      violet:
+        "The mark's right-hand panel is violet, #5000F8, and it disappears into a violet or blue-violet gradient. A gradient is fine as an accent bar, a border or a rule under the logo, but the logo itself belongs on a solid surface.",
+      clearSpace: {
+        heading: 'Clear space',
+        body: 'X is the cap height of the name "WSLATL", roughly 18% of the height of the mark. Keep at least X of empty space on all four sides. Nothing enters the blue zone: no text, no icon, no border, no page edge.',
+        lockup:
+          'The lockup uses the same X on all four sides, and X scales with the artwork. Keep the mark, the name and the line together.',
+        markCaption: 'Around the mark',
+        lockupCaption: 'Around the lockup',
+      },
+      minimum: {
+        heading: 'Minimum sizes',
+        body: 'Below the floor the artwork stops reading. Under 190 px wide, the "{0}" line is no longer legible, so use the mark on its own.',
+        artwork: 'Artwork',
+        columnScreen: 'Screen',
+        columnPrint: 'Print',
+        mark: 'Mark',
+        lockup: 'Full lockup',
+        markScreen: '16 px',
+        markPrint: '5 mm',
+        lockupScreen: '190 px wide',
+        lockupPrint: '45 mm wide',
+        shipped: (sizes: string) => `We ship the mark at ${sizes} px. Use the size closest above the one you need.`,
+      },
+      downloads: {
+        heading: 'Downloads',
+        intro: 'PNG with a transparent background, exactly as the kit ships them.',
+        download: 'Download',
+        markHeading: 'The mark',
+        markBody: 'Use the size closest above the one you need. For a Discord server icon, use the 512 or the 1024.',
+        lockupHeading: 'The lockup',
+        uses: {
+          social: 'Social header',
+          preview: 'Link previews and social posts',
+          discord: 'Discord server banner',
+        },
+        morePrefix: "Need another size, or the SVG files? They're in",
+        moreLink: 'the full kit',
+        moreSuffix: '.',
+      },
+      which: {
+        heading: 'Which file do I want?',
+        rows: [
+          { space: 'A small square space', examples: 'Favicon, avatar, app icon', pick: 'The mark' },
+          { space: 'A wide space', examples: 'Header, email signature, social banner', pick: 'The lockup' },
+          { space: 'Something big or printed', examples: 'Print and merch', pick: 'The SVG files, from the full kit' },
+        ],
+      },
+      alt: {
+        markWhite: 'The WSLATL mark on white: three angled panels, from cyan on the left to violet on the right.',
+        markInk: 'The WSLATL mark on Ink: three angled panels, from cyan on the left to violet on the right.',
+        lockupWhite: 'The WSLATL lockup on white: the mark, the name WSLATL and the line Private Hosting underneath.',
+        lockupInk: 'The WSLATL lockup on Ink: the mark, the name WSLATL and the line Private Hosting underneath.',
+        clearSpaceMark:
+          'Diagram of the clear space around the mark: a band of empty space, one X wide, runs around all four sides, and nothing may enter it.',
+        clearSpaceLockup: 'Diagram of the clear space around the lockup: the same X of empty space on all four sides.',
+        minimumSizes: 'The mark at 256, 192, 160, 128, 96, 64, 48 and 32 pixels, each one smaller than the last.',
+      },
+    },
+    colors: {
+      heading: 'Colors',
+      intro:
+        'Use these and nothing else. The logo colors were sampled from the artwork as it ships, and the interface colors are the ones our live sites already use.',
+      copy: 'Copy',
+      copied: 'Copied',
+      copyFailed: 'The hex code is selected. Copy it with your keyboard or menu.',
+      logoHeading: 'Logo colors',
+      logoIntro: 'The only colors in the logo itself.',
+      gradientsHeading: 'Gradients',
+      gradientsIntro:
+        'A brand device, not decoration. Use them on large surfaces or thin rules, and never put body text on one.',
+      from: 'From',
+      to: 'To',
+      interfaceHeading: 'Interface colors',
+      interfaceIntro: 'Taken from wslatl.com, the knowledge base and the billing portal.',
+      rulesHeading: 'Rules for color',
+      rules: [
+        'Never recolor the logo. Not to black, not to white, not to a brand color you like better. The gradient is part of the artwork.',
+        'One accent per screen. Primary blue for actions, semantic colors for status, gradients for large surfaces. Not all three at once.',
+        `Never rely on color alone. A status must also say "Online" or "Degraded" in words, or carry an icon. Plenty of people can't tell amber from red.`,
+        'Body text is Ink or Paper. Never a gradient, never a mid-panel blue.',
+        'Links are #0079CE on light and #48C5FF on dark, and always underlined in body copy. In buttons and menus, no underline.',
+      ],
+      uses: {
+        violet: 'Right-hand panel of the mark, far end of the wordmark gradient',
+        cyan: 'Near end of the wordmark gradient',
+        brandCyan: 'Left-hand panel of the mark',
+        brandBlue: 'Middle panel of the mark',
+        primary: 'Buttons, links, active states, focus rings',
+        primarySite: 'The wslatl.com theme color, larger UI',
+        lightAccent: 'Hover states, glow, data highlights',
+        paleAccent: 'Info panels, soft fills',
+        secondaryBlue: 'Secondary actions',
+        ink: 'Primary dark background',
+        inkAlt: 'Billing portal background',
+        surface: 'Cards, raised panels',
+        surfaceAlt: 'Borders, dividers, inputs',
+        paper: 'Primary text on dark',
+        muted: 'Secondary text, metadata',
+        success: 'Online, active, healthy',
+        successAlt: 'Confirmations',
+        warning: 'Degraded, pending, maintenance',
+        danger: 'Errors, outages, destructive actions',
+        info: 'Informational badges',
+      },
+      gradientUses: {
+        wordmark: 'Hero panels, section headers, link underlines, progress and status bars',
+        subline: 'Secondary accents, tag backgrounds, panel edges',
+      },
+    },
+    type: {
+      heading: 'Type',
+      intro: 'Three typefaces, one job each.',
+      sans: {
+        role: 'Sans',
+        use: 'Everything structural: headings, body copy, UI, buttons and tables.',
+        size: 'Body is 16 to 18 px at weight 400, with a line height of 1.5 to 1.7. Headings are weight 600.',
+      },
+      serif: {
+        role: 'Serif',
+        use: 'Accent moments only: the "{0}" line, pull quotes and hero emphasis. Keep it rare.',
+        size: '28 to 56 px at weight 400.',
+      },
+      mono: {
+        role: 'Mono',
+        use: 'Code, commands, IPs, ports, panel values, file names and changelogs.',
+        size: '14 to 16 px at weight 400.',
+        noSample: "No sample here: this site doesn't load Geist Mono.",
+      },
+      rules: [
+        'Sentence case for headings.',
+        'Numbers big, labels small.',
+        'Uppercase only for short labels, three words or fewer.',
+      ],
+    },
+    voice: {
+      heading: 'Voice',
+      intro:
+        'Our voice is the product. People stay with a small host because somebody answers, so the writing should sound like that person.',
+      scope: 'These are the rules our English copy follows. The examples are real lines from it, so they stay in English.',
+      areHeading: 'We are',
+      are: ['direct', 'specific', 'warm', 'a little funny', 'unapologetic'],
+      notHeading: 'We are not',
+      not: ['corporate', 'breathless', 'vague', 'mean'],
+      rulesHeading: 'The rules',
+      rules: [
+        {
+          title: 'Talk like a human.',
+          body: "Use contractions and short sentences. A little mild swearing is on-brand (it's literally in our tagline), but never in a billing or legal context.",
+        },
+        { title: 'Be specific.', body: '"{0}" beats "{1}". "{2}" beats "{3}". Give the number.' },
+        {
+          title: 'Own it.',
+          body: 'We built WSLATL because the big hosts were bad. Say so without naming them.',
+        },
+        { title: 'No filler.', body: 'Cut "{0}", "{1}", "{2}", "{3}" and "{4}".' },
+        { title: 'Never shout in all caps.', body: 'One word in caps for emphasis is fine.' },
+        { title: "Respect the reader's time.", body: 'Answer the question in the first sentence.' },
+      ],
+      examplesHeading: 'Real examples',
+      insteadOf: 'Instead of',
+      write: 'Write',
+    },
+    dos: {
+      heading: "Do and don't",
+      intro: 'These are the mistakes we see most often.',
+      doHeading: 'Do',
+      dontHeading: "Don't",
+      doItems: [
+        'Use the artwork exactly as it ships.',
+        'Keep the mark, the name and the line together, at the spacing we ship.',
+        'Give it room (see clear space).',
+      ],
+      dontItems: [
+        'Stretch, squash or rotate it.',
+        'Recolor it, tint it, or add a shadow or an outline.',
+        'Place it over photography, noise or a busy gradient.',
+        'Rebuild it from the pieces.',
+      ],
+      rebuild:
+        'Never rebuild the lockup from parts, re-space the name by hand, or set it in a font that merely looks similar. The name is artwork, not type.',
+      tiles: {
+        original: 'Original artwork',
+        dark: 'On a dark surface',
+        lockup: 'Full lockup, untouched',
+        stretch: 'Stretch or squash',
+        recolor: 'Recolor it',
+        shadow: 'Shadow or outline',
+      },
+      alt: {
+        original: 'The mark on white, exactly as it ships.',
+        dark: 'The mark on a dark Ink panel.',
+        lockup: 'The full lockup on white, untouched.',
+        stretch: 'The mark squashed flat, wider than it is tall.',
+        recolor: 'The mark recolored solid red.',
+        shadow: 'The mark with a blurry drop shadow around it.',
+      },
+    },
+    fullKit: {
+      heading: 'The full kit',
+      body: 'Every logo size and every banner size, the SVG files and the PDF guide, in one Google Drive folder.',
+      items: (n: { smallest: number; largest: number; sizes: number; banners: number; pages: number }) => [
+        `The mark as PNG in ${n.sizes} sizes, ${n.smallest} to ${n.largest} px`,
+        `The lockup as PNG in ${n.banners} banner sizes`,
+        'The two SVG files',
+        `The guide as a ${n.pages}-page PDF`,
+      ],
+      cta: 'Open the full kit on Google Drive',
+      questionPrefix: "Missing a size, or not sure a rule covers what you're making?",
+      questionLink: 'Ask us on Discord',
+      questionSuffix: ". We're usually quick.",
     },
   },
   share: {

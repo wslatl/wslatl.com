@@ -23,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/pricing', changeFrequency: 'weekly', priority: 0.9 },
     { path: '/games', changeFrequency: 'weekly', priority: 0.9 },
     { path: '/partners', changeFrequency: 'weekly', priority: 0.6 },
+    { path: '/brand', changeFrequency: 'monthly', priority: 0.4 },
     { path: '/legal', changeFrequency: 'yearly', priority: 0.3 },
     ...games.map((game) => ({ path: `/games/${game.slug}`, changeFrequency: 'monthly' as const, priority: 0.7 })),
     ...partners.map((partner) => ({
