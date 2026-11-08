@@ -1,5 +1,3 @@
-import Link from 'next/link'
-import { Wordmark } from '@/components/brand/wordmark'
 import { ShareSiteAd } from '@/components/share/ads'
 import { Email } from '@/components/ui/email'
 import { SiteLink } from '@/components/ui/site-link'
@@ -7,7 +5,6 @@ import { footerColumns } from '@/data/footer'
 import { siteConfig } from '@/config/site'
 import { copy } from '@/i18n/copy'
 import { getLocale } from '@/i18n/locale'
-import { localePath } from '@/i18n/config'
 import { localizedLegalPages } from '@/i18n/content'
 
 // Every page is static, so this is the year the site was built. Read here
@@ -22,15 +19,9 @@ export function Footer() {
   return (
     <footer className="mt-24 border-t bg-card/20 print:hidden">
       <div className="shell grid gap-12 py-14 lg:grid-cols-[1.1fr_3fr]">
+        {/* No logo here: the brand kit shows the mark once per page, in the header. */}
         <div className="max-w-xs">
-          <Link
-            href={localePath(locale, '/')}
-            className="-m-1 inline-flex items-center rounded-md p-1"
-            aria-label={t.header.home}
-          >
-            <Wordmark />
-          </Link>
-          <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+          <p className="text-sm leading-relaxed text-muted-foreground">
             {t.footer.blurb(siteConfig.location)} <span lang="en">{siteConfig.slogan}</span>
           </p>
           <p className="mt-4 text-sm">

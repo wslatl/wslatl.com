@@ -136,6 +136,9 @@ const nextConfig = {
       // licensed partners), so their pages are gone.
       { source: '/games/battlefield-2042-portal', destination: '/games', permanent: true },
       { source: '/games/hell-let-loose', destination: '/games', permanent: true },
+      // The old logo's SVG icon went with it on 2026-11-07. The new logo ships
+      // as pictures only, so anything that kept the address gets the PNG icon.
+      { source: '/favicon.svg', destination: '/icon-192.png', permanent: true },
     ]
     return [
       ...moved,

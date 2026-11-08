@@ -15,7 +15,6 @@ export const rootFiles: readonly string[] = [
   // public/
   '/favicon.ico',
   '/favicon.png',
-  '/favicon.svg',
   '/apple-icon.png',
   '/icon-192.png',
   '/icon-512.png',
@@ -31,12 +30,13 @@ export const rootFiles: readonly string[] = [
 ]
 
 /**
- * Directories under public/ that hold only pictures (client logos, team
- * photos). Only a picture there is a file; any other path under them is a
- * page and gets a language, so a made-up address like /clients/pricing is a
- * 404 rather than a second copy of /pricing that a search engine could index.
+ * Directories under public/ that hold only pictures (the WSLATL logo, client
+ * logos, team photos). Only a picture there is a file; any other path under
+ * them is a page and gets a language, so a made-up address like
+ * /clients/pricing is a 404 rather than a second copy of /pricing that a
+ * search engine could index.
  */
-export const rootDirectories: readonly string[] = ['/clients/', '/owners/']
+export const rootDirectories: readonly string[] = ['/brand/', '/clients/', '/owners/']
 
 /**
  * Directories under public/ that share their name with pages. /partners and
