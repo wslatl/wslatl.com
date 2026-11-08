@@ -1,7 +1,21 @@
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import type { Metadata } from 'next'
 import { siteConfig } from '@/config/site'
 import { defaultLocale, localePath, locales, openGraphLocales, type Locale } from '@/i18n/config'
 import { getLocale } from '@/i18n/locale'
+
+/**
+ * A short fingerprint of the picture's file, for its address. Apps that show
+ * link previews (Discord above all) keep a picture by its address, so a
+ * picture redrawn at the same address goes on showing the old one. With this,
+ * a new picture is a new address, with nothing to remember.
+ */
+const ogImageFingerprint = createHash('sha256')
+  .update(readFileSync(join(process.cwd(), 'public', 'og-image.png')))
+  .digest('hex')
+  .slice(0, 8)
 
 /**
  * The site's own share picture: the home page's, and the layout's for
@@ -9,7 +23,7 @@ import { getLocale } from '@/i18n/locale'
  * shareCardUrl).
  */
 export const ogImage = {
-  url: '/og-image.png',
+  url: `/og-image.png?v=${ogImageFingerprint}`,
   width: 1200,
   height: 630,
   alt: 'WSLATL LLC: hosting that actually gives a damn',

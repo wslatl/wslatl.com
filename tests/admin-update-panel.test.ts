@@ -9,7 +9,7 @@ import type { UpdaterState, UpdaterStatus } from '@/lib/admin/updater'
  * dashboard until its files are copied over ("The updater itself changed").
  * The panel shows the steps the supervisor reports, and only those.
  */
-function finished(steps: Partial<UpdaterState['steps']>): UpdaterStatus {
+function finished(steps: Partial<UpdaterState['steps']>, more: Partial<UpdaterState> = {}): UpdaterStatus {
   return {
     available: true,
     pending: false,
@@ -23,6 +23,7 @@ function finished(steps: Partial<UpdaterState['steps']>): UpdaterStatus {
       finishedAt: '2026-11-07T20:05:00Z',
       message: 'Installed v1.2.0 (commit aaaaaaa).',
       log: [],
+      ...more,
     },
   }
 }
@@ -43,5 +44,14 @@ describe('the update steps', () => {
     expect(html).toContain('>Trial start<')
     expect(html).not.toContain('Clean up')
     expect(html).not.toContain('Waiting')
+  })
+})
+
+describe('the notice that the updater itself changed', () => {
+  it('names the folder to copy from', () => {
+    const current = { tag: 'v1.2.0', sha: 'a'.repeat(40), name: 'v1.2.0', publishedAt: '', deployedAt: '' }
+    const html = render(finished({}, { updaterChanged: true, current }))
+    expect(html).toContain('The updater itself changed')
+    expect(html).toContain('.updater/releases/v1.2.0/scripts/')
   })
 })
