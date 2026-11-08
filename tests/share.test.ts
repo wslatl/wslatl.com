@@ -47,7 +47,7 @@ const withCode: Partner = {
 const noCode: Partner = { ...withCode, slug: 'plain', name: 'Plain Partner', referralCode: undefined }
 
 /** Every ad the site can build, in every language, with the address it should end on. */
-function everyAd(): { name: string; locale: Locale; url: string; text: string }[] {
+function everyAd(): { name: string; locale: Locale; url: string; text: string; own?: boolean }[] {
   return locales.flatMap((locale) => {
     const c = ctx(locale)
     return [
@@ -58,6 +58,7 @@ function everyAd(): { name: string; locale: Locale; url: string; text: string }[
         name: `partner ${p.slug}`,
         url: absoluteUrl(locale, `/partners/${p.slug}`),
         text: partnerAd(c, p),
+        own: p.ad !== undefined,
       })),
       ...games.map((g) => ({
         name: `game ${g.slug}`,
@@ -75,6 +76,9 @@ function everyAd(): { name: string; locale: Locale; url: string; text: string }[
 
 describe('every ad', () => {
   const ads = everyAd()
+  // A partner's own ad keeps its own opening and its own links: a bare invite
+  // is what makes Discord show its join card. The rest applies to every ad.
+  const written = ads.filter((ad) => !ad.own)
 
   it('covers the home page, the games, the partners and the plan lines in every language', () => {
     expect(ads.length).toBeGreaterThanOrEqual(locales.length * (3 + games.length + productLines.length))
@@ -94,9 +98,12 @@ describe('every ad', () => {
     }
   })
 
-  it('opens with a heading and has no mention syntax', () => {
+  it('opens with a heading, unless a partner wrote it', () => {
+    for (const ad of written) expect(ad.text.startsWith('## '), `${ad.locale} ${ad.name}`).toBe(true)
+  })
+
+  it('has no mention syntax', () => {
     for (const ad of ads) {
-      expect(ad.text.startsWith('## '), `${ad.locale} ${ad.name}`).toBe(true)
       expect(ad.text).not.toMatch(/@everyone|@here/i)
       expect(ad.text).not.toMatch(/<[@#&!:]/)
     }
@@ -108,8 +115,8 @@ describe('every ad', () => {
     for (const ad of ads) expect(ad.text).not.toMatch(dashes)
   })
 
-  it('previews only its own page: other addresses are wrapped in angle brackets', () => {
-    for (const ad of ads) {
+  it('previews only its own page, unless a partner wrote it: other addresses are wrapped in angle brackets', () => {
+    for (const ad of written) {
       const bare = ad.text.split('\n').filter((line) => /https?:\/\//.test(line) && !/<https?:\/\/[^>]+>/.test(line))
       expect(bare, `${ad.locale} ${ad.name}`).toEqual([ad.url])
     }
