@@ -7,7 +7,7 @@ import { ShareAd } from '@/components/share/share-ad'
 import { commitments, features, leadFeature } from '@/data/features'
 import { services } from '@/data/services'
 import { games } from '@/data/games'
-import { partners, type Partner } from '@/data/partners'
+import { partners, partnerTextLimits, type Partner } from '@/data/partners'
 import { productLines } from '@/data/pricing'
 import { locales, type Locale } from '@/i18n/config'
 import { copyFor } from '@/i18n/copy'
@@ -205,6 +205,54 @@ describe('partner ad', () => {
     expect(partnerAd(ctx('fr'), withCode)).toContain('Code de parrainage')
     expect(partnerAd(ctx('pt'), withCode)).toContain('Código de indicação')
     expect(partnerAd(ctx('pt'), withCode)).toContain('https://wslatl.com/pt/partners/with-code')
+  })
+})
+
+describe("a partner's own ad", () => {
+  const profile = 'https://wslatl.com/partners/with-code'
+  const written = '## Join With Code\n\n**Free kits** every week\n- Discord: <https://discord.gg/abc>'
+
+  it('replaces the one the site writes, exactly as they wrote it, with their profile at the end', () => {
+    expect(partnerAd(ctx('en'), { ...withCode, ad: written }, ['Minecraft'])).toBe(`${written}\n\n${profile}`)
+  })
+
+  it('leaves every partner without one on the ad the site writes', () => {
+    expect(partnerAd(ctx('en'), withCode)).toContain('Referral code: `WITHCODE10`')
+  })
+
+  it('is in the language of the page when they gave one, and in English when they did not', () => {
+    const both: Partner = { ...withCode, ad: { en: 'English ad', es: 'Anuncio' } }
+    expect(partnerAd(ctx('es'), both)).toBe('Anuncio\n\nhttps://wslatl.com/es/partners/with-code')
+    expect(partnerAd(ctx('de'), both)).toBe('English ad\n\nhttps://wslatl.com/de/partners/with-code')
+  })
+
+  it('does not get their profile twice when they wrote it in themselves', () => {
+    const linked = `See my profile: ${profile}\n\nMore soon`
+    expect(partnerAd(ctx('en'), { ...withCode, ad: linked })).toBe(linked)
+  })
+
+  it('can never ping a server when it is pasted, and keeps the rest of their formatting', () => {
+    const pings = '@everyone Big news\n\nHey @here **join** <@123> <@!4> <@&5> <#6> @@everyone **@here**\n<https://discord.gg/x>'
+    const text = partnerAd(ctx('en'), { ...withCode, ad: pings })
+    expect(text).not.toMatch(/@everyone|@here|<@|<#/i)
+    expect(text.startsWith('Big news\n\nHey **join**')).toBe(true)
+    expect(text).toContain('<https://discord.gg/x>')
+  })
+
+  it('cannot have a ping rebuilt from the pieces left when another is taken out', () => {
+    const nested = ['<@<@1>2>', '<<@1>@2>', '<#<#1>2>', '<@&<@&1>2>', '<@<@<@1>2>3>', '@<@1>everyone', '@<#1>here', '<@@everyone1>']
+    for (const piece of nested) {
+      expect(partnerAd(ctx('en'), { ...withCode, ad: `Hi ${piece} there` }), piece).not.toMatch(/@everyone|@here|<@|<#/i)
+    }
+  })
+
+  it('falls back to the ad the site writes when nothing is left of theirs', () => {
+    expect(partnerAd(ctx('en'), { ...withCode, ad: '@everyone <@123>' })).toBe(partnerAd(ctx('en'), withCode))
+  })
+
+  it("fits in one Discord message at the longest the checks allow, on a language's longer address", () => {
+    const text = partnerAd(ctx('es'), { ...withCode, slug: 's'.repeat(60), ad: 'x'.repeat(partnerTextLimits.ad) })
+    expect(text.length).toBeLessThanOrEqual(discordLimit)
   })
 })
 
