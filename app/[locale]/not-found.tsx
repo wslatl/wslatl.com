@@ -3,6 +3,7 @@ import { locale as requestedLocale } from 'next/root-params'
 import Link from 'next/link'
 import { SiteHeader } from '@/components/layout/site-header'
 import { Footer } from '@/components/layout/footer'
+import { TabTitle } from '@/components/layout/tab-title'
 import { Button } from '@/components/ui/button'
 import { siteConfig } from '@/config/site'
 import { Main } from '@/components/layout/main'
@@ -39,6 +40,7 @@ export default async function NotFound() {
     // <html> living in app/[locale]; moving it out would fix them and cost
     // every translated page the right language, which is the worse trade.
     <div lang={locale}>
+      <TabTitle title={`${t.notFound.metaTitle} | ${siteConfig.brand}`} />
       <SiteHeader />
       <Main className="shell pt-20 pb-10 md:pt-28">
         <p className="text-sm font-medium text-link">404</p>

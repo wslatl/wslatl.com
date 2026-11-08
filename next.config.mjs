@@ -97,6 +97,20 @@ function siteCommit() {
 /** @satisfies {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
+  // A picture's address in these folders keeps its path through proxy.ts,
+  // which cannot tell a real file from a missing one. By this point the real
+  // files have been served, so what is left gets a language and reaches our
+  // 404 page. Without it "brand" is taken for a language and the root layout
+  // rejects it, with nothing above it to show our page. The same folders as
+  // i18n/routing.ts: tests/error-pages.test.ts checks they agree.
+  async rewrites() {
+    return {
+      afterFiles: ['/clients/', '/owners/', '/brand/', '/partners/'].map((folder) => ({
+        source: `${folder}:path*`,
+        destination: `/en${folder}:path*`,
+      })),
+    }
+  },
   // This folder, always. The updater builds each release in a folder inside
   // the uploaded copy of the site, and Next would otherwise take the outer
   // package-lock.json as the workspace root (and warn about it).
