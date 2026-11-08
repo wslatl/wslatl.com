@@ -132,6 +132,7 @@ export const partners: Partner[] = [
     description:
       'Last Stop is a community Discord server built to give every member a great time, with game nights, art sharing and plenty of giveaways.\n\nWe host two Minecraft servers with WSLATL: a regular server and a busier, casual-friendly Lifesteal server. Clear guidelines keep it fun and welcoming, and you can jump straight into the game servers.',
     avatar: '/partners/last-stop/avatar.webp',
+    banner: '/partners/last-stop/banner.webp',
     referralCode: 'TLS',
     since: '2026-10',
     games: ['minecraft'],
@@ -155,17 +156,19 @@ export const partners: Partner[] = [
     },
   },
   {
+    // Two servers now (ZSR on FiveM, Frontier on RedM), so the name is the
+    // community's; the address and the referral code stay as they were.
     slug: 'nxtlyfe-zsr',
-    name: 'NxtLyfe ZSR',
-    tagline: 'Zombie Apocalypse Server',
+    name: 'NxtLyfe',
+    tagline: 'Two worlds. One community. Pick your survival.',
     description:
-      'NxtLyfe ZSR is a FiveM community for people who enjoy the thrill. We have custom scripts and immersive gameplay.',
+      'NxtLyfe: two servers, one community, now recruiting.\n\nNxtLyfe ZSR (FiveM): Los Santos has fallen and the infected fill the streets. Scavenge, craft and build to stay alive, make loot runs into high-risk areas, form factions or alliances, and trade, barter or betray.\n\nNxtLyfe Frontier (RedM): serious western roleplay as a rancher, bounty hunter, doctor, saloon owner, lawman or outlaw, with a player-run economy, businesses and properties.\n\nWhitelisted and 18+, with fair staff, custom scripts and events on both servers. Now hiring staff, developers, content creators, and law and medical leads.',
     avatar: '/partners/nxtlyfe-zsr/avatar.webp',
     referralCode: 'NXTLYFEZSR',
     since: '2026-10',
-    games: ['fivem'],
+    games: ['fivem', 'RedM'],
     socials: {
-      discord: 'https://discord.gg/sseaUasVEt',
+      discord: 'https://discord.gg/qRv8frjyAX',
     },
   },
   {
@@ -191,6 +194,7 @@ export const partners: Partner[] = [
     description:
       "My name is Turtle, a Twitch streamer who plays mostly community-style games with anyone who wants to join. I've been creating content since 2011 and love making people laugh.",
     avatar: '/partners/turtle/avatar.webp',
+    banner: '/partners/turtle/banner.webp',
     referralCode: 'TURTLE',
     since: '2026-10',
     games: ['fivem', 'Farming Simulator', 'Among Us', 'American Truck Simulator'],
