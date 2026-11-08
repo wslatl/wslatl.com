@@ -32,6 +32,15 @@ export interface Partner {
   /** Who they are, up to 600 characters. A blank line (\n\n) starts a new paragraph. */
   description: PartnerText
   /**
+   * Their own ad, when they want one: what the share button on their profile
+   * copies, in place of the one the site writes for them (partnerAd in
+   * lib/share.ts). In Discord's markdown, with \n for a new line, up to 1900
+   * characters. Their profile's address goes on the end by itself, and
+   * anything that would ping a server when pasted (@everyone, @here, <@id>)
+   * is taken out. Optional: without one the site writes it.
+   */
+  ad?: PartnerText
+  /**
    * Square picture, at least 256px across, at /partners/<slug>/<file>. Optional:
    * without one the card and profile show a circle with their initials.
    */
@@ -68,11 +77,12 @@ export interface Partner {
 }
 
 /**
- * Longest name, tagline and description, in characters, in any language. The
- * name limit keeps a partner's Discord ad (lib/share.ts) inside Discord's
- * 2000 characters, since the name is a line the ad never drops.
+ * Longest name, tagline, description and ad, in characters, in any language.
+ * The name limit keeps a partner's Discord ad (lib/share.ts) inside Discord's
+ * 2000 characters, since the name is a line the ad never drops. The ad limit
+ * leaves room in those 2000 for their profile's address on the end.
  */
-export const partnerTextLimits = { name: 60, tagline: 80, description: 600 } as const
+export const partnerTextLimits = { name: 60, tagline: 80, description: 600, ad: 1900 } as const
 
 /**
  * A referral code as the billing panel stores it: letters and digits, at

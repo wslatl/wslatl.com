@@ -28,7 +28,9 @@ import { formatPrice, gameEntryPlan, pricingHref, startingPrice } from '@/lib/pr
  * page's full address on a line of its own at the end, so Discord builds a
  * link preview from that page's picture. Other addresses inside an ad are
  * wrapped in <angle brackets>, which tells Discord not to preview them, so
- * they never push the page's own preview out.
+ * they never push the page's own preview out. A partner may write their own
+ * ad instead (Partner.ad), which keeps its own shape but still ends on the
+ * page's address.
  *
  * Wording lives in i18n/copy/*.ts under `share`. Only facts that are already
  * on the site go in: prices come from data/pricing.ts, and a price is only
@@ -60,6 +62,23 @@ export function plain(text: string): string {
     .replace(/[\\*_~`|[\]]/g, (char) => `\\${char}`)
     .replace(/^([#>-])/, '\\$1')
     .replace(/^(\d+)\./, '$1\\.')
+}
+
+/**
+ * A partner's own ad made safe to paste. Their formatting is the point of
+ * writing one, so unlike in plain() it stays. But whoever copies it may paste
+ * it into a server that is not the partner's, so it must never ping anyone:
+ * @everyone and @here go (the word as well when it stands alone), as do
+ * <@id>, <@&id> and <#id> mentions, and the gaps they leave are closed up.
+ */
+function withoutPings(text: string): string {
+  return text
+    .replace(/<(?:@[!&]?|#)\d+>[ \t]*/g, '')
+    .replace(/(^|\s)@+(?:everyone|here)\b[ \t]*/gim, '$1')
+    .replace(/@+(?=everyone|here)/gi, '')
+    .replace(/[ \t]+$/gm, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }
 
 /**
@@ -171,12 +190,21 @@ export function homeAd({ t, locale }: Context, content: SiteContent): string {
   return assemble(lines, extras, absoluteUrl(locale, '/'))
 }
 
-/** The ad for one partner: who they are, their code and the deal (only with a code), their links, their profile. */
+/**
+ * The ad for one partner. One who wrote their own gets it as they wrote it,
+ * with their profile's address on the end unless it is already in there.
+ * For anyone else the site writes it: who they are, their code and the deal
+ * (only with a code), their links, their profile.
+ */
 export function partnerAd(
   { t, locale }: Context,
   partner: Partner,
   gameNames: string[] = [],
 ): string {
+  const profile = absoluteUrl(locale, `/partners/${partner.slug}`)
+  const own = partner.ad === undefined ? '' : withoutPings(partnerText(partner.ad, locale))
+  if (own) return own.includes(profile) ? own : `${own}\n\n${profile}`
+
   const a = t.share.ad
   const name = plain(partner.name)
   const lines = [`## ${name}`, a.partnerIntro(name), plain(partnerText(partner.tagline, locale))]
@@ -194,7 +222,7 @@ export function partnerAd(
           ...links.map((link) => bullet(`${platformName(link.platform, t)}: <${link.href}>`)),
         ]
       : []
-  return assemble(lines, extras, absoluteUrl(locale, `/partners/${partner.slug}`))
+  return assemble(lines, extras, profile)
 }
 
 /**

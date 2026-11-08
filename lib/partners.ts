@@ -341,8 +341,11 @@ export function partnerProblems(list: readonly Partner[], context: PartnerCheckC
       at(`name is ${partner.name.length} characters, over ${partnerTextLimits.name}`)
     }
 
-    for (const field of ['tagline', 'description'] as const) {
-      const entries = partnerTextEntries(partner[field])
+    for (const field of ['tagline', 'description', 'ad'] as const) {
+      const value = partner[field]
+      // Only the ad is optional: left out, the site writes one for them.
+      if (value === undefined) continue
+      const entries = partnerTextEntries(value)
       if (!entries.some(([locale]) => locale === defaultLocale)) at(`${field} has no English`)
       for (const [locale, text] of entries) {
         if (!(locales as readonly string[]).includes(locale)) at(`${field} has a language we do not publish: ${locale}`)

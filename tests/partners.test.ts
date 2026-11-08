@@ -16,7 +16,7 @@ import { footerColumns } from '@/data/footer'
 import { games } from '@/data/games'
 import { legalPages } from '@/data/legal'
 import { mainNav } from '@/data/nav'
-import { partners, socialPlatformIds, type Partner } from '@/data/partners'
+import { partners, partnerTextLimits, socialPlatformIds, type Partner } from '@/data/partners'
 import { defaultLocale, locales } from '@/i18n/config'
 import { copyFor } from '@/i18n/copy'
 import { en } from '@/i18n/copy/en'
@@ -200,6 +200,16 @@ describe('the partner checks', () => {
       ['valheim', 'Valheim'],
       [null, 'Among Us'],
     ])
+  })
+
+  it('check a custom ad like their other words, and leave one out without complaint', () => {
+    expect(problemsWith({ ad: undefined })).toEqual([])
+    expect(problemsWith({ ad: 'Join us' })).toEqual([])
+    expect(problemsWith({ ad: { en: 'Join us', es: 'Ven' } })).toEqual([])
+    expect(problemsWith({ ad: 'x'.repeat(partnerTextLimits.ad + 1) }).join('\n')).toMatch(/ad \(en\) is \d+ characters, over/)
+    expect(problemsWith({ ad: '   ' }).join('\n')).toMatch(/ad \(en\) is empty/)
+    expect(problemsWith({ ad: { es: 'Ven' } as unknown as Partner['ad'] }).join('\n')).toMatch(/ad has no English/)
+    expect(problemsWith({ ad: { en: 'Hi', xx: 'Yo' } as unknown as Partner['ad'] }).join('\n')).toMatch(/language we do not publish: xx/)
   })
 
   it('check each picture that is given: where it is, its type and its shape', () => {
