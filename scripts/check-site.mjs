@@ -10,6 +10,7 @@
 //     answers 200 without a redirect
 //   - an unknown path is a real 404, and every kind of wrong URL reaches
 //     our own 404 page in the right language rather than the built-in one
+//   - one page of each kind names a share picture (og:image) that loads
 //   - the security headers are there
 //   - every moved page (permanent redirect in next.config.mjs) still lands
 //     on a page that loads
@@ -84,6 +85,29 @@ async function checkPages() {
 
   const missing = await get(`/this-page-does-not-exist-${Date.now()}`)
   record('Unknown paths are a real 404', missing.status === 404, `status ${missing.status}`)
+}
+
+/**
+ * Most share pictures are drawn on request by /og (app/og/route.tsx), so a
+ * renderer that breaks would only show as a blank preview on Discord or X.
+ * One page of each kind, in two languages besides English: the picture its
+ * og:image names has to load, from the site being checked rather than the
+ * address in the tag, so a local build is checked against itself.
+ */
+async function checkSharePictures() {
+  const pages = ['/', '/pricing', '/games', '/games/minecraft', '/legal', '/legal/privacy', '/partners', '/es/pricing', '/de/legal/privacy']
+  const wrong = []
+  await eachLimited(pages, async (path) => {
+    const html = await (await get(path)).text()
+    const tag = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/)?.[1]
+    if (!tag) return wrong.push(`${path}: no og:image`)
+    const { pathname, search } = new URL(tag.replaceAll('&amp;', '&'), base)
+    const res = await get(pathname + search)
+    const type = res.headers.get('content-type') ?? ''
+    await res.body?.cancel()
+    if (res.status !== 200 || !type.startsWith('image/')) wrong.push(`${path}: ${pathname}${search} (${res.status} ${type})`)
+  }, (path, error) => wrong.push(`${path}: ${error.message}`))
+  record('Share pictures load', wrong.length === 0, wrong.join(', ') || `${pages.length} pages`)
 }
 
 /**
@@ -198,6 +222,7 @@ function checkCertificate() {
 for (const [name, run] of [
   ['Pages', checkPages],
   ['Not found', checkNotFound],
+  ['Share pictures', checkSharePictures],
   ['Headers', checkHeaders],
   ['Redirects', checkRedirects],
   ['Certificate', checkCertificate],

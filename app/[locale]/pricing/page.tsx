@@ -13,6 +13,7 @@ import type { ProductLine } from '@/data/pricing'
 import { uptimeTarget } from '@/data/sla'
 import { formatPrice, specRanges, startingPrice, storageTypes } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
+import { pricingText } from '@/lib/page-text'
 import { Main } from '@/components/layout/main'
 import type { Metadata } from 'next'
 import type { Locale } from '@/i18n/config'
@@ -28,13 +29,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params
   setLocale(locale)
-  const t = copy().pricing
-  return pageMetadata({
-    title: t.metaTitle,
-    description: t.metaDescription(formatPrice(startingPrice('vps')), formatPrice(startingPrice('game'))),
-    path: '/pricing',
-    locale,
-  })
+  return pageMetadata({ ...pricingText(locale), path: '/pricing', locale })
 }
 
 const lineIcons: Record<ProductLine['id'], typeof Server> = {

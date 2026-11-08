@@ -15,6 +15,7 @@ import { gameComparisons } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
 import { formatPrice, gameEntryPlan, smallestPlansWithRam } from '@/lib/pricing'
 import { pageMetadata } from '@/lib/metadata'
+import { gameText } from '@/lib/page-text'
 import { slugify } from '@/lib/utils'
 import { gameGuidesUrl } from '@/lib/knowledge-base'
 import { SiteLink } from '@/components/ui/site-link'
@@ -29,8 +30,8 @@ interface PageProps {
 }
 
 /** The game in the language of the page, or nothing when the slug is unknown. */
-function localizedGame(slug: string) {
-  return localizedGames().find((game) => game.slug === slug)
+function localizedGame(slug: string, locale: Locale) {
+  return localizedGames(locale).find((game) => game.slug === slug)
 }
 
 /**
@@ -71,24 +72,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale, slug } = await params
   setLocale(locale)
-  const game = localizedGame(slug)
+  const game = localizedGame(slug, locale)
   if (!game) return {}
-
-  // The same "from" price the page shows. When no plan covers even the
-  // smallest setup, the page shows no price, so the search result does not
-  // either.
-  const entry = gameEntryPlan(game)
-  const price = entry ? formatPrice(entry.plan.price) : null
-  const t = copy().games.detail
-
-  return pageMetadata({
-    title: price ? t.metaTitle(game.name, price) : t.heading(game.name),
-    description: price
-      ? t.metaDescription(game.name, price, game.tagline)
-      : t.metaDescriptionNoPrice(game.name, game.tagline),
-    path: `/games/${game.slug}`,
-    locale,
-  })
+  return pageMetadata({ ...gameText(game, locale), path: `/games/${game.slug}`, locale })
 }
 
 export default async function GamePage({ params }: PageProps) {
@@ -96,7 +82,7 @@ export default async function GamePage({ params }: PageProps) {
   setLocale(locale)
   const t = copy()
   const path = (href: string) => localePath(locale, href)
-  const game = localizedGame(slug)
+  const game = localizedGame(slug, locale)
   if (!game) notFound()
 
   const line = localizedProductLine('game')

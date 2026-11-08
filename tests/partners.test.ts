@@ -626,10 +626,12 @@ describe('the partners page', () => {
     expect(profile).toContain(encodeURIComponent(examplePartner.banner ?? ''))
   })
 
-  it('shares a profile with their banner, or the site picture when they have none', async () => {
+  it('shares a profile with their banner, or with a share card of its own when they have none', async () => {
     // Everyone listed today, so taking a partner down never breaks this.
     for (const partner of partners) {
-      expect(await shareImages(partner.slug), partner.slug).toContain(partner.banner ?? '/og-image.png')
+      expect(await shareImages(partner.slug), partner.slug).toContain(
+        partner.banner ?? encodeURIComponent(`/partners/${partner.slug}`),
+      )
     }
   })
 
