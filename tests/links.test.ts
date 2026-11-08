@@ -11,6 +11,7 @@ import { siteConfig } from '@/config/site'
 import { en } from '@/i18n/copy/en'
 import { defaultLocale, localePath, locales } from '@/i18n/config'
 import { isShortLink, shortLinks } from '@/config/links'
+import { rootFiles } from '@/i18n/routing'
 import nextConfig from '../next.config.mjs'
 
 const root = join(__dirname, '..')
@@ -71,6 +72,8 @@ function homeSectionIds(): Set<string> {
 }
 
 const routes = appRoutes()
+// A retired file (the old favicon.svg) redirects to a file the site serves.
+const exists = (path: string) => routes.has(path) || rootFiles.includes(path)
 const sectionIds = homeSectionIds()
 const pricingAnchors = new Set(productLines.map((l) => l.anchor))
 
@@ -115,15 +118,15 @@ describe('links', () => {
     expect(insecure).toEqual([])
   })
 
-  it('redirects retired URLs to pages that exist', async () => {
+  it('redirects retired URLs to pages and files that exist', async () => {
     const redirects = await nextConfig.redirects()
     // Pattern rules (/en/:path*) stand for many pages at once, so they are
     // checked on their own below rather than looked up as a single route.
     const single = redirects.filter((r) => !r.source.includes(':') && !r.destination.includes(':'))
     const retired = single.filter((r) => r.permanent)
     expect(retired.length).toBeGreaterThan(0)
-    expect(single.filter((r) => routes.has(r.source)).map((r) => r.source)).toEqual([])
-    expect(retired.filter((r) => !routes.has(r.destination)).map((r) => r.destination)).toEqual([])
+    expect(single.filter((r) => exists(r.source)).map((r) => r.source)).toEqual([])
+    expect(retired.filter((r) => !exists(r.destination)).map((r) => r.destination)).toEqual([])
   })
 
   it('sends the /en prefix to the plain English URL', async () => {

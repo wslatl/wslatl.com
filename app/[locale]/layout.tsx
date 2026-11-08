@@ -44,13 +44,12 @@ export const metadata: Metadata = {
   },
   // Google shows the favicon beside every result. It takes PNG or ICO (not
   // SVG), square and larger than 48px, so the 192px PNG is listed for it; the
-  // ICO holds 16, 32 and 48 for older browsers, and the SVG is for current
-  // ones. All are a white mark on a dark tile, which reads on light and dark.
+  // ICO holds the brand kit's own 16, 32 and 48px marks for browser tabs. The
+  // mark's colours read on light and dark alike, so these are transparent.
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: '16x16 32x32 48x48' },
       { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
-      { url: '/favicon.svg', type: 'image/svg+xml' },
     ],
     apple: [{ url: '/apple-icon.png', sizes: '180x180' }],
   },
