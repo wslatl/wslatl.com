@@ -2,6 +2,7 @@ import { partners } from '@/data/partners'
 import type { Locale } from '@/i18n/config'
 import { localizedGames, localizedLegalPages } from '@/i18n/content'
 import {
+  brandText,
   gameText,
   gamesText,
   homeText,
@@ -44,6 +45,8 @@ export function shareCardText(path: string, locale: Locale): ShareCardText | und
       return legalIndexText(locale)
     case '/partners':
       return partnersText(locale)
+    case '/brand':
+      return brandText(locale)
   }
 
   const game = localizedGames(locale).find((entry) => `/games/${entry.slug}` === path)
