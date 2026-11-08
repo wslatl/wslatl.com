@@ -34,6 +34,11 @@
   --input: oklch(0.42 0.01 0);
   --ring: oklch(0.7 0.15 240);
   --radius: 0.625rem;
+  /* The brand kit's status colours, so far only in the admin. A state is
+     never shown in colour alone: a word always goes with it. */
+  --success: #05df72;
+  --warning: #fcbb00;
+  --danger: #fb2c36;
 }
 
 @theme inline {
@@ -58,6 +63,9 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

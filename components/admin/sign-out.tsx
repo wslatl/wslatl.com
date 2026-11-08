@@ -17,7 +17,7 @@ export function SignOut() {
   return (
     <Button variant="ghost" size="sm" onClick={signOut}>
       <LogOut aria-hidden="true" />
-      Log out
+      Sign out
     </Button>
   )
 }
