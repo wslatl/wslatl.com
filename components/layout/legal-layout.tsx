@@ -8,6 +8,7 @@ import type { LegalPage } from '@/data/legal'
 import { legalEffectiveDate, siteConfig } from '@/config/site'
 import { formatLegalDate } from '@/i18n/dates'
 import { pageMetadata } from '@/lib/metadata'
+import { legalText } from '@/lib/page-text'
 import { cn, slugify } from '@/lib/utils'
 import { Main } from '@/components/layout/main'
 import { Email } from '@/components/ui/email'
@@ -18,7 +19,7 @@ import { copy } from '@/i18n/copy'
 import { localizedLegalPages } from '@/i18n/content'
 
 export function legalMetadata(page: LegalPage, locale?: Locale) {
-  return pageMetadata({ title: page.title, description: page.metaDescription, path: page.href, locale })
+  return pageMetadata({ ...legalText(page), path: page.href, locale })
 }
 
 interface SectionProps {

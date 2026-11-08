@@ -31,14 +31,22 @@ describe('the files served from the site root', () => {
     expect(isRootFile('/clients/example.png')).toBe(true)
   })
 
-  it('lists every file the app generates at the root', () => {
-    // app/company.json/route.ts is served at /company.json. Added there and
-    // forgotten in rootFiles, it would be given a language and answer 404.
-    const generated = readdirSync(join(root, 'app')).filter(
-      (name) => name.includes('.') && statSync(join(root, 'app', name)).isDirectory(),
+  it('lists every route handler the app serves at the root', () => {
+    // app/company.json/route.ts is served at /company.json and app/og/route.tsx
+    // at /og. Added there and forgotten in rootFiles, a handler would be given
+    // a language and answer 404.
+    const handlers = readdirSync(join(root, 'app')).filter((name) =>
+      ['route.ts', 'route.tsx'].some((file) => existsSync(join(root, 'app', name, file))),
     )
-    expect(generated.length).toBeGreaterThan(0)
-    for (const name of generated) expect(rootFiles, `/${name}`).toContain(`/${name}`)
+    expect(handlers).toEqual(expect.arrayContaining(['company.json', 'og']))
+    for (const name of handlers) expect(rootFiles, `/${name}`).toContain(`/${name}`)
+  })
+
+  it('leaves the share card route without a language, so /og?path=... is not looked up as a page', () => {
+    expect(isRootFile('/og')).toBe(true)
+    expect(rewriteTarget('/og')).toBeNull()
+    // Only that exact path: /og/ is a page that does not exist.
+    expect(rewriteTarget('/og/')).toBe('/en/og/')
   })
 })
 

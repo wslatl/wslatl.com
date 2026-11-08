@@ -25,6 +25,7 @@ app/
   sitemap.ts, robots.ts    Every page in every language, from the same data the pages use.
   manifest.ts              /manifest.webmanifest: the name and icons for a home-screen shortcut.
   company.json/route.ts    /company.json: the company profile for the billing panel, written at build time.
+  og/route.tsx             /og: the share card of every page but the home page, drawn on request (see Images).
   admin/                   The admin: log in and update the site from GitHub (see Admin and updates).
   [locale]/                Every page, once, for all five languages (see Languages).
     layout.tsx             Root layout: language, fonts, default metadata, Organization JSON-LD, skip link.
@@ -39,6 +40,8 @@ app/
     not-found.tsx, error.tsx  Branded 404 and error pages.
 
 proxy.ts                   Serves the English tree at the unprefixed URLs, and answers 405 to every method but GET and HEAD, apart from POST on the admin's JSON routes.
+
+assets/                    Files the server reads from disk rather than serves: the share card's fonts and the WSLATL lockup (see Images, and CREDITS.md for the fonts).
 
 components/
   ui/                      Primitives: button, dropdown-menu, section-header, site-link.
@@ -57,7 +60,7 @@ config/referral.ts         The referral discount percent (first invoice only), w
 content/legal/             The text of each policy; index.ts maps each document and language to its text.
 data/                      Everything else the pages render (see below).
 i18n/                      Languages: the current one, the dictionaries, the translations.
-lib/                       pricing helpers, pageMetadata(), cn() and slugify().
+lib/                       pricing helpers, pageMetadata(), what each page says about itself (page-text.ts) and the share card's words (share-card.ts), cn() and slugify().
 scripts/                   Checks that need a build or a live site (see Automation), keep-old-assets.mjs (see Deploying), and serve.mjs, the updater (see Admin and updates).
 tests/                     Vitest suites for data, links, and house style.
 ```
@@ -97,7 +100,7 @@ Never type a price, a plan spec, or an uptime figure anywhere else. Format price
 
 ## Pages and metadata
 
-Use `pageMetadata({ title, description, path })` from `lib/metadata.ts` for every new page. It sets the canonical URL and the full Open Graph and Twitter set. Next.js replaces a nested `openGraph` object instead of merging it, so hand-written page metadata silently loses the share image.
+Use `pageMetadata({ title, description, path })` from `lib/metadata.ts` for every new page. It sets the canonical URL and the full Open Graph and Twitter set, share card included (see Images). Next.js replaces a nested `openGraph` object instead of merging it, so hand-written page metadata silently loses the share image. What a page says about itself is written once, in `lib/page-text.ts`, and its `generateMetadata` and its share card both read it from there.
 
 Retired URLs get a permanent redirect in `next.config.mjs`, in the same change that moves the page. The link tests check that every redirect lands on a page that exists. The legal documents moved from the site root to `/legal/...` in September 2026; their old paths (`/privacy`, `/terms`, and so on) redirect, and a test fails if any document loses its redirect. Always link to a legal document through `siteConfig.paths`, never a typed-out path (a test enforces this too).
 
@@ -167,7 +170,7 @@ Only with the partner's written OK to be shown here. Keep that message (a ticket
 Taking someone down is two steps on the same day: delete their entry and their folder here, and revoke them as a referrer in the billing panel. Revoking is what stops their code from giving the first-invoice discount and the referral credit from then on. The site does not promise the discount for as long as a partner stays, so no page text changes when someone is taken down.
 
 1. Get from them: their name (60 characters at most), a one-line tagline (80 characters at most), a short description (600 at most), optionally a square picture and a wide banner, the links they want shown, the games they play, and their referral code from the billing panel. The code is optional: skip it for a partner who is not in the referral program or does not want one shown.
-2. Pictures are optional: skip steps 2 and 3 for a partner who has none yet. Without a picture their card and profile show a circle in our primary blue with their initials, without a banner a plain branded banner of the same shape, and a shared link to their profile shows the site's own picture. A picture that is given must still pass the checks in step 5. Export the picture as a square WebP, 512px (at least 256px), and the banner as a WebP about 3:1, ideally 1500x500 (at least 1200px wide). PNG and JPEG work too; nothing else is served from `public/partners/` (no SVG, which can carry script). Two things to tell them about the banner:
+2. Pictures are optional: skip steps 2 and 3 for a partner who has none yet. Without a picture their card and profile show a circle in our primary blue with their initials, without a banner a plain branded banner of the same shape, and a shared link to their profile shows a share card made for it (see Images). A picture that is given must still pass the checks in step 5. Export the picture as a square WebP, 512px (at least 256px), and the banner as a WebP about 3:1, ideally 1500x500 (at least 1200px wide). PNG and JPEG work too; nothing else is served from `public/partners/` (no SVG, which can carry script). Two things to tell them about the banner:
    - On their profile, their picture sits over the bottom-left corner of the banner, so nothing important should be there.
    - The banner is also the picture a shared link to their profile shows. Many link previews (Facebook, LinkedIn, X) are made for pictures of about 2:1 and crop the left and right ends off a 3:1 banner, so names and logos belong in the middle.
 3. Put them in `public/partners/<slug>/`, for example `public/partners/pixel-forge/avatar.webp` and `banner.webp`. The slug and the file names are lowercase letters, digits and hyphens, and the slug becomes the address of their profile. With a banner, also run `npm run partners:cards` once the entry in step 4 is in: it makes `banner-card.webp`, the small 720x240 copy of the banner that their card on `/partners` loads. Their profile and shared links keep the full banner; full banners on every card would take the page over its 600 KB budget. The tests fail until the copy exists.
@@ -203,15 +206,28 @@ Taking someone down is two steps on the same day: delete their entry and their f
 - **Site name.** Google shows "WSLATL" as the site's name in results. It reads that from the `WebSite` structured data, which only the English home page carries (Google ignores it anywhere else), and from `application-name` and `og:site_name`. All three come from `siteConfig.brand`, and every title ends with it. The `Organization` data on every page has the legal name, "WSLATL LLC", with "WSLATL" as an `alternateName`, so the two read as one brand.
 - **Titles and descriptions.** The home page title starts with the brand. Game pages say the game and the real starting price, in the words people search with in each language ("DayZ Server mieten", "hébergement de serveur"). Prices come from `data/pricing.ts`, never typed. `tests/seo.test.ts` checks the brand and that no two game pages share a title.
 - **Sitemap.** It has no `lastmod`. Google only trusts that date when it is accurate every time, and a build date on every page teaches it to ignore the field. Add one back only with a real per-page date.
+- **Link previews.** Every page but the home page is shared with a card of its own, drawn by `/og` in the page's language from the same title and description the page gives search engines. The home page keeps `public/og-image.png`, and a partner with a banner is shared with the banner. See Images.
 - **Icons.** See Images.
 
 ## Images
 
-`images.unoptimized` is on, so every file in `public/` is served as-is. Export images at twice their display size before adding them: client logos are trimmed WebP at 96px tall, team photos are 192px square WebP. Partner pictures go in `public/partners/<slug>/` (see Partners). `public/og-image.png` (1200x630) is rendered from the site's own fonts and logo; re-export it if the slogan or branding changes.
+`images.unoptimized` is on, so every file in `public/` is served as-is. Export images at twice their display size before adding them: client logos are trimmed WebP at 96px tall, team photos are 192px square WebP. Partner pictures go in `public/partners/<slug>/` (see Partners). `public/og-image.png` (1200x630) is the home page's share picture, drawn by `npm run home:card` (`scripts/home-card.mjs`) from the share cards' fonts and lockup in `assets/`; run it again after a change to the slogan or the branding. Every other page has a card drawn on request (see Share cards below).
 
 The icons are the WSLATL mark from the brand kit (`assets/logo-png/logo/`), used as it ships: three panels, cyan to violet, on a transparent background. Its colours read on a white results page, in a light browser tab and on dark, so the icons need no tile. `favicon.ico` holds the kit's own 16, 32 and 48px marks as classic 32-bit bitmaps (the form every ICO reader takes, rather than PNGs inside the ICO), `favicon.png` is its 64px one, `icon-192.png` is the one Google uses beside results (it takes PNG or ICO, not SVG, square and larger than 48px), and `icon-512.png` is for the web app manifest. Two icons may not be transparent, so they put the mark on the brand's Ink tile (`#0F090B`) with room around it: `apple-icon.png` (180px; iOS fills transparency with black and rounds the corners) and `icon-maskable-512.png` (the mark inside the centre 80% that Android's masks keep). The logo ships as pictures only (its SVG files just wrap pictures), so there is no `favicon.svg`; its old address redirects to `icon-192.png`. `logo.png` (the 512px mark) is the logo in the `Organization` data. `tests/seo.test.ts` checks their sizes and that the two tiles have no transparency. Each one must also be listed in `rootFiles` in `i18n/routing.ts`.
 
-The header shows the mark alone at 32px, the smallest the kit allows in a header: `public/brand/wslatl-mark.webp` is the kit's own 96px mark, three times that (`components/brand/logo.tsx`). The brand kit asks for the mark once per page, near the top, on a solid surface, so the header is opaque and the footer has no logo. The share image carries the full lockup (the mark, "WSLATL" and "Private Hosting", from `assets/logo-png/banner/`) on solid Ink, with the brand gradient only as an accent bar along the bottom. The kit's other rules: the name is artwork, so never set "WSLATL" in type beside the mark; keep clear space of about 18% of the mark's height on every side; the lockup is never under 190px wide; and never recolour, stretch, outline or rebuild the logo.
+The header shows the mark alone at 32px, the smallest the kit allows in a header: `public/brand/wslatl-mark.webp` is the kit's own 96px mark, three times that (`components/brand/logo.tsx`). The brand kit asks for the mark once per page, near the top, on a solid surface, so the header is opaque and the footer has no logo. The share images carry the full lockup (the mark, "WSLATL" and "Private Hosting", from `assets/logo-png/banner/`) on solid Ink, with the brand gradient only as an accent bar along the bottom. The kit's other rules: the name is artwork, so never set "WSLATL" in type beside the mark; keep clear space of about 18% of the mark's height on every side; the lockup is never under 190px wide; and never recolour, stretch, outline or rebuild the logo.
+
+### Share cards
+
+Every page but the home page has a share card of its own, drawn by `app/og/route.tsx` and addressed by page: `/og?path=/games/minecraft&locale=es`. `pageMetadata()` points the page's Open Graph and Twitter image at it, with the page's title as the alt text, so a link on Discord, X or Slack shows that page's title and description in its language, and a game page also shows the game's name above its title. The home page keeps `public/og-image.png`, and a partner who gave a banner is shared with it.
+
+- **It can only say what the site says.** The route looks the words up from the page itself (`lib/share-card.ts`), through the same functions the page's `generateMetadata` reads its title and description from (`lib/page-text.ts`). So a card and its page cannot disagree, a link cannot be made to show other words, and a path that is not a page, or a language that is not ours, is a 404. Cards are kept for a day (`Cache-Control: public, max-age=86400`), so a changed title or price shows on its card within a day. A preview Discord or X already made keeps the old card until they refresh it.
+- **To give a new page its words,** add a function for it to `lib/page-text.ts` (it takes the language), build the page's metadata from it (`pageMetadata({ ...pricingText(locale), path: '/pricing', locale })`), and add a line for its path to `shareCardText()` in `lib/share-card.ts`. `tests/share-card.test.ts` fails for any page in the sitemap that has no words or does not point at its card, and for a page it has no metadata function for, which is added to `metadataOf()` there.
+- **The lockup comes from the brand kit.** `assets/brand/wslatl-lockup.png` is the kit's `assets/logo-png/banner/wslatl-banner-1920x600.png`, trimmed of its transparent margin and resized to 448x128, twice the 224x64 it is drawn at. Make it again from a checkout with `node -e "require('sharp')('<brand kit>/assets/logo-png/banner/wslatl-banner-1920x600.png').trim().resize(448, 128).toFile('assets/brand/wslatl-lockup.png')"`. It lives in `assets/`, not `public/`, because only the route reads it. Never recolour or stretch it.
+- **The rest follows the kit too:** 1200x630 on solid Ink `#0F090B`, the title in Geist 700 (Paper `#F1EDEE`), an optional line above it in Instrument Serif italic (`#48C5FF`), the description in Geist 400 (Muted `#9A8A8F`), `wslatl.com` bottom right, and the gradient as an 8px bar along the very bottom edge with nothing on it. The fonts are static instances in `assets/fonts/`, credited in `CREDITS.md`; the renderer cannot read the variable Geist. They are cut down to Latin letters, and a test fails if a page's words need a character they lack.
+- **Keep the knowledge base's cards the same.** knowledge.wslatl.com draws its own cards, to this design: the same layout, sizes, colours, fonts and lockup, so a link to either site looks alike. A change to the design on one site goes to the other too.
+- **Each card is drawn once per server start.** The route keeps every card it draws in memory, by language and page, and answers later requests from there. Only a real page gets that far, so that is at most one card per page in the sitemap. A new release starts a new process, so it draws its cards again with its own words.
+- **`npm run check:site` checks them on the live site:** one page of each kind has to name a share picture that loads.
 
 ---
 
@@ -370,7 +386,7 @@ Runtime site config lives in `config/site.ts`: company name and location, the si
 
 ## Credits
 
-Designed and built by [RejectModders](https://rejectmodders.dev).
+Designed and built by [RejectModders](https://rejectmodders.dev). The fonts the share cards are drawn in are credited in `CREDITS.md`.
 
 The site footer also displays "Made by RejectModders" with a link to the same place. If you fork this project, please keep the credit or replace it with your own.
 

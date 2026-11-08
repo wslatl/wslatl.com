@@ -1,15 +1,15 @@
 import { defaultLocale, locales } from '@/i18n/config'
 
 /**
- * The paths served from the site root that are files rather than pages.
- * They have no language, so they are left alone; everything else is given
- * one. That is what lets app/[locale] trust that it has a real language,
- * rather than the framework rejecting an unknown first segment and serving
- * its own bare 404 page.
+ * The paths served from the site root that are files or endpoints rather
+ * than pages. They have no language, so they are left alone; everything else
+ * is given one. That is what lets app/[locale] trust that it has a real
+ * language, rather than the framework rejecting an unknown first segment and
+ * serving its own bare 404 page.
  *
- * tests/routing.test.ts keeps this in step with public/ and with the
- * app/<name>.<ext>/route.ts handlers, so adding a file there and forgetting
- * it here fails the tests rather than the site.
+ * tests/routing.test.ts keeps this in step with public/ and with the route
+ * handlers directly under app/ (app/<name>/route.ts), so adding a file or a
+ * handler there and forgetting it here fails the tests rather than the site.
  */
 export const rootFiles: readonly string[] = [
   // public/
@@ -27,6 +27,10 @@ export const rootFiles: readonly string[] = [
   '/sitemap.xml',
   '/manifest.webmanifest',
   '/company.json',
+  // The share card of every page, in every language, drawn by app/og/route.tsx
+  // from its query string. Given a language prefix, it would be looked up as a
+  // page called "og" and answer 404 instead of an image.
+  '/og',
 ]
 
 /**

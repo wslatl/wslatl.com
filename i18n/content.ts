@@ -29,8 +29,8 @@ import { pt } from '@/i18n/content/pt'
  */
 const translations: Partial<Record<Locale, ContentTranslation>> = { es, fr, de, pt }
 
-function current(): ContentTranslation | undefined {
-  return translations[getLocale()]
+function current(locale: Locale = getLocale()): ContentTranslation | undefined {
+  return translations[locale]
 }
 
 /** One language's translations, for tests and tooling. */
@@ -115,10 +115,12 @@ export function localizedComparison(id: ComparisonId): Comparison {
   return current()?.pricing?.comparisons?.[id] ?? englishComparisons[id]
 }
 
-export function localizedGames(): GameEntry[] {
-  const t = current()?.games
-  const categories = current()?.gameCategories
-  const ramLabels = current()?.ramLabels
+/** The games in the language of the page, or in `locale` where there is no page being rendered (the share card). */
+export function localizedGames(locale?: Locale): GameEntry[] {
+  const translation = current(locale)
+  const t = translation?.games
+  const categories = translation?.gameCategories
+  const ramLabels = translation?.ramLabels
   if (!t && !categories && !ramLabels) return englishGames
   return englishGames.map((game) => {
     const translated = t?.[game.slug]
@@ -143,8 +145,9 @@ export function localizedGameCategories(): string[] {
   return t ? englishCategories.map((category) => t[category] ?? category) : englishCategories
 }
 
-export function localizedLegalPages(): LegalPage[] {
-  const t = current()?.legal
+/** The legal documents in the language of the page, or in `locale` where there is no page being rendered. */
+export function localizedLegalPages(locale?: Locale): LegalPage[] {
+  const t = current(locale)?.legal
   if (!t) return englishLegal
   return englishLegal.map((page) => ({ ...page, ...t[page.key] }))
 }

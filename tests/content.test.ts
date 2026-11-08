@@ -24,6 +24,7 @@ describe('house style', () => {
       .concat(
         [
           'README.md',
+          'CREDITS.md',
           'package.json',
           'next.config.mjs',
           'eslint.config.mjs',
