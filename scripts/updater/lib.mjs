@@ -15,7 +15,8 @@
 //   .updater/request.json    written by /admin to ask for an update
 //   .updater/npm-cache/      npm's download cache, only while an update runs
 //   .updater/releases/<tag>  one folder per installed release: its files,
-//                            node_modules and .next, built where it runs.
+//                            node_modules and .next, built where it runs,
+//                            then pruned of what production never uses.
 //                            Named by tag, not commit: two releases may tag
 //                            the same commit, and an installed tag is never
 //                            installed again, so a new folder never lands on
@@ -24,12 +25,13 @@
 // Until the first update, the site runs from the uploaded folder itself.
 // After that it runs from the current release, and the previous one is kept
 // for one more update. An update builds the new release beside the live
-// one, starts it once on a spare local port as a trial, and only then stops
-// the live server and starts the new one on the real port. If that fails,
-// the old release starts again.
+// one, prunes it, starts it once on a spare local port as a trial, and only
+// then stops the live server and starts the new one on the real port. If
+// that fails, the old release starts again.
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { rm } from 'node:fs/promises'
 import { join, relative, sep } from 'node:path'
+import { removeDevFiles, uploadedFolderKeeps } from './dev-files.mjs'
 import { isNewer, parseVersion, tagRule } from './release.mjs'
 
 /**
@@ -66,7 +68,7 @@ import { isNewer, parseVersion, tagRule } from './release.mjs'
  */
 
 export const busyStatuses = ['downloading', 'installing', 'building', 'checking', 'swapping']
-export const stepIds = ['download', 'install', 'build', 'check', 'switch']
+export const stepIds = ['download', 'install', 'build', 'prune', 'check', 'switch']
 
 const logLines = 200
 
@@ -236,9 +238,10 @@ export async function pruneReleases(paths, state, spare = []) {
 }
 
 /**
- * Run at start-up once the site is starting: removes half-built and old
- * releases. Not when state.json is damaged, since an empty state would have
- * every release deleted, the live one included.
+ * Run at start-up once the site is starting: deletes from the uploaded
+ * folder what production never uses, and removes half-built and old
+ * releases. No release is removed when state.json is damaged, since an
+ * empty state would have every release deleted, the live one included.
  * @param {Paths} paths
  * @param {State} state
  * @param {OnLine} print
@@ -246,6 +249,16 @@ export async function pruneReleases(paths, state, spare = []) {
 export async function cleanUpAtStart(paths, state, print) {
   // Left by an update the server was stopped in the middle of.
   await rm(paths.npmCache, { recursive: true, force: true, maxRetries: 3 }).catch(() => {})
+  // Never its node_modules or .next: the build at start-up needs the
+  // devDependencies, and the uploaded folder may be what is serving. Never
+  // in a git checkout (.git is a folder, or a file in a worktree): that is a
+  // working copy npm run serve is tried out in, and it needs its tests.
+  if (existsSync(join(paths.root, '.git'))) {
+    print('The uploaded folder is a git checkout, so its tests and dev configs were left alone. Releases are still pruned.')
+  } else {
+    const removed = await removeDevFiles(paths.root, print, uploadedFolderKeeps)
+    if (removed.length) print(`Deleted from the uploaded folder what production never uses: ${removed.join(', ')}`)
+  }
   if (stateIsDamaged(paths)) {
     print('.updater/state.json is damaged, so no release was removed. The site runs from the uploaded folder until the next update writes the file again.')
     return
@@ -527,6 +540,19 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
         onLine: log,
       })
       step('build', 'done')
+
+      // Before the trial start, so the trial proves the release starts
+      // without them: the files production never uses
+      // (scripts/updater/dev-files.mjs), then the devDependencies, which
+      // only the build and the checks need. npm prune gets npm ci's
+      // environment and time limit. Its status is 'installing', one of the
+      // busy statuses the dashboard already knows.
+      stage = 'prune'
+      step('prune', 'running', 'installing')
+      const removed = await removeDevFiles(release, log)
+      if (removed.length) log(`Deleted what production never uses: ${removed.join(', ')}`)
+      await deps.npm(['prune', '--omit=dev', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: release, env, onLine: log })
+      step('prune', 'done')
 
       stage = 'check'
       step('check', 'running', 'checking')
