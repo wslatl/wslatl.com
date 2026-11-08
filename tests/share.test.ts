@@ -239,6 +239,13 @@ describe("a partner's own ad", () => {
     expect(text).toContain('<https://discord.gg/x>')
   })
 
+  it('cannot have a ping rebuilt from the pieces left when another is taken out', () => {
+    const nested = ['<@<@1>2>', '<<@1>@2>', '<#<#1>2>', '<@&<@&1>2>', '<@<@<@1>2>3>', '@<@1>everyone', '@<#1>here', '<@@everyone1>']
+    for (const piece of nested) {
+      expect(partnerAd(ctx('en'), { ...withCode, ad: `Hi ${piece} there` }), piece).not.toMatch(/@everyone|@here|<@|<#/i)
+    }
+  })
+
   it('falls back to the ad the site writes when nothing is left of theirs', () => {
     expect(partnerAd(ctx('en'), { ...withCode, ad: '@everyone <@123>' })).toBe(partnerAd(ctx('en'), withCode))
   })

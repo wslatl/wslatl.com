@@ -70,15 +70,20 @@ export function plain(text: string): string {
  * it into a server that is not the partner's, so it must never ping anyone:
  * @everyone and @here go (the word as well when it stands alone), as do
  * <@id>, <@&id> and <#id> mentions, and the gaps they leave are closed up.
+ * It repeats until nothing changes, since taking one out can join the pieces
+ * around it into another: <@<@1>2> would leave <@2>.
  */
 function withoutPings(text: string): string {
-  return text
-    .replace(/<(?:@[!&]?|#)\d+>[ \t]*/g, '')
-    .replace(/(^|\s)@+(?:everyone|here)\b[ \t]*/gim, '$1')
-    .replace(/@+(?=everyone|here)/gi, '')
-    .replace(/[ \t]+$/gm, '')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim()
+  let safe = text
+  let before: string
+  do {
+    before = safe
+    safe = safe
+      .replace(/<(?:@[!&]?|#)\d+>[ \t]*/g, '')
+      .replace(/(^|\s)@+(?:everyone|here)\b[ \t]*/gim, '$1')
+      .replace(/@+(?=everyone|here)/gi, '')
+  } while (safe !== before)
+  return safe.replace(/[ \t]+$/gm, '').replace(/\n{3,}/g, '\n\n').trim()
 }
 
 /**
