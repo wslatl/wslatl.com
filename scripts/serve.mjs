@@ -34,6 +34,7 @@ import {
   rollBack,
   runUpdate,
   supervisorChanged,
+  syncUploadedVersion,
   updaterPaths,
   writeState,
 } from './updater/lib.mjs'
@@ -275,14 +276,17 @@ async function trial(dir, onLine) {
 /**
  * This supervisor always runs from the uploaded folder, never from a
  * release, so a release that changes it (scripts/serve.mjs or anything in
- * scripts/updater/) changes nothing until its files are copied over by hand.
- * The dashboard says so when that is the case.
+ * scripts/updater/) changes nothing until its files are copied over, which
+ * the button on the dashboard does. The dashboard says so when that is the
+ * case. Run at every start and after every update and rollback, so this is
+ * also where the uploaded folder's package.json follows the live version.
  */
 function noteSupervisorChanges() {
   const state = readState(paths)
   const dir = liveDir(paths, state)
+  syncUploadedVersion(root, dir, print)
   const changed = supervisorChanged(root, dir)
-  if (changed) print(`The updater itself changed in this release. Copy scripts/serve.mjs and scripts/updater/ from ${dir} over the ones in the uploaded folder, then restart.`)
+  if (changed) print(`The updater itself changed in this release. Press Copy the new updater in /admin, or copy scripts/serve.mjs and scripts/updater/ from ${dir} over the ones in the uploaded folder, then restart.`)
   if (Boolean(state.updaterChanged) !== changed) writeState(paths, { ...state, updaterChanged: changed })
 }
 

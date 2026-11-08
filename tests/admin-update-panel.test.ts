@@ -54,4 +54,10 @@ describe('the notice that the updater itself changed', () => {
     expect(html).toContain('The updater itself changed')
     expect(html).toContain('.updater/releases/v1.2.0/scripts/')
   })
+
+  it('has the button that copies it over, and no notice when nothing changed', () => {
+    const current = { tag: 'v1.2.0', sha: 'a'.repeat(40), name: 'v1.2.0', publishedAt: '', deployedAt: '' }
+    expect(render(finished({}, { updaterChanged: true, current }))).toContain('Copy the new updater')
+    expect(render(finished({}, { updaterChanged: false, current }))).not.toContain('Copy the new updater')
+  })
 })

@@ -8,7 +8,7 @@ import { adminPostRoutes, methodAllowed, rewriteTarget } from '@/i18n/routing'
  * reaches a route from here has a language app/[locale] recognises. The
  * admin (app/admin) is the exception: English only, and never rewritten.
  *
- * The site is read-only apart from three of the admin's JSON routes under
+ * The site is read-only apart from four of the admin's JSON routes under
  * /admin/api/, which take a POST and check where it came from. It has no
  * Server Actions. So every other method, and any request naming a Server
  * Action, gets a plain 405 here. Left to Next, a POST naming a Server Action
