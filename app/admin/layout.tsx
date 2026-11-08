@@ -21,7 +21,12 @@ export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: { default: 'Admin', template: `%s | ${siteConfig.brand} admin` },
   robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
-  icons: { icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }] },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '16x16 32x32 48x48' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+    ],
+  },
 }
 
 export const viewport: Viewport = {

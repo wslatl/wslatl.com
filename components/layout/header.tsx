@@ -6,7 +6,7 @@ import { useRef } from 'react'
 import { ArrowUpRight, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { SiteLink, isExternal } from '@/components/ui/site-link'
-import { Wordmark } from '@/components/brand/wordmark'
+import { Logo } from '@/components/brand/logo'
 import { DiscordIcon } from '@/components/brand/icons'
 import { LoginMenu } from '@/components/layout/login-menu'
 import { LanguagePicker } from '@/components/layout/language-picker'
@@ -74,13 +74,13 @@ export function Header({
   const menuRef = useRef<HTMLDivElement>(null)
   const closeMenu = () => menuRef.current?.hidePopover()
 
+  // Solid, not see-through: the brand kit puts the logo on a solid surface,
+  // never over the page scrolling underneath.
   return (
-    <header className="site-header sticky top-0 z-50 border-b bg-background/85 backdrop-blur-md print:hidden">
-      {/* A size container, so the wordmark text can step aside when enlarged
-          text leaves no room (the query is in rem, so it follows font size). */}
-      <div className="shell @container flex h-16 items-center gap-3 lg:gap-6">
+    <header className="site-header sticky top-0 z-50 border-b bg-background print:hidden">
+      <div className="shell flex h-16 items-center gap-3 lg:gap-6">
         <Link href={homeHref} className="-m-1 flex shrink-0 items-center rounded-md p-1" aria-label={labels.home}>
-          <Wordmark textClassName="@max-[17.5rem]:hidden" />
+          <Logo />
         </Link>
 
         <nav aria-label={labels.mainNav} className="hidden lg:block">

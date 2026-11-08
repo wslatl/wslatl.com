@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import { generateMetadata as homeMetadata } from '@/app/[locale]/page'
@@ -39,9 +39,34 @@ describe('the icons search results and browsers show', () => {
     expect(icoSizes(publicFile('favicon.ico')).toSorted((a, b) => a - b)).toEqual([16, 32, 48])
   })
 
-  it('draws the mark on a tile, so it does not vanish on a white results page', () => {
-    // The mark is white: a favicon.svg without a background is invisible on white.
-    expect(publicFile('favicon.svg').toString('utf8')).toMatch(/<rect [^>]*fill="#[0-9a-f]{6}"/i)
+  it('puts the mark on a solid tile where a transparent icon would not work', () => {
+    // iOS fills transparency with black, and a maskable icon must fill its
+    // square, so these two are RGB with no alpha channel: PNG colour type 2.
+    for (const name of ['apple-icon.png', 'icon-maskable-512.png']) {
+      expect(publicFile(name).readUInt8(25), name).toBe(2)
+    }
+  })
+
+  it('sends the retired favicon.svg to the PNG icon', async () => {
+    expect(existsSync(join(root, 'public', 'favicon.svg'))).toBe(false)
+    expect(await nextConfig.redirects!()).toContainEqual({
+      source: '/favicon.svg',
+      destination: '/icon-192.png',
+      permanent: true,
+    })
+  })
+
+  it('has the header mark at three times its 36px display', () => {
+    expect(imageSize(publicFile('brand/wslatl-mark.webp'))).toEqual({ width: 108, height: 108 })
+  })
+
+  it('stores favicon.ico as classic bitmaps, the form every ICO reader takes', () => {
+    const ico = publicFile('favicon.ico')
+    for (let i = 0; i < ico.readUInt16LE(4); i++) {
+      const at = ico.readUInt32LE(6 + i * 16 + 12)
+      // A 40-byte BITMAPINFOHEADER at 32 bits per pixel, not an embedded PNG.
+      expect([ico.readUInt32LE(at), ico.readUInt16LE(at + 14)]).toEqual([40, 32])
+    }
   })
 
   it('lists only icons that exist in the web app manifest', () => {
