@@ -373,7 +373,7 @@ The admin and the updater are the shared kit's, the same in WSLATL's other apps,
 
 ## Local development
 
-You need Node.js 20.9 or newer (CI uses 22). npm is the package manager.
+You need Node.js 22, the version in `.nvmrc` and the one the kit asks for (`platform/versions.json`). npm is the package manager.
 
 ```bash
 npm install
