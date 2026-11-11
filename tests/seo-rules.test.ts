@@ -248,7 +248,7 @@ describe('the structured data rules', () => {
   })
 })
 
-function entry(path: string, overrides: Record<string, string> = {}) {
+function sitemapEntry(path: string, overrides: Record<string, string> = {}) {
   const alternates = Object.fromEntries(
     alternateKeys.map((key) => [key, expectedUrl(origin, key === 'x-default' ? 'en' : key, path)]),
   )
@@ -256,7 +256,7 @@ function entry(path: string, overrides: Record<string, string> = {}) {
 }
 
 describe('the sitemap rules', () => {
-  const full = [entry('/'), entry('/games')].flatMap((e) =>
+  const full = [sitemapEntry('/'), sitemapEntry('/games')].flatMap((e) =>
     locales.map((l) => ({ loc: expectedUrl(origin, l, new URL(e.loc).pathname), alternates: e.alternates })),
   )
 
@@ -269,15 +269,15 @@ describe('the sitemap rules', () => {
     expect(checkSitemap([{ ...full[0], loc: 'https://example.com/' }, ...full.slice(1)], { origin })).toEqual(
       expect.arrayContaining(['https://example.com/ is not on https://wslatl.com']),
     )
-    expect(checkSitemap([...full, { ...entry('/legal/'), loc: `${origin}/legal/` }], { origin })).toEqual(
+    expect(checkSitemap([...full, { ...sitemapEntry('/legal/'), loc: `${origin}/legal/` }], { origin })).toEqual(
       expect.arrayContaining([`${origin}/legal/ ends in a slash`]),
     )
   })
 
   it('catches a missing language, a missing x-default, and an alternate the sitemap does not list', () => {
-    const { fr: _fr, ...noFrench } = entry('/games').alternates
+    const { fr: _fr, ...noFrench } = sitemapEntry('/games').alternates
     expect(checkSitemap([{ ...full[0], alternates: noFrench }], { origin })[0]).toContain('lists alternates')
-    const { 'x-default': _x, ...noDefault } = entry('/games').alternates
+    const { 'x-default': _x, ...noDefault } = sitemapEntry('/games').alternates
     expect(checkSitemap([{ ...full[0], alternates: noDefault }], { origin })[0]).toContain('lists alternates')
     expect(checkSitemap(full.slice(0, 1), { origin })).toEqual(expect.arrayContaining([expect.stringContaining('which the sitemap does not list')]))
   })
