@@ -3,9 +3,10 @@
 # file, rule and line gitleaks reports for it. A new finding needs a review
 # and a line of its own here; nothing is left out by file or by pattern.
 #
-# All seven are made-up admin password hashes that no password makes, found
-# by this repository's own rule for hashes (.gitleaks.toml). Their salts
-# spell saltsaltsaltsalt and canary-salt-canary in base64.
+# The first seven are made-up admin password hashes that no password makes,
+# found by this repository's own rule for hashes (.gitleaks.toml). Their
+# salts spell saltsaltsaltsalt and canary-salt-canary in base64. The rest are
+# the shared kit's file hashes (below).
 
 # The canary settings CI builds with, to prove no setting reaches the build.
 250709f38882a1709c0fdc34fa9a18c43e7773b9:.github/workflows/ci.yml:wslatl-admin-password-hash:35
@@ -18,3 +19,14 @@
 250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:38
 250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:39
 250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:77
+
+# The SHA-256 of a kit file, as platform/MANIFEST.json records it for
+# npm run platform:check: gitleaks' generic rule takes one for a key when the
+# file's path holds a word such as password, auth or tokens. Each was checked
+# against the file it names. A sync to a new kit version changes them, and
+# each new one needs the same check and a line here.
+ac59cffedd5c16dbf0574af823f98528a1d26f79:platform/MANIFEST.json:generic-api-key:24
+ac59cffedd5c16dbf0574af823f98528a1d26f79:platform/MANIFEST.json:generic-api-key:41
+ac59cffedd5c16dbf0574af823f98528a1d26f79:platform/MANIFEST.json:generic-api-key:48
+ac59cffedd5c16dbf0574af823f98528a1d26f79:platform/MANIFEST.json:generic-api-key:94
+c417dc2e45b07918dece919394ef329ccf08da63:platform/MANIFEST.json:generic-api-key:94
