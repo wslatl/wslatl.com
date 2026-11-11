@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronDown, LogIn, UserPlus } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/components/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,11 +10,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import type { PortalEntry } from '@/components/layout/header'
+import type { PortalLink } from '@/data/nav'
 
 interface LoginMenuProps {
-  portals: PortalEntry[]
-  requestAccess: PortalEntry
+  portals: PortalLink[]
+  requestAccess: PortalLink
   labels: { login: string; clientPanels: string; newTab: string }
 }
 

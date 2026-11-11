@@ -1,3 +1,4 @@
+import { markShortLink } from '@/config/links'
 import { siteConfig } from '@/config/site'
 import { localePath, type Locale } from '@/i18n/config'
 import type { Copy } from '@/i18n/copy/en'
@@ -11,9 +12,10 @@ export interface FooterColumn {
   links: NavLink[]
 }
 
+/** The footer's columns. Off-site links, short links included, open in a new tab. */
 export function footerColumns(t: Copy, locale: Locale, legalPages: LegalPage[]): FooterColumn[] {
   const path = (href: string) => localePath(locale, href)
-  return [
+  const columns: FooterColumn[] = [
     {
       title: t.footer.columns.hosting,
       links: [
@@ -47,4 +49,5 @@ export function footerColumns(t: Copy, locale: Locale, legalPages: LegalPage[]):
       links: legalPages.map(({ label, href }) => ({ label, href: path(href) })),
     },
   ]
+  return columns.map((column) => ({ ...column, links: column.links.map(markShortLink) }))
 }

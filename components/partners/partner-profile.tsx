@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { ArrowLeft, ArrowUpRight, BadgeCheck } from 'lucide-react'
 import { Breadcrumbs } from '@/components/layout/page-header'
-import { CopyCode } from '@/components/partners/copy-code'
+import { CopyButton } from '@/platform/components/copy-button'
 import { copyLabels } from '@/components/partners/partner-card'
 import { PartnerAvatar, PartnerBanner } from '@/components/partners/partner-pictures'
 import { SharePartnerAd } from '@/components/share/ads'
 import { SocialIcon } from '@/components/partners/social-icon'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/components/button'
 import type { Partner } from '@/data/partners'
 import { localePath } from '@/i18n/config'
 import { localizedGames } from '@/i18n/content'
@@ -100,7 +100,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
               <h2 id="referral-heading" className="text-sm font-medium text-muted-foreground">
                 {words.profile.referral(partner.name)}
               </h2>
-              <CopyCode code={partner.referralCode} labels={copyLabels(t)} size="lg" className="mt-3" />
+              <CopyButton value={partner.referralCode} labels={copyLabels(t)} size="lg" className="mt-3" />
               <Button asChild size="lg" className="mt-6 h-auto min-h-11 w-full py-2.5 text-center whitespace-normal">
                 <a href={referralSignupUrl(partner.referralCode)} target="_blank" rel="noopener noreferrer">
                   {words.profile.signUp}

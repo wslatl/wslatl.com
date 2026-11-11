@@ -1,26 +1,29 @@
 import { ShareSiteAd } from '@/components/share/ads'
 import { Email } from '@/components/ui/email'
-import { SiteLink } from '@/components/ui/site-link'
+import { markShortLink } from '@/config/links'
 import { footerColumns } from '@/data/footer'
 import { siteConfig } from '@/config/site'
 import { copy } from '@/i18n/copy'
 import { getLocale } from '@/i18n/locale'
 import { localizedLegalPages } from '@/i18n/content'
+import { SiteFooter } from '@/platform/components/site-footer'
 
 // Every page is static, so this is the year the site was built. Read here
 // rather than while rendering, which keeps the render itself free of the clock.
 const copyrightYear = new Date().getFullYear()
 
+/** The kit's footer, with this site's columns, its about block and its bottom line. */
 export function Footer() {
   const locale = getLocale()
   const t = copy()
-  const columns = footerColumns(t, locale, localizedLegalPages())
 
   return (
-    <footer className="mt-24 border-t bg-card/20 print:hidden">
-      <div className="shell grid gap-12 py-14 lg:grid-cols-[1.1fr_3fr]">
-        {/* No logo here: the brand kit shows the mark once per page, in the header. */}
-        <div className="max-w-xs">
+    <SiteFooter
+      columns={footerColumns(t, locale, localizedLegalPages())}
+      newTabLabel={t.header.newTab}
+      // No logo here: the brand kit shows the mark once per page, in the header.
+      about={
+        <>
           <p className="text-sm leading-relaxed text-muted-foreground">
             {t.footer.blurb(siteConfig.location)} <span lang="en">{siteConfig.slogan}</span>
           </p>
@@ -29,40 +32,10 @@ export function Footer() {
           </p>
           <p className="mt-5 text-sm text-muted-foreground">{t.share.shareOurAdHint}</p>
           <ShareSiteAd size="sm" className="mt-2" />
-        </div>
-
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4">
-          {columns.map((col) => (
-            <nav key={col.title} aria-label={col.title}>
-              <h2 className="text-sm font-semibold text-foreground">{col.title}</h2>
-              <ul className="mt-4 space-y-2.5 text-sm">
-                {col.links.map((link) => (
-                  <li key={`${col.title}-${link.label}`}>
-                    <SiteLink
-                      href={link.href}
-                      newTab={t.header.newTab}
-                      className="text-muted-foreground transition-colors break-words hyphens-auto hover:text-foreground"
-                    >
-                      {link.label}
-                    </SiteLink>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          ))}
-        </div>
-      </div>
-
-      <div className="border-t">
-        <div className="shell flex flex-col gap-2 py-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>{t.footer.rights(copyrightYear, siteConfig.legal.companyName)}</p>
-          <p>
-            <SiteLink href={siteConfig.links.credits} newTab={t.header.newTab} className="transition-colors hover:text-foreground">
-              {siteConfig.credits.label}
-            </SiteLink>
-          </p>
-        </div>
-      </div>
-    </footer>
+        </>
+      }
+      legal={t.footer.rights(copyrightYear, siteConfig.legal.companyName)}
+      credit={markShortLink({ label: siteConfig.credits.label, href: siteConfig.links.credits })}
+    />
   )
 }

@@ -1,5 +1,5 @@
 import { ArrowUpRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/components/button'
 import { siteConfig } from '@/config/site'
 import { copy } from '@/i18n/copy'
 import { localizedReviews } from '@/i18n/content'

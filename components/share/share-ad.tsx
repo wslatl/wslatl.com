@@ -2,8 +2,8 @@
 
 import { useId, useRef, useSyncExternalStore } from 'react'
 import { Check, Copy, Share2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { useCopyText } from '@/components/ui/use-copy-text'
+import { Button } from '@/platform/components/button'
+import { useCopyText } from '@/platform/components/use-copy-text'
 import type { ShareLabels } from '@/lib/share'
 import { cn } from '@/lib/utils'
 

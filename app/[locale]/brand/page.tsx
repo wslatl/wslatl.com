@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { BrandHeader, BrandKit } from '@/components/brand/brand-kit'
 import { Footer } from '@/components/layout/footer'
-import { Main } from '@/components/layout/main'
+import { Main } from '@/platform/components/main'
 import { SiteHeader } from '@/components/layout/site-header'
 import type { Locale } from '@/i18n/config'
 import { setLocale } from '@/i18n/locale'
