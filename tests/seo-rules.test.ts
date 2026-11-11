@@ -149,10 +149,17 @@ describe('the page rules', () => {
   })
 })
 
+const crumbs = (items: unknown[]) => ({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items })
+const item = (position: number, name: string, href: string) => ({ '@type': 'ListItem', position, name, item: href })
+const faqBlock = (name: string, text: string) => ({
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [{ '@type': 'Question', name, acceptedAnswer: { '@type': 'Answer', text } }],
+})
+const offer = (price: string) => ({ '@type': 'Product', name: 'P-VPS-2', offers: { '@type': 'Offer', price, priceCurrency: 'USD' } })
+
 describe('the structured data rules', () => {
   const organization = { '@context': 'https://schema.org', '@type': 'Organization', name: 'WSLATL LLC', url: origin, logo: `${origin}/logo.png` }
-  const crumbs = (items: unknown[]) => ({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items })
-  const item = (position: number, name: string, href: string) => ({ '@type': 'ListItem', position, name, item: href })
 
   it('rejects JSON that does not parse', () => {
     const { url, parsed } = page()
@@ -201,11 +208,6 @@ describe('the structured data rules', () => {
     ])
   })
 
-  const faqBlock = (name: string, text: string) => ({
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [{ '@type': 'Question', name, acceptedAnswer: { '@type': 'Answer', text } }],
-  })
   const faqBody = '<main><h1>Games</h1><details class="faq-item"><summary>How do I pay?</summary><p>By card.</p></details></main>'
   const base = [organization, crumbs([item(1, 'Home', origin), item(2, 'Games', `${origin}/games`)])]
 
@@ -224,7 +226,6 @@ describe('the structured data rules', () => {
   })
 
   it('wants the pricing page to carry offers, and each price to be one the page shows', () => {
-    const offer = (price: string) => ({ '@type': 'Product', name: 'P-VPS-2', offers: { '@type': 'Offer', price, priceCurrency: 'USD' } })
     const body = '<main><h1>Pricing</h1><p>P-VPS-2 $6.50 a month</p></main>'
     const onPricing = [organization, crumbs([item(1, 'Home', origin), item(2, 'Pricing', `${origin}/pricing`)])]
     const check = (jsonLd: unknown[]) => problemsOf({ path: '/pricing', body, jsonLd })
