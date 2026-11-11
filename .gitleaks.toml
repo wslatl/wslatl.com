@@ -1,7 +1,11 @@
 # Settings for the secret scan in .github/workflows/security.yml, which runs
-# gitleaks over every commit. gitleaks' own rules, and one more for this
+# gitleaks over every commit: gitleaks' own rules, and one more for this
 # site's admin password hashes, which no general rule knows the shape of.
-# Every exception below is a made-up value, with the reason beside it.
+#
+# The findings reviewed and set aside are in .gitleaksignore, each by its
+# commit, file and line. An exception list kept here, for this rule or for
+# all, was not applied by this version of gitleaks while its own rules are
+# extended (gitleaks issue 1919), so none is kept.
 
 [extend]
 useDefault = true
@@ -11,13 +15,3 @@ id = "wslatl-admin-password-hash"
 description = "An admin password hash: the ADMIN_PASSWORD_HASH line npm run admin:hash prints, which belongs in .env on the server alone"
 regex = '''scrypt:\d+:\d+:\d+:[A-Za-z0-9_-]{16,}:[A-Za-z0-9_-]{32,}'''
 keywords = ["scrypt:"]
-
-# The made-up hashes in the tests and in CI, which no password makes. Their
-# salts spell saltsaltsaltsalt and canary-salt-canary in base64, so a hash
-# with one of those salts is one of them. A list for every rule, since this
-# version of gitleaks does not apply one kept for a single rule when its own
-# rules are extended; no real secret contains these salts.
-[[allowlists]]
-description = "Made-up admin password hashes in the tests and CI"
-regexes = ['''scrypt:\d+:\d+:\d+:c2FsdHNhbHRzYWx0c2FsdA:''', '''scrypt:\d+:\d+:\d+:Y2FuYXJ5LXNhbHQtY2FuYXJ5:''']
-regexTarget = "match"

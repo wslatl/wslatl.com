@@ -28,6 +28,7 @@ export const devOnlyPaths = Object.freeze([
   'eslint.config.mjs',
   '.oxlintrc.json',
   '.gitleaks.toml',
+  '.gitleaksignore',
   'lighthouserc.json',
   'lychee.toml',
   'tsconfig.tsbuildinfo',

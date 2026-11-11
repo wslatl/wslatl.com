@@ -1,0 +1,20 @@
+# Findings of the secret scan (.github/workflows/security.yml) that were
+# reviewed and are not secrets. Each line is one finding, by the commit,
+# file, rule and line gitleaks reports for it. A new finding needs a review
+# and a line of its own here; nothing is left out by file or by pattern.
+#
+# All seven are made-up admin password hashes that no password makes, found
+# by this repository's own rule for hashes (.gitleaks.toml). Their salts
+# spell saltsaltsaltsalt and canary-salt-canary in base64.
+
+# The canary settings CI builds with, to prove no setting reaches the build.
+250709f38882a1709c0fdc34fa9a18c43e7773b9:.github/workflows/ci.yml:wslatl-admin-password-hash:35
+93d74c45c5f2f5c3ec0f06a0b6d723b429c45356:.github/workflows/security.yml:wslatl-admin-password-hash:79
+
+# Malformed and out-of-range hashes the admin must refuse, and a well-formed
+# one for the settings tests, in tests/admin-auth.test.ts.
+250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:36
+250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:37
+250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:38
+250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:39
+250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:77
