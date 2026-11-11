@@ -7,7 +7,9 @@ import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
  *   <html lang="en" className={fontClassNames}>
  */
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
-const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono' })
+// Mono is set only for codes and values on a few pages, so it is not
+// preloaded on every page: the browser fetches it where a page uses it.
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono', preload: false })
 // The serif is only ever set in italic (page titles, quotes), so the upright
 // face is not loaded at all.
 const instrumentSerif = Instrument_Serif({

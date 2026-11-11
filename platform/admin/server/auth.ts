@@ -1,7 +1,7 @@
 import 'server-only'
 import { readCookie } from './request'
 import { readSession, SESSION_COOKIE } from './session'
-import { passwordSettings, type Env } from './settings'
+import { signInSettings, type Env } from './settings'
 
 /**
  * How the kit finds out who sent a request. The app picks one with
@@ -62,9 +62,9 @@ export function adminRequest(headers: Headers): AdminRequest {
 /** The kit's one shared password: ADMIN_PASSWORD_HASH and ADMIN_SESSION_SECRET, as npm run admin:hash prints them. */
 export const sharedPassword: AdminAuth = Object.freeze({
   kind: 'password' as const,
-  problems: (env: Env) => passwordSettings(env).problems,
+  problems: (env: Env) => signInSettings(env).problems,
   user(request: AdminRequest, env: Env): AdminUser | null {
-    const { keys } = passwordSettings(env)
+    const { keys } = signInSettings(env)
     return keys && readSession(request.cookie(SESSION_COOKIE), keys) ? { name: 'admin' } : null
   },
   signInPath: '/admin/login',

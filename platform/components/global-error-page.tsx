@@ -40,6 +40,9 @@ const colors = {
 }
 
 const button: React.CSSProperties = {
+  // The shorthand first: it resets every font property, so the size and
+  // weight below are the ones that stay.
+  font: 'inherit',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -48,7 +51,6 @@ const button: React.CSSProperties = {
   borderRadius: '0.5rem',
   fontSize: '0.9375rem',
   fontWeight: 500,
-  font: 'inherit',
   cursor: 'pointer',
   textDecoration: 'none',
 }

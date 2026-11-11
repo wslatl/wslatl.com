@@ -1,9 +1,8 @@
 import 'server-only'
 // The one place the kit reads the app it sits in: platform.config.mjs at
-// the app's root, two folders up from platform/admin/. The kit's own repo
-// has no app around it, so there is nothing at that path there, and its
-// tests give this module a config of their own.
-// @ts-ignore: the file is the app's own, and exists only in an app.
+// the app's root, two folders up from platform/admin/. In the kit's own repo
+// the same path finds the kit's stand-in, and the tests that need another
+// app's settings give this module a config of their own.
 import platformConfig from '../../platform.config.mjs'
 import type { PlatformConfig } from '../config.mjs'
 import { createAdmin } from './admin'

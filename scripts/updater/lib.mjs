@@ -595,7 +595,10 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, fileEnv = {
   let state = readState(paths)
   if (isBusy(state)) return state
 
-  const live = serving && existsSync(serving) ? serving : liveDir(paths, state)
+  // The folder is known only at run time. The hint stops an app that bundles
+  // this file from tracing the whole project for it, as the admin's own
+  // paths do (platform/admin/server/adopt-updater.ts).
+  const live = serving && existsSync(/* turbopackIgnore: true */ serving) ? serving : liveDir(paths, state)
   const spare = [live, ...inUse]
   // The release running now: the state's current one, or the one before when
   // a rollback could not be recorded, but only if its folder is the one
@@ -962,7 +965,8 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, fileEnv = {
 export async function rollBack({ paths, deps, reason, crashed = false, serving = null, allowUpload = false }) {
   const state = readState(paths)
   if (isBusy(state)) return { ok: false, message: 'An update is running, so nothing was rolled back.' }
-  const from = serving && existsSync(serving) ? serving : liveDir(paths, state)
+  // Known only at run time, as in runUpdate.
+  const from = serving && existsSync(/* turbopackIgnore: true */ serving) ? serving : liveDir(paths, state)
   const leaving = state.current && parseVersion(state.current.tag) && releaseDir(paths, state.current.tag) === from ? state.current : null
   if (!leaving) return { ok: false, message: 'The site does not run an installed release, so there is nothing to go back to.' }
   const previous = state.previous && parseVersion(state.previous.tag) ? releaseDir(paths, state.previous.tag) : null

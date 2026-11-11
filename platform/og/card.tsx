@@ -68,8 +68,7 @@ export function drawShareCard(input: ShareCardInput): ImageResponse {
           fontFamily: 'Geist',
         }}
       >
-        {/* ImageResponse draws plain elements, so next/image does not apply. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {/* oxlint-disable-next-line nextjs/no-img-element -- ImageResponse draws plain elements, so next/image does not apply */}
         <img src={assets.lockup} width={224} height={64} alt={`WSLATL ${appName}`} />
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>

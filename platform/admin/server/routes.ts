@@ -6,7 +6,7 @@ import { verifyPassword } from './password'
 import { adminLimits } from './rate-limit'
 import { adminLog, bare, checkPost, checkRead, clientIp, json, limitKey, readCookie, whoFrom } from './request'
 import { createSession, endSession, SESSION_COOKIE, sessionCookie } from './session'
-import { passwordSettings } from './settings'
+import { signInSettings } from './settings'
 import { requestUpdate, updaterStatus } from './updater'
 
 /**
@@ -70,7 +70,7 @@ export function adminRoutes(core: AdminCore): AdminRoutes {
         if (!(await core.settings()) || !passwordOnly()) return bare(404)
         const check = await checkPost(request)
         if (!check.ok) return check.response
-        const { keys } = passwordSettings(process.env)
+        const { keys } = signInSettings(process.env)
         if (!keys) return bare(404)
 
         // Counted before the password is checked, so a burst is refused at
@@ -135,7 +135,7 @@ export function adminRoutes(core: AdminCore): AdminRoutes {
         if (!(await core.settings()) || !passwordOnly()) return bare(404)
         const check = await checkPost(request)
         if (!check.ok) return check.response
-        const { keys } = passwordSettings(process.env)
+        const { keys } = signInSettings(process.env)
         if (!keys) return bare(404)
         if (endSession(readCookie(request.headers.get('cookie'), SESSION_COOKIE), keys)) adminLog(`logout from ${whoFrom(request.headers)}`)
         const response = json({ ok: true })

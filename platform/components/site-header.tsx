@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { ArrowUpRight, LayoutGrid, Menu, X } from 'lucide-react'
 import { Button, buttonVariants } from './button'
 import { Logo } from './logo'
@@ -16,6 +16,8 @@ export interface NavItem {
   external?: boolean
   /** Only in the desktop bar from 72rem up. */
   wideOnly?: boolean
+  /** Only in the mobile menu, as one more row of its list. Left out of the desktop bar. */
+  mobileOnly?: boolean
 }
 
 export interface AppLink {
@@ -43,14 +45,25 @@ export interface SiteHeaderProps {
   openMenuLabel: string
   /** Everything on the right of the bar: login, language, buttons. They sit before the menu button. */
   actions?: React.ReactNode
-  /** Below the links in the mobile menu: a call to action, a language list. */
-  mobileFooter?: React.ReactNode
+  /**
+   * Below the links in the mobile menu: a call to action, a language list.
+   * A function gets the menu's close callback, for a link or button that
+   * should close the menu when tapped. It needs a client component to pass
+   * one, since a server component cannot hand a function to the header.
+   */
+  mobileFooter?: React.ReactNode | ((close: () => void) => React.ReactNode)
   /** The small app switcher (Website, Guides, Status). Addresses come from the app. */
   switcher?: { label: string; apps: AppLink[] }
   /** Path segments that are a language and not a page (`['es', 'fr']`), ignored when marking the current page. */
   localePrefixes?: string[]
   /** The current path, when the app knows better than the router (a 404 rendered without the visitor's URL). */
   currentPath?: string
+}
+
+// A component of its own so the close callback arrives as a prop: calling
+// the footer function in SiteHeader's body would pass a ref reader during render.
+function MobileFooter({ footer, close }: { footer: SiteHeaderProps['mobileFooter']; close: () => void }) {
+  return <>{typeof footer === 'function' ? footer(close) : footer}</>
 }
 
 function stripPrefix(path: string, prefixes: string[]): string {
@@ -93,7 +106,7 @@ export function SiteHeader({
   // (button, Escape, tap outside) with or without JavaScript. Script is only
   // needed to close it after an in-app navigation keeps the page mounted.
   const menuRef = useRef<HTMLDivElement>(null)
-  const closeMenu = () => menuRef.current?.hidePopover()
+  const closeMenu = useCallback(() => menuRef.current?.hidePopover(), [])
   const switcherRef = useRef<HTMLDetailsElement>(null)
 
   // Solid, not see-through: the brand kit puts the logo on a solid surface,
@@ -116,7 +129,7 @@ export function SiteHeader({
               language; below it, where the wide-only ones are left out, a
               long label may wrap. */}
           <ul className="flex items-center">
-            {nav.map((link) => {
+            {nav.filter((link) => !link.mobileOnly).map((link) => {
               const current = isCurrent(pathname, link, localePrefixes)
               return (
                 <li key={link.href} className={cn(link.wideOnly && 'hidden min-[72rem]:block')}>
@@ -235,7 +248,7 @@ export function SiteHeader({
               </li>
             ))}
           </ul>
-          {mobileFooter}
+          <MobileFooter footer={mobileFooter} close={closeMenu} />
           {switcher && (
             <div className="mt-6 border-t pt-4">
               <p className="text-sm font-semibold text-foreground">{switcher.label}</p>

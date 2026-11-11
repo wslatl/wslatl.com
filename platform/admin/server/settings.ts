@@ -61,7 +61,7 @@ export function githubSettings(env: Env, defaultRepo: string): { github: GitHubS
 }
 
 /** The shared password's two settings, which npm run admin:hash prints together. */
-export function passwordSettings(env: Env): { keys: SessionKeys | null; problems: string[] } {
+export function signInSettings(env: Env): { keys: SessionKeys | null; problems: string[] } {
   const passwordHash = read(env, 'ADMIN_PASSWORD_HASH')
   const secret = read(env, 'ADMIN_SESSION_SECRET')
   const problems: string[] = []
