@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { adminPostRoutes, methodAllowed, rewriteTarget } from '@/i18n/routing'
+import { adminPolicy } from '@/config/security-headers.mjs'
+import { siteConfig } from '@/config/site'
+import { adminPostRoutes, isAdminPath, methodAllowed, rewriteTarget } from '@/i18n/routing'
 
 /**
  * Gives every request a language prefix behind the scenes, so the visitor's
@@ -16,9 +18,23 @@ import { adminPostRoutes, methodAllowed, rewriteTarget } from '@/i18n/routing'
  * POST without one skips the static page and renders it from scratch on
  * every request. tests/proxy.test.ts fails if a Server Action is added, or
  * if an admin route stops checking its POSTs.
+ *
+ * The admin also gets its Content Security Policy here, with a nonce that is
+ * new for every request (config/security-headers.mjs says why).
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const admin = isAdminPath(pathname)
+
+  // A visitor who reached Cloudflare over plain HTTP (Cloudflare says so in
+  // CF-Visitor) goes to the same address on HTTPS before anything else is
+  // answered, so no page, and above all not the admin's sign-in, is ever
+  // served unencrypted. Cloudflare's "Always Use HTTPS" does this at the edge
+  // (SECURITY.md); this covers it until that is on. The address is the
+  // site's own, never whatever Host the request named.
+  if (/"scheme"\s*:\s*"http"/.test(request.headers.get('cf-visitor') ?? '')) {
+    return NextResponse.redirect(`${siteConfig.siteUrl}${pathname}${request.nextUrl.search}`, 308)
+  }
 
   // The error overlay's endpoints, which only `next dev` serves. Some of them
   // take a POST, so they are let through before the method check. In
@@ -28,15 +44,47 @@ export function proxy(request: NextRequest) {
 
   if (request.headers.has('next-action') || !methodAllowed(request.method, pathname)) {
     const allow = adminPostRoutes.includes(pathname) ? 'GET, HEAD, POST' : 'GET, HEAD'
-    return new NextResponse(null, { status: 405, headers: { Allow: allow } })
+    const refused = new NextResponse(null, { status: 405, headers: { Allow: allow } })
+    // next.config.mjs leaves the admin's policy to this file.
+    if (admin) refused.headers.set('Content-Security-Policy', adminPolicy())
+    return refused
   }
 
+  if (admin) return withNonce(request)
+
   const target = rewriteTarget(pathname)
-  if (!target) return NextResponse.next()
+  // Next takes a page's nonce from the request's own Content-Security-Policy
+  // header. Only this file may set one, for the admin above, so a visitor's
+  // own is dropped: no page is ever rendered with a nonce the visitor chose.
+  const headers = request.headers.has('content-security-policy') ? withoutPolicy(request.headers) : null
+  const forwarded = headers ? { request: { headers } } : undefined
+  if (!target) return NextResponse.next(forwarded)
 
   const url = request.nextUrl.clone()
   url.pathname = target
-  return NextResponse.rewrite(url)
+  return NextResponse.rewrite(url, forwarded)
+}
+
+function withoutPolicy(original: Headers): Headers {
+  const headers = new Headers(original)
+  headers.delete('content-security-policy')
+  return headers
+}
+
+/**
+ * An admin page, rendered for this request alone, with a nonce of its own:
+ * Next reads it from the request's Content-Security-Policy header and puts it
+ * on every script it writes into the page, and the browser runs only the
+ * scripts that carry it. 128 random bits, so it cannot be guessed.
+ */
+function withNonce(request: NextRequest) {
+  const nonce = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))))
+  const policy = adminPolicy({ nonce, dev: process.env.NODE_ENV === 'development' })
+  const headers = new Headers(request.headers)
+  headers.set('content-security-policy', policy)
+  const response = NextResponse.next({ request: { headers } })
+  response.headers.set('Content-Security-Policy', policy)
+  return response
 }
 
 export const config = {
