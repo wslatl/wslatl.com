@@ -2,6 +2,8 @@
 # reviewed and are not secrets. Each line is one finding, by the commit,
 # file, rule and line gitleaks reports for it. A new finding needs a review
 # and a line of its own here; nothing is left out by file or by pattern.
+# The scan reads every commit there has ever been, so a line stays after the
+# file it names has changed or gone: the old commit still holds the finding.
 #
 # The first seven are made-up admin password hashes that no password makes,
 # found by this repository's own rule for hashes (.gitleaks.toml). Their
@@ -13,7 +15,8 @@
 93d74c45c5f2f5c3ec0f06a0b6d723b429c45356:.github/workflows/security.yml:wslatl-admin-password-hash:79
 
 # Malformed and out-of-range hashes the admin must refuse, and a well-formed
-# one for the settings tests, in tests/admin-auth.test.ts.
+# one for the settings tests, in tests/admin-auth.test.ts, which has since
+# gone: the kit's own tests cover them now.
 250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:36
 250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:37
 250709f38882a1709c0fdc34fa9a18c43e7773b9:tests/admin-auth.test.ts:wslatl-admin-password-hash:38
@@ -23,8 +26,9 @@
 # The SHA-256 of a kit file, as platform/MANIFEST.json records it for
 # npm run platform:check: gitleaks' generic rule takes one for a key when the
 # file's path holds a word such as password, auth or tokens. Each was checked
-# against the file it names. A sync to a new kit version changes them, and
-# each new one needs the same check and a line here.
+# against the file it names. Since kit v0.1.4 the manifest gives each hash a
+# line of its own, under "sha256", which the rule does not take for a key;
+# these five stay for the two commits that hold the older manifest.
 ac59cffedd5c16dbf0574af823f98528a1d26f79:platform/MANIFEST.json:generic-api-key:24
 ac59cffedd5c16dbf0574af823f98528a1d26f79:platform/MANIFEST.json:generic-api-key:41
 ac59cffedd5c16dbf0574af823f98528a1d26f79:platform/MANIFEST.json:generic-api-key:48
