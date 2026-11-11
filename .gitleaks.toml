@@ -13,9 +13,11 @@ regex = '''scrypt:\d+:\d+:\d+:[A-Za-z0-9_-]{16,}:[A-Za-z0-9_-]{32,}'''
 keywords = ["scrypt:"]
 
 # The made-up hashes in the tests and in CI, which no password makes. Their
-# salts spell saltsaltsaltsalt and canary-salt-canary in base64, so any hash
-# with one of those salts is one of them. Set out for this one rule only.
+# salts spell saltsaltsaltsalt and canary-salt-canary in base64, so a hash
+# with one of those salts is one of them. A list for every rule, since this
+# version of gitleaks does not apply one kept for a single rule when its own
+# rules are extended; no real secret contains these salts.
 [[allowlists]]
 description = "Made-up admin password hashes in the tests and CI"
-targetRules = ["wslatl-admin-password-hash"]
-stopwords = ["c2FsdHNhbHRzYWx0c2FsdA", "Y2FuYXJ5LXNhbHQtY2FuYXJ5"]
+regexes = ['''scrypt:\d+:\d+:\d+:c2FsdHNhbHRzYWx0c2FsdA:''', '''scrypt:\d+:\d+:\d+:Y2FuYXJ5LXNhbHQtY2FuYXJ5:''']
+regexTarget = "match"
