@@ -165,6 +165,9 @@ function nodesOf(page) {
   return found
 }
 
+/** The whole address, never a part of one: "schema.org" can sit inside any other host's address. */
+const schemaContexts = new Set(['https://schema.org', 'https://schema.org/', 'http://schema.org', 'http://schema.org/'])
+
 /**
  * Structured data has to parse, say what the page says, and keep to what
  * Google asks of each type. Prices and questions are compared with the
@@ -177,7 +180,7 @@ export function checkStructuredData(page, { url, origin, path, locale }) {
   })
   const nodes = nodesOf(page)
   for (const node of nodes) {
-    if (node['@context'] !== undefined && !String(node['@context']).includes('schema.org')) problems.push('structured data @context is not schema.org')
+    if (node['@context'] !== undefined && !schemaContexts.has(String(node['@context']))) problems.push('structured data @context is not schema.org')
   }
   const ofType = (type) => nodes.filter((node) => typesOf(node).includes(type))
 

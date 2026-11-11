@@ -170,6 +170,17 @@ describe('the structured data rules', () => {
     ])
   })
 
+  it('wants the schema.org address itself as the context, not one that merely contains it', () => {
+    const trail = crumbs([item(1, 'Home', origin), item(2, 'Games', `${origin}/games`)])
+    expect(problemsOf({ jsonLd: [{ ...organization, '@context': 'https://schema.org.example.com' }, trail] })).toEqual([
+      'structured data @context is not schema.org',
+    ])
+    expect(problemsOf({ jsonLd: [{ ...organization, '@context': 'https://example.com/schema.org' }, trail] })).toEqual([
+      'structured data @context is not schema.org',
+    ])
+    expect(problemsOf({ jsonLd: [{ ...organization, '@context': 'http://schema.org/' }, trail] })).toEqual([])
+  })
+
   it('wants WebSite data on the English home page only', () => {
     const site = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'WSLATL', url: origin }
     expect(problemsOf({ path: '/', jsonLd: [organization] })).toEqual(['0 WebSite blocks on the home page, expected 1'])
@@ -237,13 +248,14 @@ describe('the structured data rules', () => {
   })
 })
 
+function entry(path: string, overrides: Record<string, string> = {}) {
+  const alternates = Object.fromEntries(
+    alternateKeys.map((key) => [key, expectedUrl(origin, key === 'x-default' ? 'en' : key, path)]),
+  )
+  return { loc: expectedUrl(origin, 'en', path), alternates: { ...alternates, ...overrides } }
+}
+
 describe('the sitemap rules', () => {
-  const entry = (path: string, overrides: Record<string, string> = {}) => {
-    const alternates = Object.fromEntries(
-      alternateKeys.map((key) => [key, expectedUrl(origin, key === 'x-default' ? 'en' : key, path)]),
-    )
-    return { loc: expectedUrl(origin, 'en', path), alternates: { ...alternates, ...overrides } }
-  }
   const full = [entry('/'), entry('/games')].flatMap((e) =>
     locales.map((l) => ({ loc: expectedUrl(origin, l, new URL(e.loc).pathname), alternates: e.alternates })),
   )
@@ -325,8 +337,9 @@ Sitemap: ${origin}/sitemap.xml`, { origin })).toEqual([
   })
 })
 
+const parsed = (title: string, description: string) => ({ ...page().parsed, title, description })
+
 describe('the duplicate rule', () => {
-  const parsed = (title: string, description: string) => ({ ...page().parsed, title, description })
   it('lets the same words sit in different languages but not twice in one', () => {
     expect(
       checkDuplicates([
