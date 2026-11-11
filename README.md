@@ -41,7 +41,8 @@ app/
     brand/page.tsx         The brand kit: logo and downloads, colors, type, voice, do and don't, and the full kit on Google Drive (see Brand kit).
     not-found.tsx, error.tsx  Branded 404 and error pages.
 
-proxy.ts                   Serves the English tree at the unprefixed URLs, and answers 405 to every method but GET and HEAD, apart from POST on the admin's JSON routes.
+proxy.ts                   Serves the English tree at the unprefixed URLs, answers 405 to every method but GET and HEAD, apart from POST on the admin's JSON routes, sends plain-HTTP visitors to HTTPS, and gives the admin's pages their nonce.
+instrumentation.ts         Checks the admin's settings once, as the server starts.
 
 assets/                    Files the server reads from disk rather than serves: the share card's fonts and the WSLATL lockup (see Images, and CREDITS.md for the fonts).
 
@@ -59,13 +60,15 @@ components/
 config/site.ts             Company details, paths, credits, legal metadata and effective dates.
 config/links.json          Where each short link (/billing, /discord, ...) sends people.
 config/emails.ts           Our email addresses. Server-only; rendered through <Email>.
+config/security-headers.mjs  The security headers and both Content Security Policies (see SECURITY.md).
 config/referral.ts         The referral discount percent (first invoice only), which must match the billing panel.
 content/legal/             The text of each policy; index.ts maps each document and language to its text.
 data/                      Everything else the pages render (see below).
 i18n/                      Languages: the current one, the dictionaries, the translations.
 lib/                       pricing helpers, pageMetadata(), what each page says about itself (page-text.ts) and the share card's words (share-card.ts), cn() and slugify().
 scripts/                   Checks that need a build or a live site (see Automation), keep-old-assets.mjs (see Deploying), home-card.mjs (see Images), brand-kit.mjs (see Brand kit), and serve.mjs, the updater (see Admin and updates).
-tests/                     Vitest suites for data, links, and house style.
+tests/                     Vitest suites for data, links, and house style; attack/ and http/ attack the site (see SECURITY.md).
+SECURITY.md                How to report a problem, the threat model, and what is left to set up outside the code.
 ```
 
 ---
@@ -284,10 +287,10 @@ When you press Install, the updater asks GitHub once which commit the tag points
 
 `npm run serve` (`scripts/serve.mjs`) is the server's startup command. It runs `next start`, starts it again if it stops, and does the updating, since a running Next server cannot replace itself. **Install** writes `.updater/request.json`, and within two seconds the supervisor:
 
-1. **Download**: asks GitHub for the latest release, checks that its tag is a version newer than the installed one (see Releasing), asks which commit the tag points at, and downloads exactly that commit into `.updater/releases/<tag>/` (named by tag, since two releases may tag the same commit).
+1. **Download**: asks GitHub for the latest release, checks that its tag is a version newer than the installed one (see Releasing), asks which commit the tag points at (as `tags/<tag>`, so a branch of the same name is never taken for it), and downloads exactly that commit into `.updater/releases/<tag>/` (named by tag, since two releases may tag the same commit). Every file of the download is then checked against GitHub's own record of that commit (its tree, with the git hash of each file, from the API rather than the download servers), and the release is refused if a file differs, is missing, or is one the commit does not have (`scripts/updater/github.mjs`).
 2. **Install**: runs `npm ci --ignore-scripts` there.
 3. **Build**: runs `npm run build` there, with the live build's own assets copied in (not the old ones put back beside them) and the one shared `.next-static-history/`, so old hashed assets survive exactly as they do in a build by hand (see Deploying).
-4. **Clean up** (`prune` in the code): deletes from the release what production never uses (`devOnlyPaths` in `scripts/updater/dev-files.mjs`): `tests/`, `.github/`, `.vscode/`, `coverage/`, `lighthouse-reports/`, the Vitest, ESLint, Oxlint, Lighthouse and lychee configs, `tsconfig.tsbuildinfo` and `.next/cache/`. Then `npm prune --omit=dev --ignore-scripts` removes the devDependencies (Tailwind, PostCSS, TypeScript, ESLint, Oxlint, Vitest and what they pull in), which only the build and the checks use. Everything the site and the updater read stays: the rest of `.next/`, `public/`, `package.json`, `package-lock.json`, the production packages, `next.config.mjs` with the two files it imports (`next start` loads it too), `config/links.json` and `scripts/updater/release.mjs`, and all of `scripts/`, which the updater compares with the uploaded folder's. A file that cannot be deleted is logged and left.
+4. **Clean up** (`prune` in the code): deletes from the release what production never uses (`devOnlyPaths` in `scripts/updater/dev-files.mjs`): `tests/`, `.github/`, `.vscode/`, `coverage/`, `lighthouse-reports/`, the Vitest, ESLint, Oxlint, gitleaks, Lighthouse and lychee configs, `tsconfig.tsbuildinfo` and `.next/cache/`. Then `npm prune --omit=dev --ignore-scripts` removes the devDependencies (Tailwind, PostCSS, TypeScript, ESLint, Oxlint, Vitest and what they pull in), which only the build and the checks use. Everything the site and the updater read stays: the rest of `.next/`, `public/`, `package.json`, `package-lock.json`, the production packages, `next.config.mjs` with the three files it imports (`next start` loads it too), `config/links.json`, `config/security-headers.mjs` and `scripts/updater/release.mjs`, and all of `scripts/`, which the updater compares with the uploaded folder's. A file that cannot be deleted is logged and left.
 5. **Trial start**: starts the pruned build on a spare local port and waits for its home page to answer, so a release that still needs something the prune removed never goes live. Until here, the live site has not been touched.
 6. **Switch**: stops the live server and starts the new build on the real port. If it does not answer within two minutes, the release before it starts again (rolled back).
 
@@ -301,7 +304,7 @@ A new release is watched for ten minutes after its switch, across a restart of t
 
 **Disk space.** The live release and the one before it are kept and older ones deleted, and when the next update starts, every release but the live one is removed (the one before it, and one a crash took back out). So at most three copies of the site are on the disk at once: the uploaded folder, the live release and the new one. A release holds about 750 MB once it is built, and about 530 MB after the prune step (step 4), which runs before its trial start, so the trial proves the pruned release still starts. The uploaded folder keeps its full `node_modules` and build, about 750 MB, since it is built at start-up while no release is installed and the build tools are devDependencies; at every start it loses only the files on the same list (see above). npm's download cache, about 140 MB, lives in `.updater/npm-cache/` only while an update runs, and is deleted after it. That makes about 1.8 GB between updates, and about 2.2 GB at the most, while a new release builds beside the live one. Give the server a disk limit of at least 4 GB: Pterodactyl stops a server that goes over its limit, and does not start it again until it is back under.
 
-The supervisor reports through `.updater/state.json`, which the dashboard reads. The settings in `.env` are given to `next start`, and never to the updater's `npm ci`, its builds of a release or its `npm prune`; `npm ci` also skips install scripts, which is where a compromised package usually strikes (the site needs none: sharp and the compilers ship prebuilt). A build still runs the site's own code and its build tools, exactly as a build by hand does, and the build of the uploaded folder at start-up reads `.env` from that folder itself, as any build by hand does. The console logs each login and failed login with the visitor's address, each update request, and each step of an update.
+The supervisor reports through `.updater/state.json`, which the dashboard reads. The site itself keeps one file there too, `.updater/ended-sessions.json`: the sessions a sign-out ended, until they would have expired anyway, so a restart does not bring one back. The settings in `.env` are given to `next start`, and never to the updater's `npm ci`, its builds of a release or its `npm prune`; `npm ci` also skips install scripts, which is where a compromised package usually strikes (the site needs none: sharp and the compilers ship prebuilt). A build still runs the site's own code and its build tools, exactly as a build by hand does, and the build of the uploaded folder at start-up reads `.env` from that folder itself, as any build by hand does. The console logs each login and failed login with the visitor's address, each update request, and each step of an update.
 
 ### One-time setup on Pterodactyl
 
@@ -323,7 +326,8 @@ From then on, a change reaches the site as a release: see Releasing.
 - **Nothing to install.** The dashboard says why: no release is published yet, the latest release is the installed one, the release marked latest is older than the installed one, or its tag is not in the form `vMAJOR.MINOR.PATCH`.
 - **The dashboard says the updater itself changed.** `scripts/serve.mjs` and `scripts/updater/` always run from the uploaded folder, so a release that changes them takes effect only once they are copied over: press **Copy the new updater** on that notice, then restart the server from the panel. The notice goes at that restart. The button copies both from `.updater/releases/<tag>/scripts/` into the server's `scripts/` folder and keeps what was there in `.updater/updater-backup/`, so a bad updater can be put back by hand. No release replaces the updater by itself, because it is what rolls a bad release back. Without the button, put `cp -f .updater/releases/<tag>/scripts/serve.mjs scripts/serve.mjs; cp -rf .updater/releases/<tag>/scripts/updater/. scripts/updater/;` in front of the startup command, restart once, and take it off again.
 - **Going back to uploading by hand.** Once an update has run, the site is served from `.updater/releases/`, so files uploaded to the server's folder are not served. Stop the server, delete the `.updater/` folder (never `.env` or `.next-static-history/`), and start it again: it builds the uploaded folder and serves it.
-- **Logging everyone out.** Change `ADMIN_SESSION_SECRET` or the password, and restart. A session lasts two hours anyway.
+- **Logging everyone out.** Change `ADMIN_SESSION_SECRET` or the password, and restart. A session lasts two hours anyway, and **Sign out** ends its own session for good, a copy of the cookie included.
+- **An update failed with "The download does not match commit ...".** What arrived from GitHub's download servers is not what GitHub's API says the commit holds, so nothing was installed. Try again later; if it keeps happening, do not install that release, and look at it on GitHub. A `.gitattributes` line with `export-ignore` or `export-subst` also changes the download, and is not supported.
 - **A new release went back by itself.** It stopped three times within ten minutes of its switch; the dashboard says so, and the console has its errors. That release is not offered again: fix it, publish the fix as a newer release, and install that.
 - **`.updater/state.json` is damaged.** The console says so at start-up. The site then runs from the uploaded folder, and no release is deleted until an update writes the file again.
 
@@ -331,22 +335,25 @@ From then on, a change reaches the site as a release: see Releasing.
 
 ### How it is kept safe
 
-- **Login.** The password is checked against an scrypt hash in constant time. Each address gets 5 attempts and everyone together 30 per 15 minutes, counted before the password is checked, and at most two checks run at once. Your own successful logins give their attempt back.
+- **Login.** The password is checked against an scrypt hash in constant time. Each address gets 5 attempts and everyone together 30 per 15 minutes, counted before the password is checked, and at most two checks run at once. Your own successful logins give their attempt back. The address is Cloudflare's `CF-Connecting-IP` and nothing else: `X-Forwarded-For` says whatever the visitor wants, so it is never read, and a request without a valid `CF-Connecting-IP` counts as one address, "unknown", with all the others like it. A browser that has signed in before carries a device cookie (`admin_device`, `lib/admin/device.ts`, after OWASP's device cookies): signed by the site, HttpOnly, Secure, SameSite=Strict, Path=/admin, for 180 days, renewed at every sign-in and kept on sign-out. Its attempts count on their own, 5 per 15 minutes, instead of against the 30, so a flood of guesses from elsewhere cannot keep you out. A cookie the site did not sign counts as none, so does one more than 180 days old (its id carries the time it was made), and changing the password ends every device's standing.
 - **Only four routes take a POST:** `/admin/api/login`, `/admin/api/logout`, `/admin/api/update` and `/admin/api/adopt-updater` (`adminPostRoutes` in `i18n/routing.ts`).
-- **Session.** A signed cookie, `wslatl_admin`: HttpOnly, Secure, SameSite=Strict, Path=/admin, two hours. Its key comes from the session secret and the password hash together.
-- **Every POST** must come from a page on this site (the `Origin` matches the host, and `Sec-Fetch-Site`, when sent, is `same-origin`), as JSON, and at most 4 KB. `proxy.ts` answers every other POST with a 405; `tests/proxy.test.ts` checks that each admin POST handler calls `checkPost()` before anything else.
-- **Secrets** are read on the server, on each request, in `server-only` modules. `tests/admin-secrets.test.ts` keeps them away from client components, and `npm run scan:build` fails if a secret from `.env`, a password hash or a GitHub token turns up in anything the site serves. CI builds with made-up values in `.env` to prove it.
+- **Session.** A signed cookie, `__Host-wslatl_admin`: HttpOnly, Secure, SameSite=Strict, Path=/, two hours. The `__Host-` name makes the browser keep it only like that, with no Domain, so no other site under wslatl.com can set or replace it. Its key comes from the session secret (32 characters at least, checked when the server starts) and the password hash together, and only the one spelling the server writes is accepted. Each session has an id of its own, and **Sign out** ends it for good: a copy of the cookie stops working too, across a restart under `npm run serve` (`.updater/ended-sessions.json`).
+- **Every POST** must come from a page on this site (the `Origin` matches the host, and `Sec-Fetch-Site`, when sent, is `same-origin`), as JSON, and at most 4 KB. The status route refuses a read sent from another site the same way. `proxy.ts` answers every other POST with a 405; `tests/proxy.test.ts` checks that each admin POST handler calls `checkPost()` before anything else.
+- **Its own Content Security Policy.** The admin's pages are rendered for each request, so `proxy.ts` gives each one a fresh nonce, and they run no inline script or style without it (`config/security-headers.mjs`, which says why the public pages cannot do the same).
+- **HTTPS.** A visitor who reaches Cloudflare over plain HTTP (its `CF-Visitor` header says so) is sent to the same address on HTTPS before anything is answered.
+- **Secrets** are read on the server, on each request, in `server-only` modules. `tests/admin-secrets.test.ts` keeps them away from client components, and `npm run scan:build` fails if a secret from `.env`, a password hash or a GitHub token turns up anywhere in the build. CI builds with made-up values in `.env` to prove it. The token goes to GitHub's API over HTTPS and nowhere else: with any other `GITHUB_API_URL`, the admin and the updates stay off.
+- **Attack tests.** `tests/attack/` and `tests/http/` try each of these from outside, by request and response, and SECURITY.md has the threat model, which test covers what, and what is left to set up outside the code.
 - **Release notes** come from GitHub and show on a page that holds the session, so they are never taken as HTML. `components/admin/release-notes.tsx` reads their Markdown itself and builds React elements from it: every piece of text reaches the page escaped, raw HTML included, and a link goes only to an https, http or mailto address. Any other link (`javascript:`, `data:`, a relative path) shows as its text, and an image as its alt text. `tests/admin-release-notes.test.ts` renders our own notes, GitHub's generated ones, and a list of attacks.
 - **If any required setting is missing,** the admin is off. It never runs open.
-- **Lockouts.** The overall limit stops the password being guessed however many addresses are used, and its flip side is that anyone with a handful of addresses (one IPv6 network holds hundreds) can use it up and keep the login locked, through Cloudflare or not. The per-address limit cannot prevent that: it reads Cloudflare's `CF-Connecting-IP`, which anyone who reaches the server's port directly can make up, and Next keeps a client's own `X-Forwarded-For`. Cloudflare Access in front of `/admin` (setup step 7) closes it. Accepting connections to the server's port from Cloudflare's addresses only (or a Cloudflare Tunnel) keeps the address honest as well.
+- **Lockouts.** The overall limit stops the password being guessed however many addresses are used, and its flip side is that anyone with a handful of addresses (one IPv6 network holds hundreds) can use it up and keep the login locked for a browser with no device cookie: a new one, or any after the password changes. The per-address limit cannot prevent that: it reads Cloudflare's `CF-Connecting-IP`, which anyone who reaches the server's port directly can make up, so it is only trustworthy once the server's port accepts connections from Cloudflare's addresses alone (or a Cloudflare Tunnel is used). Cloudflare Access in front of `/admin` (setup step 7) closes it.
 
 | File | What it holds |
 | --- | --- |
 | `app/admin/` | The login page, the dashboard, the admin's colours (`admin.css`), and the JSON routes under `api/` (login, logout, update) |
 | `components/admin/` | The login form, the update panel, the sign-out button, the release notes renderer, and the notices and badges that show each state |
-| `lib/admin/` | Settings, password hashing, sessions, rate limits, request checks, GitHub, and the dashboard's side of the updater |
+| `lib/admin/` | Settings, password hashing, sessions and the sessions a sign-out ended, rate limits, request checks, GitHub, and the dashboard's side of the updater |
 | `scripts/serve.mjs` | The supervisor, `npm run serve` |
-| `scripts/updater/` | The update steps and the `.updater/` layout (`lib.mjs`), the version rule (`release.mjs`), what production never uses and its deleting (`dev-files.mjs`), the live server and its crash watch (`live.mjs`) and child processes (`process.mjs`), each with tests in `tests/updater*.test.ts` |
+| `scripts/updater/` | The update steps and the `.updater/` layout (`lib.mjs`), GitHub and the check of each download against it (`github.mjs`), the version rule (`release.mjs`), what production never uses and its deleting (`dev-files.mjs`), the live server and its crash watch (`live.mjs`) and child processes (`process.mjs`), each with tests in `tests/updater*.test.ts` and `tests/attack/` |
 | `scripts/hash-password.mjs` | `npm run admin:hash` |
 | `.env.example` | Every setting, with what it does |
 
@@ -374,12 +381,14 @@ Then open [http://localhost:3000](http://localhost:3000). Pass a port with `npm 
 | `npm run brand:images -- "<kit folder>"` | Bring the brand kit's logo downloads and page pictures into `public/brand/` (see Brand kit) |
 | `npm run lint` | Oxlint, then ESLint with the Next.js core-web-vitals and TypeScript rules |
 | `npm run lint:fix` | Same, applying the safe automatic fixes |
-| `npm test` | Vitest: pricing invariants, link integrity, redirects, legal data, and a no-em-dash check |
+| `npm test` | Vitest: pricing invariants, link integrity, redirects, legal data, a no-em-dash check, and the attack tests in `tests/attack/` (SECURITY.md) |
+| `npm run test:http` | The attack tests against the build, run by `next start` (`tests/http/`); run after a build |
 | `npm run typecheck` | `tsc` (TypeScript 7) against the whole project; run after a build |
-| `npm run scan:build` | Fails if an email address or an admin secret reached the build output, or a page in the sitemap is no longer prerendered |
+| `npm run scan:build` | Fails if an email address reached what the site serves, an admin secret reached any of the build, or a page in the sitemap is no longer prerendered |
 | `npm run check:site <url>` | Checks a running site: pages, headers, redirects, short links, certificate |
 | `npm run check:seo <url>` | Checks what search engines read from a running site: titles, descriptions, canonicals, hreflang, sitemap, robots.txt, share cards, headings, structured data |
-| `npm run check` | Lint, test, build, scan, typecheck, in the order CI runs them |
+| `npm run check:security <url>` | Checks a running site's security from outside, passively: every header, cookie flags, HTTPS and TLS |
+| `npm run check` | Lint, test, build, scan, the attack tests against the build, typecheck, in the order CI runs them |
 
 Linting runs in two passes. [Oxlint](https://oxc.rs/docs/guide/usage/linter) goes first and does most of the work in well under a second (config in `.oxlintrc.json`: correctness rules fail the lint, suspicious patterns warn). ESLint then covers only what Oxlint cannot check yet, mainly the React Compiler hook rules and the rest of the Next.js set; `eslint-plugin-oxlint` switches off every ESLint rule Oxlint already runs, so nothing is reported twice. To silence a rule on one line, use an `oxlint-disable-next-line` comment with a reason.
 
@@ -395,7 +404,8 @@ The Node.js version lives in `.nvmrc`; every workflow reads it from there.
 
 | Workflow | Runs | What it does when it fails |
 | --- | --- | --- |
-| CI | Every push and pull request | Lint, tests, build, email scan, typecheck. Red check on the commit. |
+| CI | Every push and pull request | Lint, tests (the attack tests included), build, email and secret scan, the attack tests against the build, typecheck. Red check on the commit. |
+| Security | Every push and pull request; the live check on Mondays | gitleaks over every commit, and OWASP ZAP's baseline scan of a build, failing on medium risk or worse (reviewed exceptions in `.github/zap/rules.tsv`). Every Monday it also checks wslatl.com's headers, cookies and TLS from outside, GET requests only, and keeps one issue open while that fails. SECURITY.md has the rest. |
 | Outdated packages | Mondays | Keeps one issue listing packages with newer versions. It closes itself once everything is current. |
 | Security audit | Daily, and on dependency changes | Fails on a known vulnerability or a bad registry signature. |
 | CodeQL | Push, pull request, weekly | Static analysis of the site code and these workflows. Findings appear under Security. |
