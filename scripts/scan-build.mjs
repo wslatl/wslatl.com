@@ -3,9 +3,11 @@
 //   - an email address in anything the site serves (prerendered HTML, React
 //     Server Component payloads, browser scripts). Addresses may only reach
 //     the browser scrambled (components/ui/email.tsx).
-//   - an admin secret there: the value of any secret in .env (CI writes
-//     canary values before building), or anything shaped like a password
-//     hash or a GitHub token.
+//   - an admin secret anywhere in the build, not only in what it serves:
+//     the value of any secret in .env (CI writes canary values before
+//     building), or anything shaped like a password hash or a GitHub token.
+//     Only .next/cache is left out, the build's own scratch space, which
+//     never ships and is deleted from every release.
 //   - a page in the sitemap that is no longer prerendered, or an admin page
 //     that is. Every public page is static; only /admin renders per request.
 //
@@ -22,12 +24,16 @@ if (!served.every((dir) => existsSync(dir))) {
   process.exit(1)
 }
 
-function files(dir) {
+function files(dir, skip = '') {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name)
-    return statSync(path).isDirectory() ? files(path) : [path]
+    if (path === skip) return []
+    return statSync(path).isDirectory() ? files(path, skip) : [path]
   })
 }
+
+const servedFiles = new Set(served.flatMap((dir) => files(dir)))
+const builtFiles = files('.next', join('.next', 'cache'))
 
 // Only the secret ones: GITHUB_REPO, say, may well appear in a page.
 const secrets = existsSync('.env')
@@ -44,16 +50,18 @@ const secretShapes = [
 const leaks = []
 const secretLeaks = []
 let scanned = 0
-for (const file of served.flatMap(files)) {
-  if (file.endsWith('.map')) continue
-  scanned++
+for (const file of builtFiles) {
   const text = readFileSync(file, 'utf8')
-  const found = text.match(address)
-  if (found) leaks.push(`${relative('.', file)}: ${[...new Set(found)].join(', ')}`)
   for (const [name, value] of secrets) {
     if (text.includes(value.trim())) secretLeaks.push(`${relative('.', file)}: the value of ${name}`)
   }
   for (const [shape, what] of secretShapes) if (shape.test(text)) secretLeaks.push(`${relative('.', file)}: ${what}`)
+  // Source maps are never served, and server code may hold an address it
+  // only ever sends scrambled.
+  if (!servedFiles.has(file) || file.endsWith('.map')) continue
+  scanned++
+  const found = text.match(address)
+  if (found) leaks.push(`${relative('.', file)}: ${[...new Set(found)].join(', ')}`)
 }
 
 // Sitemap paths to the routes they are prerendered as: English pages sit at
@@ -93,5 +101,5 @@ if (adminStatic.length) {
 if (failed) process.exit(1)
 
 console.log(`No email addresses in ${scanned} served files.`)
-console.log(`No admin secrets in them${secrets.length ? `, including the ${secrets.length} from .env` : ''}.`)
+console.log(`No admin secrets in the ${builtFiles.length} files of the build${secrets.length ? `, including the ${secrets.length} from .env` : ''}.`)
 console.log(`All ${pages.length} pages in the sitemap are prerendered.`)

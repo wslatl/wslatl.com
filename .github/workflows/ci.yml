@@ -41,4 +41,9 @@ jobs:
       - run: npm run build
       - name: No email address, admin secret or dynamic page in what the site serves
         run: npm run scan:build
+      # The attack tests against the build itself, run by next start with
+      # settings of their own (tests/http): headers, the session, redirects,
+      # and nothing secret in any answer or in the server's log.
+      - name: Attack tests against the build
+        run: npm run test:http
       - run: npm run typecheck

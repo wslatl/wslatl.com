@@ -1,0 +1,21 @@
+# Settings for the secret scan in .github/workflows/security.yml, which runs
+# gitleaks over every commit. gitleaks' own rules, and one more for this
+# site's admin password hashes, which no general rule knows the shape of.
+# Every exception below is a made-up value, with the reason beside it.
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "wslatl-admin-password-hash"
+description = "An admin password hash: the ADMIN_PASSWORD_HASH line npm run admin:hash prints, which belongs in .env on the server alone"
+regex = '''scrypt:\d+:\d+:\d+:[A-Za-z0-9_-]{16,}:[A-Za-z0-9_-]{32,}'''
+keywords = ["scrypt:"]
+
+[[rules.allowlists]]
+description = "Made-up hashes in the tests and in CI. Their salts spell saltsaltsaltsalt and canary-salt-canary in base64, and no password makes them"
+regexTarget = "match"
+regexes = [
+  '''scrypt:\d+:\d+:\d+:c2FsdHNhbHRzYWx0c2FsdA:''',
+  '''scrypt:\d+:\d+:\d+:Y2FuYXJ5LXNhbHQtY2FuYXJ5:''',
+]
