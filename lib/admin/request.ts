@@ -1,4 +1,5 @@
 import 'server-only'
+import { isIP } from 'node:net'
 import { NextResponse } from 'next/server'
 
 /**
@@ -6,7 +7,8 @@ import { NextResponse } from 'next/server'
  * only routes on the site that take anything but GET (proxy.ts), so each of
  * them starts with checkPost(): the request must come from a page on this
  * same site, as JSON, and small. A form on another site can do none of
- * those, and the session cookie is SameSite=Strict besides.
+ * those, and the session cookie is SameSite=Strict besides. The GET routes
+ * start with checkRead(), which refuses a read sent from another site.
  */
 const maxBodyBytes = 4096
 
@@ -14,15 +16,21 @@ export function adminLog(message: string) {
   console.log(`${new Date().toISOString()} [admin] ${message}`)
 }
 
-/** The visitor's address: Cloudflare's header first, since the site sits behind it. */
+/**
+ * The visitor's address, from Cloudflare's CF-Connecting-IP and nothing
+ * else. Cloudflare sets that header itself on every request it passes on,
+ * whatever the visitor sent. X-Forwarded-For is never read: a visitor can
+ * put anything in it, and Cloudflare and Next both keep what they were sent,
+ * so trusting it would let anyone claim a fresh address for every attempt.
+ * A request with no valid CF-Connecting-IP (one that reached the server
+ * without going through Cloudflare) is counted as "unknown", all of them
+ * together.
+ */
 export function clientIp(headers: Headers): string {
-  const cloudflare = headers.get('cf-connecting-ip')?.trim()
-  if (cloudflare) return cloudflare
-  const forwarded = headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-  return forwarded || 'local'
+  const cloudflare = headers.get('cf-connecting-ip')?.trim() ?? ''
+  return isIP(cloudflare) ? cloudflare : 'unknown'
 }
 
-/** A JSON answer that no browser or cache keeps. */
 /**
  * What the login limit counts attempts by: the address, or for IPv6 its
  * /64, since one connection usually has the whole /64 to pick from.
@@ -42,6 +50,7 @@ export function limitKey(ip: string): string {
     .join(':')}::/64`
 }
 
+/** A JSON answer that no browser or cache keeps. */
 export function json(body: unknown, init: ResponseInit = {}): NextResponse {
   const headers = new Headers(init.headers)
   headers.set('Cache-Control', 'no-store')
@@ -78,6 +87,25 @@ async function readLimited(request: Request): Promise<string | null> {
     chunks.push(value)
   }
   return Buffer.concat(chunks).toString('utf8')
+}
+
+export type ReadCheck = { ok: true } | { ok: false; response: Response }
+
+/**
+ * For the admin's GET routes. A page on another site could ask for one, but
+ * never read the answer (there are no CORS headers) and never send the
+ * cookie (SameSite=Strict); it is refused all the same, so no admin route
+ * acts on a request from elsewhere. Typing the address in (Sec-Fetch-Site:
+ * none) is fine.
+ */
+export function checkRead(request: Request): ReadCheck {
+  const fetchSite = request.headers.get('sec-fetch-site')
+  const crossSite = fetchSite !== null && fetchSite !== 'same-origin' && fetchSite !== 'none'
+  // Browsers send Origin with a read only when it comes from a script on another page.
+  if (crossSite || (request.headers.has('origin') && !sameOrigin(request.headers))) {
+    return { ok: false, response: json({ error: 'This request did not come from this site.' }, { status: 403 }) }
+  }
+  return { ok: true }
 }
 
 export type PostCheck = { ok: true; body: unknown } | { ok: false; response: Response }

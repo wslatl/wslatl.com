@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto'
 import { copyFile, lstat, mkdir, readFile, readdir, rename, rm } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
 import { busyStatuses, updaterDir, updaterStatus } from '@/lib/admin/updater'
+import { parseVersion } from '@/scripts/updater/release.mjs'
 
 /**
  * The button on the dashboard's "The updater itself changed" notice.
@@ -20,9 +21,6 @@ import { busyStatuses, updaterDir, updaterStatus } from '@/lib/admin/updater'
 
 export type AdoptResult = { ok: true; tag: string } | { ok: false; status: 409 | 500 | 503; error: string }
 
-/** The shape tagRule in scripts/updater/release.mjs allows. Checked here because the tag becomes part of a path. */
-const versionTag = /^v\d+\.\d+\.\d+$/
-
 /** The updater's files in a scripts folder, relative to it. A Dirent says what the entry itself is, so a link is never followed. */
 async function updaterFiles(scripts: string): Promise<string[]> {
   const entries = await readdir(join(scripts, 'updater'), { withFileTypes: true })
@@ -34,7 +32,26 @@ async function sameFile(first: string, second: string): Promise<boolean> {
   return b !== null && a.equals(b)
 }
 
+// On globalThis, because Next may load this module more than once in one server.
+const copying = Symbol.for('wslatl.admin.copyingUpdater')
+const store = globalThis as typeof globalThis & { [copying]?: boolean }
+
+/**
+ * One copy at a time: two presses at once would each back up the folder
+ * while the other writes into it, and the backup could end up holding the
+ * new files rather than the old ones.
+ */
 export async function adoptUpdater(dir = updaterDir()): Promise<AdoptResult> {
+  if (store[copying]) return { ok: false, status: 409, error: 'The updater is being copied already.' }
+  store[copying] = true
+  try {
+    return await adopt(dir)
+  } finally {
+    store[copying] = false
+  }
+}
+
+async function adopt(dir: string | null): Promise<AdoptResult> {
   // The supervisor always names <uploaded folder>/.updater. Anywhere else is
   // not a folder to go writing beside.
   if (!dir || basename(dir) !== '.updater') {
@@ -44,8 +61,10 @@ export async function adoptUpdater(dir = updaterDir()): Promise<AdoptResult> {
   if (pending || (state && busyStatuses.includes(state.status))) {
     return { ok: false, status: 409, error: 'An update is running. Try again when it is done.' }
   }
+  // Only a version tag, the rule in scripts/updater/release.mjs: the tag
+  // becomes part of a path, and nothing else can name one outside releases/.
   const tag = state?.current?.tag
-  if (!tag || !versionTag.test(tag)) {
+  if (typeof tag !== 'string' || !parseVersion(tag)) {
     return { ok: false, status: 409, error: 'No release is installed, so there is no new updater to copy.' }
   }
 

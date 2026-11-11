@@ -3,10 +3,12 @@
 // It runs `next start` and keeps it running, and it is what lets /admin
 // update the site from GitHub: the admin writes .updater/request.json, and
 // this process downloads the latest GitHub release (only a newer one, and
-// only one tagged vMAJOR.MINOR.PATCH), installs and builds it in a folder of
-// its own, deletes from it what production never uses, starts it once on a
-// spare local port to be sure it answers, and only then restarts the site
-// on it. A failure at any step leaves the site as it was, and a new release
+// only one tagged vMAJOR.MINOR.PATCH), checks every file of it against
+// GitHub's own record of the commit (scripts/updater/github.mjs), installs
+// and builds it in a folder of its own, deletes from it what production
+// never uses, starts it once on a spare local port to be sure it answers,
+// and only then restarts the site on it. A failure at any step leaves the
+// site as it was, and a new release
 // that stops three times within ten minutes of its switch is replaced by the
 // one before. The steps and the folders are in scripts/updater/lib.mjs; the
 // setup is in the README, "Admin and updates" and "Releasing".
@@ -20,10 +22,9 @@ import { spawn } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createInterface } from 'node:readline'
-import { Readable, Transform } from 'node:stream'
-import { pipeline } from 'node:stream/promises'
 import { parseEnv } from 'node:util'
 import { busyFlag } from './updater/busy.mjs'
+import { apiAddressProblem, gitHub, repoPattern } from './updater/github.mjs'
 import {
   busyStatuses,
   cleanUpAtStart,
@@ -55,7 +56,15 @@ const github = {
   api: setting('GITHUB_API_URL', 'https://api.github.com').replace(/\/+$/, ''),
 }
 const secretNames = [...new Set(['ADMIN_PASSWORD_HASH', 'ADMIN_SESSION_SECRET', 'GITHUB_TOKEN', ...Object.keys(dotenv)])]
-const updatesOn = Boolean(github.token)
+// The token goes to GitHub over HTTPS or nowhere: with an address that is
+// not HTTPS (plain HTTP only to this machine, for the tests), or a
+// repository name that is not owner/name, updates stay off.
+const updatesOff = [
+  !github.token && 'GITHUB_TOKEN is not set in .env',
+  !repoPattern.test(github.repo) && 'GITHUB_REPO is not in the form owner/name',
+  apiAddressProblem(github.api),
+].filter(Boolean)
+const updatesOn = updatesOff.length === 0
 
 function print(line) {
   console.log(`${new Date().toISOString()} [updater] ${line}`)
@@ -182,78 +191,9 @@ async function crashLoop(dir) {
 
 // ----- GitHub -----
 
-const githubHeaders = {
-  Accept: 'application/vnd.github+json',
-  Authorization: `Bearer ${github.token}`,
-  'X-GitHub-Api-Version': '2022-11-28',
-  'User-Agent': 'wslatl-updater',
-}
-
-function githubProblem(status) {
-  if (status === 401) return 'GitHub refused the token (401). Check GITHUB_TOKEN in .env.'
-  if (status === 403 || status === 429) return `GitHub refused the request (${status}): the token may lack Contents read access, or the rate limit was reached.`
-  if (status === 404) return `GitHub could not find ${github.repo} (404). Check GITHUB_REPO and that the token can read it.`
-  return `GitHub answered ${status}.`
-}
-
-function githubGet(path) {
-  return fetch(`${github.api}/repos/${github.repo}${path}`, { headers: githubHeaders, signal: AbortSignal.timeout(30_000) })
-}
-
-/** GitHub's latest release (never a draft or a pre-release), or null when there is none. */
-async function latest() {
-  const response = await githubGet('/releases/latest')
-  if (response.status === 404) {
-    // No release yet, or no repository at all: only the second is an error.
-    const repo = await githubGet('')
-    if (repo.ok) return null
-    throw new Error(githubProblem(repo.status))
-  }
-  if (!response.ok) throw new Error(githubProblem(response.status))
-  const body = await response.json()
-  return {
-    tag: String(body.tag_name ?? ''),
-    name: String(body.name || body.tag_name || ''),
-    publishedAt: String(body.published_at ?? ''),
-    draft: Boolean(body.draft),
-    prerelease: Boolean(body.prerelease),
-  }
-}
-
-/** The commit a tag points at, right now. */
-async function resolveTag(tag) {
-  const response = await githubGet(`/commits/${encodeURIComponent(tag)}`)
-  if (!response.ok) throw new Error(response.status === 404 ? `GitHub could not find the commit of ${tag} (404).` : githubProblem(response.status))
-  return String((await response.json()).sha ?? '')
-}
-
-const maxDownloadBytes = 500 * 1024 * 1024
-
-/** The commit's files into dest, through the system tar reading from stdin. */
-async function download(sha, dest) {
-  const response = await fetch(`${github.api}/repos/${github.repo}/tarball/${sha}`, {
-    headers: githubHeaders,
-    signal: AbortSignal.timeout(300_000),
-  })
-  if (!response.ok || !response.body) throw new Error(githubProblem(response.status))
-  mkdirSync(dest, { recursive: true })
-  const tar = track(spawn('tar', ['-xzf', '-', '--strip-components=1'], { cwd: dest, stdio: ['pipe', 'ignore', 'pipe'] }))
-  let errors = ''
-  tar.stderr.on('data', (chunk) => (errors += chunk))
-  const exited = new Promise((resolve, reject) => {
-    tar.once('error', (error) => reject(new Error(`Could not run tar (${error.message}).`)))
-    tar.once('exit', (code) => (code === 0 ? resolve() : reject(new Error(`tar failed: ${errors.trim() || `exit code ${code}`}`))))
-  })
-  let size = 0
-  const limit = new Transform({
-    transform(chunk, _encoding, done) {
-      size += chunk.length
-      done(size > maxDownloadBytes ? new Error('The download is larger than 500 MB.') : null, chunk)
-    },
-  })
-  await Promise.all([pipeline(Readable.fromWeb(response.body), limit, tar.stdin), exited])
-  if (!existsSync(join(dest, 'package.json'))) throw new Error('The download has no package.json.')
-}
+// The latest release, its tag's commit, and that commit's files, checked
+// against GitHub's own record of the commit (scripts/updater/github.mjs).
+const releases = gitHub({ ...github, onSpawn: track })
 
 // ----- Updates -----
 
@@ -297,7 +237,7 @@ async function checkForRequest() {
   try {
     const result = await runUpdate({
       paths,
-      deps: { latest, resolve: resolveTag, download, npm, trial, switchTo, print },
+      deps: { latest: releases.latest, resolve: releases.resolve, download: releases.download, npm, trial, switchTo, print },
       baseEnv: process.env,
       secretNames,
       // What actually runs, which a lost or stale state.json may not name.
@@ -323,7 +263,7 @@ function describe() {
 }
 
 function requestUpdate() {
-  if (!updatesOn) return print('Updates are off: GITHUB_TOKEN is not set in .env.')
+  if (!updatesOn) return print(`Updates are off: ${updatesOff.join(', ')}.`)
   if (busy.held || busyStatuses.includes(readState(paths).status)) {
     return print('The site is starting, or an update or a rollback is running; try again when it is done.')
   }
@@ -413,6 +353,7 @@ function reportSettings() {
   if (problems.length) print(`The admin is off (/admin answers 404): ${problems.join(', ')} missing or not valid in .env.`)
   else print('The admin is on at /admin.')
   if (updatesOn) print(`Updates install the latest release of ${github.repo}.`)
+  else if (github.token) print(`Updates are off: ${updatesOff.join(', ')}.`)
 }
 
 mkdirSync(paths.dir, { recursive: true })

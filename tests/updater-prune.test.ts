@@ -66,9 +66,11 @@ const read = [
   'package-lock.json',
   'next.config.mjs',
   'config/links.json',
+  'config/security-headers.mjs',
   'node_modules/next/package.json',
   'scripts/serve.mjs',
   'scripts/updater/lib.mjs',
+  'scripts/updater/github.mjs',
 ]
 
 const gone = (path: string) => {

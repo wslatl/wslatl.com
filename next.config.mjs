@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process'
 import shortLinks from './config/links.json' with { type: 'json' }
+import { publicPolicy, securityHeaders } from './config/security-headers.mjs'
 import { parseVersion } from './scripts/updater/release.mjs'
 
 const legalSlugs = [
@@ -16,55 +17,9 @@ const legalSlugs = [
 ]
 
 // React needs eval() in development for its debugging tools. Production
-// never does, so it only gets 'unsafe-eval' while running `next dev`.
+// never does, so it only gets 'unsafe-eval' while running `next dev`
+// (config/security-headers.mjs, where the headers themselves are).
 const isDev = process.env.NODE_ENV === 'development'
-
-const securityHeaders = [
-  {
-    key: 'X-DNS-Prefetch-Control',
-    value: 'on',
-  },
-  {
-    key: 'Strict-Transport-Security',
-    value: 'max-age=63072000; includeSubDomains; preload',
-  },
-  {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff',
-  },
-  {
-    key: 'X-Frame-Options',
-    value: 'DENY',
-  },
-  {
-    key: 'Referrer-Policy',
-    value: 'strict-origin-when-cross-origin',
-  },
-  {
-    key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=()',
-  },
-  {
-    key: 'Cross-Origin-Opener-Policy',
-    value: 'same-origin',
-  },
-  {
-    key: 'Content-Security-Policy',
-    value: [
-      "default-src 'self'",
-      "img-src 'self' data: blob:",
-      "font-src 'self'",
-      "style-src 'self' 'unsafe-inline'",
-      `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
-      "connect-src 'self'",
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "object-src 'none'",
-      'upgrade-insecure-requests',
-    ].join('; '),
-  },
-]
 
 // The admin is for the owner only: never indexed, wherever a link to it
 // turns up. Its pages also carry a robots meta tag. robots.txt leaves it
@@ -131,6 +86,14 @@ const nextConfig = {
       {
         source: '/:path*',
         headers: securityHeaders,
+      },
+      // The public policy everywhere but the admin, whose pages get a
+      // stricter one with a nonce of their own from proxy.ts. Two policies
+      // on one page would both apply, and the scan would rightly flag the
+      // looser one.
+      {
+        source: '/((?!admin(?:/|$)).*)',
+        headers: [{ key: 'Content-Security-Policy', value: publicPolicy({ dev: isDev }) }],
       },
       { source: '/admin', headers: adminHeaders },
       { source: '/admin/:path*', headers: adminHeaders },

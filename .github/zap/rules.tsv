@@ -1,0 +1,32 @@
+# The reviewed exceptions for the ZAP baseline scan (.github/workflows/security.yml).
+#
+# Every ZAP rule stays on, and the scan fails on any alert of medium risk or
+# worse (.github/zap/gate.mjs), unless a line below says otherwise. Each one
+# is a false positive or a risk taken on purpose, with the reason above it.
+# Add a line only with its reason, and remove it once the reason is gone.
+#
+# Columns are separated by one tab: the rule's id, the action, and for
+# OUTOFSCOPE a regular expression for the addresses (from their start) where
+# the rule does not apply. The rule ids are listed at
+# https://www.zaproxy.org/docs/alerts/
+#
+# 10055, Content Security Policy, on the public pages only. They allow inline
+# scripts and styles ('unsafe-inline'). Every public page is built once,
+# ahead of time and the same for everyone, and Next writes each page's data
+# into it as inline scripts; a nonce, which would replace 'unsafe-inline',
+# has to be new for every request, and so cannot be in a page built once. No
+# public page shows anything a visitor sent. The admin, the one place with a
+# session, gets a nonce and no 'unsafe-inline' (config/security-headers.mjs),
+# and this rule stays on for it: the pattern leaves out /admin and
+# everything under it.
+10055	OUTOFSCOPE	http://localhost:3100/(?!admin(/|\?|$))
+#
+# 10202, Absence of Anti-CSRF Tokens, on the admin's sign-in page only. Its
+# form carries no token because the admin does not rely on tokens against
+# requests from other sites: every admin route refuses one whose Origin or
+# Sec-Fetch-Site is not this site, takes JSON alone, which a form on another
+# site cannot send, and the cookies are SameSite=Strict besides. The form
+# sends nothing itself: a script sends the password as JSON, and the plain
+# form post a browser makes without the script is refused (415).
+# tests/attack/admin-routes.test.ts and tests/http try each of these.
+10202	OUTOFSCOPE	http://localhost:3100/admin/login(\?.*)?$

@@ -1,7 +1,6 @@
 import 'server-only'
-import { randomBytes } from 'node:crypto'
 import { existsSync, statSync } from 'node:fs'
-import { readFile, rename, writeFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 /**
@@ -68,12 +67,18 @@ export async function requestUpdate(by: string, dir = updaterDir()): Promise<Upd
   if (!dir) {
     return { ok: false, status: 503, error: 'Updates only work when the site is started with npm run serve.' }
   }
+  const waiting = { ok: false, status: 409, error: 'An update is already waiting to start.' } as const
   const { pending, state } = await updaterStatus(dir)
-  if (pending) return { ok: false, status: 409, error: 'An update is already waiting to start.' }
+  if (pending) return waiting
   if (state && busyStatuses.includes(state.status)) return { ok: false, status: 409, error: 'An update is already running.' }
-  // Written whole and then renamed, so the supervisor never reads half a file.
-  const temporary = join(dir, `request.${randomBytes(6).toString('hex')}.tmp`)
-  await writeFile(temporary, JSON.stringify({ requestedAt: new Date().toISOString(), by }))
-  await rename(temporary, join(dir, 'request.json'))
+  // Created only if no request is there, in one step (wx), the way the
+  // server console asks too: of two presses at the same moment, only one
+  // gets through. The supervisor only looks for the file, never reads it.
+  try {
+    await writeFile(join(dir, 'request.json'), JSON.stringify({ requestedAt: new Date().toISOString(), by }), { flag: 'wx' })
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'EEXIST') return waiting
+    throw error
+  }
   return { ok: true }
 }
