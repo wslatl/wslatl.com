@@ -220,6 +220,31 @@ describe('a browser that signed in before (its device cookie)', () => {
     expect((await attempt(`${admin.password} changed`, { ...from('203.0.113.52'), cookie: device })).status).toBe(429)
   }, 120_000)
 
+  it('counts as none once it is 180 days old, whatever the browser kept, or when it claims to be from the future', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    try {
+      const day = 24 * 60 * 60 * 1000
+      vi.setSystemTime(new Date('2026-01-01T12:00:00Z'))
+      const { device } = await signInFully(admin)
+      vi.setSystemTime(new Date(Date.parse('2026-01-01T12:00:00Z') + 179 * day))
+      await flood()
+      expect((await attempt(admin.password, { ...from('203.0.113.53'), cookie: device })).status).toBe(200)
+      vi.setSystemTime(new Date(Date.parse('2026-01-01T12:00:00Z') + 180 * day))
+      setUp(admin)
+      await flood()
+      expect((await attempt(admin.password, { ...from('203.0.113.53'), cookie: device })).status).toBe(429)
+      // Made an hour ahead of the server's clock.
+      setUp(admin)
+      vi.setSystemTime(new Date('2026-06-01T13:00:00Z'))
+      const ahead = (await signInFully(admin)).device
+      vi.setSystemTime(new Date('2026-06-01T12:00:00Z'))
+      await flood()
+      expect((await attempt(admin.password, { ...from('203.0.113.54'), cookie: ahead })).status).toBe(429)
+    } finally {
+      vi.useRealTimers()
+    }
+  }, 180_000)
+
   it('opens nothing by itself', async () => {
     const { device } = await signInFully(admin)
     expect((await get(paths.update, { cookie: device })).status).toBe(401)

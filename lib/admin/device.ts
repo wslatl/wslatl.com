@@ -10,7 +10,11 @@ import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
  * keep the owner out, and the flood gains nothing by it: without a cookie the
  * site signed, an attempt counts like any other.
  *
- *   <random id, base64url>.<base64url HMAC-SHA256 of "device.<id>">
+ *   <id, base64url>.<base64url HMAC-SHA256 of "device.<id>">
+ *
+ * The id is 16 bytes: the time it was made, in seconds, as a 4-byte
+ * big-endian number, then 12 random bytes. The time is what lets the server
+ * refuse a cookie older than 180 days, whatever the browser kept.
  *
  * Its key is derived from ADMIN_SESSION_SECRET, apart from the session's own
  * key, and from the password hash too: changing the password ends every
@@ -32,19 +36,29 @@ function sign(id: string, { secret, passwordHash }: Keys): Buffer {
   return createHmac('sha256', key).update(`device.${id}`).digest()
 }
 
-export function createDevice(keys: Keys): string {
-  const id = randomBytes(16).toString('base64url')
-  return `${id}.${sign(id, keys).toString('base64url')}`
+export function createDevice(keys: Keys, now = Date.now()): string {
+  const id = Buffer.alloc(16)
+  id.writeUInt32BE(Math.floor(now / 1000), 0)
+  randomBytes(12).copy(id, 4)
+  const value = id.toString('base64url')
+  return `${value}.${sign(value, keys).toString('base64url')}`
 }
 
-/** The id of the browser a device cookie names, when the site signed it; null for anything else. */
-export function readDevice(value: string | undefined, keys: Keys): string | null {
+/**
+ * The id of the browser a device cookie names, when the site signed it and
+ * it is less than 180 days old (a minute of leeway for clocks the other way);
+ * null for anything else.
+ */
+export function readDevice(value: string | undefined, keys: Keys, now = Date.now()): string | null {
   if (typeof value !== 'string' || !shape.test(value)) return null
   const [id, signature] = value.split('.')
   const given = Buffer.from(signature, 'base64url')
-  if (given.toString('base64url') !== signature) return null
+  const bytes = Buffer.from(id, 'base64url')
+  if (given.toString('base64url') !== signature || bytes.toString('base64url') !== id) return null
   const expected = sign(id, keys)
-  return given.length === expected.length && timingSafeEqual(given, expected) ? id : null
+  if (given.length !== expected.length || !timingSafeEqual(given, expected)) return null
+  const age = now / 1000 - bytes.readUInt32BE(0)
+  return age >= -60 && age < DEVICE_SECONDS ? id : null
 }
 
 export function deviceCookie(value: string) {
