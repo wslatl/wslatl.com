@@ -26,7 +26,12 @@ export function SiteHeader() {
     <Header
       homeHref={localePath(locale, '/')}
       homeLabel={labels.home}
-      nav={mainNav(t, locale)}
+      // Discord is one more row of the mobile menu's list. The desktop bar
+      // shows it as the icon beside the language picker instead.
+      nav={[
+        ...mainNav(t, locale),
+        { label: t.footer.links.discord, href: siteConfig.links.discord, external: true, mobileOnly: true },
+      ]}
       navLabel={labels.mainNav}
       newTabLabel={labels.newTab}
       openMenuLabel={labels.openMenu}
@@ -62,7 +67,6 @@ export function SiteHeader() {
       mobileFooter={
         <MobileMenuEnd
           locale={locale}
-          discordHref={siteConfig.links.discord}
           registerHref={siteConfig.links.register}
           labels={{
             getStarted: labels.getStarted,
