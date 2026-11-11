@@ -126,7 +126,7 @@ describe('a download that does not match', () => {
   it('is refused when it holds a link the commit does not have', async () => {
     const link = { name: `${folderOf(sha)}evil-link`, type: '2' as const, linkname: '/etc/passwd' }
     // tar may refuse to make the link (Windows), or make it and leave it to the check.
-    expect(await refusal(archiveOf(sha, files, [link]))).toMatch(/evil-link is not in the commit\.$|^tar failed/)
+    expect(await refusal(archiveOf(sha, files, [link]))).toMatch(/^(?:tar failed: [\s\S]*|[\s\S]*evil-link is not in the commit\.)$/)
   })
 
   it('never writes outside its folder, whatever names the archive uses', async () => {
@@ -137,7 +137,7 @@ describe('a download that does not match', () => {
       { name: absolute, content: 'out' },
     ]
     // tar refuses the names, or leaves them inside, where the check refuses them.
-    expect(await refusal(archiveOf(sha, files, escapes))).toMatch(/^tar failed|is not in the commit/)
+    expect(await refusal(archiveOf(sha, files, escapes))).toMatch(/^(?:tar failed: [\s\S]*|The download does not match commit [\s\S]* is not in the commit[\s\S]*)$/)
     expect(existsSync(absolute)).toBe(false)
   })
 

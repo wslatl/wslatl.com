@@ -44,6 +44,13 @@ describe('the ZAP gate', () => {
     expect(found[0].uris).toEqual(['http://localhost:3100/admin', 'http://localhost:3100/admin/login', 'http://localhost:3100/admin?x=1'])
   })
 
+  it('sets the missing-token alert aside on the sign-in page alone, where the admin refuses other sites another way', () => {
+    const tokens = alert('10202', 2, 'http://localhost:3100/admin/login', 'http://localhost:3100/admin/login?next=x', 'http://localhost:3100/pricing', 'http://localhost:3100/admin/login/extra')
+    const found = findings(report(tokens), rules)
+    expect(found).toHaveLength(1)
+    expect(found[0].uris).toEqual(['http://localhost:3100/pricing', 'http://localhost:3100/admin/login/extra'])
+  })
+
   it('reads each line as ZAP does, and refuses one ZAP itself would choke on', () => {
     const read = readRules('# a note\n\n10010\tIGNORE\t(why)\n10011,10012\tOUTOFSCOPE\thttp://x/a.*\n')
     expect([...read.ignored]).toEqual(['10010'])

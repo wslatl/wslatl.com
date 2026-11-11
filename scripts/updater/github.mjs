@@ -17,7 +17,7 @@
 // header there, as the Fetch standard says it must.
 import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, readlinkSync } from 'node:fs'
+import { closeSync, constants, existsSync, mkdirSync, openSync, readdirSync, readFileSync, readlinkSync } from 'node:fs'
 import { join } from 'node:path'
 import { Readable, Transform } from 'node:stream'
 import { pipeline } from 'node:stream/promises'
@@ -68,6 +68,29 @@ export function filesIn(dir, prefix = '') {
 }
 
 /**
+ * What git stores for a file: its bytes, or for a link, where it points. The
+ * file is opened without following a link (O_NOFOLLOW), and read through
+ * what was opened, so nothing can swap it between a look and a read.
+ * @param {string} path
+ * @returns {Buffer}
+ */
+function contentOf(path) {
+  let fd
+  try {
+    fd = openSync(path, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0))
+  } catch (error) {
+    // ELOOP: a link, which git stores as the path it points to.
+    if (/** @type {NodeJS.ErrnoException} */ (error).code === 'ELOOP') return Buffer.from(readlinkSync(path))
+    throw error
+  }
+  try {
+    return readFileSync(fd)
+  } finally {
+    closeSync(fd)
+  }
+}
+
+/**
  * @typedef {{ path: string, mode: string, type: string, sha: string }} TreeEntry
  */
 
@@ -91,9 +114,7 @@ export function treeDifferences(dir, entries) {
       continue
     }
     seen.add(path)
-    const full = join(dir, ...path.split('/'))
-    const content = lstatSync(full).isSymbolicLink() ? Buffer.from(readlinkSync(full)) : readFileSync(full)
-    if (gitBlobSha(content) !== entry.sha) problems.push(`${path} differs from the commit`)
+    if (gitBlobSha(contentOf(join(dir, ...path.split('/')))) !== entry.sha) problems.push(`${path} differs from the commit`)
   }
   for (const path of listed.keys()) if (!seen.has(path)) problems.push(`${path} is missing`)
   return problems

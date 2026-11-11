@@ -127,11 +127,11 @@ describe('the security headers', () => {
       const nonce = /'nonce-([^']+)'/.exec(response.headers.get('content-security-policy') ?? '')?.[1] ?? ''
       expect(nonce, path).not.toBe('')
       seen.add(nonce)
-      const scripts = [...html.matchAll(/<script\b[^>]*>/g)].map(([tag]) => tag)
+      const scripts = [...html.matchAll(/<script\b[^>]*>/gi)].map(([tag]) => tag)
       expect(scripts.length, path).toBeGreaterThan(0)
       for (const tag of scripts) expect(tag, path).toContain(`nonce="${nonce}"`)
       expect(html, path).not.toMatch(/\sstyle="/)
-      expect([...html.matchAll(/<style\b[^>]*>/g)].filter(([tag]) => !tag.includes(`nonce="${nonce}"`)), path).toEqual([])
+      expect([...html.matchAll(/<style\b[^>]*>/gi)].filter(([tag]) => !tag.includes(`nonce="${nonce}"`)), path).toEqual([])
     }
     expect(seen.size).toBe(4)
   })

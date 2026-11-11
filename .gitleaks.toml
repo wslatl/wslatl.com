@@ -12,10 +12,10 @@ description = "An admin password hash: the ADMIN_PASSWORD_HASH line npm run admi
 regex = '''scrypt:\d+:\d+:\d+:[A-Za-z0-9_-]{16,}:[A-Za-z0-9_-]{32,}'''
 keywords = ["scrypt:"]
 
-[[rules.allowlists]]
-description = "Made-up hashes in the tests and in CI. Their salts spell saltsaltsaltsalt and canary-salt-canary in base64, and no password makes them"
-regexTarget = "match"
-regexes = [
-  '''scrypt:\d+:\d+:\d+:c2FsdHNhbHRzYWx0c2FsdA:''',
-  '''scrypt:\d+:\d+:\d+:Y2FuYXJ5LXNhbHQtY2FuYXJ5:''',
-]
+# The made-up hashes in the tests and in CI, which no password makes. Their
+# salts spell saltsaltsaltsalt and canary-salt-canary in base64, so any hash
+# with one of those salts is one of them. Set out for this one rule only.
+[[allowlists]]
+description = "Made-up admin password hashes in the tests and CI"
+targetRules = ["wslatl-admin-password-hash"]
+stopwords = ["c2FsdHNhbHRzYWx0c2FsdA", "Y2FuYXJ5LXNhbHQtY2FuYXJ5"]

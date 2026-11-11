@@ -112,8 +112,11 @@ jobs:
             echo "ZAP did not finish (exit code $status)." >&2
             exit "$status"
           fi
+      # Into the log and the job summary both; bash with pipefail, so a
+      # failure of the gate is not hidden by tee.
       - name: Fail on a medium risk or worse
-        run: node .github/zap/gate.mjs "$RUNNER_TEMP/zap/report.json" .github/zap/rules.tsv >> "$GITHUB_STEP_SUMMARY"
+        shell: bash
+        run: node .github/zap/gate.mjs "$RUNNER_TEMP/zap/report.json" .github/zap/rules.tsv | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Keep the report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7

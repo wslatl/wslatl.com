@@ -110,6 +110,16 @@ export function cookieProblems(header) {
   ].filter(Boolean)
 }
 
+/** True when a redirect goes to Cloudflare Access's own sign-in, on its own domain. */
+function accessHost(location) {
+  try {
+    const { protocol, hostname } = new URL(location)
+    return protocol === 'https:' && hostname.endsWith('.cloudflareaccess.com')
+  } catch {
+    return false
+  }
+}
+
 /** Text for one cell of a Markdown table. */
 const cell = (text) => String(text).replaceAll('|', '\\|').replaceAll('\n', ' ')
 
@@ -171,13 +181,13 @@ async function main() {
     const response = await get('/admin/login')
     cookies.push(...response.headers.getSetCookie())
     const location = response.headers.get('location') ?? ''
-    if (response.status >= 300 && response.status < 400 && /cloudflareaccess\.com/.test(location)) {
+    if (response.status >= 300 && response.status < 400 && accessHost(location)) {
       record('The admin sign-in page', [], 'behind Cloudflare Access')
     } else if (response.status === 200) {
       const html = await response.text()
       const policy = response.headers.get('content-security-policy') ?? ''
       const nonce = /'nonce-([^']+)'/.exec(policy)?.[1]
-      const unsigned = [...html.matchAll(/<script\b[^>]*>/g)].filter(([tag]) => !nonce || !tag.includes(`nonce="${nonce}"`))
+      const unsigned = [...html.matchAll(/<script\b[^>]*>/gi)].filter(([tag]) => !nonce || !tag.includes(`nonce="${nonce}"`))
       record(
         'The admin sign-in page',
         [...headerProblems(response.headers, { admin: true, page: true }), unsigned.length && `${unsigned.length} scripts without the page's nonce`].filter(Boolean),
