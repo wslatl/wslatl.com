@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react'
+import { JsonLd } from '@/components/seo/json-ld'
 import { siteConfig } from '@/config/site'
 import { SectionHeader } from '@/components/ui/section-header'
 import type { Faq } from '@/data/faqs'
@@ -8,9 +9,24 @@ import { copy } from '@/i18n/copy'
 /**
  * Native <details> disclosures: keyboard and screen reader support for free,
  * no client JavaScript, and find-in-page can open a closed answer.
+ *
+ * The same questions and answers go out as FAQPage data, word for word, since
+ * search engines only accept structured data that matches what the page shows.
  */
 export function FaqList({ faqs, className }: { faqs: Faq[]; className?: string }) {
   return (
+    <>
+    <JsonLd
+      data={{
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+        })),
+      }}
+    />
     <div className={cn('divide-y border-y', className)}>
       {faqs.map((faq) => (
         <details key={faq.question} className="faq-item group">
@@ -25,6 +41,7 @@ export function FaqList({ faqs, className }: { faqs: Faq[]; className?: string }
         </details>
       ))}
     </div>
+    </>
   )
 }
 

@@ -378,6 +378,7 @@ Then open [http://localhost:3000](http://localhost:3000). Pass a port with `npm 
 | `npm run typecheck` | `tsc` (TypeScript 7) against the whole project; run after a build |
 | `npm run scan:build` | Fails if an email address or an admin secret reached the build output, or a page in the sitemap is no longer prerendered |
 | `npm run check:site <url>` | Checks a running site: pages, headers, redirects, short links, certificate |
+| `npm run check:seo <url>` | Checks what search engines read from a running site: titles, descriptions, canonicals, hreflang, sitemap, robots.txt, share cards, headings, structured data |
 | `npm run check` | Lint, test, build, scan, typecheck, in the order CI runs them |
 
 Linting runs in two passes. [Oxlint](https://oxc.rs/docs/guide/usage/linter) goes first and does most of the work in well under a second (config in `.oxlintrc.json`: correctness rules fail the lint, suspicious patterns warn). ESLint then covers only what Oxlint cannot check yet, mainly the React Compiler hook rules and the rest of the Next.js set; `eslint-plugin-oxlint` switches off every ESLint rule Oxlint already runs, so nothing is reported twice. To silence a rule on one line, use an `oxlint-disable-next-line` comment with a reason.
@@ -402,6 +403,7 @@ The Node.js version lives in `.nvmrc`; every workflow reads it from there.
 | Lighthouse | Push and pull request | Accessibility, best practices, and SEO must stay at 100, with page weight and layout shift budgets (`lighthouserc.json`). Reports are kept as an artifact. |
 | Broken links | Mondays | Opens every page in the live sitemap and follows every link (`lychee.toml`, which skips only Trustpilot and our `/trustpilot` short link, because Trustpilot refuses link checkers). Broken ones go in one issue. |
 | Site health | Every six hours | Checks production with `scripts/check-site.mjs`. A failure opens one issue that closes itself when the site recovers. Run it by hand against any URL to check a deploy. |
+| SEO | Pull requests, and Mondays | On a pull request, builds the site and runs `scripts/check-seo.mjs` over every page in its sitemap. On Mondays, runs it against production; a failure opens one issue that closes itself once fixed. The rules are in `scripts/lib/seo-rules.mjs`, with tests in `tests/seo-rules.test.ts`. |
 | Workflow lint | Changes under `.github` | actionlint, including shellcheck on every `run` step. |
 | Release check | A release is published, or by hand | Checks that the tag is `vMAJOR.MINOR.PATCH`, its commit is on `main`, `package.json` there has the same version, and the release has notes (`scripts/release-check.mjs`). A failure opens one issue per tag that says what to fix, and the run goes red. |
 | Waiting pull requests | Mondays | Keeps one issue listing pull requests open for more than 7 days, with links and ages (`scripts/waiting-prs.mjs`). It closes itself when none is left. |
