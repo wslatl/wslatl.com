@@ -1,11 +1,13 @@
 // The updater's logic, kept apart from scripts/serve.mjs so the tests can
-// drive it with fake GitHub, npm and servers (tests/updater.test.ts).
+// drive it with fake GitHub, npm and servers.
 //
 // It installs GitHub releases, never a branch: the latest release (GitHub
 // skips drafts and pre-releases there), tagged vMAJOR.MINOR.PATCH, and only
 // when it is newer than the installed one (scripts/updater/release.mjs). The
-// tag is resolved to its commit once, when the update starts, and that exact
-// commit is downloaded, so a tag moved meanwhile cannot swap in other code.
+// tag is resolved to its commit once, as a tag, when the update starts, and
+// that exact commit is downloaded, so a tag moved meanwhile cannot swap in
+// other code. Every file of the download is checked against GitHub's own
+// record of that commit before anything is built (scripts/updater/github.mjs).
 //
 // Layout, all inside the folder the site was uploaded to:
 //
@@ -22,20 +24,39 @@
 //                            installed again, so a new folder never lands on
 //                            the live one or the one before it.
 //
+// An app with a database keeps it in updater.dataDir, outside all of these,
+// and the database step's backups go in <dataDir>/backups/.
+//
 // Until the first update, the site runs from the uploaded folder itself.
 // After that it runs from the current release, and the previous one is kept
 // for one more update. An update builds the new release beside the live
-// one, prunes it, starts it once on a spare local port as a trial, and only
+// one, prunes it, changes the database if the release asks for that
+// (backup first), starts it once on a spare local port as a trial, and only
 // then stops the live server and starts the new one on the real port. If
 // that fails, the old release starts again.
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
+//
+// What the app's platform.config.mjs asks for beyond that (its `updater`
+// settings, scripts/updater/config.mjs) comes from the release being
+// installed. With no such file, an update runs exactly as the main
+// website's always has.
+//
+// The site's own server code may import this file (an admin reading
+// state.json), so it never reads platform.config.mjs itself: serve.mjs does,
+// through deps.settings.
+import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { rm } from 'node:fs/promises'
 import { join, relative, sep } from 'node:path'
+import { dataDirProblem, defaultSettings } from './config.mjs'
 import { removeDevFiles, uploadedFolderKeeps } from './dev-files.mjs'
+import { buildSettings, kitSecrets, withoutSecrets } from './env.mjs'
+import { formatDuration, messageOf } from './process.mjs'
 import { isNewer, parseVersion, tagRule } from './release.mjs'
+
+export { loadEnvFile, withoutSecrets } from './env.mjs'
 
 /**
  * @typedef {'pending' | 'running' | 'done' | 'failed' | 'skipped'} StepState
+ * @typedef {'download' | 'install' | 'build' | 'prune' | 'migrate' | 'check' | 'switch'} StepId
  * @typedef {{ tag: string, name: string, publishedAt: string, draft: boolean, prerelease: boolean }} LatestRelease
  * @typedef {{ tag: string, sha: string, name: string, publishedAt: string }} Release
  * @typedef {Release & { deployedAt: string }} Installed
@@ -44,7 +65,7 @@ import { isNewer, parseVersion, tagRule } from './release.mjs'
  *   current: Installed | null,
  *   previous: Installed | null,
  *   target: Release | null,
- *   steps: Record<string, StepState>,
+ *   steps: Partial<Record<StepId, StepState>>,
  *   startedAt: string | null,
  *   finishedAt: string | null,
  *   message: string,
@@ -52,10 +73,14 @@ import { isNewer, parseVersion, tagRule } from './release.mjs'
  *   updaterChanged?: boolean,
  *   withdrawn?: string[],
  *   watchSince?: string | null,
+ *   backup?: string | null,
  * }} State
+ * @typedef {State} UpdateState the same, by the name the knowledge base's admin imports
+ * @typedef {Installed} InstalledRelease
  * @typedef {ReturnType<typeof updaterPaths>} Paths
- * @typedef {Record<string, string | undefined>} Env
+ * @typedef {import('./env.mjs').Env} Env
  * @typedef {(line: string) => void} OnLine
+ * @typedef {import('./config.mjs').UpdaterSettings} UpdaterSettings
  * @typedef {{
  *   latest: () => Promise<LatestRelease | null>,
  *   resolve: (tag: string) => Promise<string>,
@@ -64,17 +89,27 @@ import { isNewer, parseVersion, tagRule } from './release.mjs'
  *   trial: (dir: string, onLine: OnLine) => Promise<boolean>,
  *   switchTo: (dir: string, onLine: OnLine) => Promise<boolean>,
  *   print: OnLine,
+ *   settings?: (dir: string) => Promise<Readonly<UpdaterSettings>>,
+ *   watch?: () => void,
  * }} Deps
  */
 
+/** The statuses while an update runs. Every admin knows these five, so no other is ever written. */
 export const busyStatuses = ['downloading', 'installing', 'building', 'checking', 'swapping']
-export const stepIds = ['download', 'install', 'build', 'prune', 'check', 'switch']
+
+/** The steps of every update, in order. An app with updater.migrate also gets 'migrate', between prune and check. */
+export const stepIds = /** @type {StepId[]} */ (['download', 'install', 'build', 'prune', 'check', 'switch'])
 
 const logLines = 200
 
-/** @param {string} root */
-export function updaterPaths(root) {
-  const dir = join(root, '.updater')
+/** How many of the database step's backups are kept, newest first. Older ones the updater made are deleted. */
+export const backupsKept = 5
+
+/**
+ * @param {string} root the folder the site was uploaded to
+ * @param {string} [dir] where the updater keeps its files: .updater/ there, unless told otherwise
+ */
+export function updaterPaths(root, dir = join(root, '.updater')) {
   return {
     root,
     dir,
@@ -87,16 +122,22 @@ export function updaterPaths(root) {
 }
 
 /**
- * A release's folder, named by its tag. Only ever called with a tag that
- * parseVersion accepted, so it cannot name a path outside the folder.
+ * A release's folder, named by its tag. Throws for anything that is not a
+ * version tag, so no tag, from GitHub or from a state file edited by hand,
+ * can name a path outside the releases.
  * @param {Paths} paths
  * @param {string} tag
  */
 export function releaseDir(paths, tag) {
+  if (!parseVersion(tag)) throw new Error(`"${String(tag).slice(0, 60)}" is not a release tag (${tagRule}).`)
   return join(paths.releases, tag)
 }
 
-const short = (/** @type {string} */ sha) => sha.slice(0, 7)
+/** @param {string} sha */
+const short = (sha) => sha.slice(0, 7)
+
+/** @returns {Record<StepId, StepState>} */
+const pendingSteps = () => /** @type {Record<StepId, StepState>} */ (Object.fromEntries(stepIds.map((id) => [id, 'pending'])))
 
 /** @returns {State} */
 export function emptyState() {
@@ -105,7 +146,7 @@ export function emptyState() {
     current: null,
     previous: null,
     target: null,
-    steps: Object.fromEntries(stepIds.map((id) => [id, 'pending'])),
+    steps: pendingSteps(),
     startedAt: null,
     finishedAt: null,
     message: '',
@@ -113,21 +154,47 @@ export function emptyState() {
   }
 }
 
+/** @param {unknown} value @returns {value is Record<string, unknown>} */
+const isObject = (value) => typeof value === 'object' && value !== null && !Array.isArray(value)
+
 /**
+ * The state on disk. A missing or broken file reads as a fresh one, and
+ * steps or a log that are not what the updater writes read as none, so a
+ * file edited by hand cannot stop the supervisor.
  * @param {Paths} paths
  * @returns {State}
  */
 export function readState(paths) {
   try {
-    return { ...emptyState(), ...JSON.parse(readFileSync(paths.state, 'utf8')) }
+    const saved = JSON.parse(readFileSync(paths.state, 'utf8'))
+    if (!isObject(saved)) return emptyState()
+    const state = { ...emptyState(), ...saved }
+    if (!isObject(state.steps)) state.steps = pendingSteps()
+    if (!Array.isArray(state.log)) state.log = []
+    return /** @type {State} */ (state)
   } catch {
     return emptyState()
   }
 }
 
+/** @param {State} state */
+export const isBusy = (state) => busyStatuses.includes(state.status)
+
+/**
+ * The releases a crash took back out, which are never installed again.
+ * Read with care: state.json can be edited by hand, and the admin reads it too.
+ * @param {State} state
+ * @returns {string[]}
+ */
+export function withdrawnTags(state) {
+  return Array.isArray(state.withdrawn) ? state.withdrawn.filter((tag) => typeof tag === 'string') : []
+}
+
+/** @param {number} ms */
 const pause = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
 
-const quietly = (/** @type {() => void} */ action) => {
+/** @param {() => void} action */
+const quietly = (action) => {
   try {
     action()
   } catch {
@@ -150,9 +217,9 @@ const quietly = (/** @type {() => void} */ action) => {
 export function writeState(paths, state) {
   const text = JSON.stringify(state, null, 2)
   const temporary = `${paths.state}.${process.pid}.tmp`
-  const failed = (/** @type {any} */ error) => {
+  const failed = (/** @type {unknown} */ error) => {
     quietly(() => rmSync(temporary, { force: true }))
-    console.error(`Could not write ${paths.state}: ${error.message}`)
+    console.error(`Could not write ${paths.state}: ${messageOf(error)}`)
     return false
   }
   try {
@@ -166,7 +233,7 @@ export function writeState(paths, state) {
       renameSync(temporary, paths.state)
       return true
     } catch (error) {
-      if (!['EPERM', 'EACCES', 'EBUSY'].includes(/** @type {any} */ (error).code)) return failed(error)
+      if (!['EPERM', 'EACCES', 'EBUSY'].includes(/** @type {NodeJS.ErrnoException} */ (error).code ?? '')) return failed(error)
       pause(20 * attempt)
     }
   }
@@ -187,10 +254,30 @@ export function writeState(paths, state) {
 export function stateIsDamaged(paths) {
   if (!existsSync(paths.state)) return false
   try {
-    const state = JSON.parse(readFileSync(paths.state, 'utf8'))
-    return state === null || typeof state !== 'object' || Array.isArray(state)
+    return !isObject(JSON.parse(readFileSync(paths.state, 'utf8')))
   } catch {
     return true
+  }
+}
+
+/**
+ * Asks the supervisor for an update, as /admin's Install button and the
+ * console's update command do: request.json, which it looks for every two
+ * seconds. Created only when none is waiting, in one step, so two requests
+ * at once cannot both get through. The supervisor never reads what is in it.
+ * @param {Paths} paths
+ * @param {string} by who asked, for the record
+ * @returns {{ ok: true } | { ok: false, reason: string }}
+ */
+export function requestUpdate(paths, by) {
+  if (isBusy(readState(paths))) return { ok: false, reason: 'An update is already running.' }
+  try {
+    mkdirSync(paths.dir, { recursive: true })
+    writeFileSync(paths.request, JSON.stringify({ requestedAt: new Date().toISOString(), by: String(by).slice(0, 200) }), { flag: 'wx' })
+    return { ok: true }
+  } catch (error) {
+    if (/** @type {NodeJS.ErrnoException} */ (error).code === 'EEXIST') return { ok: false, reason: 'An update is already waiting to start.' }
+    return { ok: false, reason: `Could not ask for an update: ${messageOf(error)}` }
   }
 }
 
@@ -208,18 +295,22 @@ export function liveDir(paths, state) {
   return paths.root
 }
 
+/** A name that can only be a folder directly inside releases/: no slash, no way up. @param {string} name */
+const releaseFolderName = (name) => /^[\w.-]+$/.test(name) && !/^\.+$/.test(name)
+
 /**
  * Deleted without blocking: a release holds hundreds of megabytes of
  * node_modules, and the supervisor has a site to keep running meanwhile.
  * Never the installed release, the one before it, or a folder in spare (the
- * one actually served, which a stale state.json may not name).
+ * one actually served, which a stale state.json may not name), and never
+ * anything but a folder directly inside releases/.
  * @param {Paths} paths
  * @param {State} state
  * @param {string | undefined} name a folder name in releases/, which is a tag
  * @param {string[]} [spare]
  */
 async function removeRelease(paths, state, name, spare = []) {
-  if (!name) return
+  if (!name || !releaseFolderName(name)) return
   const kept = [state.current?.tag, state.previous?.tag]
   const dir = join(paths.releases, name)
   if (!kept.includes(name) && !spare.includes(dir)) await rm(dir, { recursive: true, force: true, maxRetries: 3 })
@@ -266,17 +357,23 @@ export async function cleanUpAtStart(paths, state, print) {
   await pruneReleases(paths, state)
 }
 
-/** scripts/serve.mjs and every file in scripts/updater/, as paths relative to base. */
-const updaterFiles = (/** @type {string} */ base) => {
+/**
+ * scripts/serve.mjs and every file directly in scripts/updater/, as paths
+ * relative to base. The folder stays flat: "Copy the new updater" copies
+ * just these.
+ * @param {string} base
+ */
+const updaterFiles = (base) => {
   const updater = join(base, 'scripts', 'updater')
   const names = existsSync(updater) ? readdirSync(updater).filter((name) => statSync(join(updater, name)).isFile()) : []
   return ['scripts/serve.mjs', ...names.map((name) => `scripts/updater/${name}`)]
 }
 
-/** A file's text with Windows line endings made plain, or null when it is not there. */
-const plainText = (/** @type {string} */ path) => (existsSync(path) ? readFileSync(path, 'utf8').replaceAll('\r\n', '\n') : null)
+/** A file's text with Windows line endings made plain, or null when it is not there. @param {string} path */
+const plainText = (path) => (existsSync(path) ? readFileSync(path, 'utf8').replaceAll('\r\n', '\n') : null)
 
-const built = (/** @type {string} */ dir) => existsSync(join(dir, '.next', 'BUILD_ID'))
+/** @param {string} dir */
+const built = (dir) => existsSync(join(dir, '.next', 'BUILD_ID'))
 
 /**
  * True when the release carries a different updater than the one running,
@@ -288,9 +385,7 @@ const built = (/** @type {string} */ dir) => existsSync(join(dir, '.next', 'BUIL
  */
 export function supervisorChanged(root, dir) {
   if (dir === root) return false
-  return [...new Set([...updaterFiles(root), ...updaterFiles(dir)])].some(
-    (file) => plainText(join(root, file)) !== plainText(join(dir, file)),
-  )
+  return [...new Set([...updaterFiles(root), ...updaterFiles(dir)])].some((file) => plainText(join(root, file)) !== plainText(join(dir, file)))
 }
 
 /**
@@ -305,6 +400,13 @@ export function supervisorChanged(root, dir) {
  */
 export function syncUploadedVersion(root, dir, print) {
   if (dir === root) return
+  const say = (/** @type {string} */ line) => {
+    try {
+      print(line)
+    } catch {
+      // A closed stdout is no reason to stop.
+    }
+  }
   const file = join(root, 'package.json')
   const temporary = `${file}.${process.pid}.tmp`
   try {
@@ -322,13 +424,13 @@ export function syncUploadedVersion(root, dir, print) {
       if (JSON.stringify(JSON.parse(updated)) === wanted) {
         writeFileSync(temporary, updated)
         renameSync(temporary, file)
-        print(`The uploaded folder's package.json now says version ${version}.`)
+        say(`The uploaded folder's package.json now says version ${version}.`)
         return
       }
     }
     throw new Error('it has no version to change')
   } catch (error) {
-    print(`Could not update the version in the uploaded folder's package.json: ${error instanceof Error ? error.message : error}`)
+    say(`Could not update the version in the uploaded folder's package.json: ${messageOf(error)}`)
   } finally {
     quietly(() => rmSync(temporary, { force: true }))
   }
@@ -348,8 +450,35 @@ export function syncUploadedVersion(root, dir, print) {
  */
 export function crashWatchSince(paths, state, dir, windowMs, now = Date.now()) {
   const since = Date.parse(state.watchSince ?? '')
-  if (!state.current || !parseVersion(state.current.tag ?? '') || dir !== releaseDir(paths, state.current.tag)) return null
-  return Number.isFinite(since) && now - since < windowMs ? since : null
+  if (!state.current || !parseVersion(state.current.tag) || dir !== releaseDir(paths, state.current.tag)) return null
+  return Number.isFinite(since) && since <= now && now - since < windowMs ? since : null
+}
+
+/**
+ * An update the server was restarted in the middle of, marked as failed. A
+ * database step it cut short is named, with its backup.
+ * @param {State} state
+ * @returns {State}
+ */
+function cutShort(state) {
+  const steps = { ...state.steps }
+  const migrating = steps.migrate === 'running'
+  for (const id of /** @type {StepId[]} */ (Object.keys(steps))) {
+    if (steps[id] === 'running') steps[id] = 'failed'
+    else if (steps[id] === 'pending') steps[id] = 'skipped'
+  }
+  const database = !migrating
+    ? ''
+    : state.backup
+      ? ` It was changing the database, which may be half changed: the backup from just before is in ${state.backup}.`
+      : ' It was backing up the database, which it had not changed yet.'
+  return {
+    ...state,
+    status: 'failed',
+    steps,
+    finishedAt: new Date().toISOString(),
+    message: `The server restarted in the middle of an update, so the update stopped. The site is on the version it had before.${database}`,
+  }
 }
 
 /**
@@ -365,19 +494,25 @@ export function recoverState(paths) {
     for (const name of readdirSync(paths.dir)) if (name.endsWith('.tmp')) rmSync(join(paths.dir, name), { force: true })
   }
   const state = readState(paths)
-  if (!busyStatuses.includes(state.status)) return state
-  for (const id of stepIds) {
-    if (state.steps[id] === 'running') state.steps[id] = 'failed'
-    else if (state.steps[id] === 'pending') state.steps[id] = 'skipped'
-  }
-  const recovered = {
-    ...state,
-    status: 'failed',
-    finishedAt: new Date().toISOString(),
-    message: 'The server restarted in the middle of an update, so the update stopped. The site is on the version it had before.',
-  }
+  if (!isBusy(state)) return state
+  const recovered = cutShort(state)
   writeState(paths, recovered)
   return recovered
+}
+
+/**
+ * Writes recoverState's verdict again while state.json still says an update
+ * runs: the write at start-up did not get through (a full disk, say), and
+ * until it does, /admin shows an update running and refuses Install, and no
+ * update can start. The supervisor tries once its start-up clean-up has made
+ * room, then every minute. Half-written files are left alone here: by now
+ * /admin may be in the middle of writing one.
+ * @param {Paths} paths
+ * @returns {boolean} true once state.json no longer says an update runs
+ */
+export function retryRecoverState(paths) {
+  const state = readState(paths)
+  return !isBusy(state) || writeState(paths, cutShort(state))
 }
 
 /**
@@ -398,49 +533,81 @@ export function restoredAssets(dir) {
 }
 
 /**
- * Settings from .env never reach npm: any package's install script can read the environment.
- * @param {Env} env
- * @param {string[]} secretNames
- * @returns {Env}
+ * A package.json's name and its scripts. Empty when it cannot be read.
+ * @param {string} dir
+ * @returns {{ name: string | null, scripts: Record<string, unknown> }}
  */
-export function withoutSecrets(env, secretNames) {
-  return Object.fromEntries(Object.entries(env).filter(([name]) => !secretNames.includes(name)))
+function packageOf(dir) {
+  try {
+    const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'))
+    return { name: typeof pkg?.name === 'string' ? pkg.name : null, scripts: isObject(pkg?.scripts) ? pkg.scripts : {} }
+  } catch {
+    return { name: null, scripts: {} }
+  }
+}
+
+/** A folder name for a backup: the release it was made for and when, such as v1.2.0-20261110T231500Z. */
+const backupFolder = /^v\d+\.\d+\.\d+-(\d{8}T\d{6}Z)$/
+
+/**
+ * Deletes all but the newest backupsKept backups in folder, and only those
+ * the updater made: folders named like backupFolder, never a link and never
+ * anything else.
+ * @param {string} folder
+ * @param {OnLine} print
+ */
+async function pruneBackups(folder, print) {
+  try {
+    const made = readdirSync(folder)
+      .filter((name) => backupFolder.test(name) && lstatSync(join(folder, name)).isDirectory())
+      .toSorted((a, b) => (/** @type {RegExpExecArray} */ (backupFolder.exec(b)))[1].localeCompare(/** @type {RegExpExecArray} */ (backupFolder.exec(a))[1]))
+    for (const name of made.slice(backupsKept)) await rm(join(folder, name), { recursive: true, force: true, maxRetries: 3 })
+  } catch (error) {
+    print(`Could not remove an old backup: ${messageOf(error)}`)
+  }
 }
 
 /**
  * One update, start to finish. Every outside effect comes in `deps`:
  *   latest()                      GitHub's latest release, or null when none
  *   resolve(tag)                  the commit the tag points at, now
- *   download(sha, dest)           that commit's files into dest
+ *   download(sha, dest)           that commit's files into dest, each one
+ *                                 checked against GitHub's record of it
+ *   settings(dir)                 the updater settings in dest's platform.config.mjs
  *   npm(args, { cwd, env, onLine })
  *   trial(dir, onLine)            start dir on a spare port: did it answer?
  *   switchTo(dir, onLine)         make dir the live server: did it answer?
+ *   watch()                       watch what was just switched to for crashes
  *   print(line)                   the server log
- * serving is the folder the supervisor actually serves from: a failed
- * switch goes back to it, nothing deletes it, and a release counts as
- * installed only when its folder is the one served, so a lost or stale
- * state.json is never taken for the truth about what runs.
- * Returns the final state, which is also on disk.
- * @param {{ paths: Paths, deps: Deps, baseEnv: Env, secretNames: string[], serving?: string | null }} options
+ * baseEnv is the panel's variables, which npm runs with less secretNames.
+ * fileEnv is .env: with baseEnv over it, it is where updater.buildEnv,
+ * BUILD_WORKERS and the database step's settings come from. serving is the
+ * folder the supervisor actually serves from: a failed switch goes back to
+ * it, nothing deletes it, and a release counts as installed only when its
+ * folder is the one served, so a lost or stale state.json is never taken for
+ * the truth about what runs. inUse are the folders the processes beside the
+ * website run from, which nothing deletes either. redact hides the token in
+ * what is logged. Returns the final state, which is also on disk.
+ * @param {{ paths: Paths, deps: Deps, baseEnv: Env, secretNames: string[], fileEnv?: Env, serving?: string | null, inUse?: string[], redact?: (line: string) => string }} options
  * @returns {Promise<State>}
  */
-export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = null }) {
+export async function runUpdate({ paths, deps, baseEnv, secretNames, fileEnv = {}, serving = null, inUse = [], redact = (line) => line }) {
   let state = readState(paths)
-  if (busyStatuses.includes(state.status)) return state
+  if (isBusy(state)) return state
 
   const live = serving && existsSync(serving) ? serving : liveDir(paths, state)
+  const spare = [live, ...inUse]
   // The release running now: the state's current one, or the one before when
   // a rollback could not be recorded, but only if its folder is the one
   // served. A folder the state does not describe (uploaded by hand, or a
   // lost state.json) is none.
   const runningRelease =
-    [state.current, state.previous].find((release) => release && parseVersion(release.tag ?? '') && releaseDir(paths, release.tag) === live) ??
-    null
+    [state.current, state.previous].find((release) => release && parseVersion(release.tag) && releaseDir(paths, release.tag) === live) ?? null
   let finished = false
   // Neither the log nor the state file may stop an update.
   const print = (/** @type {string} */ line) => {
     try {
-      deps.print(line)
+      deps.print(redact(line))
     } catch {
       // A closed stdout is no reason to give up.
     }
@@ -451,22 +618,24 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
     saved = writeState(paths, state)
   }
   const log = (/** @type {string} */ line) => {
-    print(line)
+    const safe = redact(line)
+    print(safe)
     // A line from a process that outlived its update (a build stopped too
     // late) is printed only: the state now belongs to what runs after it.
-    if (!finished) save({ log: [...state.log, line.slice(0, 500)].slice(-logLines) })
+    if (!finished) save({ log: [...state.log, safe.slice(0, 500)].slice(-logLines) })
   }
-  const step = (/** @type {string} */ id, /** @type {StepState} */ value, /** @type {string} */ status = '') =>
+  const step = (/** @type {StepId} */ id, /** @type {StepState} */ value, /** @type {string} */ status = '') =>
     save({ steps: { ...state.steps, [id]: value }, ...(status && { status }) })
 
   save({
     status: 'downloading',
     target: null,
-    steps: emptyState().steps,
+    steps: pendingSteps(),
     startedAt: new Date().toISOString(),
     finishedAt: null,
     message: '',
     log: [],
+    backup: null,
     // A release whose build is gone is no longer installed: the site runs
     // from the uploaded folder, and a failed build of the same tag must not
     // be taken for it at the next start.
@@ -477,28 +646,47 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
 
   const finish = (/** @type {string} */ status, /** @type {string} */ message) => {
     const steps = { ...state.steps }
-    for (const id of stepIds) if (steps[id] === 'pending') steps[id] = 'skipped'
-    save({ status, message, steps, finishedAt: new Date().toISOString() })
+    for (const id of /** @type {StepId[]} */ (Object.keys(steps))) if (steps[id] === 'pending') steps[id] = 'skipped'
+    save({ status, message: redact(message), steps, finishedAt: new Date().toISOString() })
     print(message)
     return state
   }
   const discard = (/** @type {string | undefined} */ tag) =>
-    removeRelease(paths, state, tag, [live]).catch((error) => print(`Could not remove a release: ${error.message}`))
+    removeRelease(paths, state, tag, spare).catch((error) => print(`Could not remove a release: ${messageOf(error)}`))
   // A switch that throws is a switch that failed: the rollback still runs.
   const switchTo = async (/** @type {string} */ dir) => {
     try {
       return await deps.switchTo(dir, log)
     } catch (error) {
-      log(`The switch failed: ${error instanceof Error ? error.message : error}`)
+      log(`The switch failed: ${messageOf(error)}`)
       return false
     }
+  }
+  /**
+   * An npm step, with how long it took in the log: how close a build comes
+   * to its limit (UPDATE_STEP_MINUTES) is what says the limit needs raising.
+   * @param {string} name
+   * @param {string[]} args
+   * @param {{ cwd: string, env: Env }} options
+   */
+  const timed = async (name, args, { cwd, env }) => {
+    const started = Date.now()
+    try {
+      await deps.npm(args, { cwd, env, onLine: log })
+    } catch (error) {
+      log(`${name} stopped after ${formatDuration(Date.now() - started)}.`)
+      throw error
+    }
+    log(`${name} took ${formatDuration(Date.now() - started)}.`)
   }
 
   async function attempt() {
     /** @type {string | null} */
     let release = null
+    /** @type {StepId} */
     let stage = 'download'
     const installed = runningRelease
+    const before = installed ? installed.tag : 'the version it had'
     try {
       step('download', 'running')
       const latest = await deps.latest()
@@ -512,7 +700,7 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
       if (!parseVersion(latest.tag)) {
         throw new Error(`The latest release is tagged "${latest.tag.slice(0, 60)}", not ${tagRule}, so it was not installed.`)
       }
-      if ((state.withdrawn ?? []).includes(latest.tag)) {
+      if (withdrawnTags(state).includes(latest.tag)) {
         step('download', 'skipped')
         return finish('idle', `${latest.tag} was taken back out after it kept stopping, so it is not installed again. Publish the fix as a newer release.`)
       }
@@ -544,11 +732,42 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
       // the one before it, which goes now, along with any other folder (one
       // taken back out after it kept stopping, say).
       if (state.previous) save({ previous: null })
-      await pruneReleases(paths, state, [live]).catch((error) => print(`Could not remove an old release: ${error.message}`))
+      await pruneReleases(paths, state, spare).catch((error) => print(`Could not remove an old release: ${messageOf(error)}`))
       release = releaseDir(paths, head.tag)
       await rm(release, { recursive: true, force: true, maxRetries: 3 })
       mkdirSync(release, { recursive: true })
       await deps.download(head.sha, release)
+      if (!existsSync(join(release, 'package.json'))) throw new Error('The download has no package.json.')
+      // A release names its app in package.json. One with another name is
+      // another app, from a GITHUB_REPO that points at the wrong repository.
+      const site = packageOf(paths.root)
+      const incoming = packageOf(release)
+      if (site.name && incoming.name !== site.name) {
+        throw new Error(
+          `The release's package.json names the app ${JSON.stringify(incoming.name ?? '')}, and this site is ${JSON.stringify(site.name)}, so it was not installed. Check GITHUB_REPO in .env.`,
+        )
+      }
+      /** @type {Readonly<UpdaterSettings>} */
+      let settings = defaultSettings
+      if (deps.settings) {
+        try {
+          settings = await deps.settings(release)
+        } catch (error) {
+          throw new Error(`The release's platform.config.mjs cannot be used, so it was not installed. ${messageOf(error)}`, { cause: error })
+        }
+      }
+      const placement = dataDirProblem(paths.root, settings.dataDir)
+      if (placement) throw new Error(`${placement} Nothing was installed.`)
+      // Every npm script the settings name, before anything is run.
+      for (const name of [...settings.afterInstall, ...(settings.migrate ? [settings.migrate.backup, settings.migrate.apply] : [])]) {
+        if (!Object.hasOwn(incoming.scripts, name)) {
+          throw new Error(`platform.config.mjs names the npm script ${name}, which the release's package.json does not have, so nothing was installed.`)
+        }
+      }
+      if (settings.migrate) {
+        const { check, switch: last, ...rest } = state.steps
+        save({ steps: { ...rest, migrate: 'pending', check, switch: last } })
+      }
       // The live build's own assets, so the build's history step stamps them
       // as still live (scripts/keep-old-assets.mjs). Not the old ones put
       // back beside them: stamped as live, those would never reach their 30
@@ -563,22 +782,34 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
       }
       step('download', 'done')
 
-      // No install scripts: they are where a compromised package strikes, and
-      // the site needs none (sharp and the compilers ship prebuilt binaries).
-      // npm's cache lives under .updater/ and goes after the update, so it
-      // never grows into the server's disk limit.
+      // No install scripts: they are where a compromised package strikes.
+      // Only the packages updater.installScripts names run theirs, after
+      // npm ci, and with npm ci's environment. npm's cache lives under
+      // .updater/ and goes after the update, so it never grows into the
+      // server's disk limit.
       const env = { ...withoutSecrets(baseEnv, secretNames), npm_config_cache: paths.npmCache }
+      const buildEnv = { ...env, ...buildSettings(fileEnv, baseEnv, settings.buildEnv) }
       stage = 'install'
       step('install', 'running', 'installing')
-      await deps.npm(['ci', '--include=dev', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: release, env, onLine: log })
+      await timed('npm ci', ['ci', '--include=dev', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: release, env })
+      if (settings.installScripts.length > 0) {
+        for (const name of settings.installScripts) {
+          if (!existsSync(join(release, 'node_modules', ...name.split('/'), 'package.json'))) {
+            throw new Error(`updater.installScripts names ${name}, which the release does not install.`)
+          }
+        }
+        log(`Running the install scripts of ${settings.installScripts.join(', ')}, which updater.installScripts allows.`)
+        await timed('npm rebuild', ['rebuild', ...settings.installScripts, '--foreground-scripts'], { cwd: release, env })
+      }
+      // Each with what the build gets: none of .env but what updater.buildEnv lists.
+      for (const name of settings.afterInstall) await timed(`npm run ${name}`, ['run', name], { cwd: release, env: buildEnv })
       step('install', 'done')
 
       stage = 'build'
       step('build', 'running', 'building')
-      await deps.npm(['run', 'build'], {
+      await timed('npm run build', ['run', 'build'], {
         cwd: release,
-        env: { ...env, SITE_COMMIT: head.sha, SITE_RELEASE: head.tag, STATIC_HISTORY_DIR: paths.history },
-        onLine: log,
+        env: { ...buildEnv, SITE_COMMIT: head.sha, SITE_RELEASE: head.tag, STATIC_HISTORY_DIR: paths.history },
       })
       step('build', 'done')
 
@@ -587,18 +818,55 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
       // (scripts/updater/dev-files.mjs), then the devDependencies, which
       // only the build and the checks need. npm prune gets npm ci's
       // environment and time limit. Its status is 'installing', one of the
-      // busy statuses the dashboard already knows.
+      // busy statuses every admin knows.
       stage = 'prune'
       step('prune', 'running', 'installing')
       const removed = await removeDevFiles(release, log)
       if (removed.length) log(`Deleted what production never uses: ${removed.join(', ')}`)
-      await deps.npm(['prune', '--omit=dev', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: release, env, onLine: log })
+      await timed('npm prune', ['prune', '--omit=dev', '--ignore-scripts', '--no-audit', '--no-fund'], { cwd: release, env })
       step('prune', 'done')
+
+      // The database step, before the trial, so the trial runs the new code
+      // on the database it will have. The version running now goes on
+      // serving meanwhile, so every change must be one it still works with:
+      // add, never drop or rename. That is also what lets a rollback go back
+      // to it. A backup comes first, into a folder of its own in
+      // <dataDir>/backups, and must not be empty.
+      if (settings.migrate) {
+        const { backup, apply } = settings.migrate
+        stage = 'migrate'
+        step('migrate', 'running', 'swapping')
+        const backups = join(/** @type {string} */ (settings.dataDir), 'backups')
+        const folder = join(backups, `${head.tag}-${new Date().toISOString().replaceAll(/[-:]/g, '').replace(/\.\d+Z$/, 'Z')}`)
+        mkdirSync(folder, { recursive: true })
+        const databaseEnv = {
+          ...withoutSecrets({ ...fileEnv, ...baseEnv }, [...kitSecrets, 'UPDATER_DIR']),
+          npm_config_cache: paths.npmCache,
+          PLATFORM_BACKUP_DIR: folder,
+        }
+        log(`Backing up the database into ${folder}.`)
+        try {
+          await timed(`npm run ${backup}`, ['run', backup], { cwd: release, env: databaseEnv })
+        } catch (error) {
+          throw new Error(`The database backup failed, so the database was not changed. ${messageOf(error)}`, { cause: error })
+        }
+        if (readdirSync(folder).length === 0) throw new Error(`npm run ${backup} wrote nothing into ${folder}, so the database was not changed.`)
+        save({ backup: folder })
+        try {
+          await timed(`npm run ${apply}`, ['run', apply], { cwd: release, env: databaseEnv })
+        } catch (error) {
+          throw new Error(`Changing the database failed, so the site stays on ${before}. The backup from just before is in ${folder}. ${messageOf(error)}`, {
+            cause: error,
+          })
+        }
+        step('migrate', 'done')
+        await pruneBackups(backups, print)
+      }
 
       stage = 'check'
       step('check', 'running', 'checking')
       if (!(await deps.trial(release, log))) {
-        throw new Error(`The new build did not start on its trial run, so the site stays on ${installed ? installed.tag : 'the version it had'}.`)
+        throw new Error(`The new build did not start on its trial run, so the site stays on ${before}.`)
       }
       step('check', 'done')
 
@@ -607,8 +875,10 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
       if (!(await switchTo(release))) {
         step('switch', 'failed')
         const back = await switchTo(live)
-        await discard(head.tag)
-        const before = installed ? installed.tag : 'the version it had'
+        // Kept when the release before did not come back: something may
+        // still run from the new one until the restart the message asks
+        // for, and the start-up clean-up removes it then.
+        if (back) await discard(head.tag)
         return finish(
           'rolled-back',
           back
@@ -619,7 +889,7 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
     } catch (error) {
       step(stage, 'failed')
       if (release) await discard(state.target?.tag)
-      return finish('failed', error instanceof Error ? error.message : String(error))
+      return finish('failed', messageOf(error))
     }
 
     // Switched. Recorded in one write, before anything else can go wrong, so a
@@ -638,10 +908,19 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
       // Watched for crashes from now, across a restart of the server too.
       watchSince: now,
       // A withdrawn release older than this one can no longer be offered.
-      withdrawn: (state.withdrawn ?? []).filter((tag) => isNewer(tag, target.tag)),
+      withdrawn: withdrawnTags(state).filter((tag) => isNewer(tag, target.tag)),
     })
+    finished = true
+    // Watched from here, not once the update returns: the release is live
+    // already, and the clean-up below can take a while. A stop meanwhile
+    // counts, within the ten minutes the switch started.
+    try {
+      deps.watch?.()
+    } catch (error) {
+      print(`Could not watch the new release for crashes: ${messageOf(error)}`)
+    }
     print(message)
-    await pruneReleases(paths, state).catch((error) => print(`Could not remove an old release: ${error.message}`))
+    await pruneReleases(paths, state).catch((error) => print(`Could not remove an old release: ${messageOf(error)}`))
     return state
   }
 
@@ -673,16 +952,18 @@ export async function runUpdate({ paths, deps, baseEnv, secretNames, serving = n
  * release). Each update removes the release before the live one to make
  * room, so after one the only earlier build may be the uploaded folder,
  * which can be months old: that is used only with allowUpload (the
- * console's "rollback upload", and a crash rollback, which says so).
+ * console's "rollback upload", and a crash rollback, which says so). The
+ * database is never put back: the release gone back to works with it as it
+ * is, since every change is one the version before still works with.
  * deps: switchTo and print, as for runUpdate.
  * @param {{ paths: Paths, deps: Pick<Deps, 'switchTo' | 'print'>, reason: string, crashed?: boolean, serving?: string | null, allowUpload?: boolean }} options
  * @returns {Promise<{ ok: boolean, message: string }>}
  */
 export async function rollBack({ paths, deps, reason, crashed = false, serving = null, allowUpload = false }) {
   const state = readState(paths)
-  if (busyStatuses.includes(state.status)) return { ok: false, message: 'An update is running, so nothing was rolled back.' }
+  if (isBusy(state)) return { ok: false, message: 'An update is running, so nothing was rolled back.' }
   const from = serving && existsSync(serving) ? serving : liveDir(paths, state)
-  const leaving = state.current && parseVersion(state.current.tag ?? '') && releaseDir(paths, state.current.tag) === from ? state.current : null
+  const leaving = state.current && parseVersion(state.current.tag) && releaseDir(paths, state.current.tag) === from ? state.current : null
   if (!leaving) return { ok: false, message: 'The site does not run an installed release, so there is nothing to go back to.' }
   const previous = state.previous && parseVersion(state.previous.tag) ? releaseDir(paths, state.previous.tag) : null
   const target = previous && built(previous) ? previous : built(paths.root) ? paths.root : null
@@ -706,7 +987,7 @@ export async function rollBack({ paths, deps, reason, crashed = false, serving =
     try {
       return await deps.switchTo(dir, say)
     } catch (error) {
-      say(`The switch failed: ${error instanceof Error ? error.message : error}`)
+      say(`The switch failed: ${messageOf(error)}`)
       return false
     }
   }
@@ -735,9 +1016,9 @@ export async function rollBack({ paths, deps, reason, crashed = false, serving =
     target: null,
     watchSince: null,
     // Every release a crash took back out, not only the last one.
-    withdrawn: crashed ? [...new Set([...(state.withdrawn ?? []), leaving.tag])] : (state.withdrawn ?? []),
+    withdrawn: crashed ? [...new Set([...withdrawnTags(state), leaving.tag])] : withdrawnTags(state),
     // The steps and log were the update that installed what was left: not this.
-    steps: emptyState().steps,
+    steps: pendingSteps(),
     startedAt: null,
     log: [],
     finishedAt: now,

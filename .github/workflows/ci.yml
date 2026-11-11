@@ -25,6 +25,10 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      # platform/, scripts/serve.mjs and scripts/updater/ are the shared kit's
+      # files: this fails when one was edited here, or a package fell behind
+      # the kit's versions.
+      - run: npm run platform:check
       - run: npm run lint
       - run: npm test
       # Made-up admin settings, so the scan below can prove that no .env

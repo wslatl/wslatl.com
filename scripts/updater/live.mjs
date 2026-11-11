@@ -1,72 +1,150 @@
-// The live `next start` (scripts/serve.mjs): started from a folder, and
+// A server the supervisor keeps running (scripts/serve.mjs): the live
+// `next start`, and each process beside it. Started from a folder, and
 // started again whenever it stops or fails to start. After a switch to a new
 // release it is also watched: three stops within ten minutes of the switch
 // call onCrashLoop instead of another restart, so the supervisor can go back
-// to the release before. Kept apart so the tests can drive it
-// (tests/updater-live.test.ts).
+// to the release before.
+//
+// Given its ports, it starts only once nothing else holds them, and waits
+// for them otherwise. A server started onto a taken port only exits with
+// "port in use", over and over, and soon after an install each of those
+// exits would count as a crash of a release that is fine. A port that cannot
+// be listened on for any other reason (EACCES, say) is never waited for:
+// that is said at once. Kept apart so the tests can drive it.
+import { messageOf, portFree } from './process.mjs'
 
 export const crashLimit = 3
 export const crashWindowMs = 10 * 60_000
 
 /**
+ * @typedef {import('node:child_process').ChildProcess} ChildProcess
+ * @typedef {{ dir: string, child: ChildProcess | null, wanted: boolean, ended: boolean, startedAt: number, timer: unknown, waitSaid: boolean }} LiveEntry
+ */
+
+/**
  * @param {{
- *   start: (dir: string) => import('node:child_process').ChildProcess,
- *   stop: (child: import('node:child_process').ChildProcess) => Promise<void>,
+ *   name?: string,
+ *   start: (dir: string) => ChildProcess,
+ *   stop: (child: ChildProcess) => Promise<void>,
  *   print: (line: string) => void,
  *   onCrashLoop: (dir: string) => void,
+ *   ports?: () => number[],
+ *   isFree?: (port: number) => Promise<boolean>,
+ *   portRetryMs?: number,
  *   now?: () => number,
  *   setTimer?: (callback: () => void, ms: number) => unknown,
  *   clearTimer?: (timer: unknown) => void,
- * }} options
+ * }} options name is what the console calls it ("next start", "mail").
+ *   ports, when given, are the ports it listens on: each start waits until
+ *   isFree says every one is free, looking again every portRetryMs.
  */
 export function liveServer({
+  name = 'next start',
   start,
   stop,
   print,
   onCrashLoop,
+  ports,
+  isFree = portFree,
+  portRetryMs = 5000,
   now = Date.now,
   setTimer = setTimeout,
   clearTimer = /** @type {(timer: unknown) => void} */ (clearTimeout),
 }) {
-  /** @type {{ dir: string, child: any, wanted: boolean, ended: boolean, startedAt: number, timer: unknown } | null} */
+  /** @type {LiveEntry | null} */
   let entry = null
   let backoff = 1000
   /** @type {{ dir: string, since: number, crashes: number } | null} */
   let watch = null
 
-  /** @param {string} dir */
-  function launch(dir) {
-    const current = { dir, child: null, wanted: true, ended: false, startedAt: now(), timer: /** @type {unknown} */ (null) }
-    entry = current
-    /** @param {string} why */
-    const ended = (why) => {
-      if (current.ended) return
-      current.ended = true
-      if (entry !== current || !current.wanted) return
-      if (watch && watch.dir === dir && now() - watch.since < crashWindowMs && ++watch.crashes >= crashLimit) {
-        watch = null
-        print(`next start stopped (${why}) for the third time within ten minutes of this release's switch`)
-        onCrashLoop(dir)
-        return
-      }
-      backoff = now() - current.startedAt < 60_000 ? Math.min(backoff * 2, 30_000) : 1000
-      print(`next start stopped (${why}); starting it again in ${backoff / 1000} s`)
-      current.timer = setTimer(() => {
-        if (entry === current && current.wanted) launch(dir)
-      }, backoff)
+  /** Still the server meant to run: not stopped on purpose, nor replaced. @param {LiveEntry} current */
+  const meant = (current) => entry === current && current.wanted
+
+  /**
+   * @param {LiveEntry} current
+   * @param {string} why
+   */
+  function stopped(current, why) {
+    if (current.ended) return
+    current.ended = true
+    if (!meant(current)) return
+    const dir = current.dir
+    if (watch && watch.dir === dir && now() - watch.since < crashWindowMs && ++watch.crashes >= crashLimit) {
+      watch = null
+      print(`${name} stopped (${why}) for the third time within ten minutes of this release's switch`)
+      onCrashLoop(dir)
+      return
     }
+    backoff = now() - current.startedAt < 60_000 ? Math.min(backoff * 2, 30_000) : 1000
+    print(`${name} stopped (${why}); starting it again in ${backoff / 1000} s`)
+    current.timer = setTimer(() => {
+      current.timer = null
+      if (meant(current)) launch(dir)
+    }, backoff)
+  }
+
+  /** @param {LiveEntry} current */
+  function spawnFor(current) {
+    current.startedAt = now()
     try {
-      current.child = start(dir)
+      current.child = start(current.dir)
     } catch (error) {
       // Spawning can fail outright (EAGAIN, ENOMEM while a build runs): a stop like any other.
-      queueMicrotask(() => ended(`could not start: ${error instanceof Error ? error.message : error}`))
-      return current
+      queueMicrotask(() => stopped(current, `could not start: ${messageOf(error)}`))
+      return
     }
-    current.child.once('exit', (/** @type {number | null} */ code, /** @type {string | null} */ signal) =>
-      ended(signal ?? `exit code ${code}`),
-    )
+    current.child.once('exit', (code, signal) => stopped(current, signal ?? `exit code ${code}`))
     // A failed spawn emits 'error' and never 'exit'.
-    current.child.once('error', (/** @type {Error} */ error) => ended(`could not start: ${error.message}`))
+    current.child.once('error', (error) => stopped(current, `could not start: ${error.message}`))
+  }
+
+  /**
+   * Starts current once none of its ports is held by something else.
+   * @param {LiveEntry} current
+   * @param {number[]} wanted
+   */
+  async function whenFree(current, wanted) {
+    current.timer = null
+    if (!meant(current)) return
+    /** @type {number | undefined} */
+    let taken
+    try {
+      for (const port of wanted) {
+        if (!(await isFree(port))) {
+          taken = port
+          break
+        }
+      }
+    } catch (error) {
+      // Not in use, which waiting would cure: the port cannot be listened
+      // on at all. Marked ended, so that a restart or an update can try again.
+      if (meant(current)) {
+        current.ended = true
+        print(`${name} cannot be started: ${messageOf(error)}.`)
+      }
+      return
+    }
+    if (!meant(current)) return
+    if (taken !== undefined) {
+      if (!current.waitSaid) {
+        print(`Port ${taken} is in use by a process this updater did not start, so ${name} starts once it is free. Stop that process, or restart the server.`)
+        current.waitSaid = true
+      }
+      current.timer = setTimer(() => void whenFree(current, wanted), portRetryMs)
+      return
+    }
+    if (current.waitSaid) print(`Port ${wanted.join(', ')} is free now, so ${name} starts.`)
+    spawnFor(current)
+  }
+
+  /** @param {string} dir */
+  function launch(dir) {
+    /** @type {LiveEntry} */
+    const current = { dir, child: null, wanted: true, ended: false, startedAt: now(), timer: null, waitSaid: false }
+    entry = current
+    const wanted = ports?.() ?? []
+    if (wanted.length > 0) void whenFree(current, wanted)
+    else spawnFor(current)
     return current
   }
 
@@ -76,6 +154,7 @@ export function liveServer({
     if (!current) return
     current.wanted = false
     clearTimer(current.timer)
+    current.timer = null
     if (current.child) await stop(current.child)
   }
 
@@ -102,8 +181,8 @@ export function liveServer({
       if (entry) watch = { dir: entry.dir, since, crashes: 0 }
     },
     /**
-     * Starts dir unless a server is running or about to be started again.
-     * True when it started one.
+     * Starts dir unless a server is running, about to be started again, or
+     * waiting for its port. True when it started one.
      * @param {string} dir
      */
     ensure(dir) {

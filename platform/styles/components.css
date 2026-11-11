@@ -1,0 +1,74 @@
+/*
+ * The rules the kit's components need that Tailwind classes cannot express.
+ * base.css imports this file, so an app does not import it on its own.
+ */
+
+/* ----- Header: the hairline border fades in once the page scrolls ----- */
+/* Pure CSS, no scroll listener. Browsers without scroll timelines keep the border. */
+.site-header {
+  border-bottom-color: var(--border);
+}
+@supports (animation-timeline: scroll()) {
+  @keyframes header-lift {
+    from {
+      border-bottom-color: transparent;
+    }
+    to {
+      border-bottom-color: var(--border);
+    }
+  }
+  .site-header {
+    animation: header-lift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 32px;
+  }
+}
+
+/* ----- Mobile menu: a native popover under the header ----- */
+.mobile-menu {
+  position: fixed;
+  inset: 4rem 0 0 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border: 0;
+  border-top: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+}
+/* Lock page scroll while the menu covers it, and swap the button icon. */
+@media (width < 64rem) {
+  body:has(.mobile-menu:popover-open) {
+    overflow: hidden;
+  }
+}
+header:has(.mobile-menu:popover-open) .menu-icon-closed {
+  display: none;
+}
+header:has(.mobile-menu:popover-open) .menu-icon-open {
+  display: block;
+}
+
+/* ----- Skip to main content link (visible on keyboard focus) ----- */
+/* Parked above the viewport (not just translated) so no screenshot or
+   stitched capture can catch it; it drops in over the header on focus. */
+.skip-link {
+  position: fixed;
+  top: -5rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.7);
+  transition: top 0.15s ease-out;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 0.75rem;
+}
