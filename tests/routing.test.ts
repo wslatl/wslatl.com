@@ -1,10 +1,10 @@
 import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { isAdminPath as kitIsAdminPath } from '@/platform/admin/proxy'
 import {
   isAdminPath,
   isRootFile,
-  methodAllowed,
   partnerImageTypes,
   rewriteTarget,
   rootDirectories,
@@ -181,17 +181,9 @@ describe('the admin', () => {
     expect(rewriteTarget('/admin.php')).toBe('/en/admin.php')
   })
 
-  it('is the only place a POST is allowed, and only on its JSON routes', () => {
-    for (const path of ['/', '/pricing', '/es/pricing', '/admin', '/admin/login', '/company.json']) {
-      expect(methodAllowed('GET', path), path).toBe(true)
-      expect(methodAllowed('HEAD', path), path).toBe(true)
-      expect(methodAllowed('POST', path), path).toBe(false)
+  it('is the same admin the kit answers for, so no address falls between the two', () => {
+    for (const path of ['/admin', '/admin/', '/admin/login', '/admin/api/update', '/administrator', '/admin.php', '/es/admin', '/', '/pricing']) {
+      expect(isAdminPath(path), path).toBe(kitIsAdminPath(path))
     }
-    expect(methodAllowed('POST', '/admin/api/login')).toBe(true)
-    // Only the routes that exist: anything else there would reach a page.
-    expect(methodAllowed('POST', '/admin/api/anything')).toBe(false)
-    expect(methodAllowed('POST', '/admin/api/login/')).toBe(false)
-    expect(methodAllowed('PUT', '/admin/api/login')).toBe(false)
-    expect(methodAllowed('DELETE', '/admin/api/update')).toBe(false)
   })
 })

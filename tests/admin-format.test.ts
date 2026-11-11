@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { formatWait } from '@/components/admin/format'
+import { formatWait } from '@/platform/admin/components/format'
 
 // The login form says how long to wait after too many attempts, from the
-// Retry-After header that /admin/api/login sends with its 429.
+// Retry-After header that /admin/api/login sends with its 429. The form is
+// the kit's (platform/admin/), whose own tests do not cover this yet.
 describe('the wait after too many attempts', () => {
   it('reads Retry-After as the time left, rounded up', () => {
     expect(formatWait('900')).toBe('15 minutes')

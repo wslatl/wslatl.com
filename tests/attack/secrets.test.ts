@@ -60,11 +60,10 @@ describe('every answer the admin gives', () => {
   })
 
   it('says only which setting is wrong when one is, never its value', async () => {
+    // What signing in needs: the whole admin is off, every address a 404.
     for (const [name, value] of [
       ['ADMIN_SESSION_SECRET', admin.secret.slice(0, 31)],
       ['ADMIN_PASSWORD_HASH', `${admin.passwordHash}:x`],
-      ['GITHUB_API_URL', `http://${admin.token}.example`],
-      ['GITHUB_REPO', `../${admin.token}`],
     ] as const) {
       setUp(admin, { [name]: value })
       const { result, logs } = await logsOf(() => post(paths.login, { password: admin.password }))
@@ -73,15 +72,47 @@ describe('every answer the admin gives', () => {
       expectNoSecret(logs, `the log for a bad ${name}`)
       expect(logs.includes(value), name).toBe(false)
     }
+    // What updating needs: signing in still works, and updates are off.
+    // The update route says which setting, to whoever is signed in, and
+    // neither it nor the log says what the setting holds.
+    for (const [name, value] of [
+      ['GITHUB_API_URL', `http://${admin.token}.example`],
+      ['GITHUB_REPO', `../${admin.token}`],
+    ] as const) {
+      setUp(admin, { [name]: value })
+      const { result, logs } = await logsOf(async () => {
+        const cookie = await signIn(admin)
+        return post(paths.update, {}, { cookie })
+      })
+      expect(result.status, name).toBe(503)
+      const answer = await wholeResponse(result)
+      expect(answer, name).toContain(name)
+      expect(answer.includes(value), name).toBe(false)
+      expectNoSecret(answer, `the answer for a bad ${name}`)
+      expect(logs, name).toContain(name)
+      expectNoSecret(logs, `the log for a bad ${name}`)
+      expect(logs.includes(value), name).toBe(false)
+    }
   })
 
-  it('turns the admin off rather than send the token anywhere but GitHub over HTTPS', async () => {
-    for (const api of ['http://api.github.com', 'http://192.0.2.1:8080', 'ftp://api.github.com', 'not an address']) {
-      setUp(admin, { GITHUB_API_URL: api })
-      const cookie = '__Host-wslatl_admin=x.y'
-      for (const answer of [await post(paths.login, { password: admin.password }), await get(paths.update, { cookie })]) {
-        expect(answer.status, api).toBe(404)
+  it('turns updating off rather than send the token anywhere but GitHub over HTTPS', async () => {
+    const fetches = vi.spyOn(globalThis, 'fetch')
+    try {
+      for (const api of ['http://api.github.com', 'http://192.0.2.1:8080', 'ftp://api.github.com', 'not an address']) {
+        setUp(admin, { GITHUB_API_URL: api })
+        // Nobody signed in: as anywhere, nothing but a 401.
+        expect((await get(paths.update, { cookie: '__Host-wslatl_admin=x.y' })).status, api).toBe(401)
+        // Signed in: updates are off, and say so.
+        const cookie = await signIn(admin)
+        for (const answer of [await get(paths.update, { cookie }), await post(paths.update, {}, { cookie }), await post(paths.adoptUpdater, {}, { cookie })]) {
+          expect(answer.status, api).toBe(503)
+          expect(await answer.text(), api).toContain('GITHUB_API_URL')
+        }
       }
+      // And the token went nowhere.
+      expect(fetches).not.toHaveBeenCalled()
+    } finally {
+      fetches.mockRestore()
     }
   })
 })

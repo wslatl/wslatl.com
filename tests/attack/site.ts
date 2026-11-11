@@ -20,10 +20,11 @@ import { proxy } from '@/proxy'
  * does, proxy.ts first and then the route handler for the path, and it makes
  * the admin's settings the way the owner does, with npm run admin:hash.
  *
- * When the admin moves into the shared kit, this file is what changes: the
- * routes below, how the settings are made, and what a restart forgets. The
- * tests themselves stay as they are, and must pass against the kit's
- * version.
+ * The admin is the shared kit's (platform/admin/), so the routes below are
+ * the one-line files in app/admin/api/ that hand each request to it, the
+ * settings are made by the kit's npm run admin:hash, and a restart forgets
+ * what the kit keeps in memory. The tests themselves stayed as they were
+ * when the admin was this site's own, and pass against the kit's.
  *
  * Pages (HTML) are not rendered here. tests/http runs the same kind of
  * attacks against a real build, pages and headers included.

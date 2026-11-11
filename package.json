@@ -9,7 +9,7 @@
     "postbuild": "node scripts/keep-old-assets.mjs restore",
     "start": "next start",
     "serve": "node scripts/serve.mjs",
-    "admin:hash": "node scripts/hash-password.mjs",
+    "admin:hash": "node platform/admin/hash-password.mjs",
     "partners:cards": "node scripts/partner-cards.mjs",
     "home:card": "node scripts/home-card.mjs",
     "brand:images": "node scripts/brand-kit.mjs",

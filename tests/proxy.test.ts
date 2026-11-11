@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative } from 'node:path'
 import { NextRequest } from 'next/server'
 import { describe, expect, it } from 'vitest'
-import { adminPostRoutes } from '@/i18n/routing'
+import { adminPostRoutes } from '@/platform/admin/proxy'
 import { config, proxy } from '@/proxy'
 
 const root = join(__dirname, '..')
@@ -16,8 +16,22 @@ function sourceFiles(dir: string): string[] {
   })
 }
 
+/**
+ * The HTTP methods a route file exports, in each form the site writes one:
+ * `export async function GET`, `export const { GET } = ...` (a route the
+ * kit makes, such as the share cards) and `export { GET, POST } from ...`
+ * (the admin's, handed to the kit).
+ */
 function exportedMethods(file: string): string[] {
-  return [...readFileSync(file, 'utf8').matchAll(/export\s+(?:async\s+)?function\s+([A-Z]+)/g)].map((m) => m[1])
+  const text = readFileSync(file, 'utf8')
+  const functions = [...text.matchAll(/export\s+(?:async\s+)?function\s+([A-Z]+)/g)].map((m) => m[1])
+  const lists = [...text.matchAll(/export\s+(?:const\s+)?\{([^}]*)\}/g)].flatMap((m) =>
+    m[1]
+      .split(',')
+      .map((name) => name.trim())
+      .filter((name) => /^[A-Z]+$/.test(name)),
+  )
+  return [...functions, ...lists]
 }
 
 function post(path: string, headers: Record<string, string>, body: BodyInit = '[]') {
@@ -104,6 +118,7 @@ describe('the admin, the one place that takes a POST', () => {
       '/admin/login',
       '/admin/api',
       '/admin/api/anything',
+      '/admin/api/login/',
       '/administrator/api/login',
       '/es/admin/api/login',
     ]) {
@@ -133,24 +148,21 @@ describe('the admin, the one place that takes a POST', () => {
     )
   })
 
-  it('has route handlers that answer only GET or POST, and every POST checks where it came from', () => {
+  it('has route handlers that answer only GET or POST, each one handed to the route of the same name in the kit', () => {
     const handlers = sourceFiles(adminApi).filter((file) => /[\\/]route\.tsx?$/.test(file))
     expect(handlers.length).toBeGreaterThan(0)
     for (const file of handlers) {
       expect(exportedMethods(file).every((method) => method === 'GET' || method === 'POST'), file).toBe(true)
+      // The whole file hands the request to the kit, which checks every POST
+      // came from a page on this site, as JSON, before it reads a cookie or
+      // acts on anything (tests/attack/admin-routes.test.ts sends the attacks).
+      const name = dirname(file).split(/[\\/]/).at(-1)
+      expect(readFileSync(file, 'utf8').trim(), file).toBe(`export { GET, POST } from '@/platform/admin/routes/${name}'`)
     }
     const posts = handlers.filter((file) => exportedMethods(file).includes('POST'))
-    // Exactly these take a POST in proxy.ts.
+    // Exactly these take a POST in the kit's proxy.
     const paths = posts.map((file) => `/${relative(join(root, 'app'), dirname(file)).replaceAll('\\', '/')}`)
     expect(paths.toSorted()).toEqual([...adminPostRoutes].toSorted())
-    // And each one refuses anything not sent as JSON from a page on this site
-    // first thing, before it reads a cookie or acts on anything.
-    for (const file of posts) {
-      const handler = readFileSync(file, 'utf8').replaceAll('\r\n', '\n').split(/export\s+async\s+function\s+POST/)[1]
-      expect(handler, file).toMatch(
-        /^\(request: NextRequest\) \{\n\s+const settings = adminEnabled\(\)\n\s+if \(!settings\) return notFoundResponse\(\)\n\s+const check = await checkPost\(request\)\n\s+if \(!check\.ok\) return check\.response\n/,
-      )
-    }
   })
 })
 
