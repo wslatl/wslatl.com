@@ -1,0 +1,97 @@
+name: SEO
+
+# Two jobs, one script (scripts/check-seo.mjs, rules in scripts/lib/seo-rules.mjs):
+#
+#  - On a pull request: builds the site, starts it, and checks every page in
+#    its sitemap for what search engines read (titles, descriptions,
+#    canonicals, hreflang, share cards, headings, structured data, robots.txt,
+#    noindex on the admin and the 404 page). A page that breaks a rule fails
+#    the pull request.
+#  - Every Monday: runs the same check against the live site. A failure opens
+#    one issue, "SEO problems on wslatl.com", which updates in place and
+#    closes itself once the problems are fixed. Run it by hand against any
+#    URL to check a deploy; only production gets an issue.
+on:
+  pull_request:
+  schedule:
+    - cron: '45 13 * * 1'
+  workflow_dispatch:
+    inputs:
+      url:
+        description: Site to check
+        default: https://wslatl.com
+
+permissions:
+  contents: read
+
+concurrency:
+  group: seo-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Check the build
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Start the site
+        run: |
+          npx next start -p 3000 > "$RUNNER_TEMP/site.log" 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -fs -o /dev/null http://localhost:3000/robots.txt && exit 0
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/site.log"
+          echo "The site did not start." >&2
+          exit 1
+      - name: Check what search engines read
+        run: |
+          status=0
+          node scripts/check-seo.mjs http://localhost:3000 > "$RUNNER_TEMP/seo.md" || status=$?
+          cat "$RUNNER_TEMP/seo.md" >> "$GITHUB_STEP_SUMMARY"
+          cat "$RUNNER_TEMP/seo.md"
+          exit "$status"
+
+  live:
+    name: Check the live site
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+    env:
+      SITE_URL: ${{ inputs.url || 'https://wslatl.com' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - name: Check the site
+        id: check
+        run: |
+          status=0
+          node scripts/check-seo.mjs "$SITE_URL" > "$RUNNER_TEMP/seo.md" || status=$?
+          cat "$RUNNER_TEMP/seo.md" >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -ne 0 ]; then failing=true; else failing=false; fi
+          echo "failing=$failing" >> "$GITHUB_OUTPUT"
+      # Only production gets an issue; a hand-run check of another URL just
+      # reports in the summary.
+      - if: env.SITE_URL == 'https://wslatl.com'
+        uses: ./.github/actions/tracking-issue
+        with:
+          title: SEO problems on wslatl.com
+          label: seo
+          report: ${{ runner.temp }}/seo.md
+          failing: ${{ steps.check.outputs.failing }}
+      - name: Fail when a check failed
+        if: steps.check.outputs.failing == 'true'
+        run: exit 1

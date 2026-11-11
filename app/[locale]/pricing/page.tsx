@@ -5,6 +5,7 @@ import { Footer } from '@/components/layout/footer'
 import { PageHeader } from '@/components/layout/page-header'
 import { PlanGroupTable } from '@/components/pricing/plan-group'
 import { SectionNav } from '@/components/pricing/section-nav'
+import { PricingJsonLd } from '@/components/seo/pricing-json-ld'
 import { ShareLineAd } from '@/components/share/ads'
 import { Button } from '@/components/ui/button'
 import { siteConfig } from '@/config/site'
@@ -82,6 +83,7 @@ export default async function PricingPage({ params }: PageProps) {
   return (
     <>
       <SiteHeader />
+      <PricingJsonLd lines={productLines} locale={locale} />
       <Main>
         <div className="shell">
           <PageHeader title={t.heading} breadcrumbs={[]} crumbLabel={t.heading} path="/pricing">

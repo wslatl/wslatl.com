@@ -22,8 +22,11 @@ import tls from 'node:tls'
 import nextConfig from '../next.config.mjs'
 import shortLinks from '../config/links.json' with { type: 'json' }
 
+import { eachLimited, makeGet } from './lib/site-http.mjs'
+
 const base = new URL(process.argv[2] ?? 'https://wslatl.com')
 const results = []
+const get = makeGet(base)
 
 function record(check, ok, detail = '') {
   results.push({ check, ok, detail })
@@ -32,39 +35,6 @@ function record(check, ok, detail = '') {
 // Compared as parsed URLs: a bare origin comes back with a trailing slash.
 const same = (a, b) => Boolean(a && b) && new URL(a, base).href === new URL(b).href
 
-async function get(path, redirect = 'manual') {
-  const url = new URL(path, base)
-  for (let attempt = 1; ; attempt++) {
-    try {
-      return await fetch(url, { redirect, signal: AbortSignal.timeout(20_000) })
-    } catch (error) {
-      // One retry covers a dropped connection; a second failure is real.
-      if (attempt === 2) throw new Error(`${url.pathname}: ${error.cause?.code ?? error.message}`, { cause: error })
-    }
-  }
-}
-
-/**
- * Runs fn over items, a few at a time, so the site sees a gentle trickle. An
- * item whose request fails goes to onError and the rest carry on, so one
- * dropped connection is reported as that one page rather than replacing every
- * result in the group with a single error.
- */
-async function eachLimited(items, fn, onError, limit = 6) {
-  const queue = [...items]
-  await Promise.all(
-    Array.from({ length: limit }, async () => {
-      while (queue.length) {
-        const item = queue.shift()
-        try {
-          await fn(item)
-        } catch (error) {
-          onError(item, error)
-        }
-      }
-    }),
-  )
-}
 
 async function checkPages() {
   const robots = await get('/robots.txt')
