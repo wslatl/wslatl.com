@@ -225,7 +225,8 @@ describe('the /og route', () => {
 
 /** The code points a TrueType font has a glyph for, read from its cmap table (formats 4 and 12). */
 function glyphsIn(file: string): Set<number> {
-  const font = readFileSync(join(root, 'assets', 'fonts', file))
+  // The kit's fonts (platform/assets/fonts/), which every card is drawn in.
+  const font = readFileSync(join(root, 'platform', 'assets', 'fonts', file))
   const tables = font.readUInt16BE(4)
   let cmap = 0
   for (let i = 0; i < tables; i++) {
