@@ -5,6 +5,10 @@ import { siteConfig } from '@/config/site'
 import { defaultLocale, isLocale, localePath } from '@/i18n/config'
 import { errorCopy } from '@/i18n/error-copy'
 import { GlobalErrorPage, globalErrorLinkStyle } from '@/platform/components/global-error-page'
+// The site's stylesheet as well as the page's inline styles: under /admin,
+// the admin's Content Security Policy (style-src 'self') refuses inline style
+// attributes, and the stylesheet still gives the page its colours and type.
+import './globals.css'
 
 /**
  * The last resort: a crash in a root layout takes the layout with it, so the
@@ -29,10 +33,19 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
       homeLabel={t.home}
     >
       {t.bodyPrefix}{' '}
-      <a href={siteConfig.links.discord} target="_blank" rel="noopener noreferrer" style={globalErrorLinkStyle}>
+      {/* Classes and inline styles both: the classes where the admin's
+          policy refuses inline styles, the inline styles where the
+          stylesheet itself is gone. */}
+      <a
+        href={siteConfig.links.discord}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-link underline underline-offset-4"
+        style={globalErrorLinkStyle}
+      >
         {t.discordLink}
         <span
-          // The page's stylesheet may be gone, so the words are hidden the way sr-only hides them, inline.
+          className="sr-only"
           style={{
             position: 'absolute',
             width: 1,
