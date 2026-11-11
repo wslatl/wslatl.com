@@ -4,7 +4,8 @@ name: Security
 #
 #   - Secrets: gitleaks over every commit there has ever been, on every push
 #     and pull request. A password, token or key that was ever committed
-#     fails it, even one deleted since. Settings in .gitleaks.toml.
+#     fails it, even one deleted since. Settings in .gitleaks.toml; the
+#     findings reviewed and set aside, one by one, in .gitleaksignore.
 #   - Scan: OWASP ZAP's baseline scan of a build made here in the job, run by
 #     next start with made-up admin settings like ci.yml's. It fails on any
 #     alert of medium risk or worse (.github/zap/gate.mjs), apart from the

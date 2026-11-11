@@ -72,7 +72,7 @@ These are settings outside this repository. A run of the live check (`npm run ch
 | `npm test`, CI | The attack tests in `tests/attack/`: the sign-in, the session, every admin route, the share cards, the proxy, the updater's downloads and the supervisor, and fuzzing of every route handler |
 | `npm run test:http`, CI | The same attacks against a build run by `next start` (`tests/http/`): every header on every kind of answer, the session through the real server, redirects, methods, and no secret in any answer or in the server's log |
 | `npm run scan:build`, CI | No secret anywhere in the build, no email address in what it serves |
-| Security workflow | gitleaks over every commit; the ZAP baseline scan of a build, failing on medium risk or worse (exceptions in `.github/zap/rules.tsv`, each with its reason); every Monday, the live site's headers and TLS (`scripts/check-security.mjs`), opening an issue when one fails |
+| Security workflow | gitleaks over every commit (the findings reviewed and set aside are in `.gitleaksignore`, one by one); the ZAP baseline scan of a build, failing on medium risk or worse (exceptions in `.github/zap/rules.tsv`, each with its reason); every Monday, the live site's headers and TLS (`scripts/check-security.mjs`), opening an issue when one fails |
 | Others | Security audit, CodeQL, Dependency review and Dependabot, as the README's Automation section says |
 
 The attack tests talk to the site through `tests/attack/site.ts` alone, by request and response. When the admin moves into the shared kit, that file is what changes, and the tests must pass against the kit as they are.
