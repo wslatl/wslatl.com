@@ -78,9 +78,9 @@ describe('logging in', () => {
   it('sets a short-lived, locked-down session cookie for the right password, and logs it', async () => {
     const response = await login.POST(request('/admin/api/login', { body: { password } }))
     expect(response.status).toBe(200)
-    const cookie = response.headers.get('set-cookie') ?? ''
+    const cookie = response.headers.getSetCookie().find((header) => header.startsWith(`${SESSION_COOKIE}=`)) ?? ''
     expect(cookie).toMatch(new RegExp(`^${SESSION_COOKIE}=[\\w-]+\\.[\\w-]+;`))
-    for (const part of ['Path=/admin', 'Max-Age=7200', 'HttpOnly', 'Secure', 'SameSite=strict']) {
+    for (const part of ['Path=/;', 'Max-Age=7200', 'HttpOnly', 'Secure', 'SameSite=strict']) {
       expect(cookie.toLowerCase()).toContain(part.toLowerCase())
     }
     expect(response.headers.get('cache-control')).toBe('no-store')
@@ -173,7 +173,7 @@ describe('logging out', () => {
     expect(response.status).toBe(200)
     const cookie = response.headers.get('set-cookie') ?? ''
     expect(cookie).toMatch(new RegExp(`^${SESSION_COOKIE}=;`))
-    expect(cookie).toContain('Path=/admin')
+    expect(cookie).toMatch(/Path=\/(;|$)/)
     expect(cookie).toMatch(/Max-Age=0|Expires=Thu, 01 Jan 1970/)
   })
 

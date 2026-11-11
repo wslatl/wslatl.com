@@ -18,6 +18,13 @@ export const defaultApiUrl = 'https://api.github.com'
 
 type Env = Record<string, string | undefined>
 
+/**
+ * owner/name as GitHub allows them: an owner of letters, digits and inner
+ * hyphens, and a name that is neither . nor .., which would walk the API
+ * address up a level. The same as repoPattern in scripts/updater/github.mjs.
+ */
+const repoPattern = /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\/(?!\.{1,2}$)[\w.-]+$/
+
 // The stand-in for GitHub that the updater is tested against runs locally;
 // anything else must be HTTPS so the token never travels in the clear.
 function apiUrlProblem(value: string): boolean {
@@ -44,7 +51,7 @@ export function adminSettings(env: Env = process.env): AdminSettings {
   if (!secret) problems.push('ADMIN_SESSION_SECRET is not set')
   else if (secret.length < 32) problems.push('ADMIN_SESSION_SECRET is shorter than 32 characters')
   if (!token) problems.push('GITHUB_TOKEN is not set')
-  if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) problems.push('GITHUB_REPO is not in the form owner/name')
+  if (!repoPattern.test(repo)) problems.push('GITHUB_REPO is not in the form owner/name')
   if (apiUrlProblem(apiUrl)) problems.push('GITHUB_API_URL is not an https address')
 
   if (problems.length) return { enabled: false, problems }

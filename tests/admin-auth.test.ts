@@ -178,15 +178,27 @@ describe('admin sessions', () => {
   it('refuses a correctly signed session that claims a longer life than sessions get', () => {
     // Signed the way session.ts signs, so only the lifetime check can refuse it.
     const key = createHmac('sha256', keys.secret).update(keys.passwordHash).digest()
-    const signed = (exp: number) => {
-      const payload = Buffer.from(JSON.stringify({ iat: now / 1000, exp })).toString('base64url')
+    const signed = (exp: number, sid = 'A'.repeat(22)) => {
+      const payload = Buffer.from(JSON.stringify({ iat: now / 1000, exp, sid })).toString('base64url')
       return `${payload}.${createHmac('sha256', key).update(payload).digest('base64url')}`
     }
     expect(readSession(signed(now / 1000 + SESSION_SECONDS), keys, now)).toBe(true)
     expect(readSession(signed(now / 1000 + SESSION_SECONDS + 1), keys, now)).toBe(false)
+    // And one with no id of its own, which a sign-out could not end.
+    expect(readSession(signed(now / 1000 + 60, ''), keys, now)).toBe(false)
   })
 
-  it('is a short-lived, HttpOnly, Secure, SameSite=Strict cookie on /admin only', () => {
+  it('accepts only the one spelling of a signature, though base64 has four that decode the same', () => {
+    const value = createSession(keys, now)
+    const last = value.at(-1) ?? ''
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'
+    const twins = [...alphabet].filter((char) => char !== last && alphabet.indexOf(char) >> 2 === alphabet.indexOf(last) >> 2)
+    expect(twins.length).toBe(3)
+    for (const twin of twins) expect(readSession(`${value.slice(0, -1)}${twin}`, keys, now), twin).toBe(false)
+    for (const extra of ['=', '==', '!', ' ']) expect(readSession(`${value}${extra}`, keys, now), extra).toBe(false)
+  })
+
+  it('is a short-lived, HttpOnly, Secure, SameSite=Strict __Host- cookie, which no other site under wslatl.com can set', () => {
     expect(SESSION_SECONDS).toBe(2 * 60 * 60)
     expect(sessionCookie('v')).toEqual({
       name: SESSION_COOKIE,
@@ -194,10 +206,10 @@ describe('admin sessions', () => {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
-      path: '/admin',
+      path: '/',
       maxAge: SESSION_SECONDS,
     })
-    expect(SESSION_COOKIE).toBe('wslatl_admin')
+    expect(SESSION_COOKIE).toBe('__Host-wslatl_admin')
   })
 })
 
@@ -257,10 +269,12 @@ function post(headers: Record<string, string>, body: BodyInit = '{"password":"x"
 describe('admin requests', () => {
   const sameOrigin = { origin: 'https://wslatl.com', host: 'wslatl.com', 'content-type': 'application/json' }
 
-  it('reads the visitor address the way Cloudflare passes it', () => {
+  it('reads the visitor address from CF-Connecting-IP alone, never from X-Forwarded-For', () => {
     expect(clientIp(new Headers({ 'cf-connecting-ip': '1.1.1.1', 'x-forwarded-for': '2.2.2.2' }))).toBe('1.1.1.1')
-    expect(clientIp(new Headers({ 'x-forwarded-for': '2.2.2.2, 3.3.3.3' }))).toBe('2.2.2.2')
-    expect(clientIp(new Headers())).toBe('local')
+    expect(clientIp(new Headers({ 'cf-connecting-ip': ' 2001:db8::1 ' }))).toBe('2001:db8::1')
+    expect(clientIp(new Headers({ 'x-forwarded-for': '2.2.2.2, 3.3.3.3' }))).toBe('unknown')
+    expect(clientIp(new Headers({ 'cf-connecting-ip': 'not an address', 'x-forwarded-for': '2.2.2.2' }))).toBe('unknown')
+    expect(clientIp(new Headers())).toBe('unknown')
   })
 
   it('counts login attempts by address, and an IPv6 address by its /64', () => {

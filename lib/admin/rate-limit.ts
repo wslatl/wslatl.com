@@ -67,6 +67,7 @@ const fifteenMinutes = 15 * 60 * 1000
 type LoginLimits = {
   perIp: ReturnType<typeof rateLimiter>
   overall: ReturnType<typeof rateLimiter>
+  perDevice: ReturnType<typeof rateLimiter>
   check: ReturnType<typeof oneAtATime>
 }
 
@@ -75,11 +76,17 @@ type LoginLimits = {
 export const loginLimitsKey = Symbol.for('wslatl.admin.loginLimits')
 const store = globalThis as typeof globalThis & { [loginLimitsKey]?: LoginLimits }
 
-/** 5 attempts per address and 30 in all per 15 minutes, and 2 password checks at a time. */
+/**
+ * 5 attempts per address and 30 in all per 15 minutes, and 2 password checks
+ * at a time. A browser with a device cookie the site signed
+ * (lib/admin/device.ts) is counted apart instead, 5 per 15 minutes, so a flood
+ * that fills the 30 cannot keep it out.
+ */
 export function loginLimits(): LoginLimits {
   store[loginLimitsKey] ??= {
     perIp: rateLimiter({ limit: 5, windowMs: fifteenMinutes }),
     overall: rateLimiter({ limit: 30, windowMs: fifteenMinutes }),
+    perDevice: rateLimiter({ limit: 5, windowMs: fifteenMinutes }),
     check: oneAtATime(2),
   }
   return store[loginLimitsKey]

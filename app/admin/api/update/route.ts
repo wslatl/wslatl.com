@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { adminEnabled, notFoundResponse, signedIn } from '@/lib/admin/auth'
-import { adminLog, checkPost, clientIp, json } from '@/lib/admin/request'
+import { adminLog, checkPost, checkRead, clientIp, json } from '@/lib/admin/request'
 import { requestUpdate, updaterStatus } from '@/lib/admin/updater'
 
 export const dynamic = 'force-dynamic'
@@ -9,6 +9,8 @@ export const dynamic = 'force-dynamic'
 export async function GET(request: NextRequest) {
   const settings = adminEnabled()
   if (!settings) return notFoundResponse()
+  const check = checkRead(request)
+  if (!check.ok) return check.response
   if (!signedIn(request, settings)) return json({ error: 'Log in again.' }, { status: 401 })
   return json(await updaterStatus())
 }
