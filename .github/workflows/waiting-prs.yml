@@ -1,0 +1,44 @@
+name: Waiting pull requests
+
+# Every Monday: lists the pull requests that have been open for more than 7
+# days, with their links and ages, in one issue, "Pull requests waiting more
+# than 7 days". The issue is updated in place and closes itself once none is
+# left. Dependabot's pull requests count too, so a security update cannot
+# sit unnoticed.
+on:
+  schedule:
+    - cron: '0 13 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+concurrency:
+  group: waiting-prs
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: List the waiting pull requests
+        id: report
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          node scripts/waiting-prs.mjs "$RUNNER_TEMP/waiting.md"
+          cat "$RUNNER_TEMP/waiting.md" >> "$GITHUB_STEP_SUMMARY"
+      - uses: ./.github/actions/tracking-issue
+        with:
+          title: Pull requests waiting more than 7 days
+          label: waiting-prs
+          report: ${{ runner.temp }}/waiting.md
+          failing: ${{ steps.report.outputs.needs-attention }}
