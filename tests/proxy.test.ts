@@ -86,7 +86,7 @@ describe('requests that are not reads', () => {
     // proxy.ts answers every POST outside the admin's JSON routes with a 405,
     // and every request naming a Server Action anywhere. If the site ever
     // needs one, that rule has to change first.
-    const withActions = ['app', 'components', 'lib', 'i18n', 'config', 'data', 'content']
+    const withActions = ['app', 'components', 'lib', 'i18n', 'config', 'data', 'content', 'platform']
       .flatMap((dir) => sourceFiles(join(root, dir)))
       .filter((file) => /^\s*['"]use server['"]/m.test(readFileSync(file, 'utf8')))
       .map((file) => file.slice(root.length + 1))

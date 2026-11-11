@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto'
-import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { NextRequest } from 'next/server'
@@ -23,8 +23,9 @@ import { proxy } from '@/proxy'
  * The admin is the shared kit's (platform/admin/), so the routes below are
  * the one-line files in app/admin/api/ that hand each request to it, the
  * settings are made by the kit's npm run admin:hash, and a restart forgets
- * what the kit keeps in memory. The tests themselves stayed as they were
- * when the admin was this site's own, and pass against the kit's.
+ * what the kit keeps in memory. The tests were written against the site's
+ * own admin, and pass against the kit's, changed only where the kit changed
+ * on purpose: SECURITY.md, at its end, lists each change.
  *
  * Pages (HTML) are not rendered here. tests/http runs the same kind of
  * attacks against a real build, pages and headers included.
@@ -173,15 +174,40 @@ export function setUp(admin: Admin, env: Record<string, string> = {}) {
 }
 
 /**
+ * What the kit's admin keeps in memory, on globalThis under these names:
+ * the sign-in counts, the sessions a sign-out ended, the problems it has
+ * logged, and a copy of the updater in progress.
+ */
+const inMemory = ['wslatl.admin.copyingUpdater', 'wslatl.admin.endedSessions', 'wslatl.admin.limits', 'wslatl.admin.problemsLogged']
+
+/** The names the kit's admin code itself keeps on globalThis, read from its source. */
+function keptByTheKit(): string[] {
+  const dir = join(__dirname, '..', '..', 'platform', 'admin')
+  const files = readdirSync(dir, { recursive: true, encoding: 'utf8' }).filter((file) => /\.tsx?$/.test(file))
+  const names = files.flatMap((file) => [...readFileSync(join(dir, file), 'utf8').matchAll(/Symbol\.for\('(wslatl\.admin\.[^']+)'\)/g)].map((match) => match[1]))
+  return [...new Set(names)].toSorted()
+}
+
+// A kit version that renames one of them, or keeps something new, stops every
+// attack test here, rather than leaving restart() to forget nothing and the
+// tests to pass on what an earlier test left in memory.
+if (keptByTheKit().join() !== inMemory.join()) {
+  throw new Error(`The kit's admin keeps ${keptByTheKit().join(', ')} in memory, and restart() in tests/attack/site.ts forgets ${inMemory.join(', ')}. Bring the list up to date.`)
+}
+
+/**
  * What a restart of the server forgets: everything the admin keeps in
  * memory (login counts, sign-outs, a copy in progress). What it keeps on
  * disk stays.
  */
 export function restart() {
   const memory = globalThis as unknown as Record<symbol, unknown>
-  for (const key of Object.getOwnPropertySymbols(globalThis)) {
-    if (key.description?.startsWith('wslatl.admin.')) delete memory[key]
-  }
+  const unknown = Object.getOwnPropertySymbols(globalThis)
+    .map((key) => key.description ?? '')
+    .filter((name) => name.startsWith('wslatl.admin.') && !inMemory.includes(name))
+  if (unknown.length > 0) throw new Error(`A restart would not forget ${unknown.join(', ')}: add it to inMemory in tests/attack/site.ts.`)
+  for (const name of inMemory) delete memory[Symbol.for(name)]
+  for (const name of inMemory) if (Symbol.for(name) in memory) throw new Error(`A restart did not forget ${name}.`)
 }
 
 export function tearDown(admin: Admin) {

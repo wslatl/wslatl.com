@@ -185,8 +185,20 @@ describe('copying the updater over', () => {
   })
 
   it('refuses a release whose name could reach outside the releases folder, or is no version', async () => {
-    // Folders a bad name would point at, each holding an updater to copy.
+    // The folder a bad name would point at, built and holding an updater, so
+    // that only the check of the name itself stands between it and a copy.
+    write(join(admin.siteDir, 'evil', '.next', 'BUILD_ID'), 'build')
     write(join(admin.siteDir, 'evil', 'scripts', 'serve.mjs'), 'evil serve')
+    write(join(admin.siteDir, 'evil', 'scripts', 'updater', 'lib.mjs'), 'evil lib')
+    const refused = async (what: string) => {
+      // As after a restart, so the hour's limit on copies (below) stays out of it.
+      restart()
+      const response = await post(paths.adoptUpdater, {}, { cookie })
+      expect(response.status, what).toBe(409)
+      // The name's own check answers, not a later one a bad name could also trip.
+      expect(await response.json(), what).toEqual({ error: 'No release is installed, so there is no new updater to copy.' })
+      expect(readFileSync(uploaded('serve.mjs'), 'utf8'), what).toBe('old serve')
+    }
     for (const tag of [
       '../../evil',
       '../../../../../../evil',
@@ -208,23 +220,20 @@ describe('copying the updater over', () => {
       'v１.２.０',
     ]) {
       state({ tag, sha: 'a'.repeat(40) })
-      // As after a restart, so the hour's limit on copies (below) stays out of it.
-      restart()
-      const response = await post(paths.adoptUpdater, {}, { cookie })
-      expect(response.status, JSON.stringify(tag)).toBe(409)
-      expect(readFileSync(uploaded('serve.mjs'), 'utf8')).toBe('old serve')
+      await refused(JSON.stringify(tag))
     }
     for (const current of [null, 42, 'v1.2.0', { tag: 7 }, { tag: ['v1.2.0'] }, { tag: { toString: 'v1.2.0' } }]) {
       state(current as object)
-      restart()
-      expect((await post(paths.adoptUpdater, {}, { cookie })).status, JSON.stringify(current)).toBe(409)
+      await refused(JSON.stringify(current))
     }
-    expect(readFileSync(uploaded('serve.mjs'), 'utf8')).toBe('old serve')
   })
 
   it('copies at most ten times an hour, whoever asks', async () => {
     const statuses: number[] = []
-    for (let press = 0; press < 12; press++) statuses.push((await post(paths.adoptUpdater, {}, { cookie })).status)
+    // Each press from another address: the limit is everyone's, not each address's.
+    for (let press = 0; press < 12; press++) {
+      statuses.push((await post(paths.adoptUpdater, {}, { cookie, 'cf-connecting-ip': `203.0.113.${press + 1}` })).status)
+    }
     expect(statuses.slice(0, 10).every((status) => status === 200)).toBe(true)
     expect(statuses.slice(10)).toEqual([429, 429])
   })

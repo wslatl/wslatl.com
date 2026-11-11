@@ -1,6 +1,9 @@
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import type { ReactNode } from 'react'
+import { prerender } from 'react-dom/static'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { admin as kitAdmin } from '@/platform/admin/app'
 import { type Admin, get, logsOf, makeAdmin, paths, post, setUp, signIn, tearDown, wholeResponse } from './site'
 
 /**
@@ -11,6 +14,21 @@ import { type Admin, get, logsOf, makeAdmin, paths, post, setUp, signIn, tearDow
  */
 vi.mock('server-only', () => ({}))
 vi.setConfig({ testTimeout: 30_000 })
+
+// The Updates page, rendered as Next renders it for a request: the request's
+// headers (its cookie) from next/headers, and the router the page's panel uses.
+const incoming = vi.hoisted(() => ({ headers: new Headers() }))
+vi.mock('next/headers', () => ({ headers: async () => incoming.headers }))
+vi.mock('next/server', async (original) => ({ ...(await original<typeof import('next/server')>()), connection: async () => {} }))
+vi.mock('next/navigation', async (original) => ({
+  ...(await original<typeof import('next/navigation')>()),
+  useRouter: () => ({ replace: () => {}, refresh: () => {} }),
+}))
+
+async function html(node: ReactNode): Promise<string> {
+  const { prelude } = await prerender(node)
+  return new Response(prelude).text()
+}
 
 let admin: Admin
 beforeAll(() => {
@@ -96,23 +114,50 @@ describe('every answer the admin gives', () => {
   })
 
   it('turns updating off rather than send the token anywhere but GitHub over HTTPS', async () => {
-    const fetches = vi.spyOn(globalThis, 'fetch')
-    try {
-      for (const api of ['http://api.github.com', 'http://192.0.2.1:8080', 'ftp://api.github.com', 'not an address']) {
-        setUp(admin, { GITHUB_API_URL: api })
-        // Nobody signed in: as anywhere, nothing but a 401.
-        expect((await get(paths.update, { cookie: '__Host-wslatl_admin=x.y' })).status, api).toBe(401)
-        // Signed in: updates are off, and say so.
-        const cookie = await signIn(admin)
-        for (const answer of [await get(paths.update, { cookie }), await post(paths.update, {}, { cookie }), await post(paths.adoptUpdater, {}, { cookie })]) {
-          expect(answer.status, api).toBe(503)
-          expect(await answer.text(), api).toContain('GITHUB_API_URL')
-        }
+    for (const api of ['http://api.github.com', 'http://192.0.2.1:8080', 'ftp://api.github.com', 'not an address']) {
+      setUp(admin, { GITHUB_API_URL: api })
+      // Nobody signed in: as anywhere, nothing but a 401.
+      expect((await get(paths.update, { cookie: '__Host-wslatl_admin=x.y' })).status, api).toBe(401)
+      // Signed in: updates are off, and say so.
+      const cookie = await signIn(admin)
+      for (const answer of [await get(paths.update, { cookie }), await post(paths.update, {}, { cookie }), await post(paths.adoptUpdater, {}, { cookie })]) {
+        expect(answer.status, api).toBe(503)
+        expect(await answer.text(), api).toContain('GITHUB_API_URL')
       }
-      // And the token went nowhere.
-      expect(fetches).not.toHaveBeenCalled()
+    }
+  })
+
+  it('has the Updates page, the one thing that sends the token, ask GitHub over HTTPS and nothing else', async () => {
+    // Every request the page makes is caught here and answered as GitHub
+    // would for a repository with no releases: nothing leaves the machine.
+    const fetches = vi.spyOn(globalThis, 'fetch').mockImplementation(async () => new Response('{"message":"Not Found"}', { status: 404 }))
+    const asked = () => fetches.mock.calls.map(([url, init]) => ({ url: String(url), auth: new Headers(init?.headers).get('authorization') }))
+    try {
+      // With the settings right, the page does ask, with the token, and only
+      // GitHub's API: which shows this test would see a request that went
+      // anywhere else.
+      setUp(admin)
+      incoming.headers = new Headers({ cookie: await signIn(admin) })
+      await html(await kitAdmin.Updates())
+      expect(asked().length).toBeGreaterThan(0)
+      for (const { url, auth } of asked()) {
+        expect(url).toMatch(/^https:\/\/api\.github\.com\/repos\/wslatl\/wslatl\.com(\/|$)/)
+        expect(auth).toBe(`Bearer ${admin.token}`)
+      }
+      // With any address but GitHub's over HTTPS, it says updates are off,
+      // and asks nobody anything.
+      for (const api of ['http://api.github.com', 'http://192.0.2.1:8080', 'ftp://api.github.com', 'not an address', `https://${admin.token}@api.github.com`]) {
+        fetches.mockClear()
+        setUp(admin, { GITHUB_API_URL: api })
+        incoming.headers = new Headers({ cookie: await signIn(admin) })
+        const page = await html(await kitAdmin.Updates())
+        expect(page, api).toContain('Updates are off')
+        expect(page.includes(admin.token), api).toBe(false)
+        expect(asked(), api).toEqual([])
+      }
     } finally {
       fetches.mockRestore()
+      incoming.headers = new Headers()
     }
   })
 })

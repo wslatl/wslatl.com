@@ -172,8 +172,10 @@ function madeUp(path: string, usual: string) {
         return false
       }
     })(),
-    // The last cookie of a name is the one read; a browser sends the real one only to this site.
-    realCookie: jar.endsWith(cookie),
+    // The first cookie of a name is the one read (readCookie in
+    // platform/admin/server/request.ts), the order a browser sends them in;
+    // a browser sends the real one only to this site.
+    realCookie: jar.split(';').map((part) => part.trim()).find((part) => part.startsWith(`${session}=`)) === cookie,
     // Sent by a page of the site it was sent to, by its own account. A
     // browser fills Origin and Sec-Fetch-Site itself, so a page elsewhere
     // can never claim this.

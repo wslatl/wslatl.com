@@ -50,7 +50,11 @@ describe('admin secrets', () => {
     for (const file of clientFiles) {
       const text = read(file)
       expect(text, rel(file)).not.toMatch(/process\.env/)
-      const serverImports = [...text.matchAll(/^import\s+(type\s+)?[^'"]*['"][^'"]*\/admin\/server(?:\/[^'"]*)?['"]/gm)]
+      // The admin's server folder, by its address from anywhere, or as a
+      // relative path (../server/updater) from a file inside platform/admin.
+      const inAdmin = rel(file).startsWith('platform/admin/')
+      const isServer = (path: string) => /\/admin\/server(\/|$)/.test(path) || (inAdmin && /(^|\/)server(\/|$)/.test(path))
+      const serverImports = [...text.matchAll(/^import\s+(type\s+)?[^'"]*['"]([^'"]+)['"]/gm)].filter((match) => isServer(match[2]))
       expect(serverImports.filter((match) => !match[1]).map((match) => match[0]), rel(file)).toEqual([])
     }
   })
