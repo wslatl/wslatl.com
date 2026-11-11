@@ -1,0 +1,60 @@
+name: Release check
+
+# When a release is published (or by hand, for the latest release or any
+# tag): checks what the admin updater relies on, using scripts/release-check.mjs.
+# The tag must be vMAJOR.MINOR.PATCH, its commit must be on main,
+# package.json at that commit must say the same version, and the release
+# must have notes. A release that fails opens one issue per tag that says
+# what to fix, and the issue closes itself once a run passes.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to check (the latest release when empty)
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: release-check-${{ github.event.release.tag_name || inputs.tag || 'latest' }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # Always the code on main, never the tagged commit, so a bad tag
+      # cannot change how it is judged. Full history and tags are needed to
+      # tell whether the tagged commit is on main.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: Check the release
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          node scripts/release-check.mjs "$RELEASE_TAG" "$RUNNER_TEMP/release.md"
+          cat "$RUNNER_TEMP/release.md" >> "$GITHUB_STEP_SUMMARY"
+      - uses: ./.github/actions/tracking-issue
+        with:
+          title: Release ${{ steps.check.outputs.tag }} needs fixing before it is installed
+          label: release
+          report: ${{ runner.temp }}/release.md
+          failing: ${{ steps.check.outputs.failing }}
+      - name: Fail when the release has a problem
+        if: steps.check.outputs.failing == 'true'
+        run: exit 1

@@ -269,7 +269,7 @@ Production runs `npm run serve` (see Admin and updates), which installs publishe
 The live site only ever runs a published GitHub release. Merging into `main` changes nothing on the server by itself.
 
 1. Merge the pull request into `main`.
-2. Publish a release of `main`, tagged with the next version in the form `vMAJOR.MINOR.PATCH`: a fix raises the last number (v1.4.1), something new the middle one (v1.5.0), a big change the first (v2.0.0). On GitHub: Releases, Draft a new release, type the new tag, pick `main` as the target, Generate release notes, Publish release. Or from a terminal: `gh release create v1.5.0 --target main --generate-notes`. The version lives in the tag alone; no commit is needed to bump it.
+2. Publish a release of `main`, tagged with the next version in the form `vMAJOR.MINOR.PATCH`: a fix raises the last number (v1.4.1), something new the middle one (v1.5.0), a big change the first (v2.0.0). On GitHub: Releases, Draft a new release, type the new tag, pick `main` as the target, Generate release notes, Publish release. Or from a terminal: `gh release create v1.5.0 --target main --generate-notes`. The version in `package.json` must be the same number as the tag (v1.5.0 needs `"version": "1.5.0"`), set in a pull request merged before you publish, because the updater reads the installed version from it. The Release check workflow tests this and the points above right after you publish, and opens an issue saying what to fix if anything is wrong.
 3. Open `wslatl.com/admin` and press **Install v1.5.0**.
 
 The dashboard offers a release only when it is GitHub's latest release (never a draft or a pre-release), its tag is a version, and that version is newer than the installed one, compared as numbers (v1.10.0 is newer than v1.9.0). A tag in any other form is refused with a message saying so. To hold a release back from the site, publish it as a pre-release.
@@ -403,6 +403,9 @@ The Node.js version lives in `.nvmrc`; every workflow reads it from there.
 | Broken links | Mondays | Opens every page in the live sitemap and follows every link (`lychee.toml`, which skips only Trustpilot and our `/trustpilot` short link, because Trustpilot refuses link checkers). Broken ones go in one issue. |
 | Site health | Every six hours | Checks production with `scripts/check-site.mjs`. A failure opens one issue that closes itself when the site recovers. Run it by hand against any URL to check a deploy. |
 | Workflow lint | Changes under `.github` | actionlint, including shellcheck on every `run` step. |
+| Release check | A release is published, or by hand | Checks that the tag is `vMAJOR.MINOR.PATCH`, its commit is on `main`, `package.json` there has the same version, and the release has notes (`scripts/release-check.mjs`). A failure opens one issue per tag that says what to fix, and the run goes red. |
+| Waiting pull requests | Mondays | Keeps one issue listing pull requests open for more than 7 days, with links and ages (`scripts/waiting-prs.mjs`). It closes itself when none is left. |
+| Unreleased changes | Tuesdays | Keeps one issue listing what is merged into `main` but not in the latest release, once the oldest of it is over 7 days old (`scripts/unreleased-report.mjs`). Merging deploys nothing, so this catches a fix nobody released. It closes itself when a release catches up. |
 
 Dependabot (`.github/dependabot.yml`) opens grouped pull requests for npm packages and action versions every Monday, three days after a release so a hijacked version that gets pulled quickly never arrives. Majors held back on purpose are listed there and in `scripts/outdated-report.mjs`.
 

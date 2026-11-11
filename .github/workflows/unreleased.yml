@@ -1,0 +1,47 @@
+name: Unreleased changes
+
+# Every Tuesday: merging into main changes nothing on the server, because
+# the site runs published releases only. This keeps one issue, "Changes on
+# main are waiting for a release", listing what is merged but not yet in the
+# latest release, once the oldest of it is more than 7 days old. It closes
+# itself when a release catches up. See scripts/unreleased-report.mjs.
+on:
+  schedule:
+    - cron: '0 13 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: unreleased
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: List the changes not yet released
+        id: report
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          node scripts/unreleased-report.mjs "$RUNNER_TEMP/unreleased.md"
+          cat "$RUNNER_TEMP/unreleased.md" >> "$GITHUB_STEP_SUMMARY"
+      - uses: ./.github/actions/tracking-issue
+        with:
+          title: Changes on main are waiting for a release
+          label: unreleased
+          report: ${{ runner.temp }}/unreleased.md
+          failing: ${{ steps.report.outputs.needs-attention }}
