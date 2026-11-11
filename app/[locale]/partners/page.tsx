@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { SiteHeader } from '@/components/layout/site-header'
 import { Footer } from '@/components/layout/footer'
-import { Main } from '@/components/layout/main'
+import { Main } from '@/platform/components/main'
 import { PageHeader } from '@/components/layout/page-header'
 import { PartnerShowcase } from '@/components/partners/partner-showcase'
 import { partners } from '@/data/partners'

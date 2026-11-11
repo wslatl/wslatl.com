@@ -9,13 +9,17 @@ import { errorCopy } from '@/i18n/error-copy'
 import { rootDirectories, sharedDirectories } from '@/i18n/routing'
 import nextConfig from '../next.config.mjs'
 
+// The admin's pages are the kit's, whose server side imports server-only.
+vi.mock('server-only', () => ({}))
+
 const address = vi.hoisted(() => ({ path: '/' }))
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
   usePathname: () => address.path,
 }))
 
-const crash = { error: new Error('a detail nobody should see'), reset: () => {} }
+// What Next hands an error page: the error, and both ways to try again.
+const crash = { error: new Error('a detail nobody should see'), reset: () => {}, retry: () => {} }
 
 describe('a missing file in a folder that keeps its path', () => {
   it('gets a language once the real files have been served, for every such folder', async () => {

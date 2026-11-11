@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import { Check, Languages } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/components/button'
 import {
   DropdownMenu,
   DropdownMenuContent,

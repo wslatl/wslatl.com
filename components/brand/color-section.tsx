@@ -1,5 +1,5 @@
 import { BrandSection, Prose, SubSection } from '@/components/brand/brand-section'
-import { CopyCode, type CopyCodeLabels } from '@/components/partners/copy-code'
+import { CopyButton, type CopyButtonLabels } from '@/platform/components/copy-button'
 import {
   gradientCss,
   gradients,
@@ -17,7 +17,7 @@ const rgbText = (rgb: readonly number[]) => `RGB ${rgb.join(', ')}`
  * to it, so no one needs to see the color to use it. Beside the swatch on a
  * phone, under it from 640px.
  */
-function SwatchCard({ swatch, use, labels }: { swatch: Swatch; use: string; labels: CopyCodeLabels }) {
+function SwatchCard({ swatch, use, labels }: { swatch: Swatch; use: string; labels: CopyButtonLabels }) {
   return (
     <li className="flex gap-4 rounded-xl border bg-card/30 p-3 sm:flex-col sm:gap-0 sm:overflow-hidden sm:p-0">
       {/* The ring keeps the near-black swatches from melting into the page. */}
@@ -30,7 +30,7 @@ function SwatchCard({ swatch, use, labels }: { swatch: Swatch; use: string; labe
         <p lang="en" translate="no" className="font-semibold text-foreground">
           {swatch.name}
         </p>
-        <CopyCode code={swatch.hex} labels={labels} className="mt-1" />
+        <CopyButton value={swatch.hex} labels={labels} className="mt-1" />
         <p className="mt-1 text-xs text-muted-foreground tabular-nums">{rgbText(swatch.rgb)}</p>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{use}</p>
       </div>
@@ -46,7 +46,7 @@ function GradientCard({
 }: {
   gradient: (typeof gradients)[number]
   use: string
-  labels: CopyCodeLabels
+  labels: CopyButtonLabels
 }) {
   const t = copy().brand.colors
   const stops = [
@@ -67,7 +67,7 @@ function GradientCard({
               <span className="w-16 shrink-0 text-xs font-medium tracking-wide text-muted-foreground uppercase">
                 {stop.label}
               </span>
-              <CopyCode code={stop.hex} labels={labels} />
+              <CopyButton value={stop.hex} labels={labels} />
               <span className="text-xs text-muted-foreground tabular-nums">{rgbText(stop.rgb)}</span>
             </li>
           ))}
@@ -82,7 +82,7 @@ const swatchGrid = 'grid gap-4 sm:grid-cols-2 lg:grid-cols-4'
 /** Part 2: the logo's colors, the two gradients and the interface palette, as swatches with their hex ready to copy. */
 export function ColorSection() {
   const t = copy().brand.colors
-  const labels: CopyCodeLabels = { copy: t.copy, copied: t.copied, copyFailed: t.copyFailed }
+  const labels: CopyButtonLabels = { copy: t.copy, copied: t.copied, copyFailed: t.copyFailed }
 
   return (
     <BrandSection id="colors" number="2" title={t.heading} intro={t.intro}>

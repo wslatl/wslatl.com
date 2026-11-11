@@ -1,7 +1,7 @@
 import { Download as DownloadIcon } from 'lucide-react'
 import { BrandPicture, BrandSection, Prose, SubSection } from '@/components/brand/brand-section'
 import { WithEnglish } from '@/components/brand/with-english'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/components/button'
 import {
   downloadsPath,
   gradientCss,

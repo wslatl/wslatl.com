@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/components/button'
 import { siteConfig } from '@/config/site'
 import { copy } from '@/i18n/copy'
 import { getLocale } from '@/i18n/locale'

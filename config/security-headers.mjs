@@ -1,6 +1,7 @@
-// The security headers, in one place. next.config.mjs sends securityHeaders
-// with every response, the public Content Security Policy with every one
-// outside the admin, and proxy.ts gives the admin its own, stricter policy.
+// The site's security headers. next.config.mjs sends securityHeaders with
+// every response and the public Content Security Policy with every one
+// outside the admin. The admin's own, stricter policy is the kit's
+// (adminPolicy in platform/admin/proxy.ts), which proxy.ts gives it.
 //
 // Two policies, because there are two kinds of page:
 //
@@ -11,13 +12,14 @@
 //     visitor sent, or anything from outside this repository.
 //   - The admin's pages are rendered for each request, hold the session, and
 //     show text from GitHub (the release notes). Each one gets a fresh nonce
-//     (proxy.ts), and only the scripts that carry it run: no 'unsafe-inline'
+//     (the kit's secureRequest, in proxy.ts), and only the scripts that carry
+//     it run: no 'unsafe-inline'
 //     for scripts or styles. tests/http and the ZAP scan in
 //     .github/workflows/security.yml check both.
 //
 // React needs eval() in development for its debugging tools. Production never
 // does, so `dev` adds 'unsafe-eval' only while running `next dev`. Nothing in
-// here reads the environment: next.config.mjs and proxy.ts pass `dev` in.
+// here reads the environment: next.config.mjs passes `dev` in.
 
 /** Sent with every response, the admin's included. */
 export const securityHeaders = [
@@ -45,30 +47,6 @@ export function publicPolicy({ dev = false } = {}) {
     "connect-src 'self'",
     "frame-ancestors 'none'",
     "base-uri 'self'",
-    "form-action 'self'",
-    "object-src 'none'",
-    'upgrade-insecure-requests',
-  ].join('; ')
-}
-
-/**
- * The admin's policy. With a nonce, the inline scripts that carry it run and
- * no others do; without one (the 405 answer, which is no page), none at all.
- * Its pages have no inline styles, so none are allowed, apart from in
- * development, where Next adds its own.
- * @param {{ nonce?: string, dev?: boolean }} [options]
- */
-export function adminPolicy({ nonce, dev = false } = {}) {
-  const scripts = ["'self'", nonce && `'nonce-${nonce}'`, dev && "'unsafe-eval'"].filter(Boolean).join(' ')
-  return [
-    "default-src 'self'",
-    "img-src 'self' data:",
-    "font-src 'self'",
-    `style-src 'self'${dev ? " 'unsafe-inline'" : ''}`,
-    `script-src ${scripts}`,
-    "connect-src 'self'",
-    "frame-ancestors 'none'",
-    "base-uri 'none'",
     "form-action 'self'",
     "object-src 'none'",
     'upgrade-insecure-requests',

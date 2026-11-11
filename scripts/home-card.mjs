@@ -1,8 +1,9 @@
 /**
  * Draws public/og-image.png, the home page's share picture (every other page
- * has a card drawn by app/og/route.tsx): the slogan on solid Ink, with the
- * fonts, lockup and gradient bar the cards use, from assets/. Run it after a
- * change to the slogan or the branding: `npm run home:card`.
+ * has a card the kit draws, through app/og/route.tsx): the slogan on solid
+ * Ink, with the fonts, lockup and gradient bar the cards use, from the kit's
+ * platform/assets/. Run it after a change to the slogan or the branding:
+ * `npm run home:card`.
  */
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -12,7 +13,7 @@ import { createElement as h } from 'react'
 import sharp from 'sharp'
 
 const root = join(import.meta.dirname, '..')
-const asset = (/** @type {string[]} */ ...parts) => readFileSync(join(root, 'assets', ...parts))
+const asset = (/** @type {string[]} */ ...parts) => readFileSync(join(root, 'platform', 'assets', ...parts))
 
 // The site's .gradient-text (app/globals.css), oklch(0.78 0.16 235) to
 // oklch(0.6 0.22 268), in sRGB: the renderer reads no oklch().

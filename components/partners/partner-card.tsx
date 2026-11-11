@@ -1,7 +1,5 @@
 import Link from 'next/link'
 import { ArrowDown, ArrowRight, UserRound } from 'lucide-react'
-import { PartnerAvatar, PartnerBanner } from '@/components/partners/partner-pictures'
-import { CopyCode } from '@/components/partners/copy-code'
 import { SharePartnerAd } from '@/components/share/ads'
 import { SocialIcon } from '@/components/partners/social-icon'
 import type { Partner } from '@/data/partners'
@@ -11,6 +9,8 @@ import type { Copy } from '@/i18n/copy/en'
 import { getLocale } from '@/i18n/locale'
 import { hasReferralCode, partnerCardBanner, partnerText, partnerTextLang, platformName, socialLinks } from '@/lib/partners'
 import { cn } from '@/lib/utils'
+import { BannerCard } from '@/platform/components/banner-card'
+import { CopyButton } from '@/platform/components/copy-button'
 
 /** Where the "This could be you" card leads: the program, on /partners. */
 export const becomePartnerAnchor = 'become-a-partner'
@@ -25,53 +25,30 @@ export function copyLabels(t: Copy) {
 }
 
 /**
- * One partner on /partners and on the home page: banner, picture, name,
- * links, their code if they show one, and the way to their profile.
- * `headingLevel` is 3 where the cards sit under a section's own heading.
+ * One partner on /partners and on the home page, on the kit's one card
+ * shape: banner, picture, name, links, their code if they show one, and the
+ * way to their profile. `headingLevel` is 3 where the cards sit under a
+ * section's own heading.
  */
 export function PartnerCard({ partner, headingLevel = 2 }: { partner: Partner; headingLevel?: 2 | 3 }) {
   const locale = getLocale()
   const t = copy()
   const links = socialLinks(partner)
-  const headingId = `partner-${partner.slug}`
-  const Heading = headingLevel === 3 ? 'h3' : 'h2'
+  const featured = partner.featured ? { featured: true as const, featuredLabel: t.partners.featured } : {}
 
   return (
-    <article
-      aria-labelledby={headingId}
-      className={cn(
-        'flex h-full flex-col overflow-hidden rounded-2xl border bg-card/20',
-        partner.featured && 'border-primary/40 bg-primary/[0.04]',
-      )}
-    >
-      {/* overflow-hidden holds the box at 3:1 when a banner is a little taller than that.
-          The card loads the banner's small copy (lib/partners.ts, partnerCardBanner). */}
-      <div className="relative aspect-[3/1] overflow-hidden bg-card">
-        <PartnerBanner
-          src={partnerCardBanner(partner)}
-          alt=""
-          sizes="(min-width: 64rem) 22rem, (min-width: 40rem) 50vw, 100vw"
-        />
-        {partner.featured && (
-          <span className="absolute top-3 right-3 rounded-full border border-primary/40 bg-background/85 px-2.5 py-0.5 text-xs font-medium text-foreground">
-            {t.partners.featured}
-          </span>
-        )}
-      </div>
-
-      <div className="flex flex-1 flex-col px-5 pb-5">
-        <PartnerAvatar name={partner.name} src={partner.avatar} alt="" className="-mt-8 size-16 text-xs" />
-        <Heading id={headingId} className="mt-3 text-lg font-semibold tracking-tight text-foreground">
-          {partner.name}
-        </Heading>
-        <p
-          lang={partnerTextLang(partner.tagline, locale)}
-          className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground"
-        >
-          {partnerText(partner.tagline, locale)}
-        </p>
-
-        {links.length > 0 && (
+    <BannerCard
+      name={partner.name}
+      headingId={`partner-${partner.slug}`}
+      headingLevel={headingLevel}
+      line={partnerText(partner.tagline, locale)}
+      lineLang={partnerTextLang(partner.tagline, locale)}
+      // The banner's small copy (lib/partners.ts, partnerCardBanner).
+      bannerSrc={partnerCardBanner(partner)}
+      pictureSrc={partner.avatar}
+      {...featured}
+      meta={
+        links.length > 0 && (
           <ul className="mt-4 flex flex-wrap gap-1.5">
             {links.map((link) => (
               <li key={link.platform}>
@@ -87,30 +64,29 @@ export function PartnerCard({ partner, headingLevel = 2 }: { partner: Partner; h
               </li>
             ))}
           </ul>
-        )}
-
-        <div className="mt-auto pt-5">
+        )
+      }
+      actions={
+        <>
           {/* A partner with no code gets no box, so nothing empty sits above the link. */}
           {hasReferralCode(partner) && (
             <div className="rounded-lg border bg-background/50 px-3 py-2.5">
               <p className="text-xs text-muted-foreground">{t.partners.referralCode}</p>
-              <CopyCode code={partner.referralCode} labels={copyLabels(t)} className="mt-1" />
+              <CopyButton value={partner.referralCode} labels={copyLabels(t)} className="mt-1" />
             </div>
           )}
           <SharePartnerAd partner={partner} size="sm" className={cn('mb-4', hasReferralCode(partner) && 'mt-4')} />
           <Link
             href={localePath(locale, `/partners/${partner.slug}`)}
-            className={cn(
-              'group inline-flex items-center gap-1.5 text-sm font-medium text-link transition-colors hover:text-foreground',
-            )}
+            className="group inline-flex items-center gap-1.5 text-sm font-medium text-link transition-colors hover:text-foreground"
           >
             {t.partners.viewProfile}
             <span className="sr-only">: {partner.name}</span>
             <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
-        </div>
-      </div>
-    </article>
+        </>
+      }
+    />
   )
 }
 

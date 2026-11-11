@@ -1,13 +1,14 @@
 // The files and folders production never uses: the tests, CI and editor
-// settings, the test and lint configs, reports and build caches. The updater
-// deletes them from each release once it is built, before its trial start,
-// so the trial proves the release still starts without them
-// (scripts/updater/lib.mjs, runUpdate), and from the uploaded folder at
-// every start-up (cleanUpAtStart), apart from what its own build and the
-// live site use. Kept apart so the tests can check the list and drive the
-// deleting (tests/updater-prune.test.ts).
+// settings, the test, lint and secret scanner configs, reports and build
+// caches. The updater deletes them from each release once it is built,
+// before its trial start, so the trial proves the release still starts
+// without them (scripts/updater/lib.mjs, runUpdate), and from the uploaded
+// folder at every start-up (cleanUpAtStart), apart from what its own build
+// and the live site use. Kept apart so the tests can check the list and
+// drive the deleting.
 import { lstat, rm, unlink } from 'node:fs/promises'
 import { join } from 'node:path'
+import { messageOf } from './process.mjs'
 
 /**
  * Relative to the folder, with forward slashes. Fixed names only, never a
@@ -49,7 +50,8 @@ export const uploadedFolderKeeps = Object.freeze(['node_modules', '.next', '.env
  */
 export const plainPath = (path) => path.split('/').every((name) => /^[\w.-]+$/.test(name) && !/^\.+$/.test(name))
 
-const within = (/** @type {string} */ path, /** @type {string} */ folder) => path === folder || path.startsWith(`${folder}/`)
+/** @param {string} path @param {string} folder */
+const within = (path, folder) => path === folder || path.startsWith(`${folder}/`)
 
 /**
  * The first folder on the way to a path that is a link, or '' when there is
@@ -101,8 +103,8 @@ export async function removeDevFiles(dir, print, keep = []) {
       removed.push(path)
     } catch (error) {
       // Not there, or a folder on the way is a file: nothing to delete.
-      const code = /** @type {any} */ (error)?.code
-      if (code !== 'ENOENT' && code !== 'ENOTDIR') say(`Could not delete ${path}: ${error instanceof Error ? error.message : error}`)
+      const code = /** @type {NodeJS.ErrnoException} */ (error)?.code
+      if (code !== 'ENOENT' && code !== 'ENOTDIR') say(`Could not delete ${path}: ${messageOf(error)}`)
     }
   }
   return removed

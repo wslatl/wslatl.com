@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/components/button'
 import { ComparisonList } from '@/components/pricing/comparisons'
 import type { PlanGroup, ProductLine } from '@/data/pricing'
 import { siteConfig } from '@/config/site'

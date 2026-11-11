@@ -16,7 +16,7 @@
 # into it as inline scripts; a nonce, which would replace 'unsafe-inline',
 # has to be new for every request, and so cannot be in a page built once. No
 # public page shows anything a visitor sent. The admin, the one place with a
-# session, gets a nonce and no 'unsafe-inline' (config/security-headers.mjs),
+# session, gets a nonce and no 'unsafe-inline' (platform/admin/proxy.ts),
 # and this rule stays on for it: the pattern leaves out /admin and
 # everything under it.
 10055	OUTOFSCOPE	http://localhost:3100/(?!admin(/|\?|$))

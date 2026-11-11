@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Instrument_Serif } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { JsonLd } from '@/components/seo/json-ld'
 import { siteConfig } from '@/config/site'
@@ -8,17 +7,9 @@ import { isLocale, locales, openGraphLocales } from '@/i18n/config'
 import { getLocale, setLocale } from '@/i18n/locale'
 import { copy } from '@/i18n/copy'
 import { ogImage } from '@/lib/metadata'
+import { SkipLink } from '@/platform/components/main'
+import { fontClassNames } from '@/platform/fonts'
 import '../globals.css'
-
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' })
-// The serif is only ever set in italic (slogan, page titles, quotes), so the
-// upright face is not loaded at all.
-const instrumentSerif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  style: 'italic',
-  variable: '--font-serif',
-})
 
 // Only a fallback: every page sets its own title and description.
 const title = `${siteConfig.brand}: Game Server, VPS and Dedicated Hosting in Missouri`
@@ -150,12 +141,12 @@ export default async function RootLayout({
   const t = copy()
 
   return (
-    <html lang={locale} className={`dark ${geist.variable} ${instrumentSerif.variable}`}>
+    // The kit's three typefaces (Geist, Geist Mono and Instrument Serif), by
+    // the names its stylesheet reads.
+    <html lang={locale} className={fontClassNames}>
       <body className="relative isolate min-h-dvh font-sans antialiased">
         <JsonLd data={organizationJsonLd} />
-        <a href="#main-content" className="skip-link">
-          {t.header.skipToContent}
-        </a>
+        <SkipLink>{t.header.skipToContent}</SkipLink>
         {/* The blue wash at the top of every page. Static, so it costs nothing to scroll. */}
         <div
           aria-hidden="true"

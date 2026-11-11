@@ -65,35 +65,15 @@ export const partnerImageTypes = ['webp', 'png', 'jpg', 'jpeg'] as const
 const sharedFile = new RegExp(`\\.(${partnerImageTypes.join('|')})$`)
 
 /**
- * The admin (app/admin): English only, outside the languages, so its paths
- * are never given one. /administrator and the like are not it.
+ * The admin (app/admin, from the kit): English only, outside the languages,
+ * so its paths are never given one. /administrator and the like are not it.
+ * The kit's proxy answers every admin address before anything here is asked
+ * (proxy.ts), with the same rule as this one, which tests/routing.test.ts
+ * holds together. It is written out here so that nothing public imports the
+ * admin: lib/partners.ts reads this file too.
  */
 export function isAdminPath(pathname: string): boolean {
   return pathname === '/admin' || pathname.startsWith('/admin/')
-}
-
-/**
- * The admin's JSON routes that take a POST, the only paths on the site that
- * do. Exact paths: a POST anywhere else under /admin/api/ would reach a page
- * and bring back what the 405 is for. tests/proxy.test.ts keeps this list in
- * step with the route handlers in app/admin/api/.
- */
-export const adminPostRoutes: readonly string[] = [
-  '/admin/api/login',
-  '/admin/api/logout',
-  '/admin/api/update',
-  '/admin/api/adopt-updater',
-]
-
-/**
- * Which methods proxy.ts lets through. The site is read-only except for the
- * admin's JSON routes, which take a POST to log in, log out, ask for an
- * update and copy the updater over. Every one of those checks the request came from this site
- * (lib/admin/request.ts), and tests/proxy.test.ts makes sure of it.
- */
-export function methodAllowed(method: string, pathname: string): boolean {
-  if (method === 'GET' || method === 'HEAD') return true
-  return method === 'POST' && adminPostRoutes.includes(pathname)
 }
 
 export function isRootFile(pathname: string): boolean {

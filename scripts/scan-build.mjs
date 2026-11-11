@@ -83,7 +83,7 @@ if (leaks.length) {
   failed = true
 }
 if (secretLeaks.length) {
-  console.error(`Admin secrets in served files (read them on the server only, see lib/admin):\n${secretLeaks.join('\n')}`)
+  console.error(`Admin secrets in served files (read them on the server only, as the kit's admin in platform/admin/server does):\n${secretLeaks.join('\n')}`)
   failed = true
 }
 if (!locales.length || !defaultLocale || pages.length === 0) {

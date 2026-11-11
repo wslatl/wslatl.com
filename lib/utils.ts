@@ -1,9 +1,5 @@
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+// Class names, merged the way the kit's components merge theirs.
+export { cn } from '@/platform/lib/cn'
 
 /**
  * Letters that are their own character rather than a letter plus an accent,

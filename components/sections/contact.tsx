@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/platform/components/button'
 import { sectionHeadingClass } from '@/components/ui/section-header'
 import { Email } from '@/components/ui/email'
-import { SiteLink } from '@/components/ui/site-link'
+import { SiteLink } from '@/platform/components/site-link'
 import { siteConfig } from '@/config/site'
 import { copy } from '@/i18n/copy'
 
@@ -42,7 +42,8 @@ export function Contact() {
                   {'email' in option ? (
                     <Email name={option.email} className={ctaClass} />
                   ) : (
-                    <SiteLink href={option.href} newTab={t.header.newTab} className={ctaClass}>
+                    // Both are short links (/discord, /billing), which leave the site.
+                    <SiteLink href={option.href} external newTab={t.header.newTab} className={ctaClass}>
                       {option.cta}
                     </SiteLink>
                   )}

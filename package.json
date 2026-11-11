@@ -9,7 +9,7 @@
     "postbuild": "node scripts/keep-old-assets.mjs restore",
     "start": "next start",
     "serve": "node scripts/serve.mjs",
-    "admin:hash": "node scripts/hash-password.mjs",
+    "admin:hash": "node platform/admin/hash-password.mjs",
     "partners:cards": "node scripts/partner-cards.mjs",
     "home:card": "node scripts/home-card.mjs",
     "brand:images": "node scripts/brand-kit.mjs",
@@ -17,12 +17,14 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:http": "vitest run --mode http",
-    "check": "npm run lint && npm run test && npm run build && npm run scan:build && npm run test:http && npm run typecheck",
-    "lint:fix": "oxlint --fix && eslint . --fix",
+    "check": "npm run platform:check && npm run lint && npm run test && npm run build && npm run scan:build && npm run test:http && npm run typecheck",
+    "lint:fix": "oxlint --fix --ignore-pattern \"platform/**\" --ignore-pattern scripts/serve.mjs --ignore-pattern \"scripts/updater/**\" && eslint . --fix --ignore-pattern \"platform/**\" --ignore-pattern scripts/serve.mjs --ignore-pattern \"scripts/updater/**\"",
     "scan:build": "node scripts/scan-build.mjs",
     "check:site": "node scripts/check-site.mjs",
     "check:seo": "node scripts/check-seo.mjs",
-    "check:security": "node scripts/check-security.mjs"
+    "check:security": "node scripts/check-security.mjs",
+    "platform:sync": "node platform/tools/sync.mjs",
+    "platform:check": "node platform/tools/check.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.2.1",

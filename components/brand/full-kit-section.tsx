@@ -1,7 +1,7 @@
 import { ArrowUpRight, Check } from 'lucide-react'
 import { BrandSection } from '@/components/brand/brand-section'
-import { Button } from '@/components/ui/button'
-import { SiteLink } from '@/components/ui/site-link'
+import { Button } from '@/platform/components/button'
+import { SiteLink } from '@/platform/components/site-link'
 import { siteConfig } from '@/config/site'
 import { fullKitUrl, kitContents, markSizes } from '@/data/brand'
 import { copy } from '@/i18n/copy'
@@ -42,6 +42,8 @@ export function FullKitSection() {
           {b.questionPrefix}{' '}
           <SiteLink
             href={siteConfig.links.discord}
+            // A short link, which leaves the site through its redirect.
+            external
             newTab={t.header.newTab}
             className="text-link underline underline-offset-4 hover:text-foreground"
           >

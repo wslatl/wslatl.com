@@ -125,8 +125,10 @@ describe('a download that does not match', () => {
 
   it('is refused when it holds a link the commit does not have', async () => {
     const link = { name: `${folderOf(sha)}evil-link`, type: '2' as const, linkname: '/etc/passwd' }
-    // tar may refuse to make the link (Windows), or make it and leave it to the check.
-    expect(await refusal(archiveOf(sha, files, [link]))).toMatch(/^(?:tar failed: [\s\S]*|[\s\S]*evil-link is not in the commit\.)$/)
+    // The updater unpacks the download itself, and takes plain files and folders alone.
+    expect(await refusal(archiveOf(sha, files, [link]))).toMatch(
+      /^The download holds "[^"]*\/evil-link", a symbolic link, and a release may hold only files and folders, so nothing was installed\.$/,
+    )
   })
 
   it('never writes outside its folder, whatever names the archive uses', async () => {
@@ -136,8 +138,10 @@ describe('a download that does not match', () => {
       { name: `${folderOf(sha)}x/../../../escaped.txt`, content: 'out' },
       { name: absolute, content: 'out' },
     ]
-    // tar refuses the names, or leaves them inside, where the check refuses them.
-    expect(await refusal(archiveOf(sha, files, escapes))).toMatch(/^(?:tar failed: [\s\S]*|The download does not match commit [\s\S]* is not in the commit[\s\S]*)$/)
+    // The updater's own unpacking refuses any name that is not a plain path inside the release.
+    expect(await refusal(archiveOf(sha, files, escapes))).toMatch(
+      /^The download holds "[^"]*", which is not a plain path inside the release, so nothing was installed\.$/,
+    )
     expect(existsSync(absolute)).toBe(false)
   })
 

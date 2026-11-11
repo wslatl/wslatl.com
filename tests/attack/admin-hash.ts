@@ -6,7 +6,7 @@ import { join } from 'node:path'
  * owner makes the admin's settings, so the tests make them the same way.
  */
 export function adminHash(password: string): { passwordHash: string; secret: string } {
-  const result = spawnSync(process.execPath, [join(__dirname, '..', '..', 'scripts', 'hash-password.mjs')], {
+  const result = spawnSync(process.execPath, [join(__dirname, '..', '..', 'platform', 'admin', 'hash-password.mjs')], {
     input: `${password}\n`,
     encoding: 'utf8',
   })

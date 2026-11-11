@@ -25,3 +25,13 @@ const shortPaths = new Set<string>(Object.values(links))
 export function isShortLink(href: string): boolean {
   return shortPaths.has(href)
 }
+
+/**
+ * A link as the kit's header, footer and links take it. They treat only an
+ * absolute address as leaving the site, so a short link is marked
+ * `external`: it leaves through its redirect, opens in a new tab, and says
+ * so to screen readers, as every off-site link does.
+ */
+export function markShortLink<T extends { href: string }>(link: T): T & { external?: true } {
+  return isShortLink(link.href) ? { ...link, external: true } : link
+}

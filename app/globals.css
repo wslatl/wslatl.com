@@ -1,242 +1,22 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:is(.dark *));
-
 /*
- * WSLATL is dark-only, so there is one token set. The primary blue is the
- * same #0079CE the billing portal uses. Contrast ratios below are measured
- * against --background.
+ * The look every WSLATL app shares comes from the kit (platform/, never
+ * edited here): the colour and type names, the content width, the base
+ * layer, scrollbars, reduced motion, and the rules the header, its mobile
+ * menu and the skip link need. @source lets Tailwind see the classes the
+ * kit's components use. This file keeps only what is this site's own.
  */
-:root {
-  --background: oklch(0.08 0 0);
-  --foreground: oklch(0.95 0.005 0);
-  --card: oklch(0.15 0.01 0);
-  --card-foreground: oklch(0.95 0.005 0);
-  --popover: oklch(0.15 0.01 0);
-  --popover-foreground: oklch(0.95 0.005 0);
-  /* Fills (buttons, badges), with white text on them: 4.9:1. A shade
-     darker than the old 0.55 so white clears 4.5:1 with room to spare. */
-  --primary: oklch(0.53 0.18 240);
-  --primary-foreground: oklch(1 0 0);
-  /* The primary blue lifted for text: links and small labels, 7.9:1. */
-  --link: oklch(0.7 0.15 240);
-  --secondary: oklch(0.2 0.01 0);
-  --secondary-foreground: oklch(0.95 0.005 0);
-  --muted: oklch(0.25 0.01 0);
-  /* Secondary text, 7.7:1. */
-  --muted-foreground: oklch(0.7 0.015 0);
-  --accent: oklch(0.2 0.01 0);
-  --accent-foreground: oklch(0.95 0.005 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.24 0.01 0);
-  /* Form control outlines need 3:1 against the page. */
-  --input: oklch(0.42 0.01 0);
-  --ring: oklch(0.7 0.15 240);
-  --radius: 0.625rem;
-  /* The brand kit's status colours, so far only in the admin. A state is
-     never shown in colour alone: a word always goes with it. */
-  --success: #05df72;
-  --warning: #fcbb00;
-  --danger: #fb2c36;
-}
+@import '../platform/styles/tokens.css';
+@import '../platform/styles/base.css';
+@source '../platform';
 
-@theme inline {
-  --font-sans: var(--font-sans), 'Geist Fallback', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-serif), 'Instrument Serif Fallback', ui-serif, Georgia, serif;
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-link: var(--link);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-danger: var(--danger);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-}
-
-/* The one content width. Header, sections, and footer all line up on it. */
-@utility shell {
-  width: 100%;
-  max-width: 72rem;
-  margin-inline: auto;
-  padding-inline: 1rem;
-  @media (width >= 40rem) {
-    padding-inline: 1.5rem;
-  }
-  @media (width >= 64rem) {
-    padding-inline: 2rem;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-  html {
-    /* Anchor targets land below the sticky header instead of under it. */
-    scroll-padding-top: 5rem;
-  }
-  /*
-   * Smooth scrolling only where it was wanted: jumping to a section from the
-   * table of contents. Set on html itself it also animates the scroll to the
-   * top that the router performs on every navigation, and that animation
-   * chases a target that keeps moving while the page streams in, so opening
-   * a long document left you part way down it instead of at the heading.
-   * A page opened without a fragment has no :target, so it jumps instantly.
-   */
-  @media (prefers-reduced-motion: no-preference) {
-    html:has(:target) {
-      scroll-behavior: smooth;
-    }
-  }
-  body {
-    @apply bg-background text-foreground;
-    font-feature-settings: 'ss01' on, 'cv11' on;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  ::selection {
-    @apply bg-primary/30 text-foreground;
-  }
-  /* Outline rather than box-shadow so focus survives Windows high contrast mode. */
-  :focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
-  }
-  .font-serif {
-    font-feature-settings: 'liga' on, 'dlig' on;
-  }
-}
-
-/* ----- Scrollbars: slim and dark, with the brand blue on hover ----- */
-/* Covers the page and every inner scroll area (legal sidebar, mobile menu,
-   Login dropdown). The thumb keeps 3.5:1 against the track so it stays easy
-   to find. */
-:root {
-  --scrollbar-track: var(--background);
-  --scrollbar-thumb: oklch(0.5 0.01 0);
-  --scrollbar-thumb-hover: var(--link);
-}
-/* Chrome, Edge, and Safari: rounded thumb with a hover state. */
-::-webkit-scrollbar {
-  width: 11px;
-  height: 11px;
-}
-::-webkit-scrollbar-track,
-::-webkit-scrollbar-corner {
-  background: var(--scrollbar-track);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-  border: 3px solid var(--scrollbar-track);
-  border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover,
-::-webkit-scrollbar-thumb:active {
-  background: var(--scrollbar-thumb-hover);
-}
-/* Firefox has no scrollbar pseudo-elements, so it gets the standard,
-   hover-less version. Other browsers keep the styles above. */
-@supports not selector(::-webkit-scrollbar) {
-  html {
-    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
-  }
-  * {
-    scrollbar-width: thin;
-  }
-}
-/* Quiet scroll areas (the legal sidebar): the thumb only shows while the
-   area is hovered or holds keyboard focus. It still scrolls with the wheel,
-   touch, and Tab the whole time, so nothing becomes unreachable. This uses
-   the standard properties, which Chrome and Firefox repaint on hover (Chrome
-   does not repaint ::-webkit-scrollbar parts on a parent's :hover). */
-.scroll-quiet {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-.scroll-quiet:hover,
-.scroll-quiet:focus-within {
-  scrollbar-color: var(--scrollbar-thumb) transparent;
-}
-/* Safari has no standard scrollbar-color yet, so it uses these instead. */
-.scroll-quiet::-webkit-scrollbar-thumb {
-  background: transparent;
-}
-.scroll-quiet:hover::-webkit-scrollbar-thumb,
-.scroll-quiet:focus-within::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb);
-}
 /* Scroll areas fade out at their edges instead of slicing a line of text in
    half. The area's own padding is at least as tall as the fade, so when
    everything fits, or at either end of the scroll, only padding is faded. */
 .scroll-fade {
   mask-image: linear-gradient(to bottom, transparent, black 2rem, black calc(100% - 2.5rem), transparent);
-}
-
-/* ----- Header: the hairline border fades in once the page scrolls ----- */
-/* Pure CSS, no scroll listener. Browsers without scroll timelines keep the border. */
-.site-header {
-  border-bottom-color: var(--border);
-}
-@supports (animation-timeline: scroll()) {
-  @keyframes header-lift {
-    from {
-      border-bottom-color: transparent;
-    }
-    to {
-      border-bottom-color: var(--border);
-    }
-  }
-  .site-header {
-    animation: header-lift linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0 32px;
-  }
-}
-
-/* ----- Mobile menu: a native popover under the header ----- */
-.mobile-menu {
-  position: fixed;
-  inset: 4rem 0 0 0;
-  width: auto;
-  height: auto;
-  margin: 0;
-  padding: 0;
-  overflow-y: auto;
-  border: 0;
-  border-top: 1px solid var(--border);
-  background: var(--background);
-  color: var(--foreground);
-}
-/* Lock page scroll while the menu covers it, and swap the button icon. */
-@media (width < 64rem) {
-  body:has(.mobile-menu:popover-open) {
-    overflow: hidden;
-  }
-}
-header:has(.mobile-menu:popover-open) .menu-icon-closed {
-  display: none;
-}
-header:has(.mobile-menu:popover-open) .menu-icon-open {
-  display: block;
 }
 
 /* ----- Hero entrance: the one orchestrated motion on the site ----- */
@@ -340,28 +120,6 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
   .marquee-toggle {
     display: none;
   }
-}
-
-/* ----- Skip to main content link (visible on keyboard focus) ----- */
-/* Parked above the viewport (not just translated) so no screenshot or
-   stitched capture can catch it; it drops in over the header on focus. */
-.skip-link {
-  position: fixed;
-  top: -5rem;
-  left: 0.75rem;
-  z-index: 100;
-  padding: 0.625rem 1rem;
-  border-radius: 0.5rem;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  font-size: 0.875rem;
-  font-weight: 600;
-  box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.7);
-  transition: top 0.15s ease-out;
-}
-.skip-link:focus,
-.skip-link:focus-visible {
-  top: 0.75rem;
 }
 
 /* ----- Legal documents ----- */
@@ -566,22 +324,5 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
   }
   .faq-item[open]::details-content {
     height: auto;
-  }
-}
-
-/* ----- Reduced motion ----- */
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    /* The hero staggers its lines with inline delays; with "both" fill they
-       would sit invisible for the delay and then pop in. */
-    animation-delay: 0s !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
   }
 }

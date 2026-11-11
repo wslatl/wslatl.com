@@ -1,9 +1,9 @@
 // The supervisor's busy flag (scripts/serve.mjs). One for everything that
 // moves the live site: start-up until its build and clean-up are done,
 // updates, rollbacks and restarts, so two of them never start servers on one
-// port. Whoever holds it owns the live server: a crash rollback that comes up
-// meanwhile waits for it, and nothing starts the site behind the holder's
-// back. Kept apart so the tests can drive the order (tests/updater-busy.test.ts).
+// port. Whoever holds it owns the live server and the processes beside it: a
+// crash rollback that comes up meanwhile waits for it, and nothing starts the
+// site behind the holder's back. Kept apart so the tests can drive the order.
 
 /**
  * @param {{
