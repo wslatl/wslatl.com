@@ -6,7 +6,7 @@
 /* ----- Header: the hairline border fades in once the page scrolls ----- */
 /* Pure CSS, no scroll listener. Browsers without scroll timelines keep the border. */
 .site-header {
-  border-bottom-color: var(--border);
+  border-bottom-color: var(--admin-border, var(--border));
 }
 @supports (animation-timeline: scroll()) {
   @keyframes header-lift {
@@ -14,7 +14,7 @@
       border-bottom-color: transparent;
     }
     to {
-      border-bottom-color: var(--border);
+      border-bottom-color: var(--admin-border, var(--border));
     }
   }
   .site-header {
@@ -34,9 +34,9 @@
   padding: 0;
   overflow-y: auto;
   border: 0;
-  border-top: 1px solid var(--border);
-  background: var(--background);
-  color: var(--foreground);
+  border-top: 1px solid var(--admin-border, var(--border));
+  background: var(--admin-background, var(--background));
+  color: var(--admin-foreground, var(--foreground));
 }
 /* Lock page scroll while the menu covers it, and swap the button icon. */
 @media (width < 64rem) {
@@ -61,8 +61,8 @@ header:has(.mobile-menu:popover-open) .menu-icon-open {
   z-index: 100;
   padding: 0.625rem 1rem;
   border-radius: 0.5rem;
-  background: var(--primary);
-  color: var(--primary-foreground);
+  background: var(--admin-primary, var(--primary));
+  color: var(--admin-primary-foreground, var(--primary-foreground));
   font-size: 0.875rem;
   font-weight: 600;
   box-shadow: 0 8px 24px -8px rgb(0 0 0 / 0.7);

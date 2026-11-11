@@ -18,6 +18,7 @@
  * @property {AdminNavItem[]} [nav] The admin's own pages, in the order its header lists them, when it has more than Updates. Left out, the header lists none, as on the main website.
  * @property {boolean} [wide] Pages 72rem wide instead of 56rem, for an admin with tables.
  * @property {string} [signInText] The line on the sign-in card under "Admin". "Sign in to update the site." unless set.
+ * @property {AdminNavItem[]} [updateLinks] The app's own admin pages that belong next to updates, such as { href: "/admin/updates/publish", label: "Publish a release" }. Shown on the Updates page, at most 5, each href an address in the admin and each label plain text of 40 characters at most. While no release is published, the page points to the first one as well as to GitHub.
  *
  * @typedef {object} AdminNavItem
  * @property {string} href An address in the admin, such as "/admin/guides".
@@ -60,6 +61,12 @@ export const repoPattern = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?\/(?!\
 /** An address in the admin: /admin itself or a path under it, with nothing that leaves it. */
 const adminHref = /^\/admin(?:\/[\w-]+)*$/
 
+/** A link's words: 1 to 40 characters, no control characters or angle brackets, and no space at either end. */
+const plainLabel = {
+  /** @param {unknown} label */
+  test: (label) => typeof label === 'string' && label === label.trim() && /^[^\p{C}<>]{1,40}$/u.test(label),
+}
+
 /**
  * What is wrong with the admin's optional settings, one sentence each.
  * @param {Partial<AdminConfig>} admin
@@ -68,7 +75,7 @@ const adminHref = /^\/admin(?:\/[\w-]+)*$/
 function adminProblems(admin) {
   /** @type {string[]} */
   const problems = []
-  const { nav, wide, signInText } = admin
+  const { nav, wide, signInText, updateLinks } = admin
   if (nav !== undefined) {
     const good =
       Array.isArray(nav) &&
@@ -82,6 +89,19 @@ function adminProblems(admin) {
   if (wide !== undefined && typeof wide !== 'boolean') problems.push('admin.wide must be true or false.')
   if (signInText !== undefined && (typeof signInText !== 'string' || signInText.trim() === '')) {
     problems.push('admin.signInText must be a sentence, such as "Sign in to update the site."')
+  }
+  if (updateLinks !== undefined) {
+    const good =
+      Array.isArray(updateLinks) &&
+      updateLinks.length <= 5 &&
+      updateLinks.every((item) => typeof item?.href === 'string' && adminHref.test(item.href) && plainLabel.test(item?.label))
+    if (!good) {
+      problems.push(
+        'admin.updateLinks must be a list of at most 5 { href, label }, each href an address in the admin such as "/admin/updates/publish" and each label plain text of 40 characters at most.',
+      )
+    } else if (new Set(updateLinks.map((item) => item.href)).size !== updateLinks.length) {
+      problems.push('admin.updateLinks lists the same address twice.')
+    }
   }
   return problems
 }

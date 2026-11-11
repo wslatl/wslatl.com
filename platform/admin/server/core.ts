@@ -21,6 +21,8 @@ export type AdminApp = {
   nav: readonly AdminNavItem[]
   wide: boolean
   signInText: string
+  /** The app's own admin pages shown on the Updates page. */
+  updateLinks: readonly AdminNavItem[]
 }
 
 export function adminApp(config: PlatformConfig): AdminApp {
@@ -34,6 +36,7 @@ export function adminApp(config: PlatformConfig): AdminApp {
     nav: Object.freeze([...(config.admin.nav ?? [])]),
     wide: config.admin.wide === true,
     signInText: config.admin.signInText ?? 'Sign in to update the site.',
+    updateLinks: Object.freeze(config.admin.updateLinks?.map((link) => Object.freeze({ ...link })) ?? []),
   })
 }
 

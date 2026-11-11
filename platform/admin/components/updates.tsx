@@ -1,8 +1,10 @@
 import { ArrowUpRight } from 'lucide-react'
+import Link from 'next/link'
 import { deployedCommit, installedRelease } from '../server/build-info'
 import { releaseOverview, type Overview, type Release } from '../server/github'
 import type { GitHubSettings } from '../server/settings'
 import { updaterStatus } from '../server/updater'
+import type { AdminNavItem } from '../../config.mjs'
 import { cn } from '../../lib/cn'
 import { formatWhen, shortSha } from './format'
 import { Badge, Notice, type Tone } from './notice'
@@ -95,11 +97,46 @@ function ReleaseCard({
   )
 }
 
-/** Where the site stands against GitHub's latest release, in one sentence. */
-export function summary({ status, latest }: Overview, installed: string | null): string {
+const linkClass = 'text-link underline decoration-link/50 underline-offset-2 hover:text-foreground hover:decoration-current'
+
+/** The app's own admin pages that belong next to updates (admin.updateLinks), as a row of links. */
+function UpdateLinks({ links }: { links: readonly AdminNavItem[] }) {
+  if (links.length === 0) return null
+  return (
+    <nav aria-label="More about updates" className="mt-3">
+      <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link href={link.href} className={linkClass}>
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+const noReleases = 'No releases published yet. Publish one on GitHub to install it here.'
+
+/**
+ * Where the site stands against GitHub's latest release, in one sentence.
+ * With no release yet, links is the app's own pages for updates: the first
+ * is named as a place to publish one, beside GitHub.
+ */
+export function summary({ status, latest }: Overview, installed: string | null, links: readonly AdminNavItem[] = []): React.ReactNode {
   switch (status) {
     case 'no-releases':
-      return 'No releases published yet. Publish one on GitHub to install it here.'
+      if (links.length === 0) return noReleases
+      return (
+        <>
+          No releases published yet. Publish one from{' '}
+          <Link href={links[0].href} className={linkClass}>
+            {links[0].label}
+          </Link>{' '}
+          or on GitHub to install it here.
+        </>
+      )
     case 'bad-tag':
       return `The latest release is tagged ${latest?.tag}, not vMAJOR.MINOR.PATCH, so it cannot be installed.`
     case 'up-to-date':
@@ -120,10 +157,23 @@ export function summary({ status, latest }: Overview, installed: string | null):
  * and what is installed, from the build itself. GitHub is not asked
  * anything, and nothing is offered to install.
  */
-function UpdatesOff({ reasons, installedTag, commit }: { reasons: readonly string[]; installedTag: string | null; commit: string | null }) {
+function UpdatesOff({
+  reasons,
+  installedTag,
+  commit,
+  links,
+}: {
+  reasons: readonly string[]
+  installedTag: string | null
+  commit: string | null
+  links: readonly AdminNavItem[]
+}) {
   return (
     <>
-      <h1 className="text-2xl font-semibold tracking-tight">Updates</h1>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Updates</h1>
+        <UpdateLinks links={links} />
+      </div>
       <Notice tone="warning" title="Updates are off">
         {reasons.map((reason) => (
           <span key={reason} className="block">
@@ -162,16 +212,19 @@ export async function Updates({
   github: settings,
   updatesOff = [],
   mayUpdate = true,
+  links = [],
   fetchImpl = fetch,
 }: {
   github: GitHubSettings | null
   updatesOff?: readonly string[]
   mayUpdate?: boolean
+  /** The app's own pages for updates (admin.updateLinks). */
+  links?: readonly AdminNavItem[]
   fetchImpl?: typeof fetch
 }) {
   const installedTag = installedRelease()
   const commit = deployedCommit()
-  if (!settings) return <UpdatesOff reasons={updatesOff} installedTag={installedTag} commit={commit} />
+  if (!settings) return <UpdatesOff reasons={updatesOff} installedTag={installedTag} commit={commit} links={links} />
   const { repo } = settings
   const updater = await updaterStatus()
   // A release a crash took back out is never offered again.
@@ -210,6 +263,7 @@ export async function Updates({
         <p className="mt-1 text-sm text-muted-foreground">
           Installs the latest release of <OutLink href={`https://github.com/${repo}/releases`}>{repo}</OutLink>.
         </p>
+        <UpdateLinks links={links} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -251,7 +305,7 @@ export async function Updates({
         initial={updater}
         offer={offer}
         blocked={blocked}
-        summary={github.ok ? summary(github.overview, installedTag) : null}
+        summary={github.ok ? summary(github.overview, installedTag, links) : null}
         mayUpdate={mayUpdate}
       />
 

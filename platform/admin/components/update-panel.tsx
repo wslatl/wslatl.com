@@ -176,7 +176,7 @@ export function UpdatePanel({
   initial: UpdaterStatus
   offer: string | null
   blocked: string
-  summary: string | null
+  summary: React.ReactNode
   mayUpdate?: boolean
 }) {
   const [status, setStatus] = useState(initial)

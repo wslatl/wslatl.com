@@ -99,7 +99,7 @@ All text below is an example. The app passes its own, in the page's language.
 </PageStart>
 ```
 
-**BannerCard** is the one card shape: a 3:1 banner, a round picture overlapping it, the name, one line, and the thing to do. `headingLevel` is `3` where the cards sit under a section's own heading. `meta` sits under the line (icon links) and `actions` at the bottom. `featured` needs `featuredLabel`. Without pictures it shows a plain banner and the initials.
+**BannerCard** is the one card shape: a 3:1 banner, a round picture overlapping it, the name, one line, and the thing to do. `headingLevel` is `3` where the cards sit under a section's own heading. `meta` sits under the line (icon links) and `actions` at the bottom. `featured` needs `featuredLabel`. Without pictures it shows a plain banner and the initials. When the name is in another language than the page, such as an English guide title on a Spanish page, pass `titleLang` so the heading is marked as that language. `bannerFit` is `cover` by default, which fills the 3:1 box and crops what spills over; pass `contain` for a picture that must show whole, such as a 16:9 logo on a transparent background, which is then centred on the card's colour.
 
 ```tsx
 <BannerCard

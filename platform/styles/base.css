@@ -44,7 +44,7 @@
   }
   /* Outline rather than box-shadow so focus survives Windows high contrast mode. */
   :focus-visible {
-    outline: 2px solid var(--ring);
+    outline: 2px solid var(--admin-ring, var(--ring));
     outline-offset: 2px;
   }
   .font-serif {
@@ -56,9 +56,9 @@
 /* Covers the page and every inner scroll area. The thumb keeps 3.5:1 against
    the track so it stays easy to find. */
 :root {
-  --scrollbar-track: var(--background);
+  --scrollbar-track: var(--admin-background, var(--background));
   --scrollbar-thumb: oklch(0.5 0.01 0);
-  --scrollbar-thumb-hover: var(--link);
+  --scrollbar-thumb-hover: var(--admin-link, var(--link));
 }
 /* Chrome, Edge, and Safari: rounded thumb with a hover state. */
 ::-webkit-scrollbar {

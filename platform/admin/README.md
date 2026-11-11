@@ -117,6 +117,15 @@ export async function register() {
 - **The stylesheet** already has `@source '../platform'`, which covers the admin's classes.
 - **robots.txt** never names `/admin`, and the sitemap leaves it out.
 
+## For an app's own admin pages and routes
+
+- **Tab title**, for a page: `export const generateMetadata = admin.titled('Guides')`, the same call the kit's own pages use. While the admin is off it is a 404, so no tab ever says what a page would have been. For a page that sets its title after the browser has built it (a 404 page, say), put `<TabTitle title="Page not found" />` in it: `import { TabTitle } from '@/platform/admin/components/tab-title'`, a client component that sets `document.title`.
+- **The plain 404**, for a route: `import { bare } from '@/platform/admin/server'`, then `return bare(404)`. No body, with the admin's `Cache-Control: no-store` and `X-Robots-Tag: noindex, nofollow`; a second argument adds headers, such as `bare(405, { Allow: 'POST' })`. It is the answer the kit's own routes give while the admin is off. A route that calls `admin.signedInRoute` or `admin.signedInPost` first already gets it; `bare` is for a check the app makes itself.
+
+## `admin.css` and the app's own variables
+
+The admin's colours are set under `--admin-*` names (`--admin-muted`, `--admin-border` and so on) on the admin's `<html>`, never under `--muted`, `--accent`, `--border`, `--link`, `--input`, `--ring` or any other plain name. The kit's colour utilities (`bg-card`, `text-link`, `border-border`) read the `--admin-*` name first and the plain one after it, so the admin looks as it always did and an app's own variables with those names are left as the app set them. An app's own admin pages that use these classes get the admin's colours; its own CSS that reads `var(--muted)` gets its own.
+
 ## `admin` in platform.config.mjs
 
 | Setting | What it does |
@@ -125,6 +134,7 @@ export async function register() {
 | `nav` | The admin's own pages, as `[{ href: '/admin/guides', label: 'Guides' }]`. Left out, the header lists none, as on the main website. |
 | `wide` | `true` for pages 72rem wide instead of 56rem, for an admin with tables. |
 | `signInText` | The line on the sign-in card. "Sign in to update the site." unless set. |
+| `updateLinks` | The app's own admin pages that belong next to updates, as `[{ href: '/admin/updates/publish', label: 'Publish a release' }]`. Shown as a row of links under the Updates heading, also while updates are off. At most 5; each `href` an address in the admin (`/admin` or a path under it, no query), each `label` plain text of 40 characters at most, no angle brackets or control characters, and no address twice. While no release is published, the page says "Publish one from" the first link "or on GitHub" instead of pointing to GitHub alone. A setting that breaks these rules stops `platform.config.mjs` from loading, with the reason. |
 
 ## What it keeps to
 

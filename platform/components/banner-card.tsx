@@ -24,6 +24,8 @@ export type BannerCardProps = FeaturedProps & {
   headingId: string
   /** The heading's level: 3 where the cards sit under a section's own heading. */
   headingLevel?: 2 | 3
+  /** The language of `name`, when it differs from the page's, such as an English guide title on a Spanish page. */
+  titleLang?: string
   /** One line about it. Clamped to two lines. */
   line?: string
   /** The language of `line`, when it differs from the page's. */
@@ -32,6 +34,12 @@ export type BannerCardProps = FeaturedProps & {
   bannerSrc?: string
   /** The `sizes` hint for the banner image. */
   bannerSizes?: string
+  /**
+   * How the banner fills its 3:1 box. `cover` (the default) fills it and
+   * crops what spills over. `contain` shows the whole picture, centred, with
+   * the card's colour around it: for a 16:9 logo on a transparent background.
+   */
+  bannerFit?: 'cover' | 'contain'
   /** The round picture. Without one the initials of the name show on the brand colour. */
   pictureSrc?: string
   /** Between the line and the actions: a row of icon links. */
@@ -51,10 +59,12 @@ export function BannerCard({
   name,
   headingId,
   headingLevel = 2,
+  titleLang,
   line,
   lineLang,
   bannerSrc,
   bannerSizes = '(min-width: 64rem) 22rem, (min-width: 40rem) 50vw, 100vw',
+  bannerFit = 'cover',
   pictureSrc,
   featured,
   featuredLabel,
@@ -76,7 +86,14 @@ export function BannerCard({
       {/* overflow-hidden holds the box at 3:1 when a banner is a little taller than that. */}
       <div className="relative aspect-[3/1] overflow-hidden bg-card">
         {bannerSrc ? (
-          <Image src={bannerSrc} alt="" width={1500} height={500} sizes={bannerSizes} className="size-full object-cover" />
+          <Image
+            src={bannerSrc}
+            alt=""
+            width={1500}
+            height={500}
+            sizes={bannerSizes}
+            className={cn('size-full', bannerFit === 'contain' ? 'object-contain' : 'object-cover')}
+          />
         ) : (
           <div
             aria-hidden="true"
@@ -108,7 +125,7 @@ export function BannerCard({
             <span className="text-[length:1.5em] leading-none">{initialsOf(name)}</span>
           </span>
         )}
-        <Heading id={headingId} className="mt-3 text-lg font-semibold tracking-tight text-foreground">
+        <Heading id={headingId} lang={titleLang} className="mt-3 text-lg font-semibold tracking-tight text-foreground">
           {name}
         </Heading>
         {line && (

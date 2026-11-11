@@ -56,6 +56,13 @@ export type Admin = AdminCore & {
   ): Promise<{ user: SignedIn; settings: AdminSettings; body: Record<string, unknown> } | { response: Response }>
   /** The header and main area, for a layout around signed-in pages. It checks who is signed in first. */
   SignedInLayout(props: { children: React.ReactNode }): Promise<React.JSX.Element>
+  /**
+   * The tab title for one of the app's own admin pages, as the kit's pages
+   * title theirs: `export const generateMetadata = admin.titled('Guides')`.
+   * While the admin is off it is a 404, so a page never gives away what it
+   * would have been called.
+   */
+  titled(title: string): () => Promise<Metadata>
   /** The Updates page, and its tab title. */
   Updates(): Promise<React.JSX.Element>
   updatesMetadata(): Promise<Metadata>
@@ -92,6 +99,7 @@ export function createAdmin({ config, auth }: { config: PlatformConfig; auth: Ad
     ...core,
     routes: adminRoutes(core),
     signedInPage,
+    titled: (title) => titled(title, isOn),
 
     async signedInRoute(request) {
       const settings = await core.settings()
@@ -124,7 +132,7 @@ export function createAdmin({ config, auth }: { config: PlatformConfig; auth: Ad
 
     async Updates() {
       const { user, settings } = await signedInPage()
-      return <Updates github={settings.github} updatesOff={settings.updatesOff} mayUpdate={user.mayUpdate} />
+      return <Updates github={settings.github} updatesOff={settings.updatesOff} mayUpdate={user.mayUpdate} links={app.updateLinks} />
     },
     updatesMetadata: titled('Updates', isOn),
 
