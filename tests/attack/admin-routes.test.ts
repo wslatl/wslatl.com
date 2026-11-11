@@ -173,6 +173,17 @@ const write = (file: string, text: string) => {
 }
 const state = (current: object | null) => writeFileSync(join(admin.updaterDir, 'state.json'), JSON.stringify({ status: 'idle', current, log: [] }))
 
+/** A press of "Copy the new updater" that the check of the release's name must refuse, copying nothing. */
+async function refusedByName(what: string) {
+  // As after a restart, so the hour's limit on copies (below) stays out of it.
+  restart()
+  const response = await post(paths.adoptUpdater, {}, { cookie })
+  expect(response.status, what).toBe(409)
+  // The name's own check answers, not a later one a bad name could also trip.
+  expect(await response.json(), what).toEqual({ error: 'No release is installed, so there is no new updater to copy.' })
+  expect(readFileSync(uploaded('serve.mjs'), 'utf8'), what).toBe('old serve')
+}
+
 describe('copying the updater over', () => {
   beforeEach(() => {
     // A release the updater installed: built, with its own updater.
@@ -190,15 +201,6 @@ describe('copying the updater over', () => {
     write(join(admin.siteDir, 'evil', '.next', 'BUILD_ID'), 'build')
     write(join(admin.siteDir, 'evil', 'scripts', 'serve.mjs'), 'evil serve')
     write(join(admin.siteDir, 'evil', 'scripts', 'updater', 'lib.mjs'), 'evil lib')
-    const refused = async (what: string) => {
-      // As after a restart, so the hour's limit on copies (below) stays out of it.
-      restart()
-      const response = await post(paths.adoptUpdater, {}, { cookie })
-      expect(response.status, what).toBe(409)
-      // The name's own check answers, not a later one a bad name could also trip.
-      expect(await response.json(), what).toEqual({ error: 'No release is installed, so there is no new updater to copy.' })
-      expect(readFileSync(uploaded('serve.mjs'), 'utf8'), what).toBe('old serve')
-    }
     for (const tag of [
       '../../evil',
       '../../../../../../evil',
@@ -220,12 +222,14 @@ describe('copying the updater over', () => {
       'v１.２.０',
     ]) {
       state({ tag, sha: 'a'.repeat(40) })
-      await refused(JSON.stringify(tag))
+      await refusedByName(JSON.stringify(tag))
     }
     for (const current of [null, 42, 'v1.2.0', { tag: 7 }, { tag: ['v1.2.0'] }, { tag: { toString: 'v1.2.0' } }]) {
       state(current as object)
-      await refused(JSON.stringify(current))
+      await refusedByName(JSON.stringify(current))
     }
+    // Nothing of the folder a bad name pointed at ever reached the uploaded one.
+    expect(readFileSync(uploaded('updater/lib.mjs'), 'utf8')).toBe('old lib')
   })
 
   it('copies at most ten times an hour, whoever asks', async () => {
