@@ -1,6 +1,6 @@
 {
-  "version": "v0.1.4",
-  "commit": "0fe90427d0f1caaa90852fb5c31a3aa9d89e82ac",
+  "version": "v0.1.5",
+  "commit": "4422a721dbaf5ad5439b68c7f9094a763f4f93b3",
   "files": {
     "platform/README.md": {
       "sha256": "4caf776ad2696ec676d21d04390033eafbd4c037e21b943aa22221a8c1c02af0"
@@ -117,7 +117,7 @@
       "sha256": "f4623e8bb537f15eec5ac48d4b65663de7c463a6243279b29fbfb4e5618a694e"
     },
     "platform/admin/server/core.ts": {
-      "sha256": "fef4ee20c2fbbe91603a155fc4c30eb9030eb1b1b3d6197354d3822f7d08900a"
+      "sha256": "ea3d3bc2946564b10ce86b8992c0d42c539d689beafb99a5c5196d2e51894444"
     },
     "platform/admin/server/device.ts": {
       "sha256": "c10b74572db8af3f04faf6992516325f49c1e0ad670bf1cd3287930c05581447"

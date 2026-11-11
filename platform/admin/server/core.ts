@@ -128,7 +128,12 @@ export function adminCore(config: PlatformConfig, auth: AdminAuth | null): Admin
       }
       report(id, null)
       const { github, problems: updatesOff } = githubSettings(process.env, app.repo)
-      report(`${id} updates`, updatesOff.length > 0 ? `updates are off, and the rest of the admin works. ${updatesOff.join(' ')}` : null)
+      // A trial start (PLATFORM_TRIAL=1) gets no GITHUB_TOKEN, on purpose
+      // (scripts/serve.mjs), so updates are always off there. Saying so would
+      // put a false alarm in every update's log; the live server reports its
+      // own settings as it starts.
+      const trial = process.env.PLATFORM_TRIAL === '1'
+      report(`${id} updates`, updatesOff.length > 0 && !trial ? `updates are off, and the rest of the admin works. ${updatesOff.join(' ')}` : null)
       return { github, updatesOff: Object.freeze([...updatesOff]) }
     },
     async user(headers) {
