@@ -14,7 +14,10 @@ import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
  *
  * The id is 16 bytes: the time it was made, in seconds, as a 4-byte
  * big-endian number, then 12 random bytes. The time is what lets the server
- * refuse a cookie older than 180 days, whatever the browser kept.
+ * refuse a cookie older than 180 days, whatever the browser kept. All of it,
+ * the name, the shape, the id, the key and what is signed, is the shared
+ * kit's own device cookie (kit/admin/server/device.ts), so a browser known
+ * here stays known once the site moves onto the kit.
  *
  * Its key is derived from ADMIN_SESSION_SECRET, apart from the session's own
  * key, and from the password hash too: changing the password ends every
@@ -57,8 +60,10 @@ export function readDevice(value: string | undefined, keys: Keys, now = Date.now
   if (given.toString('base64url') !== signature || bytes.toString('base64url') !== id) return null
   const expected = sign(id, keys)
   if (given.length !== expected.length || !timingSafeEqual(given, expected)) return null
-  const age = now / 1000 - bytes.readUInt32BE(0)
-  return age >= -60 && age < DEVICE_SECONDS ? id : null
+  // The same test as the kit's: a minute of leeway for clocks, and never longer than one lifetime.
+  const made = bytes.readUInt32BE(0)
+  const seconds = now / 1000
+  return made <= seconds + 60 && seconds < made + DEVICE_SECONDS ? id : null
 }
 
 export function deviceCookie(value: string) {

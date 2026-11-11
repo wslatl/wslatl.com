@@ -1,3 +1,4 @@
+import { createHmac, randomBytes } from 'node:crypto'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { type Admin, adminHash, cookieFrom, cookieNames, deviceFrom, get, makeAdmin, paths, post, setCookieFor, setUp, signInFully, tearDown } from './site'
 
@@ -244,6 +245,26 @@ describe('a browser that signed in before (its device cookie)', () => {
       vi.useRealTimers()
     }
   }, 180_000)
+
+  it('is made to the rule the shared kit uses, so a browser known to one is known to the other', async () => {
+    // The rule, written out: an id of 16 bytes (the time made in seconds, 4
+    // bytes big-endian, then 12 random bytes), and HMAC-SHA256 of
+    // "device.<id>" under HMAC-SHA256(secret, "admin device\n" + hash).
+    const id = Buffer.alloc(16)
+    id.writeUInt32BE(Math.floor(Date.now() / 1000), 0)
+    randomBytes(12).copy(id, 4)
+    const text = id.toString('base64url')
+    const key = createHmac('sha256', admin.secret).update(`admin device\n${admin.passwordHash}`).digest()
+    const madeByTheRule = `${cookieNames.device}=${text}.${createHmac('sha256', key).update(`device.${text}`).digest('base64url')}`
+    await flood()
+    expect((await attempt(admin.password, { ...from('203.0.113.56'), cookie: madeByTheRule })).status).toBe(200)
+    // And the cookie the site sets keeps to the same rule.
+    const set = deviceFrom(await attempt(admin.password, { cookie: madeByTheRule })).slice(cookieNames.device.length + 1)
+    expect(set).toMatch(/^[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}$/)
+    const [setId, setSignature] = set.split('.')
+    expect(createHmac('sha256', key).update(`device.${setId}`).digest('base64url')).toBe(setSignature)
+    expect(Math.abs(Buffer.from(setId, 'base64url').readUInt32BE(0) - Date.now() / 1000)).toBeLessThan(60)
+  }, 120_000)
 
   it('opens nothing by itself', async () => {
     const { device } = await signInFully(admin)
