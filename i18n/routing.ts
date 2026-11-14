@@ -21,12 +21,15 @@ export const rootFiles: readonly string[] = [
   '/icon-maskable-512.png',
   '/logo.png',
   '/og-image.png',
-  // Generated from app/: robots.ts, sitemap.ts, manifest.ts and the
-  // company.json route (the company profile for the billing panel).
+  // Generated from app/: robots.ts, sitemap.ts, manifest.ts, the
+  // company.json route (the company profile for the billing panel) and the
+  // live-status.json route (each location's state, for the home page's live
+  // panel).
   '/robots.txt',
   '/sitemap.xml',
   '/manifest.webmanifest',
   '/company.json',
+  '/live-status.json',
   // The share card of every page, in every language, drawn by app/og/route.tsx
   // from its query string. Given a language prefix, it would be looked up as a
   // page called "og" and answer 404 instead of an image.

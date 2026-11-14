@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import shortLinks from '../../config/links.json' with { type: 'json' }
 import { cookieProblems, headerProblems } from '../../scripts/check-security.mjs'
+import { readLiveStatus } from '../../lib/live-status/snapshot'
 import { fakeGitHub, type FakeGitHub } from '../attack/fake-github'
 import { raw, type Site, startSite } from './server'
 
@@ -148,6 +149,19 @@ describe('the security headers', () => {
       expect(response.headers.get('x-robots-tag'), path).toMatch(/noindex/)
     }
   })
+})
+
+describe('the live status, through the real server', () => {
+  // Its own test, with room for the route's one call to the status page
+  // (3 seconds at most), which this server makes for real when it can.
+  it('answers each location\'s state, or unknown, with every header, whether or not the status page can be reached from here', async () => {
+    const response = await ask('/live-status.json?url=https://evil.example/')
+    expect(response.status).toBe(200)
+    expect(headerProblems(response.headers, {})).toEqual([])
+    expect(response.headers.get('content-type')).toBe('application/json; charset=utf-8')
+    expect(response.headers.get('cache-control')).toMatch(/^(public, max-age=30|no-store)$/)
+    expect(readLiveStatus(await response.json())).not.toBeNull()
+  }, 20_000)
 })
 
 describe('the session, through the real server', () => {

@@ -10,6 +10,7 @@ import * as login from '@/app/admin/api/login/route'
 import * as logout from '@/app/admin/api/logout/route'
 import * as update from '@/app/admin/api/update/route'
 import * as companyProfile from '@/app/company.json/route'
+import * as liveStatus from '@/app/live-status.json/route'
 import * as shareCard from '@/app/og/route'
 import { proxy } from '@/proxy'
 
@@ -39,6 +40,7 @@ export const paths = {
   adoptUpdater: '/admin/api/adopt-updater',
   shareCard: '/og',
   companyProfile: '/company.json',
+  liveStatus: '/live-status.json',
 } as const
 
 type Handler = (request: NextRequest) => Response | Promise<Response>
@@ -50,6 +52,7 @@ const routes: Record<string, object> = {
   [paths.adoptUpdater]: adoptUpdater,
   [paths.shareCard]: shareCard,
   [paths.companyProfile]: companyProfile,
+  [paths.liveStatus]: liveStatus,
 }
 
 /** Every admin route, with the methods it answers. */
