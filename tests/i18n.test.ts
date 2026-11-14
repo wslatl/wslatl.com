@@ -110,6 +110,18 @@ describe('site copy', () => {
     }
   })
 
+  it('keeps the live panel\'s placeholders, each once, in every language', () => {
+    // {price} is filled in on the server, {time} in the browser, and the
+    // hardware line takes the tier, the CPU and the storage.
+    for (const locale of locales) {
+      const live = copyFor(locale).home.hero.live
+      expect(tokens(live.fromPrice), locale).toEqual(['price'])
+      expect(tokens(live.checkedAt), locale).toEqual(['time'])
+      expect(tokens(live.hardware), locale).toEqual(['cpu', 'storage', 'tier'])
+      expect(tokens(live.unavailable), locale).toEqual([])
+    }
+  })
+
   it('keeps every mark where the brand kit page puts a line of English, in every language', () => {
     // {0} is the "Private Hosting" in the logo; the voice rules quote more
     // (tests/brand.test.ts checks those). A translation that drops one would

@@ -82,16 +82,35 @@ export const en = {
       emphasis: 'actually',
       lineTwo: 'gives a damn.',
       intro:
-        'We have worked inside hosting companies. We know what goes wrong. WSLATL exists to fix that: VPS hosting with every price published, Minecraft and game server hosting, and dedicated servers, backed by a team that actually picks up.',
+        'Game servers, VPS and dedicated servers, run by a small team in Missouri, with a real person to talk to when something breaks.',
       seePlans: 'See plans and pricing',
-      products: 'Products',
-      entries: {
-        vps: 'VPS hosting',
+      // The live panel beside the slogan (components/sections/live-panel.tsx).
+      // {price} is filled in on the server and {time} in the browser, which
+      // can only be handed plain values, so these are templates.
+      live: {
+        heading: 'Our locations',
+        cities: {
+          'los-angeles': 'Los Angeles',
+          'new-york': 'New York City',
+        },
+        tiers: {
+          premium: 'Premium',
+          budget: 'Budget',
+        },
+        hardware: '{tier} plans, {cpu} with {storage}',
+        vps: 'VPS',
         game: 'Game servers',
-        other: 'Dedicated and web hosting',
+        fromPrice: 'from {price}/mo',
+        states: {
+          up: 'Operational',
+          partial: 'Partial outage',
+          down: 'Down',
+          maintenance: 'Maintenance',
+          unknown: 'No data',
+        },
+        checkedAt: 'Checked at {time}',
+        unavailable: 'Live status is not available right now.',
       },
-      from: (price: string) => `from ${price}/mo`,
-      quoted: 'Quoted for your build',
     },
     clients: {
       heading: 'Trusted by our clients and partners',

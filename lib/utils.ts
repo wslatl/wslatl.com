@@ -1,6 +1,11 @@
 // Class names, merged the way the kit's components merge theirs.
 export { cn } from '@/platform/lib/cn'
 
+/** Puts values into a template from i18n/copy: fill('Checked at {time}', { time: '4:03 PM' }). */
+export function fill(template: string, values: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (whole, key: string) => (Object.hasOwn(values, key) ? String(values[key]) : whole))
+}
+
 /**
  * Letters that are their own character rather than a letter plus an accent,
  * so NFKD leaves them whole and they would otherwise become a hyphen:

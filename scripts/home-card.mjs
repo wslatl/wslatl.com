@@ -15,7 +15,7 @@ import sharp from 'sharp'
 const root = join(import.meta.dirname, '..')
 const asset = (/** @type {string[]} */ ...parts) => readFileSync(join(root, 'platform', 'assets', ...parts))
 
-// The site's .gradient-text (app/globals.css), oklch(0.78 0.16 235) to
+// The picture's accent on "actually", oklch(0.78 0.16 235) to
 // oklch(0.6 0.22 268), in sRGB: the renderer reads no oklch().
 const accentFrom = '#1fc6ff'
 const accentTo = '#496fff'
@@ -54,11 +54,10 @@ const card = h(
             fontWeight: 400,
             fontSize: 108,
             letterSpacing: 0,
-            // As .gradient-text does on the site: the gradient paints only
-            // inside the word's box, and the italic letters lean past it (the
-            // tail of the y hung below it and was cut off). The padding widens
-            // the painted area, and the negative margins keep the layout where
-            // it was, 24px from the next word.
+            // The gradient paints only inside the word's box, and the italic
+            // letters lean past it (the tail of the y hung below it and was
+            // cut off). The padding widens the painted area, and the negative
+            // margins keep the layout where it was, 24px from the next word.
             padding: '0 22px 36px 22px',
             margin: '0 2px -36px -22px',
             backgroundImage: `linear-gradient(135deg, ${accentFrom}, ${accentTo})`,

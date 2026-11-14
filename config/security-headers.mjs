@@ -9,7 +9,9 @@
 //     Next writes each page's data into it as inline scripts. A nonce has to
 //     be new for every request, which a page built once cannot be, so the
 //     public policy allows inline scripts. No public page shows anything a
-//     visitor sent, or anything from outside this repository.
+//     visitor sent, or any text from outside this repository: the home
+//     page's live panel takes only a state from a fixed list and a time from
+//     this site's own /live-status.json, and shows its own words for them.
 //   - The admin's pages are rendered for each request, hold the session, and
 //     show text from GitHub (the release notes). Each one gets a fresh nonce
 //     (the kit's secureRequest, in proxy.ts), and only the scripts that carry

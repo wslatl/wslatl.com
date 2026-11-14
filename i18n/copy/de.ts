@@ -73,16 +73,32 @@ export const de: Copy = {
       emphasis: 'actually',
       lineTwo: 'gives a damn.',
       intro:
-        'Wir haben in Hosting-Unternehmen gearbeitet. Wir wissen, was dort schiefläuft. WSLATL gibt es, um genau das zu beheben: VPS-Hosting mit offen veröffentlichten Preisen, Minecraft- und Gameserver-Hosting und Dedicated Server, dahinter ein Team, das sich wirklich meldet.',
+        'Gameserver, VPS und Dedicated Server von einem kleinen Team in Missouri, mit einem echten Menschen als Ansprechpartner, wenn etwas schiefgeht.',
       seePlans: 'Tarife und Preise ansehen',
-      products: 'Produkte',
-      entries: {
-        vps: 'VPS-Hosting',
+      live: {
+        heading: 'Unsere Standorte',
+        cities: {
+          'los-angeles': 'Los Angeles',
+          'new-york': 'New York City',
+        },
+        tiers: {
+          premium: 'Premium',
+          budget: 'Budget',
+        },
+        hardware: '{tier}-Tarife, {cpu} mit {storage}',
+        vps: 'VPS',
         game: 'Gameserver',
-        other: 'Dedicated Server und Webhosting',
+        fromPrice: 'ab {price}/Monat',
+        states: {
+          up: 'Betriebsbereit',
+          partial: 'Teilausfall',
+          down: 'Ausgefallen',
+          maintenance: 'Wartung',
+          unknown: 'Keine Daten',
+        },
+        checkedAt: 'Geprüft um {time} Uhr',
+        unavailable: 'Der Live-Status ist gerade nicht verfügbar.',
       },
-      from: (price: string) => `ab ${price}/Monat`,
-      quoted: 'Angebot für dein Setup',
     },
     clients: {
       heading: 'Unsere Kunden und Partner vertrauen uns',

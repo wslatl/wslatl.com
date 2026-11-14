@@ -26,6 +26,7 @@ app/
   sitemap.ts, robots.ts    Every page in every language, from the same data the pages use.
   manifest.ts              /manifest.webmanifest: the name and icons for a home-screen shortcut.
   company.json/route.ts    /company.json: the company profile for the billing panel, written at build time.
+  live-status.json/route.ts  /live-status.json: each location's state on status.wslatl.com, for the home page's live panel (see Live status on the home page).
   og/route.tsx             /og: the share card of every page but the home page, drawn on request by the kit (see Images).
   admin/                   The admin, the kit's: one-line files that hand each page and route to platform/admin/ (see Admin and updates).
   [locale]/                Every page, once, for all five languages (see Languages).
@@ -91,6 +92,7 @@ Some facts appear on many pages. Each one is defined exactly once, and everythin
 | Fact | Defined in | Used by |
 | --- | --- | --- |
 | Plan names, specs, prices | `data/pricing.ts` | Pricing page, home page, game pages, FAQ answer, meta descriptions |
+| Locations: the CPU there, and the group that lists their servers on the status page | `data/locations.ts` (the tests check it against the plan groups in `data/pricing.ts`) | The home page's live panel |
 | Price comparisons with competitors | `data/pricing.ts` (`comparisons`, dated when checked, and the competitor prices and disk sizes behind them in `comparedPrices`, which the tests check every claim against) | Pricing page plan groups, the Minecraft and FiveM pages |
 | Uptime targets | `data/sla.ts` | Terms of Service, SLA, Refund Policy, home page commitments, pricing page |
 | Legal document titles and dates | `data/legal.ts` and `config/site.ts` | Legal pages, `/legal`, footer, sitemap |
@@ -103,6 +105,17 @@ Some facts appear on many pages. Each one is defined exactly once, and everythin
 | Company profile (owners, story, links, questions) | `lib/company-profile.ts`, built from the files above | `/company.json`, read by the billing panel. Its shape is versioned, so change it with care |
 
 Never type a price, a plan spec, or an uptime figure anywhere else. Format prices with `formatPrice()` from `lib/pricing.ts`.
+
+---
+
+## Live status on the home page
+
+The panel beside the slogan shows each location in `data/locations.ts`, the hardware there, what its VPS and game server plans start at (from `data/pricing.ts`), and its state on status.wslatl.com right now.
+
+- The home page stays prerendered. Once it is up, the browser asks `/live-status.json`, this site's own route, so the Content Security Policy still lets the browser talk to nothing but this site. The route asks the status page's two public JSON answers (Uptime Kuma's `/api/status-page/wslatl` and `/api/status-page/heartbeat/wslatl`) at most once a minute, gives up after 3 seconds or 512 KB, refuses any redirect, and reads nothing from the request (`lib/live-status/source.ts`).
+- A location's state follows the status page's own rule for the servers in its group: Operational when every one answered its last check, Partial outage when some did not, Down when none did, Maintenance in a maintenance window (`lib/live-status/kuma.ts`).
+- Missing or late data is never shown as a state. A check older than five minutes counts as none. Without states, the panel keeps its locations and prices, says live status is not available right now, and links to the status page. The room every state can take is kept from the start, so nothing moves when they arrive.
+- Each location is found on the status page by its group's name, `statusGroup` in `data/locations.ts`. Rename a group there and rename it here too, or that location shows no state. The server's log says once when the status page cannot be used, and again when it can.
 
 ---
 
