@@ -90,7 +90,7 @@ export const fr: ContentTranslation = {
     'changes-later': {
       question: "Puis-je monter, descendre ou changer d'offre plus tard ?",
       answer:
-        "Oui. Sur un serveur de jeu ou un VPS, le titulaire du compte peut changer d'offre ou de cycle de facturation depuis la page du service dans le portail de facturation, soit immédiatement avec un calcul au prorata, soit au prochain renouvellement. Pour plus de RAM, de vCores ou de disque, il peut utiliser « Request an upgrade » sur la même page : cela ouvre un ticket, et rien n'est facturé tant que notre équipe n'a pas validé la demande. Les serveurs dédiés, l'hébergement web et les migrations sont gérés par notre équipe : ouvrez un ticket ou écrivez-nous sur Discord.",
+        "Oui. Sur un serveur de jeu, un VPS ou une offre d'hébergement web, le titulaire du compte peut changer d'offre ou de cycle de facturation depuis la page du service dans le portail de facturation, soit immédiatement avec un calcul au prorata, soit au prochain renouvellement. Pour plus de RAM, de vCores ou de disque sur un serveur de jeu ou un VPS, il peut utiliser « Request an upgrade » sur la même page : cela ouvre un ticket, et rien n'est facturé tant que notre équipe n'a pas validé la demande. Les serveurs dédiés et les migrations sont gérés par notre équipe : ouvrez un ticket ou écrivez-nous sur Discord.",
     },
     'vps-vs-shared': {
       question: "L'hébergement VPS est-il meilleur que l'hébergement mutualisé ?",

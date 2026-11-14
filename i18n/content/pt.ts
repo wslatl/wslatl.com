@@ -100,7 +100,7 @@ export const pt: ContentTranslation = {
     'changes-later': {
       question: 'Dá para fazer upgrade, downgrade ou mudar as coisas depois?',
       answer:
-        'Sim. Em um servidor de jogos ou VPS, o titular da conta pode trocar de plano ou de ciclo de faturamento na página do serviço no portal de faturamento, na hora com cobrança proporcional ou na próxima renovação. Para mais RAM, vCores ou disco, dá para usar “Request an upgrade” na mesma página, que abre um ticket e não cobra nada até a nossa equipe aprovar. Servidores dedicados, hospedagem de sites e migrações ficam com a nossa equipe: abra um ticket ou fale com a gente no Discord.',
+        'Sim. Em um servidor de jogos, VPS ou plano de hospedagem de sites, o titular da conta pode trocar de plano ou de ciclo de faturamento na página do serviço no portal de faturamento, na hora com cobrança proporcional ou na próxima renovação. Para mais RAM, vCores ou disco em um servidor de jogos ou VPS, dá para usar “Request an upgrade” na mesma página, que abre um ticket e não cobra nada até a nossa equipe aprovar. Servidores dedicados e migrações ficam com a nossa equipe: abra um ticket ou fale com a gente no Discord.',
     },
     'vps-vs-shared': {
       question: 'Hospedagem VPS é melhor que hospedagem compartilhada?',
