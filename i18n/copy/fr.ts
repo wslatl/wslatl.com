@@ -49,6 +49,7 @@ export const fr: Copy = {
       guides: "Guides d'installation",
       dedicated: "Serveurs dédiés",
       web: "Hébergement web",
+      hardware: "Matériel et emplacements",
       about: "À propos de nous",
       partners: 'Partenaires',
       brandKit: "Kit de marque",
@@ -235,6 +236,8 @@ export const fr: Copy = {
       "Chaque offre est facturée au mois, en dollars américains. Pas de piège au renouvellement : ce sont les tarifs mensuels habituels, et toute augmentation est annoncée par écrit au moins 30 jours à l'avance.",
     orderingPrefix: "Une commande commence par une courte demande, et la plupart sont acceptées le jour même.",
     orderingLink: "Comment se passe une commande",
+    hardwarePrefix: "Où tourne chaque offre, et sur quel matériel :",
+    hardwareLink: "matériel et emplacements",
     lines: {
       vps: "Hébergement VPS",
       game: "Hébergement de serveurs de jeu",
@@ -265,6 +268,34 @@ export const fr: Copy = {
       body:
         "Ces services sont chiffrés au cas par cas plutôt que vendus sur catalogue, parce que le matériel ou la configuration qui conviennent dépendent de ce que vous faites tourner. Dites-nous ce qu'il vous faut et nous revenons vers vous avec un prix. Déjà client ? Dans le portail de facturation, ouvrez « Browse plans », choisissez un serveur dans l'onglet « Dedicated servers » et appuyez sur « Request this server ». La mise en place d'un serveur dédié prend plus de temps que celle d'un serveur de jeu ou d'un VPS, en général quelques jours ouvrés.",
       cta: "Demander un devis",
+    },
+  },
+  hardware: {
+    metaTitle: "Matériel et emplacements",
+    metaDescription:
+      "Où tournent les serveurs WSLATL et sur quoi : chaque emplacement avec son CPU, sa mémoire et ses disques, matériel loué ou à nous, son état en direct et ses prix de départ.",
+    heading: "Matériel et emplacements",
+    intro:
+      "Où tournent nos serveurs, sur quel matériel, et à partir de quel prix pour chaque emplacement. Chacun indique si le matériel est à nous ou loué.",
+    ownership: {
+      rented: "Loué",
+      owned: "En propre",
+    },
+    specs: {
+      cpu: "CPU",
+      memory: "Mémoire",
+      storage: "Stockage",
+    },
+    storageRaid: "{storage} en {raid}",
+    ddos: "Protection DDoS intégrée",
+    filters: {
+      label: "Filtrer les emplacements",
+      product: "Produit",
+      tier: "Gamme",
+      all: "Tous",
+      showing: "{shown} emplacements sur {total}",
+      none: "Aucun emplacement ne correspond à ces filtres.",
+      reset: "Voir tous les emplacements",
     },
   },
   games: {

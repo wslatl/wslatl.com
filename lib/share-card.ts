@@ -5,6 +5,7 @@ import {
   brandText,
   gameText,
   gamesText,
+  hardwareText,
   homeText,
   legalIndexText,
   legalText,
@@ -47,6 +48,8 @@ export function shareCardText(path: string, locale: Locale): ShareCardText | und
       return partnersText(locale)
     case '/brand':
       return brandText(locale)
+    case '/hardware-and-locations':
+      return hardwareText(locale)
   }
 
   const game = localizedGames(locale).find((entry) => `/games/${entry.slug}` === path)

@@ -49,6 +49,7 @@ export const pt: Copy = {
       guides: 'Guias de configuração',
       dedicated: 'Servidores dedicados',
       web: 'Hospedagem de sites',
+      hardware: 'Hardware e localizações',
       about: 'Sobre nós',
       partners: 'Parceiros',
       brandKit: 'Kit de marca',
@@ -235,6 +236,8 @@ export const pt: Copy = {
       'Todo plano é cobrado por mês em dólares americanos. Sem armadilha no preço de renovação: estes são os preços mensais normais, e qualquer aumento vem com pelo menos 30 dias de aviso por escrito.',
     orderingPrefix: 'O pedido começa com uma inscrição curta, e a maioria é aprovada no mesmo dia.',
     orderingLink: 'Como funciona o pedido',
+    hardwarePrefix: 'Onde cada plano roda, e em qual hardware:',
+    hardwareLink: 'hardware e localizações',
     lines: {
       vps: 'Hospedagem VPS',
       game: 'Hospedagem de servidores de jogos',
@@ -265,6 +268,34 @@ export const pt: Copy = {
       body:
         'Estes são orçados por projeto em vez de vendidos numa tabela de preços, porque o hardware ou a configuração certa depende do que você vai rodar. Conte o que você precisa e voltamos com um preço. Já é cliente? No portal de faturamento, abra “Browse plans”, escolha um servidor na aba “Dedicated servers” e clique em “Request this server”. Servidores dedicados levam mais tempo para ficar prontos do que servidores de jogos e VPS, normalmente alguns dias úteis.',
       cta: 'Pedir um orçamento',
+    },
+  },
+  hardware: {
+    metaTitle: 'Hardware e localizações',
+    metaDescription:
+      'Onde os servidores da WSLATL rodam e em qual hardware: cada localização com CPU, memória e discos, se o hardware é alugado ou próprio, o status ao vivo e o preço inicial.',
+    heading: 'Hardware e localizações',
+    intro:
+      'Onde nossos servidores rodam, em qual hardware e a partir de quanto cada localização começa. Cada uma diz se o hardware é nosso ou alugado.',
+    ownership: {
+      rented: 'Alugado',
+      owned: 'Próprio',
+    },
+    specs: {
+      cpu: 'CPU',
+      memory: 'Memória',
+      storage: 'Armazenamento',
+    },
+    storageRaid: '{storage} em {raid}',
+    ddos: 'Proteção DDoS já embutida',
+    filters: {
+      label: 'Filtrar as localizações',
+      product: 'Produto',
+      tier: 'Linha',
+      all: 'Todas',
+      showing: '{shown} de {total} localizações',
+      none: 'Nenhuma localização corresponde a esses filtros.',
+      reset: 'Ver todas as localizações',
     },
   },
   games: {

@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { locations } from '@/data/locations'
+import { flagCountries } from '@/components/locations/flag'
+import { locations, regionCodes } from '@/data/locations'
 import { productLines } from '@/data/pricing'
 import { locales } from '@/i18n/config'
 import { copyFor } from '@/i18n/copy'
 import { tierStorageTypes } from '@/lib/pricing'
 import { kumaPage } from './fixtures/kuma'
+import { eightLocations } from './fixtures/locations'
 
 /**
  * data/locations.ts holds the little about each location that
@@ -31,10 +33,30 @@ describe('the locations', () => {
       const sold = groups.filter((group) => group.tier === location.tier)
       expect(sold.length, location.id).toBeGreaterThan(0)
       for (const group of sold) {
-        expect(group.description, group.id).toContain(location.cpu)
+        expect(group.description, group.id).toContain(location.hardware.cpu)
         expect(group.description, group.id).toContain(`in ${city}`)
       }
     }
+  })
+
+  it('state no hardware the site does not already state: memory and RAID are in every plan group of their tier', () => {
+    for (const location of locations) {
+      for (const group of groups.filter((g) => g.tier === location.tier)) {
+        if (location.hardware.memory) expect(group.description, `${location.id} ${group.id}`).toContain(`${location.hardware.memory} memory`)
+        if (location.hardware.raid) expect(group.description, `${location.id} ${group.id}`).toContain(`in ${location.hardware.raid}`)
+      }
+    }
+  })
+
+  it('say whose hardware it is, where in the world, and in which country, with a flag to draw', () => {
+    for (const location of locations) {
+      expect(['rented', 'owned'], location.id).toContain(location.ownership)
+      expect(Object.keys(regionCodes), location.id).toContain(location.region)
+      expect(location.country, location.id).toMatch(/^[A-Z]{2}$/)
+      expect(flagCountries, location.id).toContain(location.country)
+    }
+    // The fixture's countries too, so the screenshots of it are true to the page.
+    for (const location of eightLocations) expect(flagCountries, location.id).toContain(location.country)
   })
 
   it('have one kind of storage each, which the panel names beside the CPU', () => {

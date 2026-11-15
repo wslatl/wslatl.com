@@ -90,10 +90,10 @@ describe('the live panel before the states arrive, as the page is prerendered', 
       expect(html).toContain(`>${t.heading}</h2>`)
       // Today's two are both shown in full: nothing is counted or summed up.
       expect(html).not.toContain('data-live-summary')
-      expect(html).not.toContain(`href="${localePath(locale, '/pricing')}"`)
+      expect(html).not.toContain(`href="${localePath(locale, '/hardware-and-locations')}"`)
       for (const location of locations) {
         expect(html).toContain(`>${cityOf(locale, location.id)}</h3>`)
-        expect(html).toContain(location.cpu)
+        expect(html).toContain(location.hardware.cpu)
         for (const line of ['vps', 'game'] as const) {
           // From data/pricing.ts, never typed into the panel.
           expect(html).toContain(formatPrice(startingPrice(line, location.tier)))
@@ -197,14 +197,14 @@ describe('the live panel with many locations', () => {
   const allUp = states(() => 'up')
 
   for (const locale of locales) {
-    it(`shows the first ${shownInFull} in full, and counts the rest in one row that leads to every plan (${locale})`, () => {
+    it(`shows the first ${shownInFull} in full, and counts the rest in one row that leads to every location (${locale})`, () => {
       const t = copyFor(locale).home.hero.live
       const html = unescape(panel(locale, undefined, eightLocations))
       expect(html.match(/<h3\b/g)).toHaveLength(shownInFull)
       for (const location of eightLocations.slice(0, shownInFull)) expect(html).toContain(`>${cityOf(locale, location.id)}</h3>`)
       // The made-up six are counted, never named or drawn.
       for (const id of ids.slice(shownInFull)) expect(html).not.toContain(`data-live-status="${id}"`)
-      expect(html).toMatch(new RegExp(`<a [^>]*href="${literally(localePath(locale, '/pricing'))}"`))
+      expect(html).toMatch(new RegExp(`<a [^>]*href="${literally(localePath(locale, '/hardware-and-locations'))}"`))
       expect(html).toContain(`<span>${fill(pluralOf(t.more, 6, locale), { count: 6 })}</span>`)
     })
   }

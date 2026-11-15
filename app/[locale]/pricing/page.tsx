@@ -94,6 +94,15 @@ export default async function PricingPage({ params }: PageProps) {
                 {t.orderingLink}
               </a>
             </p>
+            <p className="mt-2 text-base">
+              {t.hardwarePrefix}{' '}
+              <Link
+                href={localePath(locale, '/hardware-and-locations')}
+                className="text-link underline underline-offset-4 hover:text-foreground"
+              >
+                {t.hardwareLink}
+              </Link>
+            </p>
           </PageHeader>
 
           <ul className="mb-14 grid gap-px overflow-hidden rounded-2xl border bg-border md:grid-cols-2">

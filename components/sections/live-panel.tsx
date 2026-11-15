@@ -24,8 +24,9 @@ export const shownInFull = 2
  *
  * It keeps one size however many locations there are. Up to two, each is
  * shown in full. From a third on, the first two are, then a "+N more
- * locations" row leads to /pricing, and a line beside the heading sums up
- * the state of every location, the ones not shown included.
+ * locations" row leads to /hardware-and-locations, where every one is, and a
+ * line beside the heading sums up the state of every location, the ones not
+ * shown included.
  *
  * `initial` is what the panel shows before the first answer: nothing, as the
  * prerendered page has it. `places` are the locations, data/locations.ts
@@ -55,7 +56,7 @@ export function LivePanel({ initial, places = locations }: { initial?: LiveState
           {counted > 0 && (
             <li>
               <Link
-                href={localePath(locale, '/pricing')}
+                href={localePath(locale, '/hardware-and-locations')}
                 className="group flex items-center justify-between gap-3 px-5 py-3.5 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
               >
                 <span>{fill(pluralOf(t.more, counted, locale), { count: counted })}</span>
@@ -103,7 +104,7 @@ function LocationRow({ location }: { location: Location }) {
         <LocationStatus location={location.id} labels={t.states} />
       </div>
       <p className="mt-1 text-sm text-pretty text-muted-foreground">
-        {fill(t.hardware, { tier: t.tiers[location.tier], cpu: location.cpu, storage })}
+        {fill(t.hardware, { tier: t.tiers[location.tier], cpu: location.hardware.cpu, storage })}
       </p>
       <ul className="mt-3 space-y-1">
         {lines.map((line) => (
