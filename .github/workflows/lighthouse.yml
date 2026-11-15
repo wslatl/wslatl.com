@@ -3,6 +3,8 @@ name: Lighthouse
 # Builds the site and audits key pages (settings in lighthouserc.json).
 # Accessibility, best practices, and SEO must stay at 100, and page weight
 # and layout shift have budgets. The full reports are kept as an artifact.
+# The Accessibility workflow runs all of axe's rules on every kind of page,
+# in all five languages.
 on:
   push:
     branches: [main]

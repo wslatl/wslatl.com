@@ -401,6 +401,7 @@ Then open [http://localhost:3000](http://localhost:3000). Pass a port with `npm 
 | `npm run check:site <url>` | Checks a running site: pages, headers, redirects, short links, certificate |
 | `npm run check:seo <url>` | Checks what search engines read from a running site: titles, descriptions, canonicals, hreflang, sitemap, robots.txt, share cards, headings, structured data |
 | `npm run check:security <url>` | Checks a running site's security from outside, passively: every header, cookie flags, HTTPS and TLS |
+| `npm run check:a11y <url>` | Runs axe in the Chrome installed on the machine on every kind of page of a running site, in all five languages: every WCAG 2.2 A and AA rule, and the best practices |
 | `npm run check` | Lint, test, build, scan, the attack tests against the build, typecheck, in the order CI runs them |
 
 Linting runs in two passes. [Oxlint](https://oxc.rs/docs/guide/usage/linter) goes first and does most of the work in well under a second (config in `.oxlintrc.json`: correctness rules fail the lint, suspicious patterns warn). ESLint then covers only what Oxlint cannot check yet, mainly the React Compiler hook rules and the rest of the Next.js set; `eslint-plugin-oxlint` switches off every ESLint rule Oxlint already runs, so nothing is reported twice. To silence a rule on one line, use an `oxlint-disable-next-line` comment with a reason.
@@ -424,6 +425,7 @@ The Node.js version lives in `.nvmrc`; every workflow reads it from there.
 | CodeQL | Push, pull request, weekly | Static analysis of the site code and these workflows. Findings appear under Security. |
 | Dependency review | Pull requests | Blocks a pull request that would add a vulnerable package. |
 | Lighthouse | Push and pull request | Accessibility, best practices, and SEO must stay at 100, with page weight and layout shift budgets (`lighthouserc.json`). Reports are kept as an artifact. |
+| Accessibility | Push and pull request | Builds the site and runs axe in Chrome (`scripts/check-a11y.mjs`) on one page of every kind in all five languages, the 404 page in each language and the admin's sign-in page, at a phone's width and a desktop's: every WCAG 2.2 A and AA rule axe has, and its best practices. Any violation fails it; the report is in the job summary. |
 | Broken links | Mondays | Opens every page in the live sitemap and follows every link (`lychee.toml`, which skips only Trustpilot and our `/trustpilot` short link, because Trustpilot refuses link checkers). Broken ones go in one issue. |
 | Site health | Every six hours | Checks production with `scripts/check-site.mjs`. A failure opens one issue that closes itself when the site recovers. Run it by hand against any URL to check a deploy. |
 | SEO | Pull requests, and Mondays | On a pull request, builds the site and runs `scripts/check-seo.mjs` over every page in its sitemap. On Mondays, runs it against production; a failure opens one issue that closes itself once fixed. The rules are in `scripts/lib/seo-rules.mjs`, with tests in `tests/seo-rules.test.ts`. |
