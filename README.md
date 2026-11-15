@@ -149,7 +149,7 @@ The site is published in English, Spanish, French, German and Portuguese. Englis
 
 Each language's messages are typed against English, so a missing key fails the build, and `npm run i18n:check` (in CI, from the kit) fails on a key a language is missing or English does not have, an argument or tag that differs from English, an empty message, a dash or a middle dot, and a legal document missing in a language. The tests fail if a language is mostly English, loses a `{placeholder}`, or is short an entry from `data/`.
 
-To add a language: add it to `locales` in `i18n/config.ts`, add `messages/<locale>.json` and `i18n/content/<locale>.ts`, add its entry to `i18n/error-copy.ts`, and translate the legal documents. Routing, the language picker, hreflang and the sitemap follow automatically.
+To add a language: the five are the kit's (`platform/i18n/config.ts`, which `i18n/config.ts` re-exports), so a sixth starts as a kit change. Then add `messages/<locale>.json` and `i18n/content/<locale>.ts`, add its entry to `i18n/error-copy.ts`, and translate the legal documents. Routing, the language picker, hreflang and the sitemap follow automatically.
 
 Prices, plan names, specs (vCPU, NVMe, GB), game titles, people's names and the slogan stay as they are in every language. A Server Component reads the language with `getLocale()` and its words with `words()` (`words('home.hero')('from', { price })`); a number goes in as text, as the page writes it. A Client Component is handed plain strings, since it cannot read it (see `components/layout/site-header.tsx`).
 
