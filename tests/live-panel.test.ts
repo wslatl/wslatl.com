@@ -181,8 +181,8 @@ describe('the first screen', () => {
       const h1s = [...html.matchAll(/<h1\b[^>]*>(.*?)<\/h1>/g)]
       expect(h1s, locale).toHaveLength(1)
       expect(h1s[0][0]).toContain('lang="en"')
-      const text = h1s[0][1].replace(/<br\/>/g, ' ').replace(/<[^>]+>/g, '').replaceAll('&nbsp;', '\u00a0')
-      expect(text, locale).toBe('Hosting that actually gives a\u00a0damn.')
+      // The words as written, with only the line break and the serif word between them.
+      expect(h1s[0][1], locale).toMatch(/^Hosting that<br\/><span class="[^"]*font-serif[^"]*">actually<\/span> gives a\u00a0damn\.$/)
     }
   })
 

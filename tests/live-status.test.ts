@@ -475,22 +475,27 @@ describe('reading the status page from the server', () => {
   it('never follows a redirect with the real fetch, even one to its own host', async () => {
     // A real server, reached through the real fetch with what the source
     // passes it: the redirect is refused, and its target is never asked.
-    let asked: string[] = []
+    // The first refusal ends the other request too, so that one may or may
+    // not have arrived by then; whatever did is one of the two addresses.
+    const asked: string[] = []
+    let port = 0
     const server: Server = createServer((request, response) => {
       asked.push(request.url ?? '')
-      response.writeHead(302, { Location: `http://127.0.0.1:${(server.address() as AddressInfo).port}/elsewhere` }).end()
+      response.writeHead(302, { Location: `http://127.0.0.1:${port}/elsewhere` }).end()
     })
     await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
+    port = (server.address() as AddressInfo).port
     try {
-      const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`
-      const throughServer: typeof fetch = (input, init) => fetch(`${base}${new URL(String(input)).pathname}`, init)
+      const throughServer: typeof fetch = (input, init) => fetch(`http://127.0.0.1:${port}${new URL(String(input)).pathname}`, init)
       const { live } = source(throughServer)
       expect(await live.current()).toEqual(unknownStatus())
-      expect(asked.toSorted()).toEqual(['/api/status-page/heartbeat/wslatl', '/api/status-page/wslatl'])
+      expect(asked.length).toBeGreaterThan(0)
+      expect(asked.filter((path) => !['/api/status-page/heartbeat/wslatl', '/api/status-page/wslatl'].includes(path))).toEqual([])
     } finally {
-      asked = []
+      server.closeAllConnections()
       await new Promise((resolve) => server.close(resolve))
     }
+    expect(asked).not.toContain('/elsewhere')
   })
 })
 
