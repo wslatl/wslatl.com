@@ -2,7 +2,7 @@ import { BrandSection } from '@/components/brand/brand-section'
 import { WithEnglish } from '@/components/brand/with-english'
 import { siteConfig } from '@/config/site'
 import { subline } from '@/data/brand'
-import { copy } from '@/i18n/copy'
+import { keep, listOf, words } from '@/i18n/words'
 import { cn } from '@/lib/utils'
 
 interface FaceProps {
@@ -54,22 +54,22 @@ function Face({ name, role, use, size, sample, noSample }: FaceProps) {
  * which is how the site sets it.
  */
 export function TypeSection() {
-  const t = copy().brand.type
+  const t = words('brand.type')
   return (
-    <BrandSection id="type" number="3" title={t.heading} intro={t.intro}>
+    <BrandSection id="type" number="3" title={t('heading')} intro={t('intro')}>
       <ul className="grid gap-5 lg:grid-cols-3">
-        <Face name="Geist" role={t.sans.role} use={t.sans.use} size={t.sans.size} sample={{ className: 'font-sans font-semibold' }} />
+        <Face name="Geist" role={t('sans.role')} use={t('sans.use')} size={t('sans.size')} sample={{ className: 'font-sans font-semibold' }} />
         <Face
           name="Instrument Serif"
-          role={t.serif.role}
-          use={<WithEnglish text={t.serif.use} english={[subline]} />}
-          size={t.serif.size}
+          role={t('serif.role')}
+          use={<WithEnglish text={t('serif.use', keep('0'))} english={[subline]} />}
+          size={t('serif.size')}
           sample={{ className: 'font-serif italic' }}
         />
-        <Face name="Geist Mono" role={t.mono.role} use={t.mono.use} size={t.mono.size} noSample={t.mono.noSample} />
+        <Face name="Geist Mono" role={t('mono.role')} use={t('mono.use')} size={t('mono.size')} noSample={t('mono.noSample')} />
       </ul>
       <ul className="max-w-2xl space-y-1.5 text-muted-foreground">
-        {t.rules.map((rule) => (
+        {listOf('brand.type.rules').map((rule) => (
           <li key={rule} className="flex gap-3 leading-relaxed">
             <span aria-hidden="true" className="mt-2.5 size-1.5 shrink-0 rounded-full bg-link" />
             {rule}

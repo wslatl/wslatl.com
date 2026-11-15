@@ -162,7 +162,7 @@
   font-size: 0.8em;
   text-decoration: none;
 }
-/* The same words in each language, from header.newTab in i18n/copy. */
+/* The same words in each language, from header.newTab in messages/<locale>.json. */
 .legal-body:lang(es) a[target='_blank']::after { content: '↗' / ' (se abre en una pestaña nueva)'; }
 .legal-body:lang(fr) a[target='_blank']::after { content: '↗' / ' (ouvre un nouvel onglet)'; }
 .legal-body:lang(de) a[target='_blank']::after { content: '↗' / ' (öffnet in einem neuen Tab)'; }

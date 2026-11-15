@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { games } from '@/data/games'
 import { footerColumns } from '@/data/footer'
-import { en } from '@/i18n/copy/en'
+import { wordsFor } from '@/i18n/words'
 import { locales } from '@/i18n/config'
 import { gameGuidesUrl, knowledgeBaseUrl } from '@/lib/knowledge-base'
 
@@ -30,7 +30,7 @@ describe('links to the knowledge base', () => {
 
   it('is in the footer in every language', () => {
     for (const locale of locales) {
-      const hrefs = footerColumns(en, locale, []).flatMap((column) => column.links.map((link) => link.href))
+      const hrefs = footerColumns(wordsFor('en'), locale, []).flatMap((column) => column.links.map((link) => link.href))
       expect(hrefs, locale).toContain(knowledgeBaseUrl(locale))
     }
   })

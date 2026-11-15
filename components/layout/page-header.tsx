@@ -1,6 +1,6 @@
 import { JsonLd } from '@/components/seo/json-ld'
 import { pageUrl } from '@/lib/metadata'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { getLocale } from '@/i18n/locale'
 import { localePath } from '@/i18n/config'
 import { Breadcrumbs as Trail, PageStart, type Crumb } from '@/platform/components/page-start'
@@ -32,7 +32,7 @@ interface BreadcrumbsProps {
 /** The trail from the home page, in this page's language, with its addresses in it. */
 function trailOf(breadcrumbs: Crumb[]): Crumb[] {
   const locale = getLocale()
-  return [{ label: copy().breadcrumbs.home, href: '/' }, ...breadcrumbs].map((crumb) => ({
+  return [{ label: words()('breadcrumbs.home'), href: '/' }, ...breadcrumbs].map((crumb) => ({
     label: crumb.label,
     href: localePath(locale, crumb.href),
   }))
@@ -41,7 +41,7 @@ function trailOf(breadcrumbs: Crumb[]): Crumb[] {
 /** The same trail as structured data, ending on this page when its path is given. */
 function BreadcrumbData({ breadcrumbs, crumbLabel, path }: Omit<BreadcrumbsProps, 'className'>) {
   const locale = getLocale()
-  const trail = [{ label: copy().breadcrumbs.home, href: '/' }, ...breadcrumbs, ...(path ? [{ label: crumbLabel, href: path }] : [])]
+  const trail = [{ label: words()('breadcrumbs.home'), href: '/' }, ...breadcrumbs, ...(path ? [{ label: crumbLabel, href: path }] : [])]
   return (
     <JsonLd
       data={{
@@ -66,7 +66,7 @@ function BreadcrumbData({ breadcrumbs, crumbLabel, path }: Omit<BreadcrumbsProps
 export function Breadcrumbs({ breadcrumbs, crumbLabel, path, className }: BreadcrumbsProps) {
   return (
     <>
-      <Trail trail={trailOf(breadcrumbs)} current={crumbLabel} label={copy().breadcrumbs.label} className={className} />
+      <Trail trail={trailOf(breadcrumbs)} current={crumbLabel} label={words()('breadcrumbs.label')} className={className} />
       <BreadcrumbData breadcrumbs={breadcrumbs} crumbLabel={crumbLabel} path={path} />
     </>
   )
@@ -86,7 +86,7 @@ export function PageHeader({ title, breadcrumbs, crumbLabel, path, children, cla
         title={title}
         breadcrumbs={breadcrumbs && trailOf(breadcrumbs)}
         current={crumbLabel}
-        breadcrumbLabel={copy().breadcrumbs.label}
+        breadcrumbLabel={words()('breadcrumbs.label')}
         className={className}
       >
         {children}

@@ -2,20 +2,20 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { Button } from '@/platform/components/button'
 import { siteConfig } from '@/config/site'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { getLocale } from '@/i18n/locale'
 import { localePath } from '@/i18n/config'
 import { formatPrice, pricingHref, startingPrice } from '@/lib/pricing'
 
 export function Hero() {
-  const t = copy().home.hero
+  const t = words('home.hero')
   const locale = getLocale()
   const path = (href: string) => localePath(locale, href)
 
   const entryPoints = [
-    { label: t.entries.vps, detail: t.from(formatPrice(startingPrice('vps'))), href: path(pricingHref('vps')) },
-    { label: t.entries.game, detail: t.from(formatPrice(startingPrice('game'))), href: path(pricingHref('game')) },
-    { label: t.entries.other, detail: t.quoted, href: path('/#services') },
+    { label: t('entries.vps'), detail: t('from', { price: formatPrice(startingPrice('vps')) }), href: path(pricingHref('vps')) },
+    { label: t('entries.game'), detail: t('from', { price: formatPrice(startingPrice('game')) }), href: path(pricingHref('game')) },
+    { label: t('entries.other'), detail: t('quoted'), href: path('/#services') },
   ]
 
   return (
@@ -27,17 +27,17 @@ export function Hero() {
         lang="en"
         className="mx-auto max-w-5xl text-[clamp(3rem,10vw,7.25rem)] leading-[0.95] font-bold tracking-[-0.04em] text-balance text-foreground"
       >
-        {t.lineOne}
+        {t('lineOne')}
         <br />
-        <span className="gradient-text font-serif font-normal tracking-[-0.02em] italic">{t.emphasis}</span>{' '}
-        {t.lineTwo}
+        <span className="gradient-text font-serif font-normal tracking-[-0.02em] italic">{t('emphasis')}</span>{' '}
+        {t('lineTwo')}
       </h1>
 
       <p
         className="animate-rise mx-auto mt-8 max-w-xl text-base leading-relaxed text-pretty text-muted-foreground md:text-lg"
         style={{ animationDelay: '60ms' }}
       >
-        {t.intro}
+        {t('intro')}
       </p>
 
       <div
@@ -46,16 +46,16 @@ export function Hero() {
       >
         <Button asChild size="lg" className="w-full sm:w-auto">
           <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-            {copy().header.getStarted}
-            <span className="sr-only">{copy().header.newTab}</span>
+            {words()('header.getStarted')}
+            <span className="sr-only">{words()('header.newTab')}</span>
           </a>
         </Button>
         <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
-          <Link href={path('/pricing')}>{t.seePlans}</Link>
+          <Link href={path('/pricing')}>{t('seePlans')}</Link>
         </Button>
       </div>
 
-      <nav aria-label={t.products} className="animate-rise mx-auto mt-14 max-w-3xl" style={{ animationDelay: '320ms' }}>
+      <nav aria-label={t('products')} className="animate-rise mx-auto mt-14 max-w-3xl" style={{ animationDelay: '320ms' }}>
         <ul className="grid gap-px overflow-hidden rounded-2xl border bg-border text-left sm:grid-cols-3">
           {entryPoints.map((entry) => (
             <li key={entry.label} className="bg-background">

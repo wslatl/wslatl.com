@@ -5,7 +5,7 @@ import { SharePartnersIndexAd } from '@/components/share/ads'
 import { Button } from '@/platform/components/button'
 import { siteConfig } from '@/config/site'
 import { localePath } from '@/i18n/config'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { getLocale } from '@/i18n/locale'
 import { referralDiscount } from '@/lib/partners'
 import { cn } from '@/lib/utils'
@@ -17,16 +17,16 @@ import { cn } from '@/lib/utils'
  */
 export function BecomePartner({ className }: { className?: string }) {
   const locale = getLocale()
-  const t = copy()
-  const program = t.partners.program
+  const t = words()
+  const program = words('partners.program')
   const percent = referralDiscount(locale)
 
   const points = [
-    { icon: BadgeCheck, ...program.approved },
-    { icon: Tag, ...program.code },
-    { icon: Percent, title: program.discount.title(percent), body: program.discount.body(percent) },
-    { icon: Wallet, ...program.credit },
-    { icon: IdCard, ...program.profile },
+    { icon: BadgeCheck, title: program('approved.title'), body: program('approved.body') },
+    { icon: Tag, title: program('code.title'), body: program('code.body') },
+    { icon: Percent, title: program('discount.title', { percent }), body: program('discount.body', { percent }) },
+    { icon: Wallet, title: program('credit.title'), body: program('credit.body') },
+    { icon: IdCard, title: program('profile.title'), body: program('profile.body') },
   ]
 
   return (
@@ -42,31 +42,31 @@ export function BecomePartner({ className }: { className?: string }) {
             id="become-partner-heading"
             className="text-3xl leading-[1.1] font-bold tracking-[-0.03em] text-balance text-foreground md:text-4xl"
           >
-            {program.heading}
+            {program('heading')}
           </h2>
-          <p className="mt-4 max-w-lg leading-relaxed text-pretty text-muted-foreground">{program.intro}</p>
+          <p className="mt-4 max-w-lg leading-relaxed text-pretty text-muted-foreground">{program('intro')}</p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Button asChild size="lg">
               <a href={siteConfig.links.discord} target="_blank" rel="noopener noreferrer">
-                {program.discordCta}
-                <span className="sr-only">{t.header.newTab}</span>
+                {program('discordCta')}
+                <span className="sr-only">{t('header.newTab')}</span>
               </a>
             </Button>
             <Button asChild size="lg" variant="outline">
               <a href={siteConfig.links.billing} target="_blank" rel="noopener noreferrer">
-                {program.ticketCta}
-                <span className="sr-only">{t.header.newTab}</span>
+                {program('ticketCta')}
+                <span className="sr-only">{t('header.newTab')}</span>
               </a>
             </Button>
           </div>
-          <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground">{program.ticketNote}</p>
+          <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground">{program('ticketNote')}</p>
           <SharePartnersIndexAd className="mt-5" />
           <p className="mt-3 text-sm">
             <Link
               href={localePath(locale, siteConfig.paths.accountCredit)}
               className="text-link underline underline-offset-4 hover:text-foreground"
             >
-              {program.creditLink}
+              {program('creditLink')}
             </Link>
           </p>
         </div>

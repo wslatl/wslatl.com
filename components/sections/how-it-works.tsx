@@ -1,7 +1,7 @@
 import { siteConfig } from '@/config/site'
 import { SectionHeader } from '@/components/ui/section-header'
 import { cn } from '@/lib/utils'
-import { copy } from '@/i18n/copy'
+import { listOf, words } from '@/i18n/words'
 
 interface HowItWorksProps {
   /** Tighter version for the pricing page, without the section intro. */
@@ -9,9 +9,8 @@ interface HowItWorksProps {
 }
 
 export function HowItWorks({ compact = false }: HowItWorksProps) {
-  const t = copy().home.howItWorks
-  const steps = t.steps
-
+  const t = words('home.howItWorks')
+  const steps = listOf<{ title: string; description: string }>('home.howItWorks.steps')
   return (
     <section
       id="how-it-works"
@@ -19,8 +18,8 @@ export function HowItWorks({ compact = false }: HowItWorksProps) {
       className={cn(!compact && 'py-20 md:py-28')}
     >
       <div className={cn(!compact && 'shell')}>
-        <SectionHeader id="how-it-works-heading" title={t.heading}>
-          {!compact && <p>{t.intro}</p>}
+        <SectionHeader id="how-it-works-heading" title={t('heading')}>
+          {!compact && <p>{t('intro')}</p>}
         </SectionHeader>
 
         {/* A real sequence, so numbered nodes joined by a rule: vertical on
@@ -43,7 +42,7 @@ export function HowItWorks({ compact = false }: HowItWorksProps) {
               </span>
               <div className="md:mt-6">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
-                  <span className="sr-only">{t.step(idx + 1)}</span>
+                  <span className="sr-only">{t('step', { n: String(idx + 1) })}</span>
                   {step.title}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{step.description}</p>
@@ -53,27 +52,27 @@ export function HowItWorks({ compact = false }: HowItWorksProps) {
         </ol>
 
         <p className="mt-10 text-sm text-muted-foreground">
-          {t.readyPrefix}{' '}
+          {t('readyPrefix')}{' '}
           <a
             href={siteConfig.links.register}
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-link underline underline-offset-4 hover:text-foreground"
           >
-            {t.requestAccess}
-            <span className="sr-only">{copy().header.newTab}</span>
+            {t('requestAccess')}
+            <span className="sr-only">{words()('header.newTab')}</span>
           </a>{' '}
-          {t.or}{' '}
+          {t('or')}{' '}
           <a
             href={siteConfig.links.discord}
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-link underline underline-offset-4 hover:text-foreground"
           >
-            {t.askOnDiscord}
-            <span className="sr-only">{copy().header.newTab}</span>
+            {t('askOnDiscord')}
+            <span className="sr-only">{words()('header.newTab')}</span>
           </a>{' '}
-          {t.readySuffix}
+          {t('readySuffix')}
         </p>
       </div>
     </section>

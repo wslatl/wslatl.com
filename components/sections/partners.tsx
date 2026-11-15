@@ -4,7 +4,7 @@ import { PartnerCard } from '@/components/partners/partner-card'
 import { SectionHeader } from '@/components/ui/section-header'
 import { partners } from '@/data/partners'
 import { localePath } from '@/i18n/config'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { getLocale } from '@/i18n/locale'
 import { hasReferralCode, homePartners, partnersPageText } from '@/lib/partners'
 import { cn } from '@/lib/utils'
@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils'
  */
 export function Partners() {
   const locale = getLocale()
-  const t = copy().partners
+  const t = words('partners')
   const shown = homePartners(partners)
   if (shown.length === 0) return null
   const { intro } = partnersPageText(t, partners.length, locale, partners.filter(hasReferralCode).length)
@@ -26,14 +26,14 @@ export function Partners() {
   return (
     <section id="partners" aria-labelledby="partners-heading" className="shell pt-20 md:pt-28">
       <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6">
-        <SectionHeader id="partners-heading" title={t.heading}>
+        <SectionHeader id="partners-heading" title={t('heading')}>
           <p>{intro}</p>
         </SectionHeader>
         <Link
           href={localePath(locale, '/partners')}
           className="group inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:text-foreground"
         >
-          {t.seeAll(partners.length)}
+          {t('seeAll', { count: String(partners.length) })}
           <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5" />
         </Link>
       </div>

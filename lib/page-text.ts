@@ -2,7 +2,7 @@ import { games, type GameEntry } from '@/data/games'
 import type { LegalPage } from '@/data/legal'
 import { partners, type Partner } from '@/data/partners'
 import type { Locale } from '@/i18n/config'
-import { copyFor } from '@/i18n/copy'
+import { wordsFor } from '@/i18n/words'
 import { hasReferralCode, partnerMetaDescription, partnersPageText } from '@/lib/partners'
 import { formatPrice, gameEntryPlan, startingPrice } from '@/lib/pricing'
 
@@ -19,18 +19,18 @@ export interface PageText {
 // render, where that is not set.
 
 export function homeText(locale: Locale): PageText {
-  const t = copyFor(locale).home
+  const t = wordsFor(locale, 'home')
   return {
-    title: t.metaTitle,
-    description: t.metaDescription(formatPrice(startingPrice('game')), formatPrice(startingPrice('vps'))),
+    title: t('metaTitle'),
+    description: t('metaDescription', { game: formatPrice(startingPrice('game')), vps: formatPrice(startingPrice('vps')) }),
   }
 }
 
 export function pricingText(locale: Locale): PageText {
-  const t = copyFor(locale).pricing
+  const t = wordsFor(locale, 'pricing')
   return {
-    title: t.metaTitle,
-    description: t.metaDescription(formatPrice(startingPrice('vps')), formatPrice(startingPrice('game'))),
+    title: t('metaTitle'),
+    description: t('metaDescription', { vps: formatPrice(startingPrice('vps')), game: formatPrice(startingPrice('game')) }),
   }
 }
 
@@ -38,10 +38,10 @@ export function pricingText(locale: Locale): PageText {
 const moreGames = Math.floor((games.length - 4) / 10) * 10
 
 export function gamesText(locale: Locale): PageText {
-  const t = copyFor(locale).games
+  const t = wordsFor(locale, 'games')
   return {
-    title: t.metaTitle(moreGames),
-    description: t.metaDescription(formatPrice(startingPrice('game'))),
+    title: t('metaTitle', { more: String(moreGames) }),
+    description: t('metaDescription', { price: formatPrice(startingPrice('game')) }),
   }
 }
 
@@ -52,23 +52,23 @@ export function gameText(game: GameEntry, locale: Locale): PageText {
   // either.
   const entry = gameEntryPlan(game)
   const price = entry ? formatPrice(entry.plan.price) : null
-  const t = copyFor(locale).games.detail
+  const t = wordsFor(locale, 'games.detail')
   return {
-    title: price ? t.metaTitle(game.name, price) : t.heading(game.name),
+    title: price ? t('metaTitle', { game: game.name, price }) : t('heading', { game: game.name }),
     description: price
-      ? t.metaDescription(game.name, price, game.tagline)
-      : t.metaDescriptionNoPrice(game.name, game.tagline),
+      ? t('metaDescription', { game: game.name, price, tagline: game.tagline })
+      : t('metaDescriptionNoPrice', { game: game.name, tagline: game.tagline }),
   }
 }
 
 export function legalIndexText(locale: Locale): PageText {
-  const t = copyFor(locale).legal
-  return { title: t.metaTitle, description: t.metaDescription }
+  const t = wordsFor(locale, 'legal')
+  return { title: t('metaTitle'), description: t('metaDescription') }
 }
 
 export function brandText(locale: Locale): PageText {
-  const t = copyFor(locale).brand
-  return { title: t.metaTitle, description: t.metaDescription }
+  const t = wordsFor(locale, 'brand')
+  return { title: t('metaTitle'), description: t('metaDescription') }
 }
 
 /** One legal document, from the document in the language of the page. */
@@ -77,16 +77,16 @@ export function legalText(page: LegalPage): PageText {
 }
 
 export function partnersText(locale: Locale): PageText {
-  const t = copyFor(locale).partners
+  const t = wordsFor(locale, 'partners')
   const codeCount = partners.filter(hasReferralCode).length
   return {
-    title: t.metaTitle,
+    title: t('metaTitle'),
     // Search results and link previews say what the page says.
     description: partnersPageText(t, partners.length, locale, codeCount).description,
   }
 }
 
 export function partnerProfileText(partner: Partner, locale: Locale): PageText {
-  const t = copyFor(locale).partners.profile
-  return { title: t.metaTitle(partner.name), description: partnerMetaDescription(partner, t, locale) }
+  const t = wordsFor(locale, 'partners.profile')
+  return { title: t('metaTitle', { name: partner.name }), description: partnerMetaDescription(partner, t, locale) }
 }

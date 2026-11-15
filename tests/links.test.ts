@@ -9,7 +9,9 @@ import { fullKitUrl } from '@/data/brand'
 import { partners } from '@/data/partners'
 import { productLines } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
-import { en } from '@/i18n/copy/en'
+import { messagesFor, wordsFor } from '@/i18n/words'
+
+const en = messagesFor('en')
 import { defaultLocale, localePath, locales } from '@/i18n/config'
 import { isShortLink, shortLinks } from '@/config/links'
 import { rootFiles } from '@/i18n/routing'
@@ -95,10 +97,10 @@ const contactOptions = [
 ]
 
 const allLinks = [
-  ...mainNav(en, defaultLocale),
-  ...portalLinks(en),
-  requestAccessLink(en),
-  ...footerColumns(en, defaultLocale, legalPages).flatMap((c) => c.links),
+  ...mainNav(wordsFor(defaultLocale), defaultLocale),
+  ...portalLinks(wordsFor(defaultLocale)),
+  requestAccessLink(wordsFor(defaultLocale)),
+  ...footerColumns(wordsFor(defaultLocale), defaultLocale, legalPages).flatMap((c) => c.links),
   ...legalPages.map((p) => ({ label: p.label, href: p.href })),
   ...contactOptions,
   // The brand kit page sends people to the full kit on Google Drive.
@@ -122,7 +124,7 @@ describe('links', () => {
   })
 
   it('redirects retired URLs to pages and files that exist', async () => {
-    const redirects = await nextConfig.redirects()
+    const redirects = await nextConfig.redirects!()
     // Pattern rules (/en/:path*) stand for many pages at once, so they are
     // checked on their own below rather than looked up as a single route.
     const single = redirects.filter((r) => !r.source.includes(':') && !r.destination.includes(':'))
@@ -135,13 +137,13 @@ describe('links', () => {
   it('sends the /en prefix to the plain English URL', async () => {
     // English is served at /pricing, not /en/pricing (proxy.ts). Both would
     // otherwise be the same page at two addresses.
-    const redirects = await nextConfig.redirects()
+    const redirects = await nextConfig.redirects!()
     expect(redirects).toContainEqual({ source: '/en', destination: '/', permanent: true })
     expect(redirects).toContainEqual({ source: '/en/:path*', destination: '/:path*', permanent: true })
   })
 
   it('redirects every short link, temporarily, to its https destination', async () => {
-    const redirects = await nextConfig.redirects()
+    const redirects = await nextConfig.redirects!()
     const problems = Object.entries(shortLinks).flatMap(([name, { path, url }]) => {
       const redirect = redirects.find((r) => r.source === path)
       if (!/^\/[a-z0-9-]+$/.test(path)) return [`${name}: ${path} is not a simple path`]
@@ -174,7 +176,7 @@ describe('links', () => {
   it('keeps every legal document reachable at its old top-level URL', async () => {
     // Legal pages moved from /privacy to /legal/privacy (and so on). Old links
     // must keep working, so each document needs a permanent redirect.
-    const redirects = await nextConfig.redirects()
+    const redirects = await nextConfig.redirects!()
     const missing = legalPages
       .map((page) => ({ from: `/${legalSlug(page)}`, to: page.href }))
       .filter(({ from, to }) => !redirects.some((r) => r.source === from && r.destination === to && r.permanent))

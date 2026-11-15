@@ -9,7 +9,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { Button } from '@/platform/components/button'
 import { SiteLink } from '@/platform/components/site-link'
 import { fullKitUrl } from '@/data/brand'
-import { copy } from '@/i18n/copy'
+import { listOf, words } from '@/i18n/words'
 
 /**
  * The title block: what the kit is for, who it is for, and the two ways in.
@@ -17,23 +17,23 @@ import { copy } from '@/i18n/copy'
  * near the top, and the header above already has it.
  */
 export function BrandHeader() {
-  const t = copy()
-  const b = t.brand
+  const t = words()
+  const b = words('brand')
   return (
-    <PageHeader title={b.heading} breadcrumbs={[]} crumbLabel={b.crumb} path="/brand">
-      <p>{b.intro}</p>
-      <p className="mt-3">{b.audience}</p>
+    <PageHeader title={b('heading')} breadcrumbs={[]} crumbLabel={b('crumb')} path="/brand">
+      <p>{b('intro')}</p>
+      <p className="mt-3">{b('audience')}</p>
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <Button asChild size="lg">
-          <SiteLink href={fullKitUrl} newTab={t.header.newTab}>
-            {b.getFullKit}
+          <SiteLink href={fullKitUrl} newTab={t('header.newTab')}>
+            {b('getFullKit')}
             <ArrowUpRight aria-hidden="true" />
           </SiteLink>
         </Button>
         <Button asChild size="lg" variant="outline">
           <a href="#downloads">
             <Download aria-hidden="true" />
-            {b.getLogo}
+            {b('getLogo')}
           </a>
         </Button>
       </div>
@@ -43,14 +43,14 @@ export function BrandHeader() {
 
 /** The guide's own short version, four lines, before any of the detail. */
 function ShortVersion() {
-  const t = copy().brand.shortVersion
+  const t = words('brand.shortVersion')
   return (
     <section aria-labelledby="short-version-heading" className="rounded-2xl border bg-card/30 p-6 sm:p-8">
       <h2 id="short-version-heading" className="font-semibold text-foreground">
-        {t.heading}
+        {t('heading')}
       </h2>
       <ul className="mt-4 grid gap-x-10 gap-y-3 md:grid-cols-2">
-        {t.items.map((item) => (
+        {listOf('brand.shortVersion.items').map((item) => (
           <li key={item} className="flex gap-3 leading-relaxed text-muted-foreground">
             <Check aria-hidden="true" className="mt-1 size-4 shrink-0 text-link" />
             {item}
@@ -63,19 +63,19 @@ function ShortVersion() {
 
 /** Plain anchors to each part, so the page works as a list of links with or without script. */
 function PageNav() {
-  const t = copy().brand
+  const t = words('brand')
   const parts = [
-    { id: 'logo', label: t.nav.logo },
-    { id: 'colors', label: t.nav.colors },
-    { id: 'type', label: t.nav.type },
-    { id: 'voice', label: t.nav.voice },
-    { id: 'dos-and-donts', label: t.nav.rules },
-    { id: 'full-kit', label: t.nav.fullKit },
+    { id: 'logo', label: t('nav.logo') },
+    { id: 'colors', label: t('nav.colors') },
+    { id: 'type', label: t('nav.type') },
+    { id: 'voice', label: t('nav.voice') },
+    { id: 'dos-and-donts', label: t('nav.rules') },
+    { id: 'full-kit', label: t('nav.fullKit') },
   ]
   return (
     <nav aria-labelledby="brand-nav-heading" className="mt-8 print:hidden">
       <p id="brand-nav-heading" className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-        {t.onThisPage}
+        {t('onThisPage')}
       </p>
       <ul className="mt-3 flex flex-wrap gap-2">
         {parts.map((part) => (

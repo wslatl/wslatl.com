@@ -6,7 +6,7 @@ import { Partners } from '@/components/sections/partners'
 import { clients, type Client } from '@/data/clients'
 import { partners, type Partner } from '@/data/partners'
 import { locales } from '@/i18n/config'
-import { copyFor } from '@/i18n/copy'
+import { messagesFor } from '@/i18n/words'
 import { clientStrip, stripName } from '@/lib/clients'
 import { homePartners } from '@/lib/partners'
 import { examplePartner } from './fixtures/partners'
@@ -80,7 +80,7 @@ describe('the trusted clients strip', () => {
       de: /Partner/,
       pt: /parceiros/,
     }
-    for (const locale of locales) expect(copyFor(locale).home.clients.heading, locale).toMatch(words[locale])
+    for (const locale of locales) expect(messagesFor(locale).home.clients.heading, locale).toMatch(words[locale])
   })
 })
 

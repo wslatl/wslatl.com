@@ -26,7 +26,7 @@ import { legalPages } from '@/data/legal'
 import { productLines } from '@/data/pricing'
 import { uptimeTarget } from '@/data/sla'
 import { defaultLocale, localePath, locales, type Locale } from '@/i18n/config'
-import { copyFor } from '@/i18n/copy'
+import { messagesFor, wordsFor } from '@/i18n/words'
 import { setLocale } from '@/i18n/locale'
 import { languageAlternates, pageUrl } from '@/lib/metadata'
 import { formatPrice, startingPrice } from '@/lib/pricing'
@@ -117,7 +117,7 @@ describe('the colors', () => {
     expect(new Set(swatches.map((swatch) => swatch.id)).size).toBe(swatches.length)
     expect(new Set(swatches.map((swatch) => swatch.name)).size).toBe(swatches.length)
     for (const locale of locales) {
-      const { uses, gradientUses } = copyFor(locale).brand.colors
+      const { uses, gradientUses } = messagesFor(locale).brand.colors
       expect(Object.keys(uses).toSorted(), locale).toEqual(swatches.map((swatch) => swatch.id).toSorted())
       expect(Object.keys(gradientUses).toSorted(), locale).toEqual(gradients.map((gradient) => gradient.id).toSorted())
     }
@@ -154,7 +154,7 @@ describe('the voice examples', () => {
 
   it('give each rule as many English quotes as its text has marks for, in every language', () => {
     for (const locale of locales) {
-      const rules = copyFor(locale).brand.voice.rules
+      const rules = Object.values(messagesFor(locale).brand.voice.rules)
       expect(rules, locale).toHaveLength(voiceRuleExamples.length)
       rules.forEach((rule, index) => {
         const marks = [...rule.body.matchAll(/\{(\d+)\}/g)].map((match) => Number(match[1])).toSorted()
@@ -290,7 +290,7 @@ describe('the page', () => {
   it('draws every color as a swatch with its name, hex, RGB and use, and a button that copies the hex', () => {
     for (const locale of locales) {
       const html = render(locale)
-      const t = copyFor(locale).brand.colors
+      const t = messagesFor(locale).brand.colors
       const colors = [...logoColors, ...interfaceColors]
       // The swatches, and the two stops of each gradient.
       expect(count(html, '<code'), locale).toBe(colors.length + gradients.length * 2)
@@ -344,7 +344,7 @@ describe('the page', () => {
   it('links the full kit on Google Drive twice, in a new tab, saying so', () => {
     for (const locale of locales) {
       const html = render(locale)
-      const newTab = copyFor(locale).header.newTab
+      const newTab = messagesFor(locale).header.newTab
       const links = [...html.matchAll(new RegExp(`<a [^>]*href="${pattern(fullKitUrl)}"[^>]*>([\\s\\S]*?)</a>`, 'g'))]
       expect(links, locale).toHaveLength(2)
       for (const [link, inner] of links) {
@@ -352,7 +352,7 @@ describe('the page', () => {
         expect(link, locale).toContain('rel="noopener noreferrer"')
         expect(inner, locale).toContain(`<span class="sr-only">${newTab}</span>`)
       }
-      expect(html, locale).toContain(copyFor(locale).brand.fullKit.cta)
+      expect(html, locale).toContain(messagesFor(locale).brand.fullKit.cta)
     }
   })
 
@@ -370,7 +370,7 @@ describe('the page', () => {
   it('says each part in the language of the page, and differently in each', () => {
     for (const locale of locales) {
       const html = render(locale)
-      const t = copyFor(locale).brand
+      const t = messagesFor(locale).brand
       for (const text of [t.heading, t.intro, t.audience, t.shortVersion.heading, t.logo.heading, t.colors.heading]) {
         expect(html, `${locale}: ${text}`).toContain(htmlEscape(text))
       }
@@ -396,7 +396,7 @@ describe('the brand kit in search results and the footer', () => {
   it('has a title and a description of its own in every language', async () => {
     for (const locale of locales) {
       const metadata = await generateMetadata({ params: Promise.resolve({ locale }) })
-      const t = copyFor(locale).brand
+      const t = messagesFor(locale).brand
       expect(metadata.title, locale).toBe(t.metaTitle)
       expect(metadata.description, locale).toBe(t.metaDescription)
       expect(t.metaDescription.length, locale).toBeGreaterThan(80)
@@ -406,7 +406,7 @@ describe('the brand kit in search results and the footer', () => {
       expect(metadata.openGraph?.url, locale).toBe(pageUrl(locale, '/brand'))
     }
     for (const field of ['metaTitle', 'metaDescription'] as const) {
-      const values = locales.map((locale) => copyFor(locale).brand[field])
+      const values = locales.map((locale) => messagesFor(locale).brand[field])
       expect(new Set(values).size, field).toBe(locales.length)
     }
   })
@@ -422,12 +422,12 @@ describe('the brand kit in search results and the footer', () => {
 
   it('is linked from the company column of the footer, in every language', () => {
     for (const locale of locales) {
-      const t = copyFor(locale)
-      const company = footerColumns(t, locale, legalPages).find((column) => column.title === t.footer.columns.company)
+      const t = messagesFor(locale)
+      const company = footerColumns(wordsFor(locale), locale, legalPages).find((column) => column.title === t.footer.columns.company)
       const link = company?.links.find((item) => item.label === t.footer.links.brandKit)
       expect(link?.href, locale).toBe(localePath(locale, '/brand'))
     }
-    expect(copyFor('en').footer.links.brandKit).toBe('Brand kit')
+    expect(messagesFor('en').footer.links.brandKit).toBe('Brand kit')
   })
 
   it('is on the Lighthouse run, which holds its pages to the byte budget', () => {

@@ -4,7 +4,7 @@ import { SectionHeader } from '@/components/ui/section-header'
 import { siteConfig } from '@/config/site'
 import type { Service } from '@/data/services'
 import { formatPrice, pricingHref, specRanges, startingPrice } from '@/lib/pricing'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { getLocale } from '@/i18n/locale'
 import { localePath } from '@/i18n/config'
 import { localizedProductLine, localizedServices } from '@/i18n/content'
@@ -19,20 +19,20 @@ const icons: Record<string, LucideIcon> = {
 function specSummary(id: NonNullable<Service['pricing']>) {
   const { cpu, ramGb, storageGb } = specRanges(id)
   const line = localizedProductLine(id)
-  return copy().home.services.specSummary({
-    plans: line.groups.reduce((n, g) => n + g.plans.length, 0),
-    cpuMin: cpu.min,
-    cpuMax: cpu.max,
+  return words()('home.services.specSummary', {
+    plans: String(line.groups.reduce((n, g) => n + g.plans.length, 0)),
+    cpuMin: String(cpu.min),
+    cpuMax: String(cpu.max),
     cpuUnit: line.cpuUnit,
-    ramMin: ramGb.min,
-    ramMax: ramGb.max,
-    storageMin: storageGb.min,
-    storageMax: storageGb.max,
+    ramMin: String(ramGb.min),
+    ramMax: String(ramGb.max),
+    storageMin: String(storageGb.min),
+    storageMax: String(storageGb.max),
   })
 }
 
 function ServiceCtas({ service }: { service: Service }) {
-  const t = copy().home.services
+  const t = words('home.services')
   const locale = getLocale()
   const linkClass =
     'group inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:text-foreground'
@@ -41,7 +41,7 @@ function ServiceCtas({ service }: { service: Service }) {
   if (service.pricing === 'vps') {
     return (
       <Link href={localePath(locale, pricingHref('vps'))} className={linkClass}>
-        {t.compareVps} {arrow}
+        {t('compareVps')} {arrow}
       </Link>
     )
   }
@@ -49,30 +49,30 @@ function ServiceCtas({ service }: { service: Service }) {
     return (
       <div className="flex flex-wrap gap-x-6 gap-y-2">
         <Link href={localePath(locale, pricingHref('game'))} className={linkClass}>
-          {t.compareGame} {arrow}
+          {t('compareGame')} {arrow}
         </Link>
         <Link href={localePath(locale, '/games')} className={linkClass}>
-          {t.findGame} {arrow}
+          {t('findGame')} {arrow}
         </Link>
       </div>
     )
   }
   return (
     <Link href={localePath(locale, siteConfig.paths.contact)} className={linkClass}>
-      {t.getQuote} {arrow}
+      {t('getQuote')} {arrow}
     </Link>
   )
 }
 
 export function Services() {
-  const t = copy().home.services
+  const t = words('home.services')
   const services = localizedServices()
 
   return (
     <section id="services" aria-labelledby="services-heading" className="py-20 md:py-28">
       <div className="shell">
-        <SectionHeader id="services-heading" title={t.heading}>
-          <p>{t.intro}</p>
+        <SectionHeader id="services-heading" title={t('heading')}>
+          <p>{t('intro')}</p>
         </SectionHeader>
 
         <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border bg-border md:grid-cols-2">
@@ -85,14 +85,14 @@ export function Services() {
                 <h3 className="text-xl font-semibold tracking-tight text-foreground">{service.title}</h3>
                 {service.pricing ? (
                   <p className="text-sm text-muted-foreground tabular-nums">
-                    {t.from}{' '}
+                    {t('from')}{' '}
                     <span className="text-2xl font-bold tracking-tight text-foreground">
                       {formatPrice(startingPrice(service.pricing))}
                     </span>
-                    {t.perMonth}
+                    {t('perMonth')}
                   </p>
                 ) : (
-                  <p className="text-sm text-muted-foreground">{t.quoted}</p>
+                  <p className="text-sm text-muted-foreground">{t('quoted')}</p>
                 )}
               </div>
               <p className="mt-3 leading-relaxed text-muted-foreground">{service.description}</p>

@@ -6,7 +6,7 @@ import { Main } from '@/platform/components/main'
 import { PartnerProfile } from '@/components/partners/partner-profile'
 import { partners } from '@/data/partners'
 import type { Locale } from '@/i18n/config'
-import { copyFor } from '@/i18n/copy'
+import { wordsFor } from '@/i18n/words'
 import { setLocale } from '@/i18n/locale'
 import { pageMetadata } from '@/lib/metadata'
 import { partnerProfileText } from '@/lib/page-text'
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     locale,
     // Their banner is the picture a shared link shows; with none, the page's own card.
     image: partner.banner
-      ? { url: partner.banner, alt: copyFor(locale).partners.profile.bannerAlt(partner.name) }
+      ? { url: partner.banner, alt: wordsFor(locale)('partners.profile.bannerAlt', { name: partner.name }) }
       : undefined,
   })
 }

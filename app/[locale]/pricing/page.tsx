@@ -17,10 +17,10 @@ import { pageMetadata } from '@/lib/metadata'
 import { pricingText } from '@/lib/page-text'
 import { Main } from '@/platform/components/main'
 import type { Metadata } from 'next'
-import type { Locale } from '@/i18n/config'
+import { languageTag, type Locale } from '@/i18n/config'
 import { localePath } from '@/i18n/config'
-import { setLocale } from '@/i18n/locale'
-import { copy } from '@/i18n/copy'
+import { getLocale, setLocale } from '@/i18n/locale'
+import { words } from '@/i18n/words'
 import { localizedProductLines } from '@/i18n/content'
 
 interface PageProps {
@@ -39,35 +39,36 @@ const lineIcons: Record<ProductLine['id'], typeof Server> = {
 }
 
 function LineOverview({ line }: { line: ProductLine }) {
-  const t = copy().pricing
+  const t = words('pricing')
   const Icon = lineIcons[line.id]
   const ranges = specRanges(line.id)
   return (
     <a href={`#${line.anchor}`} className="group flex h-full flex-col bg-background p-6 transition-colors hover:bg-card/50 sm:p-8">
       <span className="flex items-center gap-2.5 text-sm font-medium text-muted-foreground">
         <Icon aria-hidden="true" className="size-5 text-link" strokeWidth={1.75} />
-        {t.lines[line.id]}
+        {t(`lines.${line.id}`)}
       </span>
       <span className="mt-4 text-sm text-muted-foreground tabular-nums">
-        {t.from}{' '}
+        {t('from')}{' '}
         <span className="text-4xl font-bold tracking-[-0.03em] text-foreground">
           {formatPrice(startingPrice(line.id))}
         </span>
-        {t.perMonth}
+        {t('perMonth')}
       </span>
       <span className="mt-3 text-sm leading-relaxed text-muted-foreground tabular-nums">
-        {t.lineSummary({
-          plans: line.groups.reduce((n, g) => n + g.plans.length, 0),
-          ramMin: ranges.ramGb.min,
-          ramMax: ranges.ramGb.max,
-          cpuMin: ranges.cpu.min,
-          cpuMax: ranges.cpu.max,
+        {t('lineSummary', {
+          plans: String(line.groups.reduce((n, g) => n + g.plans.length, 0)),
+          ramMin: String(ranges.ramGb.min),
+          ramMax: String(ranges.ramGb.max),
+          cpuMin: String(ranges.cpu.min),
+          cpuMax: String(ranges.cpu.max),
           cpuUnit: line.cpuUnit,
-          storage: storageTypes(line.id),
+          // "NVMe or SATA SSD", in the page's own word for "or".
+          storage: new Intl.ListFormat(languageTag(getLocale()), { type: 'disjunction' }).format(storageTypes(line.id)),
         })}
       </span>
       <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-link group-hover:text-foreground">
-        {t.seePlans(t.lines[line.id])}
+        {t('seePlans', { line: t(`lines.${line.id}`) })}
         <ArrowDown aria-hidden="true" className="size-4 transition-transform group-hover:translate-y-0.5" />
       </span>
     </a>
@@ -77,7 +78,7 @@ function LineOverview({ line }: { line: ProductLine }) {
 export default async function PricingPage({ params }: PageProps) {
   const { locale } = await params
   setLocale(locale)
-  const t = copy().pricing
+  const t = words('pricing')
   const productLines = localizedProductLines()
 
   return (
@@ -86,12 +87,12 @@ export default async function PricingPage({ params }: PageProps) {
       <PricingJsonLd lines={productLines} locale={locale} />
       <Main>
         <div className="shell">
-          <PageHeader title={t.heading} breadcrumbs={[]} crumbLabel={t.heading} path="/pricing">
-            <p>{t.intro}</p>
+          <PageHeader title={t('heading')} breadcrumbs={[]} crumbLabel={t('heading')} path="/pricing">
+            <p>{t('intro')}</p>
             <p className="mt-3 text-base">
-              {t.orderingPrefix}{' '}
+              {t('orderingPrefix')}{' '}
               <a href="#how-it-works" className="text-link underline underline-offset-4 hover:text-foreground">
-                {t.orderingLink}
+                {t('orderingLink')}
               </a>
             </p>
           </PageHeader>
@@ -105,11 +106,11 @@ export default async function PricingPage({ params }: PageProps) {
           </ul>
 
           <SectionNav
-            label={t.planTypes}
+            label={t('planTypes')}
             items={productLines.map((line) => ({
               id: line.anchor,
               label: line.label,
-              detail: `${t.from} ${formatPrice(startingPrice(line.id))}`,
+              detail: `${t('from')} ${formatPrice(startingPrice(line.id))}`,
             }))}
           />
 
@@ -118,15 +119,15 @@ export default async function PricingPage({ params }: PageProps) {
               <div className="grid gap-8 lg:grid-cols-[1fr_20rem] lg:gap-14">
                 <div>
                   <h2 id={`${line.anchor}-heading`} className="text-3xl font-bold tracking-[-0.03em] text-foreground md:text-4xl">
-                    {t.lines[line.id]}
+                    {t(`lines.${line.id}`)}
                   </h2>
                   <p className="mt-4 max-w-2xl leading-relaxed text-muted-foreground">{line.intro}</p>
                   <ShareLineAd line={line} className="mt-5" />
                 </div>
                 <div className="self-start rounded-xl border bg-card/30 p-5">
-                  <h3 className="text-sm font-semibold text-foreground">{t.included}</h3>
+                  <h3 className="text-sm font-semibold text-foreground">{t('included')}</h3>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                    {[...line.included, t.uptimeIncluded(uptimeTarget(line.id))].map((item) => (
+                    {[...line.included, t('uptimeIncluded', { target: uptimeTarget(line.id) })].map((item) => (
                       <li key={item} className="flex gap-2.5">
                         <Check aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-link" />
                         <span>{item}</span>
@@ -147,12 +148,12 @@ export default async function PricingPage({ params }: PageProps) {
           <section aria-labelledby="custom-heading" className="mt-20 grid gap-6 rounded-2xl border bg-card/30 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
             <div>
               <h2 id="custom-heading" className="text-xl font-semibold tracking-tight text-foreground">
-                {t.custom.heading}
+                {t('custom.heading')}
               </h2>
-              <p className="mt-2 max-w-2xl leading-relaxed text-muted-foreground">{t.custom.body}</p>
+              <p className="mt-2 max-w-2xl leading-relaxed text-muted-foreground">{t('custom.body')}</p>
             </div>
             <Button asChild variant="outline" size="lg">
-              <Link href={localePath(locale, siteConfig.paths.contact)}>{t.custom.cta}</Link>
+              <Link href={localePath(locale, siteConfig.paths.contact)}>{t('custom.cta')}</Link>
             </Button>
           </section>
 

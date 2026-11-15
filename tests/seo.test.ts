@@ -126,7 +126,7 @@ describe('the admin, which search engines must leave alone', () => {
   })
 
   it('is sent with a noindex header on every page and route', async () => {
-    const rules = await nextConfig.headers()
+    const rules = await nextConfig.headers!()
     for (const source of ['/admin', '/admin/:path*']) {
       const rule = rules.find((r) => r.source === source)
       expect(rule?.headers, source).toContainEqual({ key: 'X-Robots-Tag', value: 'noindex, nofollow' })

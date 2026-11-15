@@ -5,7 +5,7 @@ import type { Partner } from '@/data/partners'
 import { clientStrip, stripName, type StripEntry } from '@/lib/clients'
 import { partnerStripAvatar, stripAvatarSize } from '@/lib/partners'
 import { cn } from '@/lib/utils'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 
 /** Two copies make one seamless loop. */
 const LOOP_COPIES = 2
@@ -43,7 +43,7 @@ function PartnerMark({ partner }: { partner: Partner }) {
 }
 
 export function Clients() {
-  const t = copy().home.clients
+  const t = words('home.clients')
   const strip = clientStrip()
   if (strip.length === 0) return null
   const repeats = Math.ceil(MIN_PER_COPY / strip.length)
@@ -53,13 +53,13 @@ export function Clients() {
     <section aria-labelledby="clients-heading" className="marquee shell pb-6">
       <div className="flex items-center justify-center gap-3">
         <h2 id="clients-heading" className="text-sm text-muted-foreground">
-          {t.heading}
+          {t('heading')}
         </h2>
         {/* Moving content needs a way to stop it (WCAG 2.2.2). A checkbox works without JavaScript. */}
         <label className="marquee-toggle inline-flex cursor-pointer items-center rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring">
           <input type="checkbox" className="sr-only" />
           <Pause aria-hidden="true" className="size-3.5" />
-          <span className="sr-only">{t.pause}</span>
+          <span className="sr-only">{t('pause')}</span>
         </label>
       </div>
 

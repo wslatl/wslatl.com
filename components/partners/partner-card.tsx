@@ -4,8 +4,7 @@ import { SharePartnerAd } from '@/components/share/ads'
 import { SocialIcon } from '@/components/partners/social-icon'
 import type { Partner } from '@/data/partners'
 import { localePath } from '@/i18n/config'
-import { copy } from '@/i18n/copy'
-import type { Copy } from '@/i18n/copy/en'
+import { words, type Translator } from '@/i18n/words'
 import { getLocale } from '@/i18n/locale'
 import { hasReferralCode, partnerCardBanner, partnerText, partnerTextLang, platformName, socialLinks } from '@/lib/partners'
 import { cn } from '@/lib/utils'
@@ -16,11 +15,11 @@ import { CopyButton } from '@/platform/components/copy-button'
 export const becomePartnerAnchor = 'become-a-partner'
 
 /** The words the Copy button needs, in the language of the page. */
-export function copyLabels(t: Copy) {
+export function copyLabels(t: Translator) {
   return {
-    copy: t.partners.copy,
-    copied: t.partners.copied,
-    copyFailed: t.partners.copyFailed,
+    copy: t('partners.copy'),
+    copied: t('partners.copied'),
+    copyFailed: t('partners.copyFailed'),
   }
 }
 
@@ -32,9 +31,9 @@ export function copyLabels(t: Copy) {
  */
 export function PartnerCard({ partner, headingLevel = 2 }: { partner: Partner; headingLevel?: 2 | 3 }) {
   const locale = getLocale()
-  const t = copy()
+  const t = words()
   const links = socialLinks(partner)
-  const featured = partner.featured ? { featured: true as const, featuredLabel: t.partners.featured } : {}
+  const featured = partner.featured ? { featured: true as const, featuredLabel: t('partners.featured') } : {}
 
   return (
     <BannerCard
@@ -56,7 +55,7 @@ export function PartnerCard({ partner, headingLevel = 2 }: { partner: Partner; h
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`${t.partners.onPlatform(partner.name, platformName(link.platform, t))}${t.header.newTab}`}
+                  aria-label={`${t('partners.onPlatform', { name: partner.name, platform: platformName(link.platform, t) })}${t('header.newTab')}`}
                   className="inline-flex size-10 items-center justify-center rounded-md border text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
                 >
                   <SocialIcon platform={link.platform} className="size-[18px]" />
@@ -71,7 +70,7 @@ export function PartnerCard({ partner, headingLevel = 2 }: { partner: Partner; h
           {/* A partner with no code gets no box, so nothing empty sits above the link. */}
           {hasReferralCode(partner) && (
             <div className="rounded-lg border bg-background/50 px-3 py-2.5">
-              <p className="text-xs text-muted-foreground">{t.partners.referralCode}</p>
+              <p className="text-xs text-muted-foreground">{t('partners.referralCode')}</p>
               <CopyButton value={partner.referralCode} labels={copyLabels(t)} className="mt-1" />
             </div>
           )}
@@ -80,7 +79,7 @@ export function PartnerCard({ partner, headingLevel = 2 }: { partner: Partner; h
             href={localePath(locale, `/partners/${partner.slug}`)}
             className="group inline-flex items-center gap-1.5 text-sm font-medium text-link transition-colors hover:text-foreground"
           >
-            {t.partners.viewProfile}
+            {t('partners.viewProfile')}
             <span className="sr-only">: {partner.name}</span>
             <ArrowRight aria-hidden="true" className="size-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
@@ -119,7 +118,7 @@ export function ghostItemClass(alone: GhostRow): string {
  * (`alone`), its banner is a short strip instead of 3:1.
  */
 export function GhostCard({ hero = false, alone }: { hero?: boolean; alone?: GhostRow }) {
-  const t = copy().partners
+  const t = words('partners')
 
   return (
     // The link is named by its visible text (title, sentence and call to
@@ -160,13 +159,13 @@ export function GhostCard({ hero = false, alone }: { hero?: boolean; alone?: Gho
             hero ? 'font-serif text-4xl font-normal italic' : 'text-lg',
           )}
         >
-          {t.ghost.title}
+          {t('ghost.title')}
         </h2>
         <p className={cn('mt-1.5 leading-relaxed text-muted-foreground', hero ? 'max-w-md text-base' : 'text-sm')}>
-          {t.ghost.body}
+          {t('ghost.body')}
         </p>
         <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-sm font-medium text-link transition-colors group-hover:text-foreground">
-          <span>{t.ghost.cta}</span>
+          <span>{t('ghost.cta')}</span>
           {/* The program sits below the cards, or beside this one on a wide screen with no partners yet. */}
           <ArrowDown
             aria-hidden="true"

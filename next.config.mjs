@@ -1,3 +1,4 @@
+import createNextIntlPlugin from 'next-intl/plugin'
 import shortLinks from './config/links.json' with { type: 'json' }
 import { publicPolicy, securityHeaders } from './config/security-headers.mjs'
 import { adminHeaders, buildInfoEnv, outsideAdmin } from './platform/admin/next.mjs'
@@ -110,4 +111,7 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+// next-intl's plugin, outermost, with the site's request config (i18n/request.ts).
+const withNextIntl = createNextIntlPlugin('./i18n/request.ts')
+
+export default withNextIntl(nextConfig)

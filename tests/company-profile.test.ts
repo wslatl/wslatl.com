@@ -8,9 +8,9 @@ import { siteConfig } from '@/config/site'
 import { faqs } from '@/data/faqs'
 import { legalPages, legalSlug } from '@/data/legal'
 import { team } from '@/data/team'
-import { en } from '@/i18n/copy/en'
+import { messagesFor } from '@/i18n/words'
 import { entryPlan, formatPrice, startingPrice } from '@/lib/pricing'
-import { rewriteTarget } from '@/i18n/routing'
+import { isRootFile } from '@/i18n/routing'
 
 const root = join(__dirname, '..')
 const built = new Date('2026-10-11T12:00:00.000Z')
@@ -59,9 +59,9 @@ describe('the company profile', () => {
 
   it('tells the story from the English home copy', () => {
     expect(profile.about).toEqual({
-      heading: en.home.about.heading,
-      paragraphs: en.home.about.paragraphs,
-      closing: en.home.about.closing,
+      heading: messagesFor('en').home.about.heading,
+      paragraphs: Object.values(messagesFor('en').home.about.paragraphs),
+      closing: messagesFor('en').home.about.closing,
     })
   })
 
@@ -145,7 +145,7 @@ describe('/company.json', () => {
 
   it('is left alone by the language rewrite, or it would answer with the 404 page', () => {
     expect(existsSync(join(root, 'app', 'company.json', 'route.ts'))).toBe(true)
-    expect(rewriteTarget('/company.json')).toBeNull()
+    expect(isRootFile('/company.json')).toBe(true)
   })
 })
 

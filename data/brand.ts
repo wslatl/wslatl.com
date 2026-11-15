@@ -4,7 +4,7 @@ import { formatPrice, startingPrice } from '@/lib/pricing'
 /**
  * What the brand kit page (/brand) shows, copied from the WSLATL brand kit's
  * guide (BRAND-GUIDELINES.md): the colors, the files, the examples. The words
- * around them are in i18n/copy under `brand`. README.md says where the kit's
+ * around them are in messages/<locale>.json under `brand`. README.md says where the kit's
  * files come from and how to bring them in again when the kit changes.
  */
 
@@ -162,7 +162,7 @@ export const fillerExamples = [
   'leverage',
 ] as const
 
-/** The English each voice rule quotes, in the rules' order (i18n/copy: brand.voice.rules). */
+/** The English each voice rule quotes, in the rules' order (messages/<locale>.json: brand.voice.rules). */
 export const voiceRuleExamples: readonly (readonly string[])[] = [[], specificExamples, [], fillerExamples, [], []]
 
 export interface VoiceExample {

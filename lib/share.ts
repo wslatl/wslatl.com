@@ -1,6 +1,7 @@
 import { siteConfig } from '@/config/site'
 import { localePath, type Locale } from '@/i18n/config'
-import type { Copy } from '@/i18n/copy/en'
+import { wordsFor, type Translator } from '@/i18n/words'
+
 import type { Commitment, Feature } from '@/data/features'
 import type { Service } from '@/data/services'
 import type { GameEntry } from '@/data/games'
@@ -32,7 +33,7 @@ import { formatPrice, gameEntryPlan, pricingHref, startingPrice } from '@/lib/pr
  * ad instead (Partner.ad), which keeps its own shape but still ends on the
  * page's address.
  *
- * Wording lives in i18n/copy/*.ts under `share`. Only facts that are already
+ * Wording lives in messages/<locale>.json under `share`. Only facts that are already
  * on the site go in: prices come from data/pricing.ts, and a price is only
  * named where the page itself shows one.
  */
@@ -106,14 +107,14 @@ function assemble(lines: string[], extras: string[], url: string): string {
 const bullet = (text: string) => `- ${text}`
 
 /** The "Why WSLATL" block closing a product ad, or nothing when there are no points. */
-function whySection(t: Copy, why: string[]): string[] {
-  return why.length > 0 ? ['', `**${t.share.ad.whyHeading}**`, ...why.map(bullet)] : []
+function whySection(t: Translator, why: string[]): string[] {
+  return why.length > 0 ? ['', `**${t('share.ad.whyHeading')}**`, ...why.map(bullet)] : []
 }
 
-const perMonth = (price: number, from: (price: string) => string) => from(formatPrice(price))
+const perMonth = (price: number, from: (values: { price: string }) => string) => from({ price: formatPrice(price) })
 
 interface Context {
-  t: Copy
+  t: Translator
   locale: Locale
 }
 
@@ -146,8 +147,8 @@ const asSentence = (text: string) => (/[.!?]$/.test(text) ? text : `${text}.`)
  * 1,000 to 1,500 characters; the least important lines drop first.
  */
 export function homeAd({ t, locale }: Context, content: SiteContent): string {
-  const a = t.share.ad
-  const from = (price: number) => `${t.pricing.from} ${formatPrice(price)}${t.pricing.perMonth}`
+  const a = wordsFor(locale, 'share.ad')
+  const from = (price: number) => `${t('pricing.from')} ${formatPrice(price)}${t('pricing.perMonth')}`
   const service = (id: string) => content.services.find((item) => item.id === id)
   const featured = content.games.filter((game) => game.featured).map((game) => plain(game.name))
   const game = service('game')
@@ -159,7 +160,7 @@ export function homeAd({ t, locale }: Context, content: SiteContent): string {
   const offer = [
     game &&
       bullet(
-        `**${game.title}**, ${from(startingPrice('game'))}. ${[...featured.slice(0, 6), a.andMore(Math.max(content.games.length - 6, 0))].join(', ')}. ${game.features.join(', ')}.`,
+        `**${game.title}**, ${from(startingPrice('game'))}. ${[...featured.slice(0, 6), a('andMore', { n: String(Math.max(content.games.length - 6, 0)) })].join(', ')}. ${game.features.join(', ')}.`,
       ),
     vps && bullet(`**${vps.title}**, ${from(startingPrice('vps'))}. ${vps.features.join(', ')}.`),
     dedicated && bullet(`**${dedicated.title}**: ${dedicated.features.slice(0, 3).join(', ')}.`),
@@ -176,21 +177,21 @@ export function homeAd({ t, locale }: Context, content: SiteContent): string {
   ]
 
   const lines = [
-    `## WSLATL: ${a.brandLine}`,
-    a.homeIntro(siteConfig.location),
+    `## WSLATL: ${a('brandLine')}`,
+    a('homeIntro', { location: siteConfig.location }),
     '',
-    `### ${a.offerHeading}`,
+    `### ${a('offerHeading')}`,
     ...offer,
   ]
   const extras = [
     '',
-    `### ${a.whyHeading}`,
+    `### ${a('whyHeading')}`,
     ...why,
     '',
-    `### ${a.startHeading}`,
-    bullet(`${t.footer.links.supportedGames}: <${absoluteUrl(locale, '/games')}>`),
-    bullet(`${t.footer.links.vpsPlans}: <${absoluteUrl(locale, pricingHref('vps'))}>`),
-    bullet(`${t.footer.links.partners}: <${absoluteUrl(locale, '/partners')}>`),
+    `### ${a('startHeading')}`,
+    bullet(`${t('footer.links.supportedGames')}: <${absoluteUrl(locale, '/games')}>`),
+    bullet(`${t('footer.links.vpsPlans')}: <${absoluteUrl(locale, pricingHref('vps'))}>`),
+    bullet(`${t('footer.links.partners')}: <${absoluteUrl(locale, '/partners')}>`),
   ]
   return assemble(lines, extras, absoluteUrl(locale, '/'))
 }
@@ -210,20 +211,20 @@ export function partnerAd(
   const own = partner.ad === undefined ? '' : withoutPings(partnerText(partner.ad, locale))
   if (own) return own.includes(profile) ? own : `${own}\n\n${profile}`
 
-  const a = t.share.ad
+  const a = wordsFor(locale, 'share.ad')
   const name = plain(partner.name)
-  const lines = [`## ${name}`, a.partnerIntro(name), plain(partnerText(partner.tagline, locale))]
+  const lines = [`## ${name}`, a('partnerIntro', { name }), plain(partnerText(partner.tagline, locale))]
   if (hasReferralCode(partner)) {
-    lines.push('', a.partnerCode(partner.referralCode), a.partnerDiscount(referralDiscount(locale)))
+    lines.push('', a('partnerCode', { code: partner.referralCode }), a('partnerDiscount', { percent: referralDiscount(locale) }))
   }
-  if (gameNames.length > 0) lines.push('', a.partnerGames(gameNames.map(plain).join(', ')))
+  if (gameNames.length > 0) lines.push('', a('partnerGames', { games: gameNames.map(plain).join(', ') }))
 
   const links = socialLinks(partner)
   const extras =
     links.length > 0
       ? [
           '',
-          `**${a.findOnline(name)}**`,
+          `**${a('findOnline', { name })}**`,
           ...links.map((link) => bullet(`${platformName(link.platform, t)}: <${link.href}>`)),
         ]
       : []
@@ -241,16 +242,16 @@ export function gameAd(
   included: string[],
   why: string[] = [],
 ): string {
-  const a = t.share.ad
+  const a = wordsFor(locale, 'share.ad')
   const entry = gameEntryPlan(game)
-  const lines = [`## ${t.games.detail.heading(plain(game.name))}`, plain(game.tagline)]
-  if (entry) lines.push('', perMonth(entry.plan.price, a.hostingFrom))
+  const lines = [`## ${t('games.detail.heading', { game: plain(game.name) })}`, plain(game.tagline)]
+  if (entry) lines.push('', perMonth(entry.plan.price, (values) => a('hostingFrom', values)))
   const extras = [
     '',
-    `**${t.games.detail.ramHeading(plain(game.name))}**`,
+    `**${t('games.detail.ramHeading', { game: plain(game.name) })}**`,
     ...game.recommendedRam.map((row) => bullet(`${plain(row.players)}: ${plain(row.ram)}`)),
     '',
-    `**${t.games.detail.included}**`,
+    `**${t('games.detail.included')}**`,
     ...included.slice(0, 4).map((item) => bullet(plain(item))),
     ...whySection(t, why),
   ]
@@ -259,59 +260,58 @@ export function gameAd(
 
 /** The ad for the games index: the idea (RAM, not a locked package) and a few featured titles. */
 export function gamesIndexAd({ t, locale }: Context, games: GameEntry[]): string {
-  const a = t.share.ad
+  const a = wordsFor(locale, 'share.ad')
   const featured = games.filter((game) => game.featured)
-  const lines = [`## ${t.games.heading}`, a.gamesIntro, a.gamesMore(games.length)]
+  const lines = [`## ${t('games.heading')}`, a('gamesIntro'), a('gamesMore', { count: String(games.length) })]
   const extras = featured.length > 0 ? ['', ...featured.map((game) => bullet(plain(game.name)))] : []
   return assemble(lines, extras, absoluteUrl(locale, '/games'))
 }
 
 /** The ad for one plan line (VPS or game servers) on /pricing: its starting price and each group's. */
 export function productLineAd({ t, locale }: Context, line: ProductLine, why: string[] = []): string {
-  const a = t.share.ad
-  const from = (price: number) => `${t.pricing.from} ${formatPrice(price)}${t.pricing.perMonth}`
+  const a = wordsFor(locale, 'share.ad')
+  const from = (price: number) => `${t('pricing.from')} ${formatPrice(price)}${t('pricing.perMonth')}`
   const lines = [
-    `## ${t.pricing.lines[line.id]}`,
-    a.pricingIntro,
+    `## ${t(`pricing.lines.${line.id}`)}`,
+    a('pricingIntro'),
     '',
     ...line.groups.map((group) =>
       bullet(`${group.label}: ${group.storageType}, ${from(Math.min(...group.plans.map((plan) => plan.price)))}`),
     ),
   ]
-  const extras = ['', `**${t.pricing.included}**`, ...line.included.map((item) => bullet(plain(item))), ...whySection(t, why)]
+  const extras = ['', `**${t('pricing.included')}**`, ...line.included.map((item) => bullet(plain(item))), ...whySection(t, why)]
   return assemble(lines, extras, absoluteUrl(locale, pricingHref(line.id)))
 }
 
 /** The "Become a partner" ad for /partners, from the partner program text already on that page. */
-export function partnersIndexAd({ t, locale }: Context): string {
-  const program = t.partners.program
+export function partnersIndexAd({ locale }: Context): string {
+  const program = wordsFor(locale, 'partners.program')
   const percent = referralDiscount(locale)
   const lines = [
-    `## ${program.heading}`,
-    program.intro,
+    `## ${program('heading')}`,
+    program('intro'),
     '',
-    bullet(`**${program.approved.title}**`),
-    bullet(`**${program.code.title}**`),
-    bullet(`**${program.discount.title(percent)}**`),
-    bullet(`**${program.credit.title}**`),
-    bullet(`**${program.profile.title}**`),
+    bullet(`**${program('approved.title')}**`),
+    bullet(`**${program('code.title')}**`),
+    bullet(`**${program('discount.title', { percent })}**`),
+    bullet(`**${program('credit.title')}**`),
+    bullet(`**${program('profile.title')}**`),
   ]
-  const extras = ['', program.ticketNote]
+  const extras = ['', program('ticketNote')]
   return assemble(lines, extras, absoluteUrl(locale, '/partners'))
 }
 
 /** The labels the <ShareAd> button needs, in the language of the page. */
-export function shareLabels(t: Copy) {
-  const s = t.share
+export function shareLabels(t: Translator) {
   return {
-    copy: s.copyAd,
-    copied: s.copied,
-    copyFailed: s.copyFailed,
-    preview: s.preview,
-    previewTitle: s.previewTitle,
-    previewHint: s.previewHint,
-    share: s.nativeShare,
-    close: s.close,
+    copy: t('share.copyAd'),
+    copied: t('share.copied'),
+    copyFailed: t('share.copyFailed'),
+    preview: t('share.preview'),
+    previewTitle: t('share.previewTitle'),
+    previewHint: t('share.previewHint'),
+    share: t('share.nativeShare'),
+    close: t('share.close'),
   }
 }
 

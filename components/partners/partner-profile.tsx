@@ -10,7 +10,7 @@ import { Button } from '@/platform/components/button'
 import type { Partner } from '@/data/partners'
 import { localePath } from '@/i18n/config'
 import { localizedGames } from '@/i18n/content'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { formatMonth } from '@/i18n/dates'
 import { getLocale } from '@/i18n/locale'
 import {
@@ -32,8 +32,8 @@ import { cn } from '@/lib/utils'
  */
 export function PartnerProfile({ partner }: { partner: Partner }) {
   const locale = getLocale()
-  const t = copy()
-  const words = t.partners
+  const t = words()
+  const p = words('partners')
   const path = (href: string) => localePath(locale, href)
   const links = socialLinks(partner)
   const games = partnerGames(partner, localizedGames())
@@ -43,7 +43,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
     <>
       <div className="pt-10 md:pt-14">
         <Breadcrumbs
-          breadcrumbs={[{ label: words.crumb, href: '/partners' }]}
+          breadcrumbs={[{ label: p('crumb'), href: '/partners' }]}
           crumbLabel={partner.name}
           path={`/partners/${partner.slug}`}
           className="mb-6"
@@ -52,7 +52,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
         <div className="aspect-[3/1] overflow-hidden rounded-2xl border bg-card">
           <PartnerBanner
             src={partner.banner}
-            alt={words.profile.bannerAlt(partner.name)}
+            alt={p('profile.bannerAlt', { name: partner.name })}
             preload
             sizes="(min-width: 72rem) 68rem, 100vw"
           />
@@ -62,7 +62,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
           <PartnerAvatar
             name={partner.name}
             src={partner.avatar}
-            alt={words.profile.avatarAlt(partner.name)}
+            alt={p('profile.avatarAlt', { name: partner.name })}
             loading="eager"
             className="-mt-12 size-24 shrink-0 text-xl sm:-mt-16 sm:size-32 sm:text-2xl md:-mt-20 md:size-40 md:text-3xl"
           />
@@ -74,9 +74,9 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
             <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted-foreground">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 font-medium text-foreground">
                 <BadgeCheck aria-hidden="true" className="size-4 text-link" />
-                {words.officialPartner}
+                {p('officialPartner')}
               </span>
-              <span>{words.since(formatMonth(partner.since, locale))}</span>
+              <span>{p('since', { month: formatMonth(partner.since, locale) })}</span>
             </p>
           </div>
         </div>
@@ -98,17 +98,17 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
           <aside aria-labelledby="referral-heading" className="lg:order-last">
             <div className="rounded-2xl border border-primary/30 bg-card/30 p-6 lg:sticky lg:top-24">
               <h2 id="referral-heading" className="text-sm font-medium text-muted-foreground">
-                {words.profile.referral(partner.name)}
+                {p('profile.referral', { name: partner.name })}
               </h2>
               <CopyButton value={partner.referralCode} labels={copyLabels(t)} size="lg" className="mt-3" />
               <Button asChild size="lg" className="mt-6 h-auto min-h-11 w-full py-2.5 text-center whitespace-normal">
                 <a href={referralSignupUrl(partner.referralCode)} target="_blank" rel="noopener noreferrer">
-                  {words.profile.signUp}
-                  <span className="sr-only">{t.header.newTab}</span>
+                  {p('profile.signUp')}
+                  <span className="sr-only">{t('header.newTab')}</span>
                 </a>
               </Button>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                {words.profile.discount(referralDiscount(locale))}
+                {p('profile.discount', { percent: referralDiscount(locale) })}
               </p>
             </div>
           </aside>
@@ -117,7 +117,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
         <div className="min-w-0 space-y-14">
           <section aria-labelledby="about-heading">
             <h2 id="about-heading" className="text-2xl font-semibold tracking-tight text-foreground">
-              {words.profile.about(partner.name)}
+              {p('profile.about', { name: partner.name })}
             </h2>
             <div
               lang={partnerTextLang(partner.description, locale)}
@@ -132,7 +132,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
           {links.length > 0 && (
             <section aria-labelledby="links-heading">
               <h2 id="links-heading" className="text-2xl font-semibold tracking-tight text-foreground">
-                {words.profile.links(partner.name)}
+                {p('profile.links', { name: partner.name })}
               </h2>
               <ul className="mt-5 grid gap-3 sm:grid-cols-2">
                 {links.map((link) => (
@@ -156,7 +156,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
                         aria-hidden="true"
                         className="ml-auto size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
                       />
-                      <span className="sr-only">{t.header.newTab}</span>
+                      <span className="sr-only">{t('header.newTab')}</span>
                     </a>
                   </li>
                 ))}
@@ -167,7 +167,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
           {games.length > 0 && (
             <section aria-labelledby="games-heading">
               <h2 id="games-heading" className="text-2xl font-semibold tracking-tight text-foreground">
-                {words.profile.games}
+                {p('profile.games')}
               </h2>
               <ul className="mt-4 flex flex-wrap gap-2">
                 {games.map((game) =>
@@ -197,7 +197,7 @@ export function PartnerProfile({ partner }: { partner: Partner }) {
               className="group inline-flex items-center gap-1.5 text-sm font-medium text-link transition-colors hover:text-foreground"
             >
               <ArrowLeft aria-hidden="true" className="size-4 transition-transform group-hover:-translate-x-0.5" />
-              {words.profile.allPartners}
+              {p('profile.allPartners')}
             </Link>
           </p>
         </div>

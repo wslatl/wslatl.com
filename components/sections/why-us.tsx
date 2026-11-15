@@ -2,13 +2,13 @@ import Link from 'next/link'
 import { Check } from 'lucide-react'
 import { SectionHeader } from '@/components/ui/section-header'
 import { siteConfig } from '@/config/site'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { getLocale } from '@/i18n/locale'
 import { localePath } from '@/i18n/config'
 import { localizedCommitments, localizedFeatures, localizedLeadFeature } from '@/i18n/content'
 
 export function WhyUs() {
-  const t = copy()
+  const t = words()
   const locale = getLocale()
   const commitments = localizedCommitments()
   const features = localizedFeatures()
@@ -17,8 +17,8 @@ export function WhyUs() {
   return (
     <section id="why-us" aria-labelledby="why-us-heading" className="border-y bg-card/20 py-20 md:py-28">
       <div className="shell">
-        <SectionHeader id="why-us-heading" title={t.home.whyUs.heading}>
-          <p>{t.home.whyUs.intro}</p>
+        <SectionHeader id="why-us-heading" title={t('home.whyUs.heading')}>
+          <p>{t('home.whyUs.intro')}</p>
         </SectionHeader>
 
         {/* Columns follow the strip's own width in rem, so enlarged text gets fewer, wider cells. */}
@@ -35,12 +35,12 @@ export function WhyUs() {
           </dl>
         </div>
         <p className="mt-4 text-sm text-muted-foreground">
-          {t.home.whyUs.slaNotePrefix}{' '}
+          {t('home.whyUs.slaNotePrefix')}{' '}
           <Link
             href={localePath(locale, siteConfig.paths.sla)}
             className="text-link underline underline-offset-4 hover:text-foreground"
           >
-            {t.home.whyUs.slaLink}
+            {t('home.whyUs.slaLink')}
           </Link>
           .
         </p>
@@ -58,8 +58,8 @@ export function WhyUs() {
                 rel="noopener noreferrer"
                 className="text-link underline underline-offset-4 hover:text-foreground"
               >
-                {t.home.whyUs.joinDiscord}
-                <span className="sr-only">{t.header.newTab}</span>
+                {t('home.whyUs.joinDiscord')}
+                <span className="sr-only">{t('header.newTab')}</span>
               </a>
               <a
                 href={siteConfig.links.billing}
@@ -67,8 +67,8 @@ export function WhyUs() {
                 rel="noopener noreferrer"
                 className="text-link underline underline-offset-4 hover:text-foreground"
               >
-                {t.home.whyUs.openTicket}
-                <span className="sr-only">{t.header.newTab}</span>
+                {t('home.whyUs.openTicket')}
+                <span className="sr-only">{t('header.newTab')}</span>
               </a>
             </p>
           </div>

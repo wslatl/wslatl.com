@@ -4,7 +4,7 @@ import type { Partner } from '@/data/partners'
 import type { ProductLine } from '@/data/pricing'
 import type { GameEntry } from '@/data/games'
 import { localizedCommitments, localizedFeatures, localizedGames, localizedLeadFeature, localizedProductLine, localizedServices } from '@/i18n/content'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { getLocale } from '@/i18n/locale'
 import { partnerGames } from '@/lib/partners'
 import { gameAd, gamesIndexAd, homeAd, partnerAd, partnersIndexAd, productLineAd, shareLabels, whyLines } from '@/lib/share'
@@ -30,14 +30,14 @@ function siteContent() {
 }
 
 function context() {
-  return { t: copy(), locale: getLocale() }
+  return { t: words(), locale: getLocale() }
 }
 
 /** The ad for the whole company. */
 export function ShareSiteAd(look: Look) {
   const ctx = context()
   const text = homeAd(ctx, siteContent())
-  return <ShareAd text={text} labels={{ ...shareLabels(ctx.t), copy: ctx.t.share.shareOurAd }} {...look} />
+  return <ShareAd text={text} labels={{ ...shareLabels(ctx.t), copy: ctx.t('share.shareOurAd') }} {...look} />
 }
 
 /** The ad for one partner, with the names of the games they play. */

@@ -3,16 +3,17 @@ import { sectionHeadingClass } from '@/components/ui/section-header'
 import { Email } from '@/components/ui/email'
 import { SiteLink } from '@/platform/components/site-link'
 import { siteConfig } from '@/config/site'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 
 const ctaClass = 'mt-2 inline-block text-sm font-medium text-link underline underline-offset-4 hover:text-foreground'
 
 export function Contact() {
-  const t = copy()
-  const reachOptions = [
-    { ...t.home.contact.options.discord, href: siteConfig.links.discord },
-    { ...t.home.contact.options.billing, href: siteConfig.links.billing },
-    { ...t.home.contact.options.email, email: 'support' as const },
+  const t = words()
+  // A way to talk is a link, or for email the address revealed on the page.
+  const reachOptions: ({ title: string; description: string } & ({ cta: string; href: string } | { email: 'support' }))[] = [
+    { title: t('home.contact.options.discord.title'), description: t('home.contact.options.discord.description'), cta: t('home.contact.options.discord.cta'), href: siteConfig.links.discord },
+    { title: t('home.contact.options.billing.title'), description: t('home.contact.options.billing.description'), cta: t('home.contact.options.billing.cta'), href: siteConfig.links.billing },
+    { title: t('home.contact.options.email.title'), description: t('home.contact.options.email.description'), email: 'support' as const },
   ]
 
   return (
@@ -21,19 +22,19 @@ export function Contact() {
         <div className="grid gap-12 rounded-3xl border border-primary/30 bg-card/30 p-6 sm:p-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:p-14">
           <div>
             <h2 id="contact-heading" className={sectionHeadingClass}>
-              {t.home.contact.heading}
+              {t('home.contact.heading')}
             </h2>
-            <p className="mt-5 max-w-lg leading-relaxed text-muted-foreground">{t.home.contact.body}</p>
+            <p className="mt-5 max-w-lg leading-relaxed text-muted-foreground">{t('home.contact.body')}</p>
             <Button asChild size="lg" className="mt-8">
               <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-                {t.home.contact.requestAccess}
-                <span className="sr-only">{t.header.newTab}</span>
+                {t('home.contact.requestAccess')}
+                <span className="sr-only">{t('header.newTab')}</span>
               </a>
             </Button>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-foreground">{t.home.contact.preferToTalk}</h3>
+            <h3 className="text-sm font-semibold text-foreground">{t('home.contact.preferToTalk')}</h3>
             <ul className="mt-4 divide-y border-y">
               {reachOptions.map((option) => (
                 <li key={option.title} className="py-5">
@@ -43,7 +44,7 @@ export function Contact() {
                     <Email name={option.email} className={ctaClass} />
                   ) : (
                     // Both are short links (/discord, /billing), which leave the site.
-                    <SiteLink href={option.href} external newTab={t.header.newTab} className={ctaClass}>
+                    <SiteLink href={option.href} external newTab={t('header.newTab')} className={ctaClass}>
                       {option.cta}
                     </SiteLink>
                   )}

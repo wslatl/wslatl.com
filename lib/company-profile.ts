@@ -3,7 +3,7 @@ import { shortLinks } from '@/config/links'
 import { legalPages, legalSlug } from '@/data/legal'
 import { team } from '@/data/team'
 import { faqs } from '@/data/faqs'
-import { en } from '@/i18n/copy/en'
+import { listOf, wordsFor } from '@/i18n/words'
 import { fillPrices } from '@/lib/pricing'
 
 /**
@@ -43,7 +43,8 @@ export interface CompanyProfile {
 const notCompanyLinks: readonly string[] = ['credits']
 
 export function buildCompanyProfile(now: Date = new Date()): CompanyProfile {
-  const about = en.home.about
+  // The profile is in English, the billing panel's language.
+  const about = wordsFor('en', 'home.about')
 
   return {
     version: companyProfileVersion,
@@ -56,9 +57,9 @@ export function buildCompanyProfile(now: Date = new Date()): CompanyProfile {
     // The photo is left out: the profile is words, not pictures.
     team: team.map(({ name, role, bio }) => ({ name, role, bio })),
     about: {
-      heading: about.heading,
-      paragraphs: [...about.paragraphs],
-      closing: about.closing,
+      heading: about('heading'),
+      paragraphs: listOf('home.about.paragraphs', { locale: 'en' }),
+      closing: about('closing'),
     },
     links: Object.fromEntries(
       Object.entries(shortLinks)

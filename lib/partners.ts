@@ -1,7 +1,7 @@
 import { shortLinks } from '@/config/links'
 import { referralDiscountPercent } from '@/config/referral'
 import { defaultLocale, locales, type Locale } from '@/i18n/config'
-import type { Copy } from '@/i18n/copy/en'
+import type { Translator } from '@/i18n/words'
 import { languageTag } from '@/i18n/dates'
 import { partnerImageTypes } from '@/i18n/routing'
 import { slugify } from '@/lib/utils'
@@ -52,15 +52,15 @@ export function hasReferralCode(partner: Partner): partner is Partner & { referr
  * nobody listed can give.
  */
 export function partnersPageText(
-  t: Copy['partners'],
+  t: Translator<'partners'>,
   partnerCount: number,
   locale: Locale,
   codeCount: number = partnerCount,
 ) {
-  if (partnerCount === 0) return { intro: t.emptyIntro, description: t.emptyMetaDescription }
-  if (codeCount === 0) return { intro: t.introNoCodes, description: t.metaDescriptionNoCodes }
+  if (partnerCount === 0) return { intro: t('emptyIntro'), description: t('emptyMetaDescription') }
+  if (codeCount === 0) return { intro: t('introNoCodes'), description: t('metaDescriptionNoCodes') }
   const percent = referralDiscount(locale)
-  return { intro: t.intro(percent), description: t.metaDescription(percent) }
+  return { intro: t('intro', { percent }), description: t('metaDescription', { percent }) }
 }
 
 /**
@@ -72,10 +72,10 @@ export function partnersPageText(
  * front of a German sentence reads as a mistake and muddles which language
  * the page is in. It ends with a full stop, so the two read as sentences.
  */
-export function partnerMetaDescription(partner: Partner, t: Copy['partners']['profile'], locale: Locale): string {
+export function partnerMetaDescription(partner: Partner, t: Translator<'partners.profile'>, locale: Locale): string {
   const about = hasReferralCode(partner)
-    ? t.metaDescription(partner.referralCode, referralDiscount(locale))
-    : t.metaDescriptionNoCode(partner.name)
+    ? t('metaDescription', { code: partner.referralCode, percent: referralDiscount(locale) })
+    : t('metaDescriptionNoCode', { name: partner.name })
   if (partnerTextLang(partner.tagline, locale)) return about
   const tagline = partnerText(partner.tagline, locale).trim()
   return `${/[.!?]$/.test(tagline) ? tagline : `${tagline}.`} ${about}`
@@ -207,8 +207,8 @@ export const socialPlatforms: Record<SocialPlatform, PlatformRule> = {
 }
 
 /** A platform's name for a label: its own brand name, or "Website" in the reader's language. */
-export function platformName(platform: SocialPlatform, t: Copy): string {
-  return platform === 'website' ? t.partners.website : socialPlatforms[platform].name
+export function platformName(platform: SocialPlatform, t: Translator): string {
+  return platform === 'website' ? t('partners.website') : socialPlatforms[platform].name
 }
 
 /** Why a social link is not acceptable, or null when it is. */

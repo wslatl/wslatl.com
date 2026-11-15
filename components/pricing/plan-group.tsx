@@ -4,7 +4,7 @@ import type { PlanGroup, ProductLine } from '@/data/pricing'
 import { siteConfig } from '@/config/site'
 import { formatGb, formatPrice, formatTraffic } from '@/lib/pricing'
 import { cn } from '@/lib/utils'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 
 interface PlanGroupTableProps {
   line: ProductLine
@@ -14,12 +14,12 @@ interface PlanGroupTableProps {
 }
 
 function OrderButton({ planName, emphasis, className }: { planName: string; emphasis: boolean; className?: string }) {
-  const t = copy().pricing
+  const t = words('pricing')
   return (
     <Button asChild size="sm" variant={emphasis ? 'default' : 'outline'} className={className}>
       <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-        {t.table.order}
-        <span className="sr-only">{t.table.orderPlan(planName)}</span>
+        {t('table.order')}
+        <span className="sr-only">{t('table.orderPlan', { plan: planName })}</span>
       </a>
     </Button>
   )
@@ -28,7 +28,7 @@ function OrderButton({ planName, emphasis, className }: { planName: string; emph
 function PopularTag() {
   return (
     <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-link">
-      {copy().pricing.table.popular}
+      {words()('pricing.table.popular')}
     </span>
   )
 }
@@ -39,7 +39,7 @@ function PopularTag() {
  * assistive tech sees a single copy.
  */
 export function PlanGroupTable({ line, group, showComparisons = true }: PlanGroupTableProps) {
-  const t = copy().pricing
+  const t = words('pricing')
   const showTraffic = group.plans.some((p) => p.trafficTb !== undefined)
   const headingId = `${group.id}-heading`
 
@@ -50,7 +50,7 @@ export function PlanGroupTable({ line, group, showComparisons = true }: PlanGrou
           {group.label}
         </h3>
         <span className="text-sm text-muted-foreground">
-          {group.storageType} {t.storageSuffix}
+          {group.storageType} {t('storageSuffix')}
         </span>
       </div>
       <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground">{group.description}</p>
@@ -60,7 +60,7 @@ export function PlanGroupTable({ line, group, showComparisons = true }: PlanGrou
       <div className="mt-5 hidden overflow-hidden rounded-xl border @min-[44rem]:block">
         <table className="w-full table-fixed text-left text-sm tabular-nums">
           <caption className="sr-only">
-            {t.table.caption(group.label)}
+            {t('table.caption', { group: group.label })}
           </caption>
           {/* Fixed widths so tables with the same columns line up down the page. */}
           <colgroup>
@@ -74,13 +74,13 @@ export function PlanGroupTable({ line, group, showComparisons = true }: PlanGrou
           </colgroup>
           <thead className="bg-card/50 text-muted-foreground">
             <tr>
-              <th scope="col" className="px-5 py-3 font-medium">{t.table.plan}</th>
+              <th scope="col" className="px-5 py-3 font-medium">{t('table.plan')}</th>
               <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{line.cpuUnit}</th>
-              <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{t.table.ram}</th>
-              <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{t.table.storage}</th>
-              {showTraffic && <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{t.table.traffic}</th>}
-              <th scope="col" className="px-4 py-3 text-right font-medium break-words hyphens-auto">{t.table.price}</th>
-              <th scope="col" className="px-5 py-3"><span className="sr-only">{t.table.order}</span></th>
+              <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{t('table.ram')}</th>
+              <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{t('table.storage')}</th>
+              {showTraffic && <th scope="col" className="px-4 py-3 font-medium break-words hyphens-auto">{t('table.traffic')}</th>}
+              <th scope="col" className="px-4 py-3 text-right font-medium break-words hyphens-auto">{t('table.price')}</th>
+              <th scope="col" className="px-5 py-3"><span className="sr-only">{t('table.order')}</span></th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -98,10 +98,10 @@ export function PlanGroupTable({ line, group, showComparisons = true }: PlanGrou
                 <td className="px-4 py-3.5 text-foreground/90">{plan.cpu}</td>
                 <td className="px-4 py-3.5 text-foreground/90">{formatGb(plan.ramGb)}</td>
                 <td className="px-4 py-3.5 text-foreground/90">{formatGb(plan.storageGb)}</td>
-                {showTraffic && <td className="px-4 py-3.5 text-foreground/90">{formatTraffic(plan) ?? t.table.notAvailable}</td>}
+                {showTraffic && <td className="px-4 py-3.5 text-foreground/90">{formatTraffic(plan) ?? t('table.notAvailable')}</td>}
                 <td className="px-4 py-3.5 text-right whitespace-nowrap">
                   <span className="text-base font-semibold text-foreground">{formatPrice(plan.price)}</span>
-                  <span className="text-muted-foreground">{t.perMonth}</span>
+                  <span className="text-muted-foreground">{t('perMonth')}</span>
                 </td>
                 <td className="px-5 py-3 text-right">
                   <OrderButton planName={plan.name} emphasis={!!plan.popular} />
@@ -123,7 +123,7 @@ export function PlanGroupTable({ line, group, showComparisons = true }: PlanGrou
               </p>
               <p className="shrink-0 tabular-nums">
                 <span className="text-lg font-semibold text-foreground">{formatPrice(plan.price)}</span>
-                <span className="text-sm text-muted-foreground">{t.perMonth}</span>
+                <span className="text-sm text-muted-foreground">{t('perMonth')}</span>
               </p>
             </div>
             <dl className={cn('mt-3 grid grid-cols-2 gap-2 text-sm tabular-nums', showTraffic ? '@min-[20rem]:grid-cols-4' : '@min-[16rem]:grid-cols-3')}>
@@ -132,17 +132,17 @@ export function PlanGroupTable({ line, group, showComparisons = true }: PlanGrou
                 <dd className="text-foreground/90">{plan.cpu}</dd>
               </div>
               <div>
-                <dt className="text-xs text-muted-foreground">{t.table.ram}</dt>
+                <dt className="text-xs text-muted-foreground">{t('table.ram')}</dt>
                 <dd className="text-foreground/90">{formatGb(plan.ramGb)}</dd>
               </div>
               <div>
-                <dt className="text-xs text-muted-foreground">{t.table.storage}</dt>
+                <dt className="text-xs text-muted-foreground">{t('table.storage')}</dt>
                 <dd className="text-foreground/90">{formatGb(plan.storageGb)}</dd>
               </div>
               {showTraffic && (
                 <div>
-                  <dt className="text-xs text-muted-foreground">{t.table.traffic}</dt>
-                  <dd className="text-foreground/90">{formatTraffic(plan) ?? t.table.notAvailable}</dd>
+                  <dt className="text-xs text-muted-foreground">{t('table.traffic')}</dt>
+                  <dd className="text-foreground/90">{formatTraffic(plan) ?? t('table.notAvailable')}</dd>
                 </div>
               )}
             </dl>

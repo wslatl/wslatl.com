@@ -80,7 +80,7 @@ Visitors can copy a ready-made Discord post about a page: the footer has "Share 
 
 - The text is built by pure functions in `lib/share.ts` (`homeAd`, `partnerAd`, `gameAd`, `gamesIndexAd`, `productLineAd`, `partnersIndexAd`). They take the site's words and data as arguments and use only what is already on the site: prices come from `data/pricing.ts`, a partner's discount line only appears when they have a code.
 - Each ad is Discord markdown: a `## ` title, `### ` headings, `- ` bullets, and the page's full address alone on the last line so Discord shows a link preview. Other links are wrapped in `<angle brackets>` so they do not push that preview out. No mentions are ever written, and a partner's own words are escaped.
-- The wording is under `share` in `i18n/copy/*.ts` (all five languages); the ad follows the page's language. Which facts go into the main ad (services, features, commitments) is chosen in `homeAd`.
+- The wording is under `share` in `messages/<locale>.json` (all five languages); the ad follows the page's language. Which facts go into the main ad (services, features, commitments) is chosen in `homeAd`.
 - Ads are kept under Discord's 2000 character limit: the required lines always stay, optional lines are added only while they fit. `tests/share.test.ts` checks every ad in every language.
 - The button is `components/share/share-ad.tsx`; `components/share/ads.tsx` builds the text on the server for each page.
 
@@ -136,22 +136,22 @@ Addresses live only in `config/emails.ts` and are rendered with `<Email name="su
 
 ## Languages
 
-The site is published in English, Spanish, French, German and Portuguese. English keeps the plain URLs it has always had (`/pricing`, `/legal/terms`); the others sit under a prefix (`/es/pricing`). Every page lives under `app/[locale]`, `proxy.ts` rewrites an unprefixed path to the English tree without changing the URL, and `/en/...` redirects to the plain address so no page has two.
+The site is published in English, Spanish, French, German and Portuguese. English keeps the plain URLs it has always had (`/pricing`, `/legal/terms`); the others sit under a prefix (`/es/pricing`). Every page lives under `app/[locale]`. The routing is the shared kit's (`platform/i18n`, on next-intl 4): `proxy.ts` hands each request to it, which rewrites an unprefixed path to the English tree without changing the URL, and `/en/...` redirects to the plain address (`next.config.mjs`) so no page has two.
 
 | Where | What it holds |
 | --- | --- |
 | `i18n/config.ts` | The languages, their names, and `localePath()` |
 | `i18n/locale.ts` | The language of the page being rendered |
-| `i18n/copy/` | The words components render, one file per language |
+| `messages/<locale>.json` | The words components render, one file per language, as ICU messages; `i18n/words.ts` reads them through next-intl |
 | `i18n/content/` | Translations of the text in `data/`, keyed by id |
 | `i18n/error-copy.ts` | The error boundary's words, kept small because it ships with every page |
 | `content/legal/<locale>/` | Translated legal documents, registered in `content/legal/index.ts` |
 
-Each language's copy file is typed against English, so a missing or extra key fails the build, and the tests fail if a language is mostly English, loses a `{placeholder}`, or is short an entry from `data/`. Anything without a translation falls back to English rather than rendering blank.
+Each language's messages are typed against English, so a missing key fails the build, and `npm run i18n:check` (in CI, from the kit) fails on a key a language is missing or English does not have, an argument or tag that differs from English, an empty message, a dash or a middle dot, and a legal document missing in a language. The tests fail if a language is mostly English, loses a `{placeholder}`, or is short an entry from `data/`.
 
-To add a language: add it to `locales` in `i18n/config.ts`, add `i18n/copy/<locale>.ts` and `i18n/content/<locale>.ts`, add its entry to `i18n/error-copy.ts`, and translate the legal documents. Routing, the language picker, hreflang and the sitemap follow automatically.
+To add a language: add it to `locales` in `i18n/config.ts`, add `messages/<locale>.json` and `i18n/content/<locale>.ts`, add its entry to `i18n/error-copy.ts`, and translate the legal documents. Routing, the language picker, hreflang and the sitemap follow automatically.
 
-Prices, plan names, specs (vCPU, NVMe, GB), game titles, people's names and the slogan stay as they are in every language. A Server Component reads the language with `getLocale()`; a Client Component is handed plain strings, since it cannot read it (see `components/layout/site-header.tsx`).
+Prices, plan names, specs (vCPU, NVMe, GB), game titles, people's names and the slogan stay as they are in every language. A Server Component reads the language with `getLocale()` and its words with `words()` (`words('home.hero')('from', { price })`); a number goes in as text, as the page writes it. A Client Component is handed plain strings, since it cannot read it (see `components/layout/site-header.tsx`).
 
 Legal documents in a translation carry a notice that the English version is the one that applies, with a link to it.
 
@@ -222,11 +222,11 @@ Taking someone down is two steps on the same day: delete their entry and their f
 
 - `public/brand/downloads/`: eight PNGs copied byte for byte from `assets/logo-png/` (the mark at 64, 128, 256, 512 and 1024 px, the lockup at 1500x500, 1200x630 and 960x540).
 - `public/brand/kit-*.webp`: WebP at twice the size they show at. The mark and the lockup are the kit's PNGs, resized. The clear space, minimum size and do-and-don't diagrams are cropped to the figure: the guide's titles and captions are English text inside the picture and cannot be translated, so the page says the same in words, and the do-and-don't diagram is its six pictures with their labels written under them.
-- `data/brand.ts` and `i18n/copy/*.ts` (under `brand`): the guide's colors, examples and words.
+- `data/brand.ts` and `messages/<locale>.json` (under `brand`): the guide's colors, examples and words.
 
 The kit's two SVG files only wrap pictures, so they stay on Drive (`i18n/routing.ts` serves no SVG from `public/`, because one opened directly can carry script), and `logo-png/profile/` is not used.
 
-**When the kit changes:** download it and run `npm run brand:images -- "path/to/Brand Kit"` (`scripts/brand-kit.mjs`), which copies the downloads and makes the WebP files again. If a color, a size or an example changed in the guide, change `data/brand.ts` and the words in every `i18n/copy/<locale>.ts`; if the Drive folder moved, change `fullKitUrl`; if a diagram changed shape, adjust its crop in the script and its size in `data/brand.ts`. `tests/brand.test.ts` fails until each file is twice the size it shows at. Then run `npm run check`.
+**When the kit changes:** download it and run `npm run brand:images -- "path/to/Brand Kit"` (`scripts/brand-kit.mjs`), which copies the downloads and makes the WebP files again. If a color, a size or an example changed in the guide, change `data/brand.ts` and the words in every `messages/<locale>.json`; if the Drive folder moved, change `fullKitUrl`; if a diagram changed shape, adjust its crop in the script and its size in `data/brand.ts`. `tests/brand.test.ts` fails until each file is twice the size it shows at. Then run `npm run check`.
 
 Two of the voice examples hold figures, so they come from `data/pricing.ts` and `data/sla.ts` like every other figure on the site. The guide's line for new VPS plans says "$5.91/mo" beside the Ryzen 9 and NVMe, but $5.91 is the cheapest Budget plan (Intel i7, SATA SSD), so the page quotes what the Premium plans cost.
 

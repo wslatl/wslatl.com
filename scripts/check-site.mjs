@@ -92,7 +92,7 @@ async function checkSharePictures() {
 async function checkNotFound() {
   const stamp = Date.now()
   // The heading each language answers with, mirroring notFound.heading in
-  // i18n/copy. The 404 page is sent as data for the browser to build, so
+  // messages/<locale>.json. The 404 page is sent as data for the browser to build, so
   // there is no markup to read: these are matched against the response.
   const heading = {
     en: 'This page does not exist.',

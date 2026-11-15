@@ -18,8 +18,9 @@ import { legalPages } from '@/data/legal'
 import { mainNav } from '@/data/nav'
 import { partners, partnerTextLimits, socialPlatformIds, type Partner } from '@/data/partners'
 import { defaultLocale, locales } from '@/i18n/config'
-import { copyFor } from '@/i18n/copy'
-import { en } from '@/i18n/copy/en'
+import { messagesFor, wordsFor } from '@/i18n/words'
+
+const en = messagesFor('en')
 import {
   cardBannerSize,
   hasReferralCode,
@@ -405,9 +406,9 @@ describe('a partner with no referral code', () => {
 
   it('has a profile description with no code and no discount, in every language', () => {
     for (const locale of locales) {
-      const t = copyFor(locale).partners.profile
+      const t = wordsFor(locale, 'partners.profile')
       const description = partnerMetaDescription(partnerWithoutCode, t, locale)
-      const about = t.metaDescriptionNoCode(partnerWithoutCode.name)
+      const about = t('metaDescriptionNoCode', { name: partnerWithoutCode.name })
       // The tagline leads only in its own language, ending as a sentence.
       const tagline = partnerText(partnerWithoutCode.tagline, locale).replace(/([^.!?])$/, '$1.')
       const expected = partnerTextLang(partnerWithoutCode.tagline, locale) ? about : `${tagline} ${about}`
@@ -421,7 +422,7 @@ describe('a partner with no referral code', () => {
 
   it('keeps the code and the discount in the description of a partner who has one', () => {
     for (const locale of locales) {
-      const t = copyFor(locale).partners.profile
+      const t = wordsFor(locale, 'partners.profile')
       const description = partnerMetaDescription(examplePartner, t, locale)
       expect(description, locale).toContain(examplePartner.referralCode ?? '')
       expect(description, locale).toContain(referralDiscount(locale))
@@ -430,19 +431,19 @@ describe('a partner with no referral code', () => {
 
   it('does not let the partners page promise a discount when no listed partner has a code', () => {
     for (const locale of locales) {
-      const t = copyFor(locale).partners
+      const t = wordsFor(locale, 'partners')
       const plain = partnersPageText(t, 2, locale, 0)
       expect(plain, locale).toEqual({
-        intro: t.introNoCodes,
-        description: t.metaDescriptionNoCodes,
+        intro: t('introNoCodes'),
+        description: t('metaDescriptionNoCodes'),
       })
       expect(plain.intro, locale).not.toContain(referralDiscount(locale))
       expect(plain.description, locale).not.toContain(referralDiscount(locale))
       // One code anywhere in the list, or no count at all, keeps the offer.
-      expect(partnersPageText(t, 2, locale, 1).intro, locale).toBe(t.intro(referralDiscount(locale)))
-      expect(partnersPageText(t, 2, locale).intro, locale).toBe(t.intro(referralDiscount(locale)))
+      expect(partnersPageText(t, 2, locale, 1).intro, locale).toBe(t('intro', { percent: referralDiscount(locale) }))
+      expect(partnersPageText(t, 2, locale).intro, locale).toBe(t('intro', { percent: referralDiscount(locale) }))
       // And an empty list is still the invitation.
-      expect(partnersPageText(t, 0, locale, 0).intro, locale).toBe(t.emptyIntro)
+      expect(partnersPageText(t, 0, locale, 0).intro, locale).toBe(t('emptyIntro'))
     }
   })
 })
@@ -497,15 +498,15 @@ describe('the partners page', () => {
   it('describes itself to search engines and link previews the way its intro does', async () => {
     // With no partners yet, neither may talk about partners or codes that do not exist.
     for (const locale of locales) {
-      const t = copyFor(locale).partners
+      const t = wordsFor(locale, 'partners')
       expect(partnersPageText(t, 0, locale), locale).toEqual({
-        intro: t.emptyIntro,
-        description: t.emptyMetaDescription,
+        intro: t('emptyIntro'),
+        description: t('emptyMetaDescription'),
       })
-      expect(t.emptyMetaDescription, locale).not.toContain(String(referralDiscountPercent))
+      expect(t('emptyMetaDescription'), locale).not.toContain(String(referralDiscountPercent))
       const listed = partnersPageText(t, 1, locale)
-      expect(listed.description, locale).toBe(t.metaDescription(referralDiscount(locale)))
-      expect(listed.intro, locale).toBe(t.intro(referralDiscount(locale)))
+      expect(listed.description, locale).toBe(t('metaDescription', { percent: referralDiscount(locale) }))
+      expect(listed.intro, locale).toBe(t('intro', { percent: referralDiscount(locale) }))
     }
 
     // And the page itself, with the list as it ships.
@@ -513,7 +514,7 @@ describe('the partners page', () => {
       params: Promise.resolve({ locale: 'en' }),
     })
     const codeCount = partners.filter(hasReferralCode).length
-    const expected = partnersPageText(en.partners, partners.length, 'en', codeCount).description
+    const expected = partnersPageText(wordsFor('en', 'partners'), partners.length, 'en', codeCount).description
     expect(metadata.description).toBe(expected)
     expect(metadata.openGraph?.description).toBe(expected)
     expect(metadata.twitter?.description).toBe(expected)
@@ -587,7 +588,7 @@ describe('the partners page', () => {
     const html = renderProfile(examplePartner)
     expect(html).toContain(`>${examplePartner.name}</h1>`)
     expect(html).toContain(examplePartner.referralCode ?? '')
-    expect(html).toContain(en.partners.profile.discount(referralDiscount('en')))
+    expect(html).toContain(wordsFor('en', 'partners.profile')('discount', { percent: referralDiscount('en') }))
     for (const game of examplePartner.games ?? []) expect(html, game).toContain(`href="/games/${game}"`)
   })
 
@@ -632,7 +633,7 @@ describe('the partners page', () => {
     const profile = renderProfile(bare)
     expect(profile).not.toContain('<img')
     expect(profile).toContain('>LS</span>')
-    expect(profile).toContain(`aria-label="${en.partners.profile.avatarAlt(bare.name)}"`)
+    expect(profile).toContain(`aria-label="${wordsFor('en', 'partners.profile')('avatarAlt', { name: bare.name })}"`)
     expect(profile).toContain('data-plain-banner')
   })
 
@@ -696,9 +697,9 @@ describe('the partners page', () => {
 
     expect(html).not.toContain('<code')
     expect(html).not.toContain('referral-heading')
-    expect(html).not.toContain(en.partners.profile.referral(partnerWithoutCode.name))
+    expect(html).not.toContain(wordsFor('en', 'partners.profile')('referral', { name: partnerWithoutCode.name }))
     expect(html).not.toContain(en.partners.profile.signUp)
-    expect(html).not.toContain(en.partners.profile.discount(referralDiscount('en')))
+    expect(html).not.toContain(wordsFor('en', 'partners.profile')('discount', { percent: referralDiscount('en') }))
     expect(html).not.toContain(`>${en.partners.copy}<`)
     // No empty column is held open for the side box.
     expect(html).not.toContain('22rem')
@@ -718,7 +719,7 @@ describe('the partners page', () => {
 
   it('is linked from the header and the footer in every language', () => {
     for (const locale of locales) {
-      const t = copyFor(locale)
+      const t = wordsFor(locale)
       const target = locale === defaultLocale ? '/partners' : `/${locale}/partners`
       expect(
         mainNav(t, locale).map((link) => link.href),

@@ -3,8 +3,16 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Metadata } from 'next'
 import { siteConfig } from '@/config/site'
-import { defaultLocale, localePath, locales, openGraphLocales, type Locale } from '@/i18n/config'
+import { locales, type Locale } from '@/i18n/config'
 import { getLocale } from '@/i18n/locale'
+import { createSeo } from '@/platform/i18n/seo'
+
+/**
+ * Every address, hreflang set and Open Graph locale the site writes, from
+ * the kit (platform/i18n/seo.ts), on the site's own https address. Every
+ * page is written in all five languages.
+ */
+export const seo = createSeo(siteConfig.siteUrl)
 
 /**
  * A short fingerprint of the picture's file, for its address. Apps that show
@@ -41,10 +49,9 @@ export function shareCardUrl(path: string, locale: Locale): string {
   return `/og?${new URLSearchParams({ path, locale })}`
 }
 
-/** The full URL of a page in one language. */
+/** The full URL of a page in one language: the home page is the bare address, https://wslatl.com. */
 export function pageUrl(locale: Locale, path: string): string {
-  const localized = localePath(locale, path)
-  return localized === '/' ? siteConfig.siteUrl : `${siteConfig.siteUrl}${localized}`
+  return seo.pageUrl(locale, path)
 }
 
 /**
@@ -53,10 +60,7 @@ export function pageUrl(locale: Locale, path: string): string {
  * these, so they always agree.
  */
 export function languageAlternates(path: string): Record<Locale | 'x-default', string> {
-  return {
-    ...(Object.fromEntries(locales.map((other) => [other, pageUrl(other, path)])) as Record<Locale, string>),
-    'x-default': pageUrl(defaultLocale, path),
-  }
+  return seo.languageAlternates(path, locales) as Record<Locale | 'x-default', string>
 }
 
 interface PageMetadataInput {
@@ -101,14 +105,10 @@ export function pageMetadata({ title, description, path, absoluteTitle = false, 
   return {
     title: absoluteTitle ? { absolute: title } : title,
     description,
-    alternates: {
-      canonical: url,
-      languages: languageAlternates(path),
-    },
+    alternates: seo.alternates(language, path, locales),
     openGraph: {
       type: 'website',
-      locale: openGraphLocales[language],
-      alternateLocale: locales.filter((other) => other !== language).map((other) => openGraphLocales[other]),
+      ...seo.openGraph(language, locales),
       siteName: siteConfig.brand,
       url,
       title: fullTitle,

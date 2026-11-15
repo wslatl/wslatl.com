@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { defaultLocale, isLocale, localeNames, localePath, locales, openGraphLocales, stripLocale } from '@/i18n/config'
-import { copyFor } from '@/i18n/copy'
+import { categoryInSentence, messagesFor, wordsFor, type Words } from '@/i18n/words'
 import { errorCopy } from '@/i18n/error-copy'
 import { translationFor } from '@/i18n/content'
 import { services } from '@/data/services'
@@ -26,7 +26,7 @@ function cover(name: string, ids: string[], entries: Record<string, unknown> | u
 const tokens = (text = '') => [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1]).toSorted()
 
 /** The texts on the brand kit page that have a {0} where a line of English goes, besides the voice rules. */
-const markedTexts = (copy: ReturnType<typeof copyFor>) => [
+const markedTexts = (copy: Words) => [
   copy.brand.logo.parts,
   copy.brand.logo.minimum.body,
   copy.brand.type.serif.use,
@@ -35,7 +35,7 @@ const markedTexts = (copy: ReturnType<typeof copyFor>) => [
 /** The numbers in a text, as English writes them: 1,5 is 1.5. */
 const figures = (text: string) => [...text.matchAll(/\d+(?:[.,]\d+)?/g)].map((match) => match[0].replace(',', '.'))
 
-/** Every string in a dictionary, as "path: value" pairs. Functions are skipped. */
+/** Every string in the messages, as "path: value" pairs. */
 function strings(value: unknown, path = ''): [string, string][] {
   if (typeof value === 'string') return [[path, value]]
   if (Array.isArray(value)) return value.flatMap((item, i) => strings(item, `${path}[${i}]`))
@@ -72,17 +72,20 @@ describe('languages', () => {
   })
 })
 
-describe('site copy', () => {
+/** "More ... games", with the category written the way the language writes one in a sentence. */
+const moreIn = (locale: 'en' | 'de', category: string) => wordsFor(locale, 'games.detail')('moreIn', { category: categoryInSentence[locale](category) })
+
+describe('site words (messages/<locale>.json)', () => {
   it('gives every language the same keys as English', () => {
-    const english = strings(copyFor(defaultLocale)).map(([path]) => path)
+    const english = strings(messagesFor(defaultLocale)).map(([path]) => path)
     for (const locale of others) {
-      expect(strings(copyFor(locale)).map(([path]) => path), locale).toEqual(english)
+      expect(strings(messagesFor(locale)).map(([path]) => path), locale).toEqual(english)
     }
   })
 
   it('has no empty string in any language', () => {
     for (const locale of locales) {
-      const empty = strings(copyFor(locale)).filter(([, value]) => value.trim() === '')
+      const empty = strings(messagesFor(locale)).filter(([, value]) => value.trim() === '')
       expect(empty, locale).toEqual([])
     }
   })
@@ -90,9 +93,9 @@ describe('site copy', () => {
   it('actually translates: most strings differ from the English', () => {
     // Brand and product names are the same in every language, so this is a
     // floor, not a target. A language left in English lands far below it.
-    const english = new Map(strings(copyFor(defaultLocale)))
+    const english = new Map(strings(messagesFor(defaultLocale)))
     for (const locale of others) {
-      const pairs = strings(copyFor(locale))
+      const pairs = strings(messagesFor(locale))
       const translated = pairs.filter(([path, value]) => english.get(path) !== value)
       expect(translated.length / pairs.length, `${locale} is mostly English`).toBeGreaterThan(0.6)
     }
@@ -100,7 +103,7 @@ describe('site copy', () => {
 
   it('keeps the placeholders the browser fills in', () => {
     for (const locale of locales) {
-      const directory = copyFor(locale).games
+      const directory = messagesFor(locale).games
       expect(directory.matchCount, locale).toContain('{shown}')
       expect(directory.matchCount, locale).toContain('{total}')
       expect(directory.showing, locale).toContain('{shown}')
@@ -114,18 +117,18 @@ describe('site copy', () => {
     // {0} is the "Private Hosting" in the logo; the voice rules quote more
     // (tests/brand.test.ts checks those). A translation that drops one would
     // read fine and quietly lose the English.
-    const english = markedTexts(copyFor(defaultLocale)).map(tokens)
+    const english = markedTexts(messagesFor(defaultLocale)).map(tokens)
     expect(english.every((marks) => marks.length === 1)).toBe(true)
     for (const locale of others) {
-      expect(markedTexts(copyFor(locale)).map(tokens), locale).toEqual(english)
+      expect(markedTexts(messagesFor(locale)).map(tokens), locale).toEqual(english)
     }
   })
 
   it('writes the minimum sizes on the brand kit page with the same numbers in every language', () => {
     // They are the guide's rules: a translation puts them in its own words, never in other numbers.
-    const english = copyFor(defaultLocale).brand.logo.minimum
+    const english = messagesFor(defaultLocale).brand.logo.minimum
     for (const locale of others) {
-      const t = copyFor(locale).brand.logo.minimum
+      const t = messagesFor(locale).brand.logo.minimum
       for (const key of ['markScreen', 'markPrint', 'lockupScreen', 'lockupPrint'] as const) {
         expect(figures(t[key]), `${locale} ${key}`).toEqual(figures(english[key]))
       }
@@ -134,7 +137,7 @@ describe('site copy', () => {
 
   it('keeps the slogan in English, because it is the brand', () => {
     for (const locale of locales) {
-      const hero = copyFor(locale).home.hero
+      const hero = messagesFor(locale).home.hero
       expect(`${hero.lineOne} ${hero.emphasis} ${hero.lineTwo}`, locale).toBe('Hosting that actually gives a damn.')
     }
   })
@@ -148,9 +151,9 @@ describe('site copy', () => {
 
   it('lets each language case the category in "more games" its own way', () => {
     // German capitalizes nouns, so lowercasing it there reads as a mistake.
-    expect(copyFor('de').games.detail.moreIn('Shooter & Taktik')).toBe('Mehr Spiele aus Shooter & Taktik')
-    expect(copyFor('en').games.detail.moreIn('Survival & Sandbox')).toBe('More survival & sandbox games')
-    expect(copyFor('en').games.detail.moreIn('Zombie & PvP')).toBe('More zombie & PvP games')
+    expect(moreIn('de', 'Shooter & Taktik')).toBe('Mehr Spiele aus Shooter & Taktik')
+    expect(moreIn('en', 'Survival & Sandbox')).toBe('More survival & sandbox games')
+    expect(moreIn('en', 'Zombie & PvP')).toBe('More zombie & PvP games')
   })
 })
 
