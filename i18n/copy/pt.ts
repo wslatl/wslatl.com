@@ -73,16 +73,51 @@ export const pt: Copy = {
       emphasis: 'actually',
       lineTwo: 'gives a damn.',
       intro:
-        'Já trabalhamos dentro de empresas de hospedagem. Sabemos o que dá errado. A WSLATL existe para consertar isso: hospedagem VPS com todos os preços publicados, hospedagem de Minecraft e de servidores de jogos, e servidores dedicados, com uma equipe que realmente atende.',
+        'Servidores de jogos, VPS e servidores dedicados, tocados por uma equipe pequena no Missouri, com uma pessoa de verdade para conversar se algo quebrar.',
       seePlans: 'Ver planos e preços',
-      products: 'Produtos',
-      entries: {
-        vps: 'Hospedagem VPS',
+      live: {
+        heading: 'Nossas localizações',
+        cities: {
+          'los-angeles': 'Los Angeles',
+          'new-york': 'Nova York',
+        },
+        tiers: {
+          premium: 'Premium',
+          budget: 'Budget',
+        },
+        hardware: 'Planos {tier}, {cpu} com {storage}',
+        vps: 'VPS',
         game: 'Servidores de jogos',
-        other: 'Dedicados e hospedagem de sites',
+        fromPrice: 'a partir de {price}/mês',
+        states: {
+          up: 'Operacional',
+          partial: 'Interrupção parcial',
+          down: 'Fora do ar',
+          maintenance: 'Manutenção',
+          unknown: 'Sem dados',
+        },
+        checkedAt: 'Verificado às {time}',
+        unavailable: 'O status ao vivo não está disponível agora.',
+        more: {
+          one: '+{count} outra localização',
+          other: '+{count} outras localizações',
+        },
+        summary: {
+          allUp: 'Todas as {total} operacionais',
+          issues: {
+            one: '{count} de {total} com problemas',
+            other: '{count} de {total} com problemas',
+          },
+          maintenance: {
+            one: '{count} de {total} em manutenção',
+            other: '{count} de {total} em manutenção',
+          },
+          someUp: {
+            one: '{count} de {total} operacional',
+            other: '{count} de {total} operacionais',
+          },
+        },
       },
-      from: (price: string) => `a partir de ${price}/mês`,
-      quoted: 'Orçamento para a sua configuração',
     },
     clients: {
       heading: 'Com a confiança dos nossos clientes e parceiros',

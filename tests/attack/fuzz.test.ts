@@ -4,7 +4,9 @@ import { NextRequest } from 'next/server'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import sitemap from '@/app/sitemap'
 import { defaultLocale, locales, stripLocale } from '@/i18n/config'
+import { liveStatus } from '@/lib/live-status/source'
 import { proxy } from '@/proxy'
+import { kumaHeartbeats, kumaPage } from '../fixtures/kuma'
 import { type Admin, logsOf, makeAdmin, origin, paths, restart, send, setUp, signInFully, tearDown, wholeResponse } from './site'
 
 /**
@@ -312,6 +314,48 @@ describe('fuzzing the public routes', () => {
       const body = await response.text()
       expect(undated(body), `case ${i}`).toBe(first)
       expect(value.length <= 8 || !body.includes(value), `case ${i}`).toBe(true)
+    }
+  })
+
+  it('/live-status.json: the same answer whatever is sent with it, and nothing of what was sent', async () => {
+    rng = generator(seed + 4)
+    const { text, pick } = rng
+    // The status page as Kuma answers it, so the route has something to say.
+    const asked: string[] = []
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<typeof fetch>(async (input) => {
+        const url = String(input)
+        asked.push(url)
+        return Response.json(url.includes('/heartbeat/') ? kumaHeartbeats(Date.now()) : kumaPage)
+      }),
+    )
+    try {
+      liveStatus.forget()
+      const first = await (await send(paths.liveStatus, { method: 'GET' })).text()
+      expect(JSON.parse(first).locations).toEqual({ 'los-angeles': 'up', 'new-york': 'up' })
+      for (let i = 0; i < 150; i++) {
+        const key = printable(text(10)) || 'x'
+        const value = printable(text(20)) || 'y'
+        const response = await send(`${paths.liveStatus}?${encodeURIComponent(key)}=${encodeURIComponent(value)}`, {
+          method: pick(['GET', 'HEAD']),
+          headers: {
+            host: pick(['wslatl.com', 'evil.example', 'status.wslatl.com']),
+            cookie: printable(text(30)),
+            'accept-language': printable(text(10)),
+            'x-forwarded-host': printable(text(12)) || 'x',
+          },
+        })
+        expect(response.status, `case ${i}`).toBe(200)
+        const body = await response.text()
+        expect(body, `case ${i}`).toBe(first)
+        expect(value.length <= 8 || !body.includes(value), `case ${i}`).toBe(true)
+      }
+      // Only the status page's two fixed addresses, once, for all of them.
+      expect(asked.toSorted()).toEqual(['https://status.wslatl.com/api/status-page/heartbeat/wslatl', 'https://status.wslatl.com/api/status-page/wslatl'])
+    } finally {
+      vi.unstubAllGlobals()
+      liveStatus.forget()
     }
   })
 

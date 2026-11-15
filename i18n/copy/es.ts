@@ -73,16 +73,51 @@ export const es: Copy = {
       emphasis: 'actually',
       lineTwo: 'gives a damn.',
       intro:
-        'Hemos trabajado dentro de empresas de hosting. Sabemos lo que sale mal. WSLATL existe para arreglarlo: hosting VPS con todos los precios publicados, hosting de Minecraft y de servidores de juego, y servidores dedicados, con un equipo detrás que de verdad contesta.',
+        'Servidores de juego, VPS y servidores dedicados, llevados por un equipo pequeño en Missouri, con una persona real a la que escribir si algo se tuerce.',
       seePlans: 'Ver planes y precios',
-      products: 'Productos',
-      entries: {
-        vps: 'Hosting VPS',
+      live: {
+        heading: 'Nuestras ubicaciones',
+        cities: {
+          'los-angeles': 'Los Ángeles',
+          'new-york': 'Nueva York',
+        },
+        tiers: {
+          premium: 'Premium',
+          budget: 'Budget',
+        },
+        hardware: 'Planes {tier}, {cpu} con {storage}',
+        vps: 'VPS',
         game: 'Servidores de juego',
-        other: 'Dedicados y hosting web',
+        fromPrice: 'desde {price}/mes',
+        states: {
+          up: 'Operativo',
+          partial: 'Interrupción parcial',
+          down: 'Fuera de servicio',
+          maintenance: 'Mantenimiento',
+          unknown: 'Sin datos',
+        },
+        checkedAt: 'Comprobado a las {time}',
+        unavailable: 'El estado en directo no está disponible ahora mismo.',
+        more: {
+          one: '+{count} ubicación más',
+          other: '+{count} ubicaciones más',
+        },
+        summary: {
+          allUp: 'Las {total} operativas',
+          issues: {
+            one: '{count} de {total} con problemas',
+            other: '{count} de {total} con problemas',
+          },
+          maintenance: {
+            one: '{count} de {total} en mantenimiento',
+            other: '{count} de {total} en mantenimiento',
+          },
+          someUp: {
+            one: '{count} de {total} operativa',
+            other: '{count} de {total} operativas',
+          },
+        },
       },
-      from: (price: string) => `desde ${price}/mes`,
-      quoted: 'Presupuesto según tu configuración',
     },
     clients: {
       heading: 'Nuestros clientes y socios confían en nosotros',

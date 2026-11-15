@@ -32,13 +32,14 @@ describe('the files served from the site root', () => {
   })
 
   it('lists every route handler the app serves at the root', () => {
-    // app/company.json/route.ts is served at /company.json and app/og/route.tsx
-    // at /og. Added there and forgotten in rootFiles, a handler would be given
-    // a language and answer 404.
+    // app/company.json/route.ts is served at /company.json, app/og/route.tsx
+    // at /og and app/live-status.json/route.ts at /live-status.json. Added
+    // there and forgotten in rootFiles, a handler would be given a language
+    // and answer 404.
     const handlers = readdirSync(join(root, 'app')).filter((name) =>
       ['route.ts', 'route.tsx'].some((file) => existsSync(join(root, 'app', name, file))),
     )
-    expect(handlers).toEqual(expect.arrayContaining(['company.json', 'og']))
+    expect(handlers).toEqual(expect.arrayContaining(['company.json', 'live-status.json', 'og']))
     for (const name of handlers) expect(rootFiles, `/${name}`).toContain(`/${name}`)
   })
 

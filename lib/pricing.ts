@@ -74,6 +74,11 @@ export function storageTypes(id: ProductLineId): StorageType[] {
   return [...new Set(productLine(id).groups.map((g) => g.storageType))]
 }
 
+/** The storage types the plans of one tier run on, across both lines, in the order their groups are listed. */
+export function tierStorageTypes(tier: PlanGroup['tier']): StorageType[] {
+  return [...new Set(productLines.flatMap((line) => line.groups.filter((g) => g.tier === tier).map((g) => g.storageType)))]
+}
+
 export interface PlanMatch {
   group: PlanGroup
   plan: Plan
