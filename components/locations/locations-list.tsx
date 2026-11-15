@@ -210,7 +210,8 @@ export function LocationsList({
   return (
     <div>
       {filters && (
-        <div role="group" aria-label={filters.label} className="mb-8 flex flex-col gap-5 rounded-2xl border p-5 sm:flex-row sm:gap-10">
+        <fieldset data-filters="" className="mb-8 flex min-w-0 flex-col gap-5 rounded-2xl border p-5 sm:flex-row sm:gap-10">
+          <legend className="sr-only">{filters.label}</legend>
           <Choice
             legend={filters.product}
             options={[{ id: 'all' as ProductFilter, label: filters.all }, ...filters.products]}
@@ -227,7 +228,7 @@ export function LocationsList({
           <p role="status" className="text-sm text-muted-foreground sm:ml-auto sm:self-end">
             {fill(filters.showing, { shown: shown.length, total: views.length })}
           </p>
-        </div>
+        </fieldset>
       )}
 
       {shown.length === 0 && filters ? (

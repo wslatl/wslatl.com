@@ -40,12 +40,15 @@ describe('the locations', () => {
   })
 
   it('state no hardware the site does not already state: memory and RAID are in every plan group of their tier', () => {
-    for (const location of locations) {
-      for (const group of groups.filter((g) => g.tier === location.tier)) {
-        if (location.hardware.memory) expect(group.description, `${location.id} ${group.id}`).toContain(`${location.hardware.memory} memory`)
-        if (location.hardware.raid) expect(group.description, `${location.id} ${group.id}`).toContain(`in ${location.hardware.raid}`)
-      }
-    }
+    const unstated = locations.flatMap((location) =>
+      groups
+        .filter((group) => group.tier === location.tier)
+        .flatMap((group) => [
+          ...(location.hardware.memory && !group.description.includes(`${location.hardware.memory} memory`) ? [`${location.id}: ${group.id} says no ${location.hardware.memory}`] : []),
+          ...(location.hardware.raid && !group.description.includes(`in ${location.hardware.raid}`) ? [`${location.id}: ${group.id} says no ${location.hardware.raid}`] : []),
+        ]),
+    )
+    expect(unstated).toEqual([])
   })
 
   it('say whose hardware it is, where in the world, and in which country, with a flag to draw', () => {

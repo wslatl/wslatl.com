@@ -13,7 +13,7 @@ import { locations, type Location } from '@/data/locations'
 import { localePath, locales, type Locale } from '@/i18n/config'
 import { copyFor } from '@/i18n/copy'
 import { setLocale } from '@/i18n/locale'
-import { locationStates, type LocationState } from '@/lib/live-status/snapshot'
+import { locationStates } from '@/lib/live-status/snapshot'
 import { filtersFrom, matchesFilters } from '@/lib/locations-filter'
 import { countryName, productsAt, regionName } from '@/lib/locations'
 import { pageUrl } from '@/lib/metadata'
@@ -21,7 +21,7 @@ import { hardwareText } from '@/lib/page-text'
 import { formatPrice, pricingHref, startingPrice } from '@/lib/pricing'
 import { shareCardText } from '@/lib/share-card'
 import { limits } from '../scripts/lib/seo-rules.mjs'
-import { eightLocations, manyLocations } from './fixtures/locations'
+import { eightLocations } from './fixtures/locations'
 
 /**
  * /hardware-and-locations: one block per location, with today's two and
@@ -96,7 +96,7 @@ describe('the page with today\'s locations', () => {
     const html = page('en')
     expect(locations.length).toBeLessThan(filtersFrom)
     expect(html).not.toContain('id="region-')
-    expect(html).not.toContain('role="group"')
+    expect(html).not.toContain('data-filters')
     expect(html).not.toContain('type="radio"')
   })
 
@@ -130,7 +130,9 @@ describe('the page with the eight-location fixture', () => {
     const t = copyFor('de')
     const html = unescape(page('de', eightLocations))
     expect(eightLocations.length).toBeGreaterThanOrEqual(filtersFrom)
-    expect(html).toContain(`role="group" aria-label="${t.hardware.filters.label}"`)
+    // One set of filters, named for screen readers by its legend.
+    expect(html.match(/<fieldset data-filters=""/g)).toHaveLength(1)
+    expect(html).toContain(`<legend class="sr-only">${t.hardware.filters.label}</legend>`)
     expect(html.match(/type="radio"/g)).toHaveLength(6)
     expect(html).toContain(`>${t.hardware.filters.showing.replace('{shown}', '8').replace('{total}', '8')}</p>`)
   })
@@ -153,55 +155,59 @@ describe('the page with the eight-location fixture', () => {
   })
 })
 
-describe('filtering', () => {
-  const place = (products: ('vps' | 'game')[], tier: 'premium' | 'budget') => ({ products, tier })
+/** What the filters look at in a location. */
+const filterable = (products: ('vps' | 'game')[], tier: 'premium' | 'budget') => ({ products, tier })
 
-  it('keeps a location that runs the product and is in the tier, and nothing else', () => {
-    expect(matchesFilters(place(['vps', 'game'], 'premium'), 'all', 'all')).toBe(true)
-    expect(matchesFilters(place(['vps'], 'premium'), 'game', 'all')).toBe(false)
-    expect(matchesFilters(place(['vps', 'game'], 'budget'), 'game', 'premium')).toBe(false)
-    expect(matchesFilters(place(['game'], 'budget'), 'game', 'budget')).toBe(true)
-  })
+/** A block's words, for a list drawn without the page around it. */
+const view = (id: string, region: string, tier: 'premium' | 'budget', products: ('vps' | 'game')[]): LocationView => ({
+  id,
+  city: id,
+  country: 'United States',
+  countryCode: 'US',
+  region,
+  ownership: 'rented',
+  ownershipLabel: 'Rented',
+  tier,
+  tierLabel: tier,
+  specs: [],
+  products: products.map((line) => ({ id: line, label: line, before: 'from ', after: '/mo', price: '$1.00', href: '/pricing', note: null })),
+})
 
-  /** A block's words, for a list drawn without the page around it. */
-  const view = (id: string, region: string, tier: 'premium' | 'budget', products: ('vps' | 'game')[]): LocationView => ({
-    id,
-    city: id,
-    country: 'United States',
-    countryCode: 'US',
-    region,
-    ownership: 'rented',
-    ownershipLabel: 'Rented',
-    tier,
-    tierLabel: tier,
-    specs: [],
-    products: products.map((line) => ({ id: line, label: line, before: 'from ', after: '/mo', price: '$1.00', href: '/pricing', note: null })),
-  })
-  const labels = copyFor('en').hardware.filters
-  const list = (views: LocationView[], initialProduct: 'all' | 'vps' | 'game', initialTier: 'all' | 'premium' | 'budget' = 'all') =>
-    renderToStaticMarkup(
-      createElement(LocationsList, {
-        views,
-        regions: [
-          { id: 'north-america', name: 'North America' },
-          { id: 'europe', name: 'Europe' },
+const labels = copyFor('en').hardware.filters
+
+/** The list on its own, in English, starting from the filters given. */
+const list = (views: LocationView[], initialProduct: 'all' | 'vps' | 'game', initialTier: 'all' | 'premium' | 'budget' = 'all') =>
+  renderToStaticMarkup(
+    createElement(LocationsList, {
+      views,
+      regions: [
+        { id: 'north-america', name: 'North America' },
+        { id: 'europe', name: 'Europe' },
+      ],
+      filters: {
+        ...labels,
+        products: [
+          { id: 'vps', label: 'VPS' },
+          { id: 'game', label: 'Game servers' },
         ],
-        filters: {
-          ...labels,
-          products: [
-            { id: 'vps', label: 'VPS' },
-            { id: 'game', label: 'Game servers' },
-          ],
-          tiers: [
-            { id: 'premium', label: 'Premium' },
-            { id: 'budget', label: 'Budget' },
-          ],
-        },
-        stateLabels: copyFor('en').home.hero.live.states,
-        initialProduct,
-        initialTier,
-      }),
-    )
+        tiers: [
+          { id: 'premium', label: 'Premium' },
+          { id: 'budget', label: 'Budget' },
+        ],
+      },
+      stateLabels: copyFor('en').home.hero.live.states,
+      initialProduct,
+      initialTier,
+    }),
+  )
+
+describe('filtering', () => {
+  it('keeps a location that runs the product and is in the tier, and nothing else', () => {
+    expect(matchesFilters(filterable(['vps', 'game'], 'premium'), 'all', 'all')).toBe(true)
+    expect(matchesFilters(filterable(['vps'], 'premium'), 'game', 'all')).toBe(false)
+    expect(matchesFilters(filterable(['vps', 'game'], 'budget'), 'game', 'premium')).toBe(false)
+    expect(matchesFilters(filterable(['game'], 'budget'), 'game', 'budget')).toBe(true)
+  })
 
   it('hides what does not match, and a region with nothing left in it', () => {
     const views = [view('a', 'north-america', 'premium', ['vps', 'game']), view('b', 'europe', 'budget', ['vps'])]

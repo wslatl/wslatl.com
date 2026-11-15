@@ -13,12 +13,12 @@ const drawings: Record<string, React.ReactNode> = {
   US: (
     <>
       <rect width="30" height="20" fill="#ffffff" />
-      {Array.from({ length: 7 }, (_, i) => (
+      {Array.from({ length: 7 }, (_stripe, i) => (
         <rect key={i} y={(i * 2 * 20) / 13} width="30" height={20 / 13} fill="#b22234" />
       ))}
       <rect width="12" height={(7 * 20) / 13} fill="#3c3b6e" />
-      {Array.from({ length: 9 }, (_, row) =>
-        Array.from({ length: row % 2 === 0 ? 6 : 5 }, (_, col) => (
+      {Array.from({ length: 9 }, (_line, row) =>
+        Array.from({ length: row % 2 === 0 ? 6 : 5 }, (_star, col) => (
           <circle
             key={`${row}-${col}`}
             cx={1 + col * 2 + (row % 2 === 0 ? 0 : 1)}
