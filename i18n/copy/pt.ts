@@ -98,6 +98,25 @@ export const pt: Copy = {
         },
         checkedAt: 'Verificado às {time}',
         unavailable: 'O status ao vivo não está disponível agora.',
+        more: {
+          one: '+{count} outra localização',
+          other: '+{count} outras localizações',
+        },
+        summary: {
+          allUp: 'Todas as {total} operacionais',
+          issues: {
+            one: '{count} de {total} com problemas',
+            other: '{count} de {total} com problemas',
+          },
+          maintenance: {
+            one: '{count} de {total} em manutenção',
+            other: '{count} de {total} em manutenção',
+          },
+          someUp: {
+            one: '{count} de {total} operacional',
+            other: '{count} de {total} operacionais',
+          },
+        },
       },
     },
     clients: {

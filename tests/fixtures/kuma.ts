@@ -101,3 +101,36 @@ export function kumaHeartbeats(at = now, last: (id: number) => number = () => UP
 
 /** A deep copy to change one thing in. */
 export const copyOf = <T>(value: T): T => structuredClone(value)
+
+/**
+ * A status page in Kuma's shape with one group of two servers, A and B, for
+ * each of these group names, monitors numbered from 101, and the heartbeat
+ * answer for it: a check a minute for each, the last at `at` with the state
+ * `last` gives for that server (up unless it says otherwise).
+ */
+export function kumaFor(groups: readonly string[], at = now, last: (group: string, server: 'A' | 'B') => number = () => UP) {
+  const page = {
+    ...copyOf(kumaPage),
+    publicGroupList: groups.map((name, i) => ({
+      id: 200 + i,
+      name,
+      weight: i + 1,
+      monitorList: [
+        { id: 101 + i * 2, name: `${name} A`, sendUrl: 0, type: 'port' },
+        { id: 102 + i * 2, name: `${name} B`, sendUrl: 0, type: 'port' },
+      ],
+    })),
+  }
+  const beats = (status: number): Beat[] =>
+    Array.from({ length: 10 }, (_, i) => ({ status: i === 9 ? status : UP, time: kumaTime(at - (9 - i) * 60_000), msg: '', ping: 9 }))
+  const heartbeats = {
+    heartbeatList: Object.fromEntries(
+      groups.flatMap((name, i) => [
+        [String(101 + i * 2), beats(last(name, 'A'))],
+        [String(102 + i * 2), beats(last(name, 'B'))],
+      ]),
+    ) as Record<string, Beat[]>,
+    uptimeList: {},
+  }
+  return { page, heartbeats }
+}

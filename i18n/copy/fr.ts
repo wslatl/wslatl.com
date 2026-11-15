@@ -98,6 +98,25 @@ export const fr: Copy = {
         },
         checkedAt: "Vérifié à {time}",
         unavailable: "L'état en direct n'est pas disponible pour le moment.",
+        more: {
+          one: "+{count} autre emplacement",
+          other: "+{count} autres emplacements",
+        },
+        summary: {
+          allUp: "Les {total} sont opérationnels",
+          issues: {
+            one: "{count} sur {total} a des problèmes",
+            other: "{count} sur {total} ont des problèmes",
+          },
+          maintenance: {
+            one: "{count} sur {total} en maintenance",
+            other: "{count} sur {total} en maintenance",
+          },
+          someUp: {
+            one: "{count} sur {total} opérationnel",
+            other: "{count} sur {total} opérationnels",
+          },
+        },
       },
     },
     clients: {

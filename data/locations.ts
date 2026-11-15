@@ -7,14 +7,20 @@ import type { PlanGroup } from '@/data/pricing'
  * (it is in the plan groups' descriptions, as words) and the group that
  * lists the location's servers on status.wslatl.com.
  *
- * The home page's live panel reads this (components/sections/live-panel.tsx).
+ * The home page's live panel reads this (components/sections/live-panel.tsx)
+ * and shows the first two in full, in this order. From a third location on,
+ * it keeps the same size: the rest are counted in a "+N more locations" row,
+ * and a line at its top sums up the state of all of them. So put the
+ * locations people should see first at the top.
+ *
  * Each location's name, in every language, is in i18n/copy under
- * home.hero.live.cities. tests/locations.test.ts checks every plan group of a
- * location's tier names its CPU and its city.
+ * home.hero.live.cities. tests/locations.test.ts checks every location has
+ * one, and that every plan group of its tier names its CPU and its city.
  */
-export type LocationId = 'los-angeles' | 'new-york'
+export type LocationId = string
 
 export interface Location {
+  /** Lowercase letters, digits and dashes, such as "los-angeles". */
   id: LocationId
   /** The plans sold here: Premium in Los Angeles, Budget in New York City. */
   tier: PlanGroup['tier']

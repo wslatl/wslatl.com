@@ -119,6 +119,15 @@ describe('site copy', () => {
       expect(tokens(live.checkedAt), locale).toEqual(['time'])
       expect(tokens(live.hardware), locale).toEqual(['cpu', 'storage', 'tier'])
       expect(tokens(live.unavailable), locale).toEqual([])
+      // From a third location on: the row that counts the rest, and the
+      // line that sums up all of them, in the form for one and for more.
+      for (const form of ['one', 'other'] as const) {
+        expect(tokens(live.more[form]), `${locale} more.${form}`).toEqual(['count'])
+        for (const kind of ['issues', 'maintenance', 'someUp'] as const) {
+          expect(tokens(live.summary[kind][form]), `${locale} summary.${kind}.${form}`).toEqual(['count', 'total'])
+        }
+      }
+      expect(tokens(live.summary.allUp), locale).toEqual(['total'])
     }
   })
 

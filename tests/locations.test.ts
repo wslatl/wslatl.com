@@ -14,15 +14,20 @@ import { kumaPage } from './fixtures/kuma'
  */
 const groups = productLines.flatMap((line) => line.groups)
 
+/** A location's name in a language. */
+const cityOf = (locale: (typeof locales)[number], id: string) => (copyFor(locale).home.hero.live.cities as Record<string, string>)[id]
+
 describe('the locations', () => {
-  it('cover every tier of plans, one location each, with a status group each', () => {
-    expect(locations.map((location) => location.tier).toSorted()).toEqual([...new Set(groups.map((group) => group.tier))].toSorted())
+  it('cover every tier of plans, each location with its own id and its own status group', () => {
+    expect([...new Set(locations.map((location) => location.tier))].toSorted()).toEqual([...new Set(groups.map((group) => group.tier))].toSorted())
+    expect(new Set(locations.map((location) => location.id)).size).toBe(locations.length)
     expect(new Set(locations.map((location) => location.statusGroup)).size).toBe(locations.length)
+    for (const location of locations) expect(location.id).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/)
   })
 
   it('run the CPU, in the city, that every plan group of their tier names', () => {
     for (const location of locations) {
-      const city = copyFor('en').home.hero.live.cities[location.id]
+      const city = cityOf('en', location.id)
       const sold = groups.filter((group) => group.tier === location.tier)
       expect(sold.length, location.id).toBeGreaterThan(0)
       for (const group of sold) {
@@ -36,9 +41,10 @@ describe('the locations', () => {
     for (const location of locations) expect(tierStorageTypes(location.tier), location.id).toHaveLength(1)
   })
 
-  it('have a name in every language', () => {
+  it('have a name in every language, and no name is left over from a location that went', () => {
     for (const locale of locales) {
-      for (const location of locations) expect(copyFor(locale).home.hero.live.cities[location.id], `${locale} ${location.id}`).toMatch(/\S/)
+      for (const location of locations) expect(cityOf(locale, location.id), `${locale} ${location.id}`).toMatch(/\S/)
+      expect(Object.keys(copyFor(locale).home.hero.live.cities).toSorted(), locale).toEqual(locations.map((location) => location.id).toSorted())
     }
   })
 

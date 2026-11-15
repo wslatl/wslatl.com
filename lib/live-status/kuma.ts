@@ -1,4 +1,4 @@
-import { locations } from '@/data/locations'
+import { locations, type Location } from '@/data/locations'
 import { unknownStatus, type LiveStatus, type LocationState } from '@/lib/live-status/snapshot'
 
 /**
@@ -102,18 +102,24 @@ function stateOf(checks: (Check | null)[], now: number): { state: LocationState;
 }
 
 /**
- * The states of our locations (data/locations.ts) from the status page's
- * two answers, at time `now`. Null when either answer is not the shape Kuma
- * gives, which the caller treats as no data at all. A location whose group
- * is not on the page, or has no recent check, is unknown.
+ * The states of our locations (data/locations.ts, unless others are given)
+ * from the status page's two answers, at time `now`. Null when either answer
+ * is not the shape Kuma gives, which the caller treats as no data at all. A
+ * location whose group is not on the page, or has no recent check, is
+ * unknown.
  */
-export function statusFromKuma(page: unknown, heartbeats: unknown, now: number): LiveStatus | null {
-  const groups = monitorsByGroup(page, locations.map((location) => location.statusGroup))
+export function statusFromKuma(
+  page: unknown,
+  heartbeats: unknown,
+  now: number,
+  places: readonly Pick<Location, 'id' | 'statusGroup'>[] = locations,
+): LiveStatus | null {
+  const groups = monitorsByGroup(page, places.map((place) => place.statusGroup))
   if (!groups || !isRecord(heartbeats) || !isRecord(heartbeats.heartbeatList)) return null
   const beats = heartbeats.heartbeatList
-  const status = unknownStatus()
+  const status = unknownStatus(places)
   let oldest: number | null = null
-  for (const location of locations) {
+  for (const location of places) {
     const ids = groups.get(location.statusGroup) ?? []
     const { state, oldest: checked } = stateOf(
       ids.map((id) => latestCheck(beats, id)),

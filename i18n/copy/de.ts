@@ -98,6 +98,25 @@ export const de: Copy = {
         },
         checkedAt: 'Geprüft um {time} Uhr',
         unavailable: 'Der Live-Status ist gerade nicht verfügbar.',
+        more: {
+          one: '+{count} weiterer Standort',
+          other: '+{count} weitere Standorte',
+        },
+        summary: {
+          allUp: 'Alle {total} betriebsbereit',
+          issues: {
+            one: '{count} von {total} mit Problemen',
+            other: '{count} von {total} mit Problemen',
+          },
+          maintenance: {
+            one: '{count} von {total} in Wartung',
+            other: '{count} von {total} in Wartung',
+          },
+          someUp: {
+            one: '{count} von {total} betriebsbereit',
+            other: '{count} von {total} betriebsbereit',
+          },
+        },
       },
     },
     clients: {

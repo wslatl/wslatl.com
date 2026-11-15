@@ -98,6 +98,25 @@ export const es: Copy = {
         },
         checkedAt: 'Comprobado a las {time}',
         unavailable: 'El estado en directo no está disponible ahora mismo.',
+        more: {
+          one: '+{count} ubicación más',
+          other: '+{count} ubicaciones más',
+        },
+        summary: {
+          allUp: 'Las {total} operativas',
+          issues: {
+            one: '{count} de {total} con problemas',
+            other: '{count} de {total} con problemas',
+          },
+          maintenance: {
+            one: '{count} de {total} en mantenimiento',
+            other: '{count} de {total} en mantenimiento',
+          },
+          someUp: {
+            one: '{count} de {total} operativa',
+            other: '{count} de {total} operativas',
+          },
+        },
       },
     },
     clients: {

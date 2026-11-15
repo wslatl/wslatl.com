@@ -42,6 +42,8 @@ lighthouse-reports/
 
 # local editor and agent tooling
 .claude/
+# written into the project by `next dev` (Next 16.4), and never part of the site
+AGENTS.md
 
 # Local archives
 *.rar

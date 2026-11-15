@@ -19,6 +19,20 @@
   mask-image: linear-gradient(to bottom, transparent, black 2rem, black calc(100% - 2.5rem), transparent);
 }
 
+.gradient-text {
+  background: linear-gradient(135deg, oklch(0.78 0.16 235) 0%, oklch(0.6 0.22 268) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  /* The gradient only paints inside the element's box, and italic letters
+     lean past it (the tail of the y in "actually" was cut off). Padding widens
+     the painted area; the negative margin keeps the layout where it was. */
+  padding: 0 0.2em 0.15em;
+  margin-inline: -0.2em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
 /* The "Show email address" placeholder (components/ui/email-link.tsx). In the
    components layer, so a className passed in (footer, legal meta) wins. */
 @layer components {

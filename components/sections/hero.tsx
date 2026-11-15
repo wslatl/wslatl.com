@@ -31,7 +31,7 @@ export function Hero() {
         >
           {t.lineOne}
           <br />
-          <span className="font-serif font-normal tracking-[-0.01em] italic">{t.emphasis}</span>{' '}
+          <span className="gradient-text font-serif font-normal tracking-[-0.02em] italic">{t.emphasis}</span>{' '}
           {t.lineTwo.replace(/ (?=\S+$)/, '\u00a0')}
         </h1>
         <p className="mt-6 max-w-xl text-lg leading-relaxed text-pretty text-muted-foreground">{t.intro}</p>

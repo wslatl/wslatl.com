@@ -7,7 +7,8 @@ import { rootFiles } from '@/i18n/routing'
 import { maxCheckAgeMs, parseCheckTime, statusFromKuma } from '@/lib/live-status/kuma'
 import { hasLiveData, liveStatusPath, loadLiveStatus, readLiveStatus, unknownStatus, type LiveStatus } from '@/lib/live-status/snapshot'
 import { createLiveStatusSource, limits, statusPageOrigin, type SourceOptions } from '@/lib/live-status/source'
-import { copyOf, DOWN, kumaHeartbeats, kumaPage, kumaTime, MAINTENANCE, monitorsAt, now, PENDING, UP } from './fixtures/kuma'
+import { copyOf, DOWN, kumaFor, kumaHeartbeats, kumaPage, kumaTime, MAINTENANCE, monitorsAt, now, PENDING, UP } from './fixtures/kuma'
+import { eightLocations } from './fixtures/locations'
 
 /**
  * The live panel's data, from the status page to the browser: how Kuma's
@@ -179,6 +180,50 @@ describe('the states from the status page', () => {
   })
 })
 
+describe('many locations', () => {
+  // Eight locations, six of them made up (tests/fixtures/locations.ts), on a
+  // status page with a group for each.
+  const groups = eightLocations.map((location) => location.statusGroup)
+
+  it('reads a state for every one, however many there are', () => {
+    const { page, heartbeats } = kumaFor(groups)
+    const status = statusFromKuma(page, heartbeats, now, eightLocations)
+    expect(Object.keys(status?.locations ?? {})).toEqual(eightLocations.map((location) => location.id))
+    expect(Object.values(status?.locations ?? {}).every((state) => state === 'up')).toBe(true)
+    expect(status?.checkedAt).toBe(lastCheck)
+  })
+
+  it('reads each by its own group: one partial, one down, one in maintenance, the rest up', () => {
+    const [, , third, fourth, fifth] = groups
+    const { page, heartbeats } = kumaFor(groups, now, (group, server) => {
+      if (group === third) return server === 'A' ? DOWN : UP
+      if (group === fourth) return DOWN
+      if (group === fifth) return MAINTENANCE
+      return UP
+    })
+    expect(statusFromKuma(page, heartbeats, now, eightLocations)?.locations).toEqual({
+      'los-angeles': 'up',
+      'new-york': 'up',
+      'fixture-3': 'partial',
+      'fixture-4': 'down',
+      'fixture-5': 'maintenance',
+      'fixture-6': 'up',
+      'fixture-7': 'up',
+      'fixture-8': 'up',
+    })
+  })
+
+  it('reads in the browser only the locations it was given, and counts the rest unknown', () => {
+    const { page, heartbeats } = kumaFor(groups)
+    const answer = JSON.parse(JSON.stringify(statusFromKuma(page, heartbeats, now, eightLocations)))
+    expect(Object.keys(readLiveStatus(answer, eightLocations)?.locations ?? {})).toHaveLength(8)
+    // With today's two, the six made up are left out.
+    expect(readLiveStatus(answer)?.locations).toEqual({ 'los-angeles': 'up', 'new-york': 'up' })
+    // And a location the answer does not have is unknown.
+    expect(readLiveStatus({ ...answer, locations: { 'los-angeles': 'up' } }, eightLocations)?.locations['fixture-8']).toBe('unknown')
+  })
+})
+
 describe('the answer the browser reads', () => {
   const good: LiveStatus = { checkedAt: lastCheck, locations: { 'los-angeles': 'up', 'new-york': 'partial' } }
 
@@ -240,7 +285,7 @@ describe('the answer the browser reads', () => {
           new Promise<Response>((_resolve, reject) => init?.signal?.addEventListener('abort', () => reject(init.signal?.reason))),
       )
       const started = Date.now()
-      expect(await loadLiveStatus(never, 50)).toBeNull()
+      expect(await loadLiveStatus(never, undefined, 50)).toBeNull()
       expect(Date.now() - started).toBeLessThan(2000)
     })
   })

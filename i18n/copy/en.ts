@@ -110,6 +110,28 @@ export const en = {
         },
         checkedAt: 'Checked at {time}',
         unavailable: 'Live status is not available right now.',
+        // From a third location on: the row that counts the ones not shown,
+        // and the line beside the heading that sums up all of them. Each has
+        // a form for one and for more ({count} and {total} are numbers).
+        more: {
+          one: '+{count} more location',
+          other: '+{count} more locations',
+        },
+        summary: {
+          allUp: 'All {total} operational',
+          issues: {
+            one: '{count} of {total} has issues',
+            other: '{count} of {total} have issues',
+          },
+          maintenance: {
+            one: '{count} of {total} in maintenance',
+            other: '{count} of {total} in maintenance',
+          },
+          someUp: {
+            one: '{count} of {total} operational',
+            other: '{count} of {total} operational',
+          },
+        },
       },
     },
     clients: {
