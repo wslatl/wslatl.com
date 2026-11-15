@@ -17,7 +17,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:http": "vitest run --mode http",
-    "check": "npm run platform:check && npm run lint && npm run test && npm run build && npm run scan:build && npm run test:http && npm run typecheck",
+    "check": "npm run platform:check && npm run i18n:check && npm run lint && npm run test && npm run build && npm run scan:build && npm run test:http && npm run typecheck",
     "lint:fix": "oxlint --fix --ignore-pattern \"platform/**\" --ignore-pattern scripts/serve.mjs --ignore-pattern \"scripts/updater/**\" && eslint . --fix --ignore-pattern \"platform/**\" --ignore-pattern scripts/serve.mjs --ignore-pattern \"scripts/updater/**\"",
     "scan:build": "node scripts/scan-build.mjs",
     "check:site": "node scripts/check-site.mjs",
@@ -25,7 +25,8 @@
     "check:security": "node scripts/check-security.mjs",
     "check:a11y": "node scripts/check-a11y.mjs",
     "platform:sync": "node platform/tools/sync.mjs",
-    "platform:check": "node platform/tools/check.mjs"
+    "platform:check": "node platform/tools/check.mjs",
+    "i18n:check": "node platform/tools/i18n-check.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.2.1",
