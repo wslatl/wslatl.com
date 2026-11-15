@@ -1,0 +1,30 @@
+name: Made-up admin settings
+description: >-
+  Writes a .env with admin settings made up for this run alone, so a build
+  made in the job has its admin switched on (its sign-in page is there to be
+  checked) and a scan can prove that no .env value reaches what the site
+  serves. The password is random and never kept, so nobody can sign in with
+  them, and the token is no token. Nothing hash-shaped is written in this
+  repository, so the secret scan has nothing to set aside.
+
+inputs:
+  job:
+    description: Which job made them. It goes into the token, so a value found where it should not be says where it came from.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Write .env
+      shell: bash
+      env:
+        JOB: ${{ inputs.job }}
+      # The kit's own tool, as the owner runs it, reading the password from
+      # the pipe: the hash and a fresh session secret, one line each.
+      run: |
+        head -c 32 /dev/urandom | base64 | node platform/admin/hash-password.mjs > .env
+        echo "GITHUB_TOKEN=${JOB}-canary-github-token-${GITHUB_RUN_ID}" >> .env
+        if [ "$(grep -c -E '^(ADMIN_PASSWORD_HASH|ADMIN_SESSION_SECRET|GITHUB_TOKEN)=' .env)" -ne 3 ]; then
+          echo "The made-up admin settings were not written." >&2
+          exit 1
+        fi

@@ -21,8 +21,7 @@ on:
         description: Site to check
         default: https://wslatl.com
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: seo-${{ github.event_name }}-${{ github.ref }}
@@ -34,24 +33,22 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - run: npm run build
-      - name: Start the site
-        run: |
-          npx next start -p 3000 > "$RUNNER_TEMP/site.log" 2>&1 &
-          for _ in $(seq 1 60); do
-            curl -fs -o /dev/null http://localhost:3000/robots.txt && exit 0
-            sleep 1
-          done
-          cat "$RUNNER_TEMP/site.log"
-          echo "The site did not start." >&2
-          exit 1
+      - uses: ./.github/actions/start-site
+        with:
+          port: '3000'
+          path: /robots.txt
       - name: Check what search engines read
         run: |
           status=0
@@ -67,14 +64,17 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: read
-      issues: write
+      issues: write # its one tracking issue (.github/actions/tracking-issue)
     env:
       SITE_URL: ${{ inputs.url || 'https://wslatl.com' }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
       - name: Check the site
         id: check
         run: |

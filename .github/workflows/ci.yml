@@ -1,13 +1,19 @@
 name: CI
 
+# Every workflow here keeps to the same rules: no permission at the top and
+# only what each job needs, every action pinned to a full commit with its
+# version beside it (Dependabot moves both), a checkout that keeps no token,
+# a time limit on every job, a concurrency group, and npm ci without install
+# scripts, as the updater installs on the server. tests/workflows.test.ts
+# holds them to it on every pull request, and zizmor, in the Workflow lint
+# workflow, looks deeper at the pins, the permissions and the checkouts.
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -18,13 +24,20 @@ jobs:
     name: Lint, test, build, typecheck
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      # No install scripts, as on the server, where the updater's npm ci runs
+      # none: a package that works only once its own script has run fails
+      # here, before a release of it fails to build there.
+      - run: npm ci --ignore-scripts
       # platform/, scripts/serve.mjs and scripts/updater/ are the shared kit's
       # files: this fails when one was edited here, or a package fell behind
       # the kit's versions.
@@ -33,13 +46,9 @@ jobs:
       - run: npm test
       # Made-up admin settings, so the scan below can prove that no .env
       # value reaches what the site serves. Nothing here starts the admin.
-      - name: Canary admin settings
-        run: |
-          {
-            echo "ADMIN_PASSWORD_HASH=scrypt:32768:8:1:Y2FuYXJ5LXNhbHQtY2FuYXJ5:Y2FuYXJ5LWtleS1jYW5hcnkta2V5LWNhbmFyeS1rZXk"
-            echo "ADMIN_SESSION_SECRET=ci-canary-session-secret-${GITHUB_RUN_ID}-0123456789"
-            echo "GITHUB_TOKEN=ci-canary-github-token-${GITHUB_RUN_ID}"
-          } > .env
+      - uses: ./.github/actions/made-up-admin
+        with:
+          job: ci
       # The build generates the route types next-env.d.ts points at, so the
       # standalone typecheck runs after it.
       - run: npm run build
@@ -51,3 +60,29 @@ jobs:
       - name: Attack tests against the build
         run: npm run test:http
       - run: npm run typecheck
+
+  download:
+    name: The updater accepts this commit's download
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      # GitHub's tarball of this commit (on a pull request, of the merge
+      # GitHub made for it), downloaded and checked by the updater's own code
+      # exactly as the server checks a release (scripts/check-download.mjs):
+      # a link, a file name the updater refuses, or a .gitattributes rule
+      # that changes files on their way out fails here instead of failing
+      # the next update. The run's own token, read-only, only ever sent to
+      # GitHub's API.
+      - name: Download it and check it as the updater does
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/check-download.mjs "$GITHUB_SHA"

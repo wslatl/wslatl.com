@@ -29,6 +29,9 @@ updates:
       - dependency-name: '@types/node'
         update-types: [version-update:semver-major]
 
+  # Every action is pinned to a full commit with its version in a comment
+  # beside it. Dependabot moves both together, all in one pull request, with
+  # the same three days' wait. The actions in .github/actions/ use none.
   - package-ecosystem: github-actions
     directory: /
     schedule:

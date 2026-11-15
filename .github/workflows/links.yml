@@ -9,9 +9,11 @@ on:
     - cron: '0 13 * * 1'
   workflow_dispatch:
 
-permissions:
-  contents: read
-  issues: write
+permissions: {}
+
+concurrency:
+  group: links
+  cancel-in-progress: false
 
 env:
   SITE_URL: https://wslatl.com
@@ -20,8 +22,13 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
+      issues: write # its one tracking issue (.github/actions/tracking-issue)
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: List the pages in the sitemap
         id: pages
         run: |
@@ -29,8 +36,6 @@ jobs:
           echo "urls=$pages" >> "$GITHUB_OUTPUT"
       - name: Check every link on them
         id: lychee
-        # Pinned to a commit: a tag can be moved to other code, and this is
-        # the one action here that is not from GitHub. Dependabot bumps it.
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: --config lychee.toml ${{ steps.pages.outputs.urls }}

@@ -1,0 +1,20 @@
+# Settings for zizmor, which the Workflow lint workflow runs over every
+# workflow, the actions in .github/actions/ and dependabot.yml.
+rules:
+  # Every action, GitHub's own included, pinned to a full commit.
+  unpinned-uses:
+    config:
+      policies:
+        '*': hash-pin
+  # Three days is this repository's choice (dependabot.yml says why), where
+  # zizmor asks for seven.
+  dependabot-cooldown:
+    config:
+      days: 3
+  # zizmor would have ./.github/actions/... written in GitHub's newer $/ form,
+  # which actionlint 1.7.12, the other job here, refuses as an action with no
+  # ref. The two differ only when a job checks out other code than its
+  # workflow's own commit, and the one job here that does checks out main,
+  # on purpose (release-check.yml), so ./ always names reviewed files.
+  self-repository:
+    disable: true

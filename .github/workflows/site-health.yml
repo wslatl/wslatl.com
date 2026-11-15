@@ -14,21 +14,29 @@ on:
         description: Site to check
         default: https://wslatl.com
 
-permissions:
-  contents: read
-  issues: write
+permissions: {}
+
+concurrency:
+  group: site-health
+  cancel-in-progress: false
 
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write # its one tracking issue (.github/actions/tracking-issue)
     env:
       SITE_URL: ${{ inputs.url || 'https://wslatl.com' }}
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
       - name: Check the site
         id: check
         run: |
