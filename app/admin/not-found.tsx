@@ -1,1 +1,1 @@
-export { default, metadata } from '@/platform/admin/pages/not-found'
+export { default, generateMetadata } from '@/platform/admin/pages/not-found'

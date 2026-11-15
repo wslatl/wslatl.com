@@ -48,7 +48,7 @@ All text below is an example. The app passes its own, in the page's language.
 </Button>
 ```
 
-**SiteHeader** shows the mark (32px, the same everywhere) and the app's `appName` in small text beside it on the smaller apps. `nav` fills the bar and the mobile menu; `actions` is the right-hand area; `mobileFooter` goes under the links in the menu; `switcher` is the small Website, Guides, Status menu with addresses from the app. Give `localePrefixes` if the app puts the language in the path.
+**SiteHeader** shows the mark (32px, the same everywhere) and the app's `appName` in small text beside it on the smaller apps. `nav` fills the bar and the mobile menu; `actions` is the right-hand area; `mobileFooter` goes under the links in the menu; `switcher` is the small Website, Guides, Status menu with addresses from the app. Give `localePrefixes` if the app puts the language in the path, and `languages` for the language picker (`../i18n/README.md`), which then sits in the bar from 40rem up, before `actions`, and at the end of the mobile menu below that. The kit's own words for every label here, in five languages, are under `platform.header` in the app's messages.
 
 ```tsx
 <SiteHeader
@@ -71,6 +71,7 @@ All text below is an example. The app passes its own, in the page's language.
     ],
   }}
   actions={<Button asChild size="sm"><a href="/login">Log in</a></Button>}
+  languages={{ locale: 'en', label: 'Language: English', heading: 'Choose a language' }}
 />
 ```
 
@@ -122,7 +123,7 @@ All text below is an example. The app passes its own, in the page's language.
 </Field>
 ```
 
-**StatusBadge** takes `tone` (`success`, `warning`, `danger`, `info`) and the word to show. It always has an icon and a word, never colour alone.
+**StatusBadge** takes `tone` (`success`, `warning`, `danger`, `info`, `neutral`) and the word to show. It always has an icon and a word, never colour alone. `neutral` is grey with a dashed circle, for a state with nothing to say yet, such as a location with no live data; its usual word is `platform.status.noData` ("No data") in the app's messages.
 
 ```tsx
 <StatusBadge tone="success">Operational</StatusBadge>

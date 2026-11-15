@@ -3,7 +3,7 @@ import { Email } from '@/components/ui/email'
 import { markShortLink } from '@/config/links'
 import { footerColumns } from '@/data/footer'
 import { siteConfig } from '@/config/site'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { getLocale } from '@/i18n/locale'
 import { localizedLegalPages } from '@/i18n/content'
 import { SiteFooter } from '@/platform/components/site-footer'
@@ -15,26 +15,26 @@ const copyrightYear = new Date().getFullYear()
 /** The kit's footer, with this site's columns, its about block and its bottom line. */
 export function Footer() {
   const locale = getLocale()
-  const t = copy()
+  const t = words()
 
   return (
     <SiteFooter
       columns={footerColumns(t, locale, localizedLegalPages())}
-      newTabLabel={t.header.newTab}
+      newTabLabel={t('header.newTab')}
       // No logo here: the brand kit shows the mark once per page, in the header.
       about={
         <>
           <p className="text-sm leading-relaxed text-muted-foreground">
-            {t.footer.blurb(siteConfig.location)} <span lang="en">{siteConfig.slogan}</span>
+            {t('footer.blurb', { location: siteConfig.location })} <span lang="en">{siteConfig.slogan}</span>
           </p>
           <p className="mt-4 text-sm">
             <Email name="support" className="text-foreground hover:text-link" />
           </p>
-          <p className="mt-5 text-sm text-muted-foreground">{t.share.shareOurAdHint}</p>
+          <p className="mt-5 text-sm text-muted-foreground">{t('share.shareOurAdHint')}</p>
           <ShareSiteAd size="sm" className="mt-2" />
         </>
       }
-      legal={t.footer.rights(copyrightYear, siteConfig.legal.companyName)}
+      legal={t('footer.rights', { year: String(copyrightYear), company: siteConfig.legal.companyName })}
       credit={markShortLink({ label: siteConfig.credits.label, href: siteConfig.links.credits })}
     />
   )

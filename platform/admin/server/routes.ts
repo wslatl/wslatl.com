@@ -1,12 +1,16 @@
 import 'server-only'
+import { isLocale, type Locale } from '../../i18n/config'
 import { adoptUpdater } from './adopt-updater'
+import { adminRequest } from './auth'
 import type { AdminCore, AdminSettings, SignedIn } from './core'
 import { createDevice, DEVICE_COOKIE, deviceCookie, readDevice } from './device'
+import { chooseAdminLocale, cookieLocale, localeCookie, requestLocale } from './locale'
 import { verifyPassword } from './password'
 import { adminLimits } from './rate-limit'
-import { adminLog, bare, checkPost, checkRead, clientIp, json, limitKey, readCookie, whoFrom } from './request'
+import { adminLog, bare, checkPost, checkRead, clientIp, json, limitKey, readCookie, signInAgain, whoFrom } from './request'
 import { createSession, endSession, SESSION_COOKIE, sessionCookie } from './session'
 import { signInSettings } from './settings'
+import { adminText, say } from './text'
 import { requestUpdate, updaterStatus } from './updater'
 
 /**
@@ -30,6 +34,14 @@ export type AdminRoutes = {
   update: { GET: Handler; POST: Handler }
   /** POST /admin/api/adopt-updater: copies the live release's updater over the uploaded folder's. */
   adoptUpdater: { GET: Handler; POST: Handler }
+  /**
+   * POST /admin/api/language, `{ "locale": "es" }`: the admin's language,
+   * from its language menus. Sets the admin's language cookie, signed in or
+   * not, since the sign-in card has the menu too; for someone signed in to
+   * an app whose check keeps a language per account (saveLocale), that
+   * account's as well.
+   */
+  language: { GET: Handler; POST: Handler }
 }
 
 /** Who asked, for the log and the update request: the address alone for the shared password, the account and address otherwise. */
@@ -40,10 +52,17 @@ function asker(core: AdminCore, user: SignedIn, request: Request): string {
 
 const maxPasswordLength = 1024
 
-/** The answer while updates are off: why, one sentence for each setting, never its value. Null while they are on. */
-function updatesOffAnswer(settings: AdminSettings): Response | null {
+/** The language of an answer to someone signed in: their account's own, then the cookie, then English. */
+const localeOf = (user: SignedIn, request: Request): Locale => chooseAdminLocale(user.locale, cookieLocale(request.headers))
+
+/**
+ * The answer while updates are off: why, one sentence for each setting,
+ * never its value, in the admin's language. Null while they are on.
+ */
+function updatesOffAnswer(core: AdminCore, settings: AdminSettings, locale: Locale): Response | null {
   if (settings.updatesOff.length === 0) return null
-  return json({ error: `Updates are off. ${settings.updatesOff.join(' ')}` }, { status: 503 })
+  const reasons = core.updatesOffIn(locale).join(' ')
+  return json({ error: adminText(locale)('errors.updatesOff', { reasons }) }, { status: 503 })
 }
 
 export function adminRoutes(core: AdminCore): AdminRoutes {
@@ -55,12 +74,13 @@ export function adminRoutes(core: AdminCore): AdminRoutes {
     return bare(405, { Allow: 'POST' })
   }
 
-  /** Signed in, and allowed to change something: the user, or the answer to send instead. */
-  async function mayChange(request: Request): Promise<{ user: SignedIn } | { response: Response }> {
+  /** Signed in, and allowed to change something: the user and their language, or the answer to send instead. */
+  async function mayChange(request: Request): Promise<{ user: SignedIn; locale: Locale } | { response: Response }> {
     const user = await core.user(request.headers)
-    if (!user) return { response: json({ error: 'Sign in again.' }, { status: 401 }) }
-    if (!user.mayUpdate) return { response: json({ error: 'This account may not install updates.' }, { status: 403 }) }
-    return { user }
+    if (!user) return { response: signInAgain(request) }
+    const locale = localeOf(user, request)
+    if (!user.mayUpdate) return { response: json({ error: adminText(locale)('errors.mayNotUpdate') }, { status: 403 }) }
+    return { user, locale }
   }
 
   return {
@@ -72,6 +92,8 @@ export function adminRoutes(core: AdminCore): AdminRoutes {
         if (!check.ok) return check.response
         const { keys } = signInSettings(process.env)
         if (!keys) return bare(404)
+        // Nobody is signed in yet: the words are in the cookie's language.
+        const t = adminText(requestLocale(request.headers))
 
         // Counted before the password is checked, so a burst is refused at
         // once. A browser that signed in here before, with a device cookie
@@ -89,7 +111,7 @@ export function adminRoutes(core: AdminCore): AdminRoutes {
           : Math.max(limits.perAddress.retryAfter(key), limits.everyone.retryAfter('all'))
         if (wait > 0) {
           adminLog(`login refused (too many attempts) from ${who}${device ? ', a browser that signed in before' : ''}`)
-          return json({ error: 'Too many attempts. Try again in a few minutes.' }, { status: 429, headers: { 'Retry-After': String(wait) } })
+          return json({ error: t('errors.tooMany') }, { status: 429, headers: { 'Retry-After': String(wait) } })
         }
         if (device) {
           limits.perDevice.hit(device)
@@ -102,11 +124,11 @@ export function adminRoutes(core: AdminCore): AdminRoutes {
         const password = typeof given === 'string' && given.length <= maxPasswordLength ? given : ''
         const correct = password ? await limits.check(() => verifyPassword(password, keys.passwordHash)) : false
         if (correct === null) {
-          return json({ error: 'Busy. Try again in a moment.' }, { status: 429, headers: { 'Retry-After': '2' } })
+          return json({ error: t('errors.busy') }, { status: 429, headers: { 'Retry-After': '2' } })
         }
         if (!correct) {
           adminLog(`login failed from ${who}`)
-          return json({ error: 'That password is not right.' }, { status: 401 })
+          return json({ error: t('errors.wrongPassword') }, { status: 401 })
         }
 
         // The owner's own sign-ins never use up a limit.
@@ -151,8 +173,9 @@ export function adminRoutes(core: AdminCore): AdminRoutes {
         if (!settings) return bare(404)
         const foreign = checkRead(request)
         if (foreign) return foreign
-        if (!(await core.user(request.headers))) return json({ error: 'Sign in again.' }, { status: 401 })
-        return updatesOffAnswer(settings) ?? json(await updaterStatus())
+        const user = await core.user(request.headers)
+        if (!user) return signInAgain(request)
+        return updatesOffAnswer(core, settings, localeOf(user, request)) ?? json(await updaterStatus())
       },
       /** Asks the supervisor to install the latest release, when it is newer than the installed one. */
       async POST(request) {
@@ -162,12 +185,12 @@ export function adminRoutes(core: AdminCore): AdminRoutes {
         if (!check.ok) return check.response
         const allowed = await mayChange(request)
         if ('response' in allowed) return allowed.response
-        const off = updatesOffAnswer(settings)
+        const off = updatesOffAnswer(core, settings, allowed.locale)
         if (off) return off
 
         const by = asker(core, allowed.user, request)
         const result = await requestUpdate(by)
-        if (!result.ok) return json({ error: result.error }, { status: result.status })
+        if (!result.ok) return json({ error: say(result.said, allowed.locale) }, { status: result.status })
         adminLog(`update requested ${core.auth?.kind === 'password' ? 'from' : 'by'} ${by}`)
         return json({ ok: true }, { status: 202 })
       },
@@ -183,24 +206,56 @@ export function adminRoutes(core: AdminCore): AdminRoutes {
         const allowed = await mayChange(request)
         if ('response' in allowed) return allowed.response
         // Before the hour's presses are counted: a press that copies nothing uses none.
-        const off = updatesOffAnswer(settings)
+        const off = updatesOffAnswer(core, settings, allowed.locale)
         if (off) return off
 
         const wait = adminLimits().adopt.hit('all')
         if (wait > 0) {
-          return json(
-            { error: 'That is a lot of copies in an hour. Try again later.' },
-            { status: 429, headers: { 'Retry-After': String(wait) } },
-          )
+          return json({ error: adminText(allowed.locale)('errors.tooManyCopies') }, { status: 429, headers: { 'Retry-After': String(wait) } })
         }
         const by = asker(core, allowed.user, request)
         const result = await adoptUpdater()
         if (!result.ok) {
+          // The log in English, the answer in the admin's language.
           adminLog(`copying the updater failed, requested ${core.auth?.kind === 'password' ? 'from' : 'by'} ${by}: ${result.error}`)
-          return json({ error: result.error }, { status: result.status })
+          return json({ error: say(result.said, allowed.locale) }, { status: result.status })
         }
         adminLog(`updater copied from ${result.tag}, requested ${core.auth?.kind === 'password' ? 'from' : 'by'} ${by}`)
         return json({ ok: true })
+      },
+    },
+
+    language: {
+      GET: postOnly(false),
+      /**
+       * Needs nobody signed in, as the sign-in card has the menu too, and
+       * only what every admin POST needs: the admin on, and checkPost. The
+       * cookie names one of the five languages and nothing else.
+       */
+      async POST(request) {
+        if (!(await core.settings())) return bare(404)
+        const check = await checkPost(request)
+        if (!check.ok) return check.response
+        const wanted = check.body.locale
+        if (!isLocale(wanted)) return json({ error: adminText(requestLocale(request.headers))('errors.unknownLanguage') }, { status: 400 })
+        const user = core.auth ? await core.user(request.headers) : null
+        if (user && core.auth?.saveLocale) {
+          try {
+            await core.auth.saveLocale(adminRequest(request.headers), wanted, process.env)
+          } catch (error) {
+            adminLog(`the language could not be kept for ${user.name}: ${error instanceof Error ? error.message : String(error)}`)
+            return json({ error: adminText(localeOf(user, request))('errors.languageNotSaved') }, { status: 500 })
+          }
+        } else if (user?.locale) {
+          // The account's own language comes before the cookie, and with no
+          // saveLocale nothing can change it: setting the cookie alone would
+          // change nothing, and say it had.
+          adminLog(`the language menu cannot change ${user.name}'s own language: the app's admin check keeps one per account, with no saveLocale to change it`)
+          return json({ error: adminText(user.locale)('errors.languageKept') }, { status: 409 })
+        }
+        const response = json({ ok: true })
+        response.cookies.set(localeCookie(wanted))
+        return response
       },
     },
   }

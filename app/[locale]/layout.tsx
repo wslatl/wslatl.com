@@ -5,7 +5,7 @@ import { siteConfig } from '@/config/site'
 import { shortLinks } from '@/config/links'
 import { isLocale, locales, openGraphLocales } from '@/i18n/config'
 import { getLocale, setLocale } from '@/i18n/locale'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { ogImage } from '@/lib/metadata'
 import { SkipLink } from '@/platform/components/main'
 import { fontClassNames } from '@/platform/fonts'
@@ -138,7 +138,7 @@ export default async function RootLayout({
   // reads the language from this (i18n/locale.ts).
   setLocale(requested)
   const locale = getLocale()
-  const t = copy()
+  const t = words()
 
   return (
     // The kit's three typefaces (Geist, Geist Mono and Instrument Serif), by
@@ -146,7 +146,7 @@ export default async function RootLayout({
     <html lang={locale} className={fontClassNames}>
       <body className="relative isolate min-h-dvh font-sans antialiased">
         <JsonLd data={organizationJsonLd} />
-        <SkipLink>{t.header.skipToContent}</SkipLink>
+        <SkipLink>{t('header.skipToContent')}</SkipLink>
         {/* The blue wash at the top of every page. Static, so it costs nothing to scroll. */}
         <div
           aria-hidden="true"

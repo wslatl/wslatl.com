@@ -178,7 +178,7 @@ describe('the token', () => {
     for (const status of [401, 403, 404, 429, 500, 502]) {
       github.answer(`/repos/${repo}/releases/latest`, { status, body: { message: `failed with ${token}` } })
       github.answer(`/repos/${repo}`, { status, body: { message: token } })
-      github.answer(`/repos/${repo}/commits/tags/v9.9.9`, { status, body: { message: token } })
+      github.answer(`/repos/${repo}/commits/refs/tags/v9.9.9`, { status, body: { message: token } })
       github.answer(`/repos/${repo}/git/commits/${sha}`, { status, body: { message: token } })
       const errors = await Promise.all([client().latest(), client().resolve('v9.9.9'), client().download(sha, dest)].map((p) => p.then(() => '', (error: Error) => error.message)))
       for (const message of errors) {
@@ -199,9 +199,10 @@ describe('the token', () => {
 })
 
 describe('the commit a tag points at', () => {
-  it('is asked for as a tag, so a branch with the same name is never taken for it', async () => {
-    github.answer(`/repos/${repo}/commits/tags/v9.9.9`, { status: 200, body: { sha } })
+  it('is asked for by its full ref, so no branch is ever taken for it: one named like the tag, or tags/<tag>', async () => {
+    github.answer(`/repos/${repo}/commits/refs/tags/v9.9.9`, { status: 200, body: { sha } })
     github.answer(`/repos/${repo}/commits/v9.9.9`, { status: 200, body: { sha: 'b'.repeat(40) } })
+    github.answer(`/repos/${repo}/commits/tags/v9.9.9`, { status: 200, body: { sha: 'd'.repeat(40) } })
     expect(await client().resolve('v9.9.9')).toBe(sha)
   })
 })

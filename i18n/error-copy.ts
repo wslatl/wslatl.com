@@ -3,7 +3,7 @@ import type { Locale } from '@/i18n/config'
 /**
  * The words on the error boundary. It runs in the browser and is loaded with
  * every page, so it keeps its own small set of strings instead of pulling in
- * the full dictionaries (i18n/copy/).
+ * the site's whole messages (messages/<locale>.json).
  */
 export interface ErrorCopy {
   heading: string

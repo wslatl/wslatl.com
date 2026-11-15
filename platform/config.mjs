@@ -12,17 +12,31 @@
  * @property {string} repo The GitHub repo its releases come from, as "owner/name".
  * @property {AdminConfig} admin How its admin works.
  * @property {UpdaterConfig} [updater] What the updater does beyond the plain install, build and switch.
+ * @property {I18nConfig} [i18n] Where the app keeps its translations, for platform/tools/i18n-check.mjs.
  *
  * @typedef {object} AdminConfig
  * @property {'password' | 'custom'} auth "password" is the kit's one shared password. "custom" means the app plugs in its own check, such as staff accounts. platform/admin/README.md has both.
  * @property {AdminNavItem[]} [nav] The admin's own pages, in the order its header lists them, when it has more than Updates. Left out, the header lists none, as on the main website.
  * @property {boolean} [wide] Pages 72rem wide instead of 56rem, for an admin with tables.
- * @property {string} [signInText] The line on the sign-in card under "Admin". "Sign in to update the site." unless set.
+ * @property {LocalizedText} [signInText] The line on the sign-in card under "Admin". "Sign in to update the site.", in the admin's language, unless set.
  * @property {AdminNavItem[]} [updateLinks] The app's own admin pages that belong next to updates, such as { href: "/admin/updates/publish", label: "Publish a release" }. Shown on the Updates page, at most 5, each href an address in the admin and each label plain text of 40 characters at most. While no release is published, the page points to the first one as well as to GitHub.
  *
  * @typedef {object} AdminNavItem
  * @property {string} href An address in the admin, such as "/admin/guides".
- * @property {string} label What the header calls it, such as "Guides".
+ * @property {LocalizedText} label What the header calls it, such as "Guides".
+ *
+ * @typedef {string | Readonly<Record<'en' | 'es' | 'fr' | 'de' | 'pt', string>>} LocalizedText
+ *   Words the admin shows: one string for every language, or one for each
+ *   of the five, such as { en: "Guides", es: "Guías", fr: "Guides", de: "Anleitungen", pt: "Guias" }.
+ *
+ * @typedef {object} I18nConfig
+ * @property {string} [messages] The folder with the app's messages/<locale>.json, from the app's root. "messages" unless set.
+ * @property {(string | PagesFolder)[]} [pages] Folders of long pages, such as "content/legal": the English files in the folder, and each other language's in <folder>/<locale>/ under the same names.
+ *
+ * @typedef {object} PagesFolder
+ * @property {string} folder The folder, from the app's root.
+ * @property {'folder' | 'suffix'} [layout] "folder" (the default): each other language's pages in <folder>/<locale>/. "suffix": beside the English one, as <name>.<locale>.<ext>.
+ * @property {'fail' | 'list'} [missing] "fail" (the default): a page missing in a language fails the check. "list": it is listed, for pages still being translated.
  *
  * @typedef {object} UpdaterConfig
  *   Read by the updater from each release it installs, so a release's own
@@ -67,6 +81,25 @@ const plainLabel = {
   test: (label) => typeof label === 'string' && label === label.trim() && /^[^\p{C}<>]{1,40}$/u.test(label),
 }
 
+/** The five languages, as platform/i18n/config.ts has them; a test holds the two together. */
+export const textLocales = Object.freeze(['en', 'es', 'fr', 'de', 'pt'])
+
+/**
+ * True when every language's words pass the test: one string, or an object
+ * with exactly the five languages.
+ * @param {unknown} text
+ * @param {(words: unknown) => boolean} test
+ */
+function eachText(text, test) {
+  if (typeof text === 'string') return test(text)
+  if (typeof text !== 'object' || text === null || Array.isArray(text)) return false
+  const keys = Object.keys(text)
+  return keys.length === textLocales.length && textLocales.every((locale) => keys.includes(locale) && test(/** @type {Record<string, unknown>} */ (text)[locale]))
+}
+
+/** @param {unknown} words */
+const someWords = (words) => typeof words === 'string' && words.trim() !== ''
+
 /**
  * What is wrong with the admin's optional settings, one sentence each.
  * @param {Partial<AdminConfig>} admin
@@ -81,23 +114,27 @@ function adminProblems(admin) {
       Array.isArray(nav) &&
       nav.every(
         (item) =>
-          typeof item?.href === 'string' && adminHref.test(item.href) && typeof item?.label === 'string' && item.label.trim() !== '',
+          typeof item?.href === 'string' && adminHref.test(item.href) && eachText(item?.label, someWords),
       )
-    if (!good) problems.push('admin.nav must be a list of { href, label }, each href an address in the admin such as "/admin/guides".')
+    if (!good) {
+      problems.push(
+        'admin.nav must be a list of { href, label }, each href an address in the admin such as "/admin/guides", and each label its words, or its words in each of en, es, fr, de and pt.',
+      )
+    }
     else if (new Set(nav.map((item) => item.href)).size !== nav.length) problems.push('admin.nav lists the same address twice.')
   }
   if (wide !== undefined && typeof wide !== 'boolean') problems.push('admin.wide must be true or false.')
-  if (signInText !== undefined && (typeof signInText !== 'string' || signInText.trim() === '')) {
-    problems.push('admin.signInText must be a sentence, such as "Sign in to update the site."')
+  if (signInText !== undefined && !eachText(signInText, someWords)) {
+    problems.push('admin.signInText must be a sentence, such as "Sign in to update the site.", or one in each of en, es, fr, de and pt.')
   }
   if (updateLinks !== undefined) {
     const good =
       Array.isArray(updateLinks) &&
       updateLinks.length <= 5 &&
-      updateLinks.every((item) => typeof item?.href === 'string' && adminHref.test(item.href) && plainLabel.test(item?.label))
+      updateLinks.every((item) => typeof item?.href === 'string' && adminHref.test(item.href) && eachText(item?.label, (words) => plainLabel.test(words)))
     if (!good) {
       problems.push(
-        'admin.updateLinks must be a list of at most 5 { href, label }, each href an address in the admin such as "/admin/updates/publish" and each label plain text of 40 characters at most.',
+        'admin.updateLinks must be a list of at most 5 { href, label }, each href an address in the admin such as "/admin/updates/publish" and each label plain text of 40 characters at most, or such a text in each of en, es, fr, de and pt.',
       )
     } else if (new Set(updateLinks.map((item) => item.href)).size !== updateLinks.length) {
       problems.push('admin.updateLinks lists the same address twice.')
@@ -238,6 +275,52 @@ export function updaterProblems(updater) {
   return problems
 }
 
+/** A folder inside the app, from its root, with forward slashes: never absolute, and never a way up and out. */
+const appFolder = /^(?!\/)(?![A-Za-z]:)[\w@+-][\w.@+-]*(?:\/[\w@+-][\w.@+-]*)*$/
+
+/** @param {unknown} value */
+const isAppFolder = (value) => typeof value === 'string' && value.length <= 200 && appFolder.test(value) && !value.split('/').some((part) => /^\.+$/.test(part))
+
+/**
+ * A folder of long pages: its path, or { folder, layout, missing }.
+ * @param {unknown} entry
+ */
+function isPagesFolder(entry) {
+  if (isAppFolder(entry)) return true
+  if (!isObject(entry) || !isAppFolder(entry.folder)) return false
+  const { layout, missing, ...rest } = entry
+  return (
+    Object.keys(rest).every((key) => key === 'folder') &&
+    (layout === undefined || layout === 'folder' || layout === 'suffix') &&
+    (missing === undefined || missing === 'fail' || missing === 'list')
+  )
+}
+
+/**
+ * Every problem with the translation settings, one plain sentence each.
+ * @param {unknown} i18n
+ * @returns {string[]}
+ */
+export function i18nProblems(i18n) {
+  if (i18n === undefined) return []
+  if (!isObject(i18n)) return ['i18n must be an object of settings, such as { pages: ["content/legal"] }.']
+  /** @type {string[]} */
+  const problems = []
+  for (const key of Object.keys(i18n)) {
+    if (key !== 'messages' && key !== 'pages') problems.push(`i18n.${key.slice(0, 40)} is not a setting the kit knows.`)
+  }
+  const { messages, pages } = i18n
+  if (messages !== undefined && !isAppFolder(messages)) problems.push('i18n.messages must be a folder inside the app, such as "messages".')
+  if (pages !== undefined) {
+    if (!(Array.isArray(pages) && pages.length <= 50 && pages.every(isPagesFolder))) {
+      problems.push(
+        'i18n.pages must list folders inside the app, each as its path, such as "content/legal", or as { folder, layout: "folder" or "suffix", missing: "fail" or "list" }.',
+      )
+    } else if (hasRepeats(pages.map((entry) => (typeof entry === 'string' ? entry : entry.folder)))) problems.push('i18n.pages lists the same folder twice.')
+  }
+  return problems
+}
+
 /**
  * Checks the app's settings once, when they are read, and says plainly
  * what is wrong, so a bad value never reaches the updater on a server.
@@ -257,6 +340,7 @@ export function definePlatformConfig(config) {
   if (config?.admin?.auth !== 'password' && config?.admin?.auth !== 'custom') problems.push('admin.auth must be "password" or "custom".')
   problems.push(...adminProblems(config?.admin ?? {}))
   problems.push(...updaterProblems(config?.updater))
+  problems.push(...i18nProblems(config?.i18n))
   if (problems.length > 0) {
     throw new Error(`platform.config.mjs has ${problems.length} problem${problems.length === 1 ? '' : 's'}:\n- ${problems.join('\n- ')}`)
   }

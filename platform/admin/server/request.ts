@@ -1,9 +1,13 @@
 import 'server-only'
 import { isIP } from 'node:net'
 import { NextResponse } from 'next/server'
+import { defaultLocale } from '../../i18n/config'
 import { sameOrigin } from '../origin'
+import { requestLocale } from './locale'
+import { adminText } from './text'
 
 export { sameOrigin }
+export { readCookie } from './cookies'
 
 /**
  * What every admin request goes through. The admin's POST routes are the
@@ -92,9 +96,22 @@ export function checkRead(request: Request): Response | null {
   const fetchSite = request.headers.get('sec-fetch-site')
   const crossSite = fetchSite !== null && fetchSite !== 'same-origin' && fetchSite !== 'none'
   if (crossSite || (request.headers.has('origin') && !sameOrigin(request.headers))) {
-    return json({ error: 'This request did not come from this site.' }, { status: 403 })
+    return json({ error: said(request)('errors.notFromHere') }, { status: 403 })
   }
   return null
+}
+
+/**
+ * The words for a refusal made before anyone is known: in the language of
+ * the admin's language cookie, or English.
+ */
+function said(request: Request) {
+  return adminText(requestLocale(request.headers))
+}
+
+/** The 401 for a request from nobody signed in, in the language its cookie names. */
+export function signInAgain(request: Request): Response {
+  return json({ error: said(request)('errors.signInAgain') }, { status: 401 })
 }
 
 /** Big enough for every request the kit's routes take. */
@@ -133,44 +150,27 @@ export type PostCheck = { ok: true; body: Record<string, unknown> } | { ok: fals
  * prober that the admin is there.
  */
 export async function checkPost(request: Request, { maxBytes = defaultMaxBodyBytes } = {}): Promise<PostCheck> {
+  // Where it came from first, before any cookie is read: a request from
+  // another site is answered in English, whatever its cookies say.
   if (!sameOrigin(request.headers)) {
-    return { ok: false, response: json({ error: 'This request did not come from this site.' }, { status: 403 }) }
+    return { ok: false, response: json({ error: adminText(defaultLocale)('errors.notFromHere') }, { status: 403 }) }
   }
+  const t = said(request)
   const type = request.headers.get('content-type')?.split(';')[0].trim().toLowerCase()
   if (type !== 'application/json') {
-    return { ok: false, response: json({ error: 'Send JSON.' }, { status: 415 }) }
+    return { ok: false, response: json({ error: t('errors.sendJson') }, { status: 415 }) }
   }
   const text = await readLimited(request, maxBytes)
-  if (text === null) return { ok: false, response: json({ error: 'That is more than this request takes.' }, { status: 413 }) }
+  if (text === null) return { ok: false, response: json({ error: t('errors.tooLarge') }, { status: 413 }) }
   let body: unknown
   try {
     body = text ? JSON.parse(text) : {}
   } catch {
-    return { ok: false, response: json({ error: 'That is not valid JSON.' }, { status: 400 }) }
+    return { ok: false, response: json({ error: t('errors.badJson') }, { status: 400 }) }
   }
   // Every admin route reads named fields, so anything but an object is refused here.
   if (body === null || typeof body !== 'object' || Array.isArray(body)) {
-    return { ok: false, response: json({ error: 'Send a JSON object.' }, { status: 400 }) }
+    return { ok: false, response: json({ error: t('errors.sendObject') }, { status: 400 }) }
   }
   return { ok: true, body: body as Record<string, unknown> }
-}
-
-/**
- * One cookie from a Cookie header, or undefined. The first one of that
- * name wins: the browser sends the one set for the longest path first.
- */
-export function readCookie(header: string | null, name: string): string | undefined {
-  if (!header) return undefined
-  for (const part of header.split(';')) {
-    const at = part.indexOf('=')
-    if (at === -1 || part.slice(0, at).trim() !== name) continue
-    let value = part.slice(at + 1).trim()
-    if (value.length >= 2 && value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1)
-    try {
-      return decodeURIComponent(value)
-    } catch {
-      return value
-    }
-  }
-  return undefined
 }

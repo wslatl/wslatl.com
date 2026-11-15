@@ -14,25 +14,30 @@ An app adds a few short files under `app/admin/` that re-export from here, and t
 | `app/admin/(signed-in)/layout.tsx` | `export { default } from '@/platform/admin/pages/signed-in-layout'` |
 | `app/admin/(signed-in)/page.tsx` | `export { default, generateMetadata } from '@/platform/admin/pages/updates'` |
 | `app/admin/login/page.tsx` | `export { default, generateMetadata } from '@/platform/admin/pages/login'` |
-| `app/admin/not-found.tsx` | `export { default, metadata } from '@/platform/admin/pages/not-found'` |
+| `app/admin/not-found.tsx` | `export { default, generateMetadata } from '@/platform/admin/pages/not-found'` |
 | `app/admin/error.tsx` | `'use client'`<br>`export { default } from '@/platform/admin/pages/error'` |
 | `app/admin/[...missing]/page.tsx` | `export { default, generateMetadata } from '@/platform/admin/pages/missing'` |
 | `app/admin/api/login/route.ts` | `export { GET, POST } from '@/platform/admin/routes/login'` |
 | `app/admin/api/logout/route.ts` | `export { GET, POST } from '@/platform/admin/routes/logout'` |
 | `app/admin/api/update/route.ts` | `export { GET, POST } from '@/platform/admin/routes/update'` |
 | `app/admin/api/adopt-updater/route.ts` | `export { GET, POST } from '@/platform/admin/routes/adopt-updater'` |
+| `app/admin/api/language/route.ts` | `export { GET, POST } from '@/platform/admin/routes/language'` |
 
 `app/admin/layout.tsx` is a root layout, beside the public site's own, so the app has no `app/layout.tsx` above both. `(signed-in)` is a route group: it adds nothing to the address.
 
-An admin with more pages than Updates, as the knowledge base's has, puts its own overview at `app/admin/(signed-in)/page.tsx`, the Updates page at `app/admin/(signed-in)/updates/page.tsx`, and lists them in `admin.nav`. Its own pages call `admin.signedInPage()` first. Its own routes make one call first, `admin.signedInRoute(request)` for a GET and `admin.signedInPost(request)` for a POST, which checks in this order: a 404 while the admin is off, whatever is sent; then where the request came from and what it holds; then who is signed in. Never call `checkPost()` before it: on its own it answers a malformed request with a 403, 415 or 413 even while the admin is off, which tells a prober the admin is there. `signedInPost` takes `{ maxBytes }` for a route that takes more than 4 KB, and hands back the body. Both hand back `settings`, in which `github` is null while updates are off and `updatesOff` says why, so a route that uses the token itself (the knowledge base's saving to its repository, say) checks it first:
+**From kit v0.1:** add `app/admin/api/language/route.ts`, which the language menus post to, and re-export `generateMetadata` rather than `metadata` from `pages/not-found`. A file that still names `metadata` builds, with that 404's tab title in English. Without the route file the menus could never change the language, so `npm run platform:check` fails until it is there, and says what to write in it.
+
+An admin with more pages than Updates, as the knowledge base's has, puts its own overview at `app/admin/(signed-in)/page.tsx`, the Updates page at `app/admin/(signed-in)/updates/page.tsx`, and lists them in `admin.nav`. Its own pages call `admin.signedInPage()` first. Its own routes make one call first, `admin.signedInRoute(request)` for a GET and `admin.signedInPost(request)` for a POST, which checks in this order: a 404 while the admin is off, whatever is sent; then where the request came from and what it holds; then who is signed in. Never call `checkPost()` before it: on its own it answers a malformed request with a 403, 415 or 413 even while the admin is off, which tells a prober the admin is there. `signedInPost` takes `{ maxBytes }` for a route that takes more than 4 KB, and hands back the body. All three hand back `locale`, the admin's language (below), and both routes hand back `settings`, in which `github` is null while updates are off and `updatesOff` says why, so a route that uses the token itself (the knowledge base's saving to its repository, say) checks it first:
 
 ```ts
+import { getTranslations } from 'next-intl/server'
 import { admin } from '@/platform/admin/app'
 
 export async function POST(request: Request) {
   const checked = await admin.signedInPost(request, { maxBytes: 64 * 1024 })
   if ('response' in checked) return checked.response
-  const { user, settings, body } = checked
+  const { user, settings, locale, body } = checked
+  const t = await getTranslations({ locale, namespace: 'kbAdmin.errors' })
   // ...
 }
 ```
@@ -56,7 +61,11 @@ const staffCheck: AdminAuth = {
   // Who sent the request, or null. A bad, forged or expired cookie is null, never an error.
   async user(request) {
     const staff = await staffFromSession(request.cookie('status_session'))
-    return staff ? { name: staff.email, mayUpdate: staff.role === 'superadmin' } : null
+    return staff ? { name: staff.email, mayUpdate: staff.role === 'superadmin', locale: staff.locale } : null
+  },
+  // Optional: keeps the language the admin's menu picks for whoever is signed in.
+  async saveLocale(request, locale) {
+    await setStaffLocale(request.cookie('status_session'), locale)
   },
   signInPath: '/admin/sign-in',
   signOutPath: '/admin/api/sign-out',
@@ -65,15 +74,19 @@ const staffCheck: AdminAuth = {
 export const admin = createAdmin({ config, auth: staffCheck })
 ```
 
-`user()` gets the request's headers and its cookies (`request.cookie(name)`), and `.env` as `env`. `name` goes into the server log and the update request. `mayUpdate: false` lets an account see the Updates page but not install or copy anything. Left out, the sign-in page is `/admin/login` and Sign out posts to `/admin/api/logout`.
+`user()` gets the request's headers and its cookies (`request.cookie(name)`), and `.env` as `env`. `name` goes into the server log and the update request. `mayUpdate: false` lets an account see the Updates page but not install or copy anything. `locale` is the account's own language, for an app that keeps one per account: one of `'en'`, `'es'`, `'fr'`, `'de'` and `'pt'`, exactly so. It comes first, before the admin's language cookie (below); left out, or any other value, and the cookie decides, then English. `saveLocale(request, locale, env)` keeps the one the menu picks for the account. Without it, the menu sets only the cookie, which is all an account with no language of its own needs; for an account that has one, which comes first, the menu could change nothing, so it says so plainly instead (a 409, and a line in the server log), and the cookie stays as it was. A throw in `saveLocale` is a failed change too: the menu says so, and the cookie stays as it was. Left out, the sign-in page is `/admin/login` and Sign out posts to `/admin/api/logout`.
 
 | File in the app | What it holds |
 | --- | --- |
-| `app/admin/layout.tsx`, `not-found.tsx`, `error.tsx`, `[...missing]/page.tsx` | The same as on the shared password |
+| `app/admin/layout.tsx` | `import '../globals.css'`<br>`import { admin } from '@/lib/admin'`<br>`import { adminLayout } from '@/platform/admin/pages/layout'`<br>`export { metadata, viewport } from '@/platform/admin/pages/layout'`<br>`export default adminLayout(admin)` |
+| `app/admin/not-found.tsx`, `error.tsx`, `[...missing]/page.tsx` | The same as on the shared password |
 | `app/admin/(signed-in)/layout.tsx` | `import { admin } from '@/lib/admin'`<br>`export default admin.SignedInLayout` |
 | `app/admin/(signed-in)/updates/page.tsx` | `import { admin } from '@/lib/admin'`<br>`export default admin.Updates`<br>`export const generateMetadata = admin.updatesMetadata` |
 | `app/admin/api/update/route.ts` | `import { admin } from '@/lib/admin'`<br>`export const { GET, POST } = admin.routes.update` |
 | `app/admin/api/adopt-updater/route.ts` | `import { admin } from '@/lib/admin'`<br>`export const { GET, POST } = admin.routes.adoptUpdater` |
+| `app/admin/api/language/route.ts` | `import { admin } from '@/lib/admin'`<br>`export const { GET, POST } = admin.routes.language` |
+
+The layout made from the app's own admin puts the page's `<html lang>` in the account's own language. The shared one, which a v0.1 app's `layout.tsx` still re-exports, knows only the cookie: the page's words are still in the account's language, its `lang` in the cookie's.
 
 The app keeps its own sign-in page and its own sign-in and sign-out routes. Its sign-in page sits on the same card as everyone's: `import { AdminCard } from '@/platform/admin/components/card'`. The kit's own sign-in and sign-out routes answer 404 for it, and so do the ready-made files under `pages/` and `routes/` that need a check, with the reason in the server log.
 
@@ -117,9 +130,25 @@ export async function register() {
 - **The stylesheet** already has `@source '../platform'`, which covers the admin's classes.
 - **robots.txt** never names `/admin`, and the sitemap leaves it out.
 
+## The admin's language
+
+The admin is in five languages, and its addresses never change for it: `/admin`, never `/es/admin`. Its language comes from, in this order:
+
+1. the signed-in account's own language, for an app whose check returns `locale` on the user (above; the shared password has none);
+2. the admin's language cookie;
+3. English.
+
+A value that is not one of the five codes, exactly as written, counts as none, and the next one decides.
+
+- **The cookie** is `__Secure-admin_locale`, set by `/admin/api/language` (a POST of `{ "locale": "es" }`, as JSON from a page on the same site, like every admin POST, and answering 404 while the admin is off). It holds the code and nothing else: `Path=/admin`, so the public site never sees it and its pages stay the same for everyone; `HttpOnly`, as only the server reads it; `Secure`, which the `__Secure-` name makes the browser insist on, so a page over plain HTTP can never plant one; `SameSite=Lax` rather than Strict, because it grants nothing, and with Strict a link to the admin from an email would open its first page, the sign-in card included, in English; and a year. The route is in `adminPostRoutes`, so `secureRequest` lets its POST through. A language the visitor names in a request header (`X-NEXT-INTL-LOCALE`) never reaches an admin page or route: `secureRequest` drops it.
+- **The menus.** The admin's header has a language menu between View site and Sign out, and the sign-in card has the five in a row under the form. Each language is named in itself. They need the page's script, as signing in does.
+- **What follows it:** every word the kit's admin shows, its pages, the sign-in card, the Updates page, the 404 and the crash page, the tab titles, the answers of its routes (in the account's language for someone signed in, the cookie's otherwise), and the page's `<html lang>`. The app's own pages get the same language from `admin.signedInPage()`, `signedInRoute` and `signedInPost` (their `locale`), or `admin.locale()` anywhere in a page.
+- **What stays English:** the server log, which is the owner's, and the updater's own log and last message, which the supervisor writes as it always has. On a page in another language they are marked `lang="en"`.
+- **The words** are the `admin` part of `platform/i18n/messages/<locale>.json`, read by the admin's own translator. The admin's client components get them from the admin's own provider, which its layouts put around every page: no app provider is needed for the kit's parts, and no public page ever carries them.
+
 ## For an app's own admin pages and routes
 
-- **Tab title**, for a page: `export const generateMetadata = admin.titled('Guides')`, the same call the kit's own pages use. While the admin is off it is a 404, so no tab ever says what a page would have been. For a page that sets its title after the browser has built it (a 404 page, say), put `<TabTitle title="Page not found" />` in it: `import { TabTitle } from '@/platform/admin/components/tab-title'`, a client component that sets `document.title`.
+- **Tab title**, for a page: `export const generateMetadata = admin.titled('Guides')`, the same call the kit's own pages use, or `admin.titled({ en: 'Guides', es: 'Guías', fr: 'Guides', de: 'Anleitungen', pt: 'Guias' })` for the name in each language. It is the whole title, "Guides | WSLATL Guides admin", in the admin's language. While the admin is off it is a 404, so no tab ever says what a page would have been. For a page that sets its title after the browser has built it (a 404 page, say), put `<TabTitle title="Page not found" />` in it: `import { TabTitle } from '@/platform/admin/components/tab-title'`, a client component that sets `document.title`.
 - **The plain 404**, for a route: `import { bare } from '@/platform/admin/server'`, then `return bare(404)`. No body, with the admin's `Cache-Control: no-store` and `X-Robots-Tag: noindex, nofollow`; a second argument adds headers, such as `bare(405, { Allow: 'POST' })`. It is the answer the kit's own routes give while the admin is off. A route that calls `admin.signedInRoute` or `admin.signedInPost` first already gets it; `bare` is for a check the app makes itself.
 
 ## `admin.css` and the app's own variables
@@ -133,8 +162,10 @@ The admin's colours are set under `--admin-*` names (`--admin-muted`, `--admin-b
 | `auth` | `"password"` or `"custom"`, as above. |
 | `nav` | The admin's own pages, as `[{ href: '/admin/guides', label: 'Guides' }]`. Left out, the header lists none, as on the main website. |
 | `wide` | `true` for pages 72rem wide instead of 56rem, for an admin with tables. |
-| `signInText` | The line on the sign-in card. "Sign in to update the site." unless set. |
+| `signInText` | The line on the sign-in card. "Sign in to update the site.", in the admin's language, unless set. |
 | `updateLinks` | The app's own admin pages that belong next to updates, as `[{ href: '/admin/updates/publish', label: 'Publish a release' }]`. Shown as a row of links under the Updates heading, also while updates are off. At most 5; each `href` an address in the admin (`/admin` or a path under it, no query), each `label` plain text of 40 characters at most, no angle brackets or control characters, and no address twice. While no release is published, the page says "Publish one from" the first link "or on GitHub" instead of pointing to GitHub alone. A setting that breaks these rules stops `platform.config.mjs` from loading, with the reason. |
+
+Every label here, and `signInText`, is one string for every language, as in kit v0.1, or the words in each of the five: `{ en: 'Guides', es: 'Guías', fr: 'Guides', de: 'Anleitungen', pt: 'Guias' }`. Given by language, it must have all five, each passing the rule above, or `platform.config.mjs` does not load.
 
 ## What it keeps to
 

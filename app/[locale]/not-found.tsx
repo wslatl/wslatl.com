@@ -7,7 +7,7 @@ import { TabTitle } from '@/components/layout/tab-title'
 import { siteConfig } from '@/config/site'
 import { defaultLocale, localePath } from '@/i18n/config'
 import { getLocale, setLocale } from '@/i18n/locale'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { Button } from '@/platform/components/button'
 import { ErrorPage } from '@/platform/components/error-page'
 
@@ -23,13 +23,13 @@ export default async function NotFound() {
   // static pages, because a header is only knowable per request.
   setLocale((await requestedLocale()) ?? defaultLocale)
   const locale = getLocale()
-  const t = copy()
+  const t = words()
   const path = (href: string) => localePath(locale, href)
   const destinations = [
-    { label: t.notFound.destinations.pricing, href: path('/pricing') },
-    { label: t.notFound.destinations.games, href: path('/games') },
-    { label: t.notFound.destinations.services, href: path('/#services') },
-    { label: t.notFound.destinations.legal, href: path('/legal') },
+    { label: t('notFound.destinations.pricing'), href: path('/pricing') },
+    { label: t('notFound.destinations.games'), href: path('/games') },
+    { label: t('notFound.destinations.services'), href: path('/#services') },
+    { label: t('notFound.destinations.legal'), href: path('/legal') },
   ]
 
   return (
@@ -40,29 +40,29 @@ export default async function NotFound() {
     // <html> living in app/[locale]; moving it out would fix them and cost
     // every translated page the right language, which is the worse trade.
     <div lang={locale}>
-      <TabTitle title={`${t.notFound.metaTitle} | ${siteConfig.brand}`} />
+      <TabTitle title={`${t('notFound.metaTitle')} | ${siteConfig.brand}`} />
       <SiteHeader />
       {/* The kit's 404: the code, the serif heading, places to go and the buttons. */}
       <ErrorPage
         variant="notFound"
         code="404"
-        heading={t.notFound.heading}
+        heading={t('notFound.heading')}
         destinations={destinations}
         actions={
           <>
             <Button asChild>
-              <Link href={path('/')}>{t.notFound.home}</Link>
+              <Link href={path('/')}>{t('notFound.home')}</Link>
             </Button>
             <Button asChild variant="outline">
               <a href={siteConfig.links.discord} target="_blank" rel="noopener noreferrer">
-                {t.notFound.askOnDiscord}
-                <span className="sr-only">{t.header.newTab}</span>
+                {t('notFound.askOnDiscord')}
+                <span className="sr-only">{t('header.newTab')}</span>
               </a>
             </Button>
           </>
         }
       >
-        {t.notFound.body}
+        {t('notFound.body')}
       </ErrorPage>
       <Footer />
     </div>

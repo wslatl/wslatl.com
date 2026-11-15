@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/layout/page-header'
 import { PartnerShowcase } from '@/components/partners/partner-showcase'
 import { partners } from '@/data/partners'
 import type { Locale } from '@/i18n/config'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { setLocale } from '@/i18n/locale'
 import { pageMetadata } from '@/lib/metadata'
 import { partnersText } from '@/lib/page-text'
@@ -28,13 +28,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function PartnersPage({ params }: PageProps) {
   const { locale } = await params
   setLocale(locale)
-  const t = copy().partners
+  const t = words('partners')
 
   return (
     <>
       <SiteHeader />
       <Main className="shell">
-        <PageHeader title={t.heading} breadcrumbs={[]} crumbLabel={t.crumb} path="/partners">
+        <PageHeader title={t('heading')} breadcrumbs={[]} crumbLabel={t('crumb')} path="/partners">
           <p>{partnersPageText(t, partners.length, locale, codeCount).intro}</p>
         </PageHeader>
         <PartnerShowcase partners={partners} />

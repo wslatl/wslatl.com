@@ -1,11 +1,11 @@
 import { ArrowUpRight } from 'lucide-react'
 import { Button } from '@/platform/components/button'
 import { siteConfig } from '@/config/site'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { localizedReviews } from '@/i18n/content'
 
 export function Reviews() {
-  const t = copy().header
+  const t = words('header')
   const reviewsSection = localizedReviews()
 
   return (
@@ -24,7 +24,7 @@ export function Reviews() {
               rel="noopener noreferrer"
               className="underline underline-offset-4 hover:text-foreground"
             >
-              {reviewsSection.learnMore}<span className="sr-only">{t.newTab}</span>
+              {reviewsSection.learnMore}<span className="sr-only">{t('newTab')}</span>
             </a>
           </p>
         </div>
@@ -32,7 +32,7 @@ export function Reviews() {
           <a href={siteConfig.links.trustpilot} target="_blank" rel="noopener noreferrer">
             {reviewsSection.cta}
             <ArrowUpRight aria-hidden="true" />
-            <span className="sr-only">{t.newTab}</span>
+            <span className="sr-only">{t('newTab')}</span>
           </a>
         </Button>
       </div>

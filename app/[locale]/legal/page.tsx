@@ -10,7 +10,7 @@ import { legalIndexText } from '@/lib/page-text'
 import { Main } from '@/platform/components/main'
 import { localePath, type Locale } from '@/i18n/config'
 import { setLocale } from '@/i18n/locale'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { localizedLegalPages } from '@/i18n/content'
 
 interface PageProps {
@@ -26,14 +26,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function LegalIndexPage({ params }: PageProps) {
   const { locale } = await params
   setLocale(locale)
-  const t = copy().legal
+  const t = words('legal')
 
   return (
     <>
       <SiteHeader />
       <Main className="shell">
-        <PageHeader title={t.heading} breadcrumbs={[]} crumbLabel={t.heading} path="/legal">
-          <p>{t.intro}</p>
+        <PageHeader title={t('heading')} breadcrumbs={[]} crumbLabel={t('heading')} path="/legal">
+          <p>{t('intro')}</p>
         </PageHeader>
 
         <ul className="grid gap-px overflow-hidden rounded-2xl border bg-border md:grid-cols-2">
@@ -46,7 +46,7 @@ export default async function LegalIndexPage({ params }: PageProps) {
                 <h2 className="font-semibold text-foreground group-hover:text-link">{doc.title}</h2>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{doc.intro}</p>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  {t.effective} {formatLegalDate(legalEffectiveDate(doc.key))}
+                  {t('effective')} {formatLegalDate(legalEffectiveDate(doc.key))}
                 </p>
               </Link>
             </li>

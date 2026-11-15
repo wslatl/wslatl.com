@@ -1,0 +1,280 @@
+{
+  "header": {
+    "skipToContent": "Saltar al contenido principal",
+    "home": "Inicio de {brand}",
+    "nav": "Principal",
+    "newTab": " (se abre en una pestaña nueva)",
+    "openMenu": "Menú",
+    "switcher": "Sitios de WSLATL",
+    "apps": {
+      "website": "Sitio web",
+      "guides": "Guías",
+      "status": "Estado"
+    }
+  },
+  "breadcrumbs": {
+    "label": "Ruta de navegación",
+    "home": "Inicio"
+  },
+  "language": {
+    "label": "Idioma: {language}",
+    "heading": "Elige un idioma"
+  },
+  "copy": {
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyFailed": "El texto está seleccionado. Cópialo con el teclado o el menú."
+  },
+  "status": {
+    "noData": "Sin datos"
+  },
+  "footer": {
+    "rights": "© {year} {company}. Todos los derechos reservados."
+  },
+  "errors": {
+    "notFound": {
+      "title": "Página no encontrada",
+      "heading": "Esta página no existe.",
+      "body": "Puede que el enlace sea antiguo o que la dirección tenga un error de escritura.",
+      "home": "Volver a la página de inicio"
+    },
+    "crash": {
+      "title": "Algo salió mal",
+      "heading": "Algo falló de nuestro lado.",
+      "body": "Esta página no se pudo cargar. Inténtalo de nuevo y, si sigue pasando, <link>avísanos</link> para que lo arreglemos.",
+      "retry": "Intentar de nuevo",
+      "home": "Ir a la página de inicio",
+      "reference": "Código de referencia",
+      "discord": "Preguntar en Discord"
+    }
+  },
+  "admin": {
+    "heading": "<hidden>{brand} </hidden>Administración",
+    "tabTitle": "{page} | Administración de {brand}",
+    "newTab": " (se abre en una pestaña nueva)",
+    "time": {
+      "when": "{at, date, admin} (hora de Chicago)",
+      "seconds": "{count, plural, one {# segundo} other {# segundos}}",
+      "minutes": "{count, plural, one {# minuto} other {# minutos}}"
+    },
+    "shell": {
+      "nav": "Administración",
+      "pages": "Páginas de administración",
+      "viewSite": "Ver el sitio",
+      "signOut": "Cerrar sesión",
+      "signingOut": "Cerrando sesión"
+    },
+    "language": {
+      "group": "Idioma",
+      "label": "Idioma: {language}",
+      "failed": "El idioma no cambió. Inténtalo de nuevo."
+    },
+    "signIn": {
+      "title": "Iniciar sesión",
+      "text": "Inicia sesión para actualizar el sitio.",
+      "password": "Contraseña",
+      "submit": "Iniciar sesión",
+      "busy": "Iniciando sesión",
+      "wrong": {
+        "title": "Contraseña incorrecta",
+        "detail": "Revísala e inténtalo de nuevo."
+      },
+      "tooMany": {
+        "title": "Demasiados intentos",
+        "wait": "Inténtalo de nuevo en {wait}.",
+        "later": "Inténtalo de nuevo en unos minutos."
+      },
+      "failed": {
+        "title": "No se pudo iniciar sesión",
+        "status": "El servidor respondió {status}."
+      },
+      "unreachable": {
+        "title": "No se pudo conectar con el servidor",
+        "detail": "Revisa la conexión e inténtalo de nuevo."
+      }
+    },
+    "updates": {
+      "title": "Actualizaciones",
+      "intro": "Instala la última versión de <link>{repo}</link>.",
+      "links": "Más sobre las actualizaciones",
+      "installed": "Versión instalada",
+      "latest": "Última versión",
+      "published": "Publicada",
+      "installedAt": "Instalada",
+      "commit": "Commit",
+      "byHand": "Subida a mano",
+      "noneYet": "Aún no hay ninguna publicada",
+      "onGitHub": "Versión en GitHub",
+      "cannotRead": "No se pudo leer GitHub",
+      "brings": "Qué trae {tag}",
+      "badge": {
+        "update": "Lista para instalar",
+        "upToDate": "Instalada",
+        "older": "Más antigua que la instalada",
+        "badTag": "No es una etiqueta de versión",
+        "withdrawn": "Retirada"
+      },
+      "summary": {
+        "noReleases": "Aún no hay versiones publicadas. Publica una en GitHub para instalarla aquí.",
+        "noReleasesFrom": "Aún no hay versiones publicadas. Publica una desde <link>{label}</link> o en GitHub para instalarla aquí.",
+        "badTag": "La última versión tiene la etiqueta {tag}, no vMAJOR.MINOR.PATCH, así que no se puede instalar.",
+        "upToDate": "El sitio ya tiene la última versión.",
+        "older": "La versión marcada como la última, {tag}, es más antigua que la instalada, {installed}, así que no hay nada que instalar.",
+        "withdrawn": "{tag} se retiró porque seguía fallando, así que no se vuelve a ofrecer. Publica la corrección como una versión más nueva.",
+        "update": "{tag} está lista para instalarse.",
+        "updateByHand": "{tag} está lista para instalarse en lugar de la carpeta subida a mano."
+      },
+      "off": {
+        "title": "Las actualizaciones están desactivadas",
+        "fix": "{count, plural, one {Corrige el ajuste} other {Corrige los ajustes}} en <code>.env</code> y reinicia el servidor. Todas las demás páginas de administración funcionan con normalidad."
+      },
+      "blocked": {
+        "upToDate": "Actualizado",
+        "nothing": "Nada que instalar"
+      }
+    },
+    "panel": {
+      "heading": "Actualizar el sitio",
+      "explain": "Compila la versión junto al sitio en vivo y solo cambia cuando arranca. Si algo falla, el sitio se queda como está.",
+      "viewOnly": "Tu cuenta puede ver las actualizaciones, pero no instalarlas.",
+      "updating": "Actualizando",
+      "install": "Instalar {tag}",
+      "notServed": {
+        "title": "Las actualizaciones están desactivadas aquí",
+        "body": "El sitio no se inició con <code>npm run serve</code>, así que no puede actualizarse solo. Configura el comando de inicio del servidor como <code>npm run serve</code> y reinícialo."
+      },
+      "waiting": "Esperando a que el actualizador recoja la solicitud.",
+      "restarting": "El sitio se está reiniciando. Esperando a que responda.",
+      "installing": "Instalando <mono>{tag}</mono>",
+      "commit": "Commit <mono>{sha}</mono>",
+      "outcome": {
+        "failed": "Falló",
+        "rolledBack": "Revertido",
+        "done": "Listo"
+      },
+      "signedOut": {
+        "title": "Sesión cerrada",
+        "watching": "Tu sesión caducó. Inicia sesión de nuevo para ver cómo salió la actualización.",
+        "text": "Tu sesión caducó. Inicia sesión de nuevo."
+      },
+      "couldNotStart": {
+        "title": "No se pudo iniciar",
+        "status": "La actualización no se pudo iniciar ({status})."
+      },
+      "alreadyRunning": {
+        "title": "Ya está en marcha",
+        "text": "Ya hay una actualización en marcha."
+      },
+      "noAnswer": {
+        "title": "Sin respuesta",
+        "text": "No se pudo conectar con el servidor."
+      },
+      "stepsLabel": "Pasos de la actualización",
+      "steps": {
+        "download": {
+          "label": "Descarga",
+          "detail": "La versión, desde GitHub"
+        },
+        "install": {
+          "label": "Instalación",
+          "detail": "npm ci, en una carpeta nueva"
+        },
+        "build": {
+          "label": "Compilación",
+          "detail": "npm run build, conservando los recursos antiguos"
+        },
+        "prune": {
+          "label": "Limpieza",
+          "detail": "Se quitan las pruebas y las configuraciones y paquetes de desarrollo"
+        },
+        "migrate": {
+          "label": "Base de datos",
+          "detail": "Primero una copia de seguridad, luego los cambios en la base de datos"
+        },
+        "check": {
+          "label": "Arranque de prueba",
+          "detail": "Debe responder antes de que cambie nada"
+        },
+        "switch": {
+          "label": "Cambio",
+          "detail": "Reinicio con la nueva compilación, o vuelta atrás"
+        }
+      },
+      "states": {
+        "pending": "En espera",
+        "running": "En marcha",
+        "done": "Listo",
+        "failed": "Falló",
+        "skipped": "Omitido"
+      },
+      "log": {
+        "title": "Registro del actualizador",
+        "lines": "{count, plural, one {# línea} other {# líneas}}",
+        "last": "Últimas {shown} de {total} líneas"
+      },
+      "updaterChanged": {
+        "title": "El propio actualizador cambió",
+        "body": "Esta versión cambia el actualizador, que sigue ejecutándose desde la carpeta subida. Pulsa el botón para copiar el nuevo desde <code>.updater/releases/{tag}/scripts/</code> y luego reinicia el servidor desde el panel.",
+        "copy": "Copiar el nuevo actualizador",
+        "copying": "Copiando",
+        "copiedTitle": "Actualizador copiado",
+        "copiedBody": "Ahora reinicia el servidor desde el panel para terminar. Este mensaje desaparece después del reinicio.",
+        "sessionRanOut": "Tu sesión caducó. Inicia sesión de nuevo.",
+        "failed": "No se pudo copiar ({status}).",
+        "unreachable": "No se pudo conectar con el servidor."
+      }
+    },
+    "notFound": {
+      "title": "Página no encontrada",
+      "body": "No hay nada en esta dirección.",
+      "goTo": "Ir a {host}"
+    },
+    "crash": {
+      "title": "Algo salió mal",
+      "body": "Esta página tuvo un error. Inténtalo de nuevo y, si sigue pasando, la consola del servidor tiene los detalles.",
+      "retry": "Intentar de nuevo",
+      "back": "Volver a la administración",
+      "reference": "Referencia: {reference}"
+    },
+    "errors": {
+      "signInAgain": "Inicia sesión de nuevo.",
+      "mayNotUpdate": "Esta cuenta no puede instalar actualizaciones.",
+      "updatesOff": "Las actualizaciones están desactivadas. {reasons}",
+      "tooMany": "Demasiados intentos. Inténtalo de nuevo en unos minutos.",
+      "busy": "Ocupado. Inténtalo de nuevo en un momento.",
+      "wrongPassword": "Esa contraseña no es correcta.",
+      "tooManyCopies": "Son muchas copias en una hora. Inténtalo más tarde.",
+      "notFromHere": "Esta solicitud no vino de este sitio.",
+      "sendJson": "Envía JSON.",
+      "tooLarge": "Es más de lo que admite esta solicitud.",
+      "badJson": "Eso no es JSON válido.",
+      "sendObject": "Envía un objeto JSON.",
+      "unknownLanguage": "Ese no es uno de los idiomas de la administración.",
+      "languageNotSaved": "No se pudo guardar el idioma en la cuenta.",
+      "languageKept": "Esta cuenta tiene su propio idioma, y la administración no puede cambiarlo aquí."
+    },
+    "problems": {
+      "tokenMissing": "GITHUB_TOKEN no está definido. La página de actualizaciones lee las versiones con él: un token de acceso específico (fine-grained) con “Contents: Read-only” en el repositorio, o “Read and write” si la administración también guarda en él.",
+      "repoForm": "GITHUB_REPO no tiene el formato owner/name.",
+      "apiHttps": "GITHUB_API_URL no es una dirección https.",
+      "apiPlain": "GITHUB_API_URL debe ser una dirección simple, sin nada después del host salvo una ruta.",
+      "refused": "GitHub rechazó el token (401). Revisa GITHUB_TOKEN en .env y que no haya caducado.",
+      "rateLimit": "Se alcanzó el límite de peticiones de GitHub. Inténtalo de nuevo en unos minutos.",
+      "forbidden": "El token no puede leer {repo} (403). Necesita “Contents: Read-only” en ese repositorio, o “Read and write” para una administración que guarda en él.",
+      "missingRepo": "GitHub no encontró {repo} (404). Revisa GITHUB_REPO y que el token pueda leer el repositorio.",
+      "answered": "GitHub respondió {status}.",
+      "timeout": "GitHub no respondió en {seconds} segundos.",
+      "unreachable": "No se pudo conectar con GitHub.",
+      "unreadable": "No se pudo leer GitHub.",
+      "notServe": "Las actualizaciones solo funcionan cuando el sitio se inicia con npm run serve.",
+      "waiting": "Ya hay una actualización esperando para empezar.",
+      "running": "Ya hay una actualización en marcha.",
+      "copyingAlready": "El actualizador ya se está copiando. Inténtalo de nuevo en un momento.",
+      "copyNotServe": "Esto solo funciona cuando el sitio se inicia con npm run serve.",
+      "copyBusy": "Hay una actualización en marcha. Inténtalo de nuevo cuando termine.",
+      "copyNoRelease": "No hay ninguna versión instalada, así que no hay un actualizador nuevo que copiar.",
+      "copyNoBuild": "La compilación de {tag} ya no está, así que no hay un actualizador del que copiar.",
+      "copyFailed": "No se pudo copiar el actualizador: {reason}"
+    }
+  }
+}

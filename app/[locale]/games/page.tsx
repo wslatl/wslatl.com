@@ -12,7 +12,7 @@ import { gamesText } from '@/lib/page-text'
 import { Main } from '@/platform/components/main'
 import { localePath, type Locale } from '@/i18n/config'
 import { setLocale } from '@/i18n/locale'
-import { copy } from '@/i18n/copy'
+import { keep, words } from '@/i18n/words'
 import { localizedGameCategories, localizedGames } from '@/i18n/content'
 
 interface PageProps {
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function GamesPage({ params }: PageProps) {
   const { locale } = await params
   setLocale(locale)
-  const t = copy()
+  const t = words()
   const path = (href: string) => localePath(locale, href)
 
   const listings: GameListing[] = localizedGames().map((game) => {
@@ -50,13 +50,13 @@ export default async function GamesPage({ params }: PageProps) {
     <>
       <SiteHeader />
       <Main className="shell">
-        <PageHeader title={t.games.heading} breadcrumbs={[]} crumbLabel={t.games.crumb} path="/games">
+        <PageHeader title={t('games.heading')} breadcrumbs={[]} crumbLabel={t('games.crumb')} path="/games">
           <p>
-            {t.games.introPrefix}{' '}
+            {t('games.introPrefix')}{' '}
             <Link href={path(pricingHref('game'))} className="text-link underline underline-offset-4 hover:text-foreground">
-              {t.games.introLink}
+              {t('games.introLink')}
             </Link>
-            {t.games.introSuffix}
+            {t('games.introSuffix')}
           </p>
         </PageHeader>
         <ShareGamesIndexAd className="-mt-4 mb-10" />
@@ -66,18 +66,18 @@ export default async function GamesPage({ params }: PageProps) {
           categories={localizedGameCategories()}
           discordHref={siteConfig.links.discord}
           labels={{
-            searchLabel: t.games.searchLabel,
-            searchPlaceholder: t.games.searchPlaceholder(listings.length),
-            categories: t.games.categories,
-            matchCount: t.games.matchCount,
-            showing: t.games.showing,
-            noMatch: t.games.noMatch,
-            noMatchHelp: t.games.noMatchHelp,
-            askOnDiscord: t.games.askOnDiscord,
-            newTab: t.header.newTab,
-            featured: t.games.featured,
-            toStart: t.games.toStart,
-            fromPrice: t.games.fromPrice,
+            searchLabel: t('games.searchLabel'),
+            searchPlaceholder: t('games.searchPlaceholder', { count: String(listings.length) }),
+            categories: t('games.categories'),
+            matchCount: t('games.matchCount', keep('shown', 'total')),
+            showing: t('games.showing', keep('shown', 'total')),
+            noMatch: t('games.noMatch', keep('query')),
+            noMatchHelp: t('games.noMatchHelp'),
+            askOnDiscord: t('games.askOnDiscord'),
+            newTab: t('header.newTab'),
+            featured: t('games.featured'),
+            toStart: t('games.toStart', keep('ram')),
+            fromPrice: t('games.fromPrice', keep('price')),
           }}
         />
       </Main>

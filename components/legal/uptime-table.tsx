@@ -1,18 +1,18 @@
 import { ScrollTable } from '@/components/legal/blocks'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { localizedUptimeTargets } from '@/i18n/content'
 
 /** The SLA uptime table, shared by the Terms of Service and the SLA page. */
 export function UptimeTable() {
-  const t = copy().legal.uptimeTable
+  const t = words('legal.uptimeTable')
 
   return (
-    <ScrollTable label={t.label}>
+    <ScrollTable label={t('label')}>
       <table className="legal-table">
         <thead>
           <tr>
-            <th scope="col">{t.service}</th>
-            <th scope="col">{t.target}</th>
+            <th scope="col">{t('service')}</th>
+            <th scope="col">{t('target')}</th>
           </tr>
         </thead>
         <tbody>

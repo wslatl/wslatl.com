@@ -1,6 +1,7 @@
 import 'server-only'
 import { isNewer, parseVersion } from '../version.mjs'
 import type { GitHubSettings } from './settings'
+import { say, type Said } from './text'
 
 /**
  * What the Updates page shows from GitHub: the latest release and the
@@ -26,12 +27,13 @@ export type Overview = {
   status: 'no-releases' | 'bad-tag' | 'update' | 'up-to-date' | 'older' | 'withdrawn'
 }
 
+/** What went wrong asking GitHub: its message in English, and `said` to say it in the admin's language. */
 export class GitHubError extends Error {
   constructor(
-    message: string,
+    readonly said: Said,
     readonly status = 0,
   ) {
-    super(message)
+    super(say(said))
   }
 }
 
@@ -48,16 +50,12 @@ type RawRelease = {
 
 const notesAtMost = 20_000
 
-function problem(status: number, headers: Headers, gh: GitHubSettings): string {
-  if (status === 401) return 'GitHub refused the token (401). Check GITHUB_TOKEN in .env and that it has not expired.'
-  if ((status === 403 || status === 429) && headers.get('x-ratelimit-remaining') === '0') {
-    return 'GitHub rate limit reached. Try again in a few minutes.'
-  }
-  if (status === 403) {
-    return `The token may not read ${gh.repo} (403). It needs Contents: Read-only on that repository, or Read and write for an admin that saves to it.`
-  }
-  if (status === 404) return `GitHub could not find ${gh.repo} (404). Check GITHUB_REPO, and that the token can read the repository.`
-  return `GitHub answered ${status}.`
+function problem(status: number, headers: Headers, gh: GitHubSettings): Said {
+  if (status === 401) return { key: 'refused' }
+  if ((status === 403 || status === 429) && headers.get('x-ratelimit-remaining') === '0') return { key: 'rateLimit' }
+  if (status === 403) return { key: 'forbidden', values: { repo: gh.repo } }
+  if (status === 404) return { key: 'missingRepo', values: { repo: gh.repo } }
+  return { key: 'answered', values: { status: String(status) } }
 }
 
 /** The response's JSON, or null for a 404. */
@@ -76,7 +74,7 @@ async function api<T>(gh: GitHubSettings, path: string, fetchImpl: Fetch, timeou
     })
   } catch (error) {
     const timedOut = error instanceof DOMException && error.name === 'TimeoutError'
-    throw new GitHubError(timedOut ? `GitHub did not answer within ${timeoutMs / 1000} seconds.` : 'Could not reach GitHub.')
+    throw new GitHubError(timedOut ? { key: 'timeout', values: { seconds: String(timeoutMs / 1000) } } : { key: 'unreachable' })
   }
   if (response.status === 404) return null
   if (!response.ok) throw new GitHubError(problem(response.status, response.headers, gh), response.status)

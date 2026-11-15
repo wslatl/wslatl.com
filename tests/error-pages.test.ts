@@ -12,6 +12,9 @@ import nextConfig from '../next.config.mjs'
 // The admin's pages are the kit's, whose server side imports server-only.
 vi.mock('server-only', () => ({}))
 
+// The admin's 404 is in the admin's language, from its cookie: none here, so English.
+vi.mock('next/headers', () => ({ cookies: async () => ({ get: () => undefined }), headers: async () => new Headers() }))
+
 const address = vi.hoisted(() => ({ path: '/' }))
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
@@ -23,7 +26,7 @@ const crash = { error: new Error('a detail nobody should see'), reset: () => {},
 
 describe('a missing file in a folder that keeps its path', () => {
   it('gets a language once the real files have been served, for every such folder', async () => {
-    const rewrites = (await nextConfig.rewrites()) as { afterFiles: { source: string; destination: string }[] }
+    const rewrites = (await nextConfig.rewrites!()) as { afterFiles: { source: string; destination: string }[] }
     const folders = [...rootDirectories, ...sharedDirectories].toSorted()
     expect(rewrites.afterFiles.map((rule) => rule.source).toSorted()).toEqual(folders.map((folder) => `${folder}:path*`))
     for (const rule of rewrites.afterFiles) expect(rule.destination).toBe(`/en${rule.source}`)
@@ -35,8 +38,8 @@ describe('a wrong address under /admin', () => {
     expect(() => MissingAdminPage()).toThrow(expect.objectContaining({ digest: 'NEXT_HTTP_ERROR_FALLBACK;404' }))
   })
 
-  it('says nothing about the admin, since it also stands in when the admin is switched off', () => {
-    const html = renderToStaticMarkup(createElement(AdminNotFound))
+  it('says nothing about the admin, since it also stands in when the admin is switched off', async () => {
+    const html = renderToStaticMarkup(await AdminNotFound())
     expect(html).toContain('Page not found')
     expect(html).toContain('href="/"')
     expect(html).not.toMatch(/admin/i)

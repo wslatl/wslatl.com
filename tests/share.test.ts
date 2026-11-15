@@ -10,7 +10,7 @@ import { games } from '@/data/games'
 import { partners, partnerTextLimits, type Partner } from '@/data/partners'
 import { productLines } from '@/data/pricing'
 import { locales, type Locale } from '@/i18n/config'
-import { copyFor } from '@/i18n/copy'
+import { messagesFor, wordsFor } from '@/i18n/words'
 import {
   absoluteUrl,
   discordLimit,
@@ -27,7 +27,7 @@ import {
 
 const root = join(__dirname, '..')
 const read = (path: string) => readFileSync(join(root, path), 'utf8')
-const ctx = (locale: Locale) => ({ t: copyFor(locale), locale })
+const ctx = (locale: Locale) => ({ t: wordsFor(locale), locale })
 const vps = productLines.find((line) => line.id === 'vps')!
 const gameLine = productLines.find((line) => line.id === 'game')!
 
@@ -303,7 +303,7 @@ describe('VPS ad', () => {
 })
 
 describe('the button', () => {
-  const labels = shareLabels(copyFor('en'))
+  const labels = shareLabels(wordsFor('en'))
   const html = renderToStaticMarkup(createElement(ShareAd, { text: '## Hi\n\nhttps://wslatl.com/', labels }))
 
   it('renders copy and preview buttons, a status message for screen readers and the exact text in the preview', () => {
@@ -316,9 +316,9 @@ describe('the button', () => {
 
   it('has a label in every language', () => {
     for (const locale of locales) {
-      const l = shareLabels(copyFor(locale))
+      const l = shareLabels(wordsFor(locale))
       for (const value of Object.values(l)) expect(value.length).toBeGreaterThan(0)
-      expect(l.copy).toBe(copyFor(locale).share.copyAd)
+      expect(l.copy).toBe(messagesFor(locale).share.copyAd)
     }
   })
 })

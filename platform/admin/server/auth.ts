@@ -1,5 +1,6 @@
 import 'server-only'
-import { readCookie } from './request'
+import type { Locale } from '../../i18n/config'
+import { readCookie } from './cookies'
 import { readSession, SESSION_COOKIE } from './session'
 import { signInSettings, type Env } from './settings'
 
@@ -29,6 +30,14 @@ export type AdminUser = {
   name: string
   /** False for an account that may see the Updates page but not install or copy anything. True when left out. */
   mayUpdate?: boolean
+  /**
+   * The account's own language, for an app that keeps one per account, as
+   * the status site does: one of the kit's five codes, 'en', 'es', 'fr',
+   * 'de' or 'pt'. It comes before the admin's language cookie. Left out, or
+   * any other value, and the cookie decides, then English. The shared
+   * password has none.
+   */
+  locale?: string
 }
 
 export interface AdminAuth {
@@ -47,6 +56,15 @@ export interface AdminAuth {
    * cookie. Called on every admin page and route, after problems() is empty.
    */
   user(request: AdminRequest, env: Env): AdminUser | null | Promise<AdminUser | null>
+  /**
+   * For an app that keeps a language per account: keeps the one picked in
+   * the admin's language menu for whoever sent the request, who is signed
+   * in. The kit has set the language cookie by then as well. Left out, the
+   * menu sets the cookie alone, and an account's own language goes on
+   * coming first. A throw is a failed change: the admin says so and the
+   * cookie stays as it was.
+   */
+  saveLocale?(request: AdminRequest, locale: Locale, env: Env): void | Promise<void>
   /** Where someone who is not signed in is sent. /admin/login unless set. */
   readonly signInPath?: string
   /** Where the Sign out button posts, as JSON. /admin/api/logout unless set. */

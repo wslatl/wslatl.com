@@ -3,7 +3,7 @@ import { games } from '@/data/games'
 import { legalPages } from '@/data/legal'
 import { partners } from '@/data/partners'
 import { defaultLocale, locales } from '@/i18n/config'
-import { languageAlternates, pageUrl } from '@/lib/metadata'
+import { seo } from '@/lib/metadata'
 
 /**
  * Every page in every language. Each entry lists its translations, so a
@@ -34,17 +34,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...legalPages.map((page) => ({ path: page.href, changeFrequency: 'yearly' as const, priority: 0.3 })),
   ]
 
-  return paths.flatMap(({ path, changeFrequency, priority }) =>
-    locales.map((locale) => ({
-      url: pageUrl(locale, path),
+  // Each entry lists the same set the page's own hreflang tags list,
+  // x-default included: Google wants the two to agree (lib/metadata.ts).
+  return seo.sitemap(
+    paths.map((page) => ({ ...page, languages: locales })),
+    ({ changeFrequency, priority }, locale) => ({
       changeFrequency,
       // A translation is not the page people should land on first.
       priority: locale === defaultLocale ? priority : Math.round(priority * 0.8 * 10) / 10,
-      alternates: {
-        // The same set the page's own hreflang tags list, x-default included:
-        // Google wants the two to agree.
-        languages: languageAlternates(path),
-      },
-    })),
+    }),
   )
 }

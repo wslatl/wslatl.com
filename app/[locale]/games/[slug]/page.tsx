@@ -22,7 +22,7 @@ import { SiteLink } from '@/platform/components/site-link'
 import { Main } from '@/platform/components/main'
 import { localePath, type Locale } from '@/i18n/config'
 import { getLocale, setLocale } from '@/i18n/locale'
-import { copy } from '@/i18n/copy'
+import { categoryInSentence, words } from '@/i18n/words'
 import { localizedGames, localizedProductLine } from '@/i18n/content'
 
 interface PageProps {
@@ -41,8 +41,8 @@ function localizedGame(slug: string, locale: Locale) {
  * server.
  */
 function PlansThatFit({ row }: { row: RamRow }) {
-  const t = copy().games.detail
-  const perMonth = copy().pricing.perMonth
+  const t = words('games.detail')
+  const perMonth = words('pricing')('perMonth')
   const fits = smallestPlansWithRam('game', ramNeedGb(row))
   if (fits.length === 0) {
     return (
@@ -50,14 +50,14 @@ function PlansThatFit({ row }: { row: RamRow }) {
         href={localePath(getLocale(), siteConfig.paths.contact)}
         className="text-link underline underline-offset-4 hover:text-foreground"
       >
-        {t.tooBig}
+        {t('tooBig')}
       </Link>
     )
   }
   return fits.map(({ plan }, i) => (
     <span key={plan.name}>
-      {i === 0 && row.perMap && t.perMap}
-      {i > 0 && t.or}
+      {i === 0 && row.perMap && t('perMap')}
+      {i > 0 && t('or')}
       <span className="whitespace-nowrap">
         <span className="font-medium text-foreground">{plan.name}</span> ({formatPrice(plan.price)}{perMonth})
       </span>
@@ -80,7 +80,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function GamePage({ params }: PageProps) {
   const { locale, slug } = await params
   setLocale(locale)
-  const t = copy()
+  const t = words()
   const path = (href: string) => localePath(locale, href)
   const game = localizedGame(slug, locale)
   if (!game) notFound()
@@ -104,8 +104,8 @@ export default async function GamePage({ params }: PageProps) {
         <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-14 xl:gap-20">
         <div className="min-w-0">
           <PageHeader
-            title={t.games.detail.heading(game.name)}
-            breadcrumbs={[{ label: t.games.crumb, href: '/games' }]}
+            title={t('games.detail.heading', { game: game.name })}
+            breadcrumbs={[{ label: t('games.crumb'), href: '/games' }]}
             crumbLabel={game.name}
             path={`/games/${game.slug}`}
           >
@@ -115,56 +115,56 @@ export default async function GamePage({ params }: PageProps) {
           <div className="-mt-2 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:hidden">
             <Button asChild size="lg" className="h-auto min-h-11 py-2.5 text-center whitespace-normal">
               <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-                {t.games.detail.order(game.name)}
-                <span className="sr-only">{t.header.newTab}</span>
+                {t('games.detail.order', { game: game.name })}
+                <span className="sr-only">{t('header.newTab')}</span>
               </a>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <a href="#plans">{t.games.detail.comparePlans}</a>
+              <a href="#plans">{t('games.detail.comparePlans')}</a>
             </Button>
           </div>
           <ShareGameAd game={game} className="mt-4" />
           <p className="mt-4 text-sm text-muted-foreground lg:mt-0">
-            {t.games.detail.listedUnderPrefix}{' '}
+            {t('games.detail.listedUnderPrefix')}{' '}
             <Link
               href={path(`/games#${slugify(game.category)}`)}
               className="text-link underline underline-offset-4 hover:text-foreground"
             >
               {game.category}
             </Link>
-            {t.games.detail.listedUnderSuffix}
+            {t('games.detail.listedUnderSuffix')}
           </p>
           {guidesUrl && (
             <p className="mt-2 text-sm text-muted-foreground">
-              {t.games.detail.guidesIntro}{' '}
+              {t('games.detail.guidesIntro')}{' '}
               {/* Through SiteLink like the footer's link, so the knowledge base
                   opens in a new tab from both, as every off-site link does. */}
               <SiteLink
                 href={guidesUrl}
-                newTab={t.header.newTab}
+                newTab={t('header.newTab')}
                 hrefLang={locale}
                 className="text-link underline underline-offset-4 hover:text-foreground"
               >
-                {t.games.detail.guidesLink(game.name)}
+                {t('games.detail.guidesLink', { game: game.name })}
               </SiteLink>
             </p>
           )}
 
         <section aria-labelledby="ram-heading" className="@container mt-16">
           <h2 id="ram-heading" className="text-2xl font-semibold tracking-tight text-foreground">
-            {t.games.detail.ramHeading(game.name)}
+            {t('games.detail.ramHeading', { game: game.name })}
           </h2>
           {/* A table when there is room (measured in rem, so enlarged text counts); stacked rows otherwise, where three columns would crush the plan names. */}
           <div className="mt-5 hidden overflow-hidden rounded-xl border @min-[36rem]:block">
             <table className="w-full text-left text-sm">
               <caption className="sr-only">
-                {t.games.detail.ramCaption(game.name)}
+                {t('games.detail.ramCaption', { game: game.name })}
               </caption>
               <thead className="bg-card/50 text-muted-foreground">
                 <tr>
-                  <th scope="col" className="px-4 py-3 font-medium">{t.games.detail.setup}</th>
-                  <th scope="col" className="px-4 py-3 font-medium">{t.games.detail.recommendedRam}</th>
-                  <th scope="col" className="px-4 py-3 font-medium">{t.games.detail.smallestPlans}</th>
+                  <th scope="col" className="px-4 py-3 font-medium">{t('games.detail.setup')}</th>
+                  <th scope="col" className="px-4 py-3 font-medium">{t('games.detail.recommendedRam')}</th>
+                  <th scope="col" className="px-4 py-3 font-medium">{t('games.detail.smallestPlans')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -197,47 +197,47 @@ export default async function GamePage({ params }: PageProps) {
                   <span className="shrink-0 text-sm whitespace-nowrap text-foreground/90">{row.ram}</span>
                 </p>
                 <p className="mt-1.5 text-sm text-muted-foreground tabular-nums">
-                  {t.games.detail.fits} <PlansThatFit row={row} />
+                  {t('games.detail.fits')} <PlansThatFit row={row} />
                 </p>
               </li>
             ))}
             {tableClaim && <li className="p-4 text-xs leading-relaxed text-muted-foreground">{tableClaim}</li>}
           </ul>
           <p className="mt-3 text-sm text-muted-foreground">
-            {t.games.detail.ramNote}
+            {t('games.detail.ramNote')}
           </p>
         </section>
         </div>
 
-        <aside aria-label={t.games.detail.atAGlance(game.name)} className="hidden lg:block">
+        <aside aria-label={t('games.detail.atAGlance', { game: game.name })} className="hidden lg:block">
           <div className="sticky top-24 mt-24 rounded-2xl border bg-card/30 p-6">
             {entry && (
               <>
-                <p className="text-sm font-medium text-muted-foreground">{t.games.detail.hosting(game.name)}</p>
+                <p className="text-sm font-medium text-muted-foreground">{t('games.detail.hosting', { game: game.name })}</p>
                 <p className="mt-2 text-sm text-muted-foreground tabular-nums">
-                  {t.pricing.from}{' '}
+                  {t('pricing.from')}{' '}
                   <span className="text-4xl font-bold tracking-[-0.03em] text-foreground">
                     {formatPrice(entry.plan.price)}
                   </span>
-                  {t.pricing.perMonth}
+                  {t('pricing.perMonth')}
                 </p>
                 <p className="mt-2 text-sm leading-relaxed text-muted-foreground tabular-nums">
                   {entry.plan.name}: {entry.plan.cpu} {line.cpuUnit}, {entry.plan.ramGb} GB RAM,{' '}
                   {entry.plan.storageGb} GB {entry.group.storageType}
                 </p>
                 {entry.group.tier === 'budget' && (
-                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t.games.detail.budgetNote}</p>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{t('games.detail.budgetNote')}</p>
                 )}
               </>
             )}
             <Button asChild size="lg" className="mt-6 h-auto min-h-11 w-full py-2.5 text-center whitespace-normal">
               <a href={siteConfig.links.register} target="_blank" rel="noopener noreferrer">
-                {t.games.detail.order(game.name)}
-                <span className="sr-only">{t.header.newTab}</span>
+                {t('games.detail.order', { game: game.name })}
+                <span className="sr-only">{t('header.newTab')}</span>
               </a>
             </Button>
             <Button asChild size="lg" variant="outline" className="mt-2 w-full">
-              <a href="#plans">{t.games.detail.comparePlans}</a>
+              <a href="#plans">{t('games.detail.comparePlans')}</a>
             </Button>
             <ul className="mt-6 space-y-2 border-t pt-5 text-sm text-muted-foreground">
               {line.included.slice(0, 3).map((item) => (
@@ -253,9 +253,9 @@ export default async function GamePage({ params }: PageProps) {
 
         <section id="plans" aria-labelledby="plans-heading" className="mt-16">
           <h2 id="plans-heading" className="text-2xl font-semibold tracking-tight text-foreground">
-            {t.games.detail.plansHeading}
+            {t('games.detail.plansHeading')}
           </h2>
-          <p className="mt-2 max-w-2xl text-muted-foreground">{t.games.detail.plansIntro}</p>
+          <p className="mt-2 max-w-2xl text-muted-foreground">{t('games.detail.plansIntro')}</p>
           {claims?.plans && <ComparisonList ids={claims.plans} className="mt-6" />}
           <div className="mt-8 space-y-12">
             {line.groups.map((group) => (
@@ -268,7 +268,7 @@ export default async function GamePage({ params }: PageProps) {
           {game.popularFor.length > 0 && (
             <section aria-labelledby="popular-heading">
               <h2 id="popular-heading" className="text-lg font-semibold tracking-tight text-foreground">
-                {t.games.detail.popular(game.name)}
+                {t('games.detail.popular', { game: game.name })}
               </h2>
               <ul className="mt-4 space-y-2.5 text-sm text-foreground/90">
                 {game.popularFor.map((item) => (
@@ -282,7 +282,7 @@ export default async function GamePage({ params }: PageProps) {
           )}
           <section aria-labelledby="included-heading">
             <h2 id="included-heading" className="text-lg font-semibold tracking-tight text-foreground">
-              {t.games.detail.included}
+              {t('games.detail.included')}
             </h2>
             <ul className="mt-4 space-y-2.5 text-sm text-foreground/90">
               {line.included.map((item) => (
@@ -298,7 +298,7 @@ export default async function GamePage({ params }: PageProps) {
         {faqs.length > 0 && (
           <section aria-labelledby="faq-heading" className="mt-16 max-w-4xl">
             <h2 id="faq-heading" className="text-2xl font-semibold tracking-tight text-foreground">
-              {t.games.detail.questions(game.name)}
+              {t('games.detail.questions', { game: game.name })}
             </h2>
             <FaqList faqs={faqs} className="mt-4" />
           </section>
@@ -307,7 +307,7 @@ export default async function GamePage({ params }: PageProps) {
         {related.length > 0 && (
           <section aria-labelledby="related-heading" className="mt-16">
             <h2 id="related-heading" className="text-lg font-semibold tracking-tight text-foreground">
-              {t.games.detail.moreIn(game.category)}
+              {t('games.detail.moreIn', { category: categoryInSentence[getLocale()](game.category) })}
             </h2>
             {/* No prefetch: each chip would pull a whole game page as it scrolls into view. */}
             <ul className="mt-4 flex flex-wrap gap-2">
@@ -324,7 +324,7 @@ export default async function GamePage({ params }: PageProps) {
               ))}
               <li>
                 <Link href={path('/games')} className="inline-block px-3.5 py-1.5 text-sm font-medium text-link hover:text-foreground">
-                  {t.games.detail.allGames}
+                  {t('games.detail.allGames')}
                 </Link>
               </li>
             </ul>

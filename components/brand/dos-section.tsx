@@ -1,7 +1,7 @@
 import { Check, X } from 'lucide-react'
 import { BrandPicture, BrandSection, Prose } from '@/components/brand/brand-section'
 import { pictures, tiles } from '@/data/brand'
-import { copy } from '@/i18n/copy'
+import { listOf, words } from '@/i18n/words'
 
 /** The guide's rules for the logo, as two short lists. Each is headed by its word and each line carries an icon: right and wrong never differ by color alone. */
 function Verdict({ verdict, heading, items }: { verdict: 'do' | 'dont'; heading: string; items: readonly string[] }) {
@@ -28,15 +28,15 @@ function Verdict({ verdict, heading, items }: { verdict: 'do' | 'dont'; heading:
  * picture, so every language has them.
  */
 export function DosSection() {
-  const t = copy().brand.dos
+  const t = words('brand.dos')
   // The six pictures are laid out three across at the size they were drawn for, on every screen that has the room.
   const width = pictures.doOriginal.width * 3 + 16 * 2
 
   return (
-    <BrandSection id="dos-and-donts" number="5" title={t.heading} intro={t.intro}>
+    <BrandSection id="dos-and-donts" number="5" title={t('heading')} intro={t('intro')}>
       <div className="grid gap-5 md:grid-cols-2">
-        <Verdict verdict="do" heading={t.doHeading} items={t.doItems} />
-        <Verdict verdict="dont" heading={t.dontHeading} items={t.dontItems} />
+        <Verdict verdict="do" heading={t('doHeading')} items={listOf('brand.dos.doItems')} />
+        <Verdict verdict="dont" heading={t('dontHeading')} items={listOf('brand.dos.dontItems')} />
       </div>
 
       {/* The rule that matters most, beside the pictures of it on a wide screen and under them on a phone. */}
@@ -48,15 +48,15 @@ export function DosSection() {
               <li key={tile.id} data-tone={tile.verdict === 'do' ? 'good' : 'critical'}>
                 <figure>
                   <div className="overflow-hidden rounded-xl border bg-white">
-                    <BrandPicture id={tile.picture} alt={t.alt[tile.id]} />
+                    <BrandPicture id={tile.picture} alt={t(`alt.${tile.id}`)} />
                   </div>
                   <figcaption className="mt-2 flex items-start gap-2 text-sm leading-snug">
                     <Icon aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-(--tone)" />
                     <span>
                       <span className="font-semibold text-foreground">
-                        {tile.verdict === 'do' ? t.doHeading : t.dontHeading}
+                        {tile.verdict === 'do' ? t('doHeading') : t('dontHeading')}
                       </span>{' '}
-                      <span className="text-muted-foreground">{t.tiles[tile.id]}</span>
+                      <span className="text-muted-foreground">{t(`tiles.${tile.id}`)}</span>
                     </span>
                   </figcaption>
                 </figure>
@@ -64,7 +64,7 @@ export function DosSection() {
             )
           })}
         </ul>
-        <Prose className="border-l-2 border-primary/30 pl-5">{t.rebuild}</Prose>
+        <Prose className="border-l-2 border-primary/30 pl-5">{t('rebuild')}</Prose>
       </div>
     </BrandSection>
   )

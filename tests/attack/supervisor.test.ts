@@ -81,7 +81,7 @@ beforeEach(async () => {
     draft: false,
     prerelease: false,
   })
-  github.answer(`/repos/${repo}/commits/tags/v9.9.9`, { status: 200, body: { sha } })
+  github.answer(`/repos/${repo}/commits/refs/tags/v9.9.9`, { status: 200, body: { sha } })
 })
 
 afterEach(async () => {
@@ -107,8 +107,8 @@ describe('the supervisor, asked to install a release that was changed on the way
     expect(state().current).toBeNull()
     // The half-made release is gone, and the uploaded folder still serves.
     await waitFor(() => !existsSync(join(site, '.updater', 'releases', 'v9.9.9')))
-    // The tag was asked for as a tag; the token went to the API and nowhere else.
-    expect(github.seen.map((request) => request.path)).toContain(`/repos/${repo}/commits/tags/v9.9.9`)
+    // The tag was asked for by its full ref; the token went to the API and nowhere else.
+    expect(github.seen.map((request) => request.path)).toContain(`/repos/${repo}/commits/refs/tags/v9.9.9`)
     for (const request of github.seen) expect(request.authorization).toBe(`Bearer ${token}`)
     for (const request of github.downloadsSeen) expect(request.authorization).toBeUndefined()
     expect(output.join('\n')).not.toContain(token)

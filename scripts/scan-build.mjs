@@ -65,8 +65,9 @@ for (const file of builtFiles) {
 }
 
 // Sitemap paths to the routes they are prerendered as: English pages sit at
-// the plain paths and are built under /en (proxy.ts, i18n/routing.ts).
-const config = readFileSync('i18n/config.ts', 'utf8')
+// the plain paths and are built under /en (proxy.ts, i18n/routing.ts). The
+// languages are the kit's, which i18n/config.ts re-exports.
+const config = readFileSync('platform/i18n/config.ts', 'utf8')
 const locales = [...(config.match(/export const locales = \[([^\]]*)\]/)?.[1] ?? '').matchAll(/'([a-z-]+)'/g)].map((m) => m[1])
 const defaultLocale = config.match(/export const defaultLocale: Locale = '([a-z-]+)'/)?.[1]
 const routes = new Set(Object.keys(JSON.parse(readFileSync('.next/prerender-manifest.json', 'utf8')).routes))

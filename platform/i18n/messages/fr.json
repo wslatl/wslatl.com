@@ -1,0 +1,280 @@
+{
+  "header": {
+    "skipToContent": "Aller au contenu principal",
+    "home": "Accueil {brand}",
+    "nav": "Principale",
+    "newTab": " (ouvre un nouvel onglet)",
+    "openMenu": "Menu",
+    "switcher": "Sites WSLATL",
+    "apps": {
+      "website": "Site web",
+      "guides": "Guides",
+      "status": "État"
+    }
+  },
+  "breadcrumbs": {
+    "label": "Fil d'Ariane",
+    "home": "Accueil"
+  },
+  "language": {
+    "label": "Langue : {language}",
+    "heading": "Choisir une langue"
+  },
+  "copy": {
+    "copy": "Copier",
+    "copied": "Copié",
+    "copyFailed": "Le texte est sélectionné. Copiez-le avec votre clavier ou votre menu."
+  },
+  "status": {
+    "noData": "Aucune donnée"
+  },
+  "footer": {
+    "rights": "© {year} {company}. Tous droits réservés."
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page introuvable",
+      "heading": "Cette page n'existe pas.",
+      "body": "Le lien est peut-être ancien, ou l'adresse a pu être mal saisie.",
+      "home": "Retour à la page d'accueil"
+    },
+    "crash": {
+      "title": "Un problème est survenu",
+      "heading": "Quelque chose a cassé de notre côté.",
+      "body": "Cette page n'a pas pu se charger. Réessayez et, si le problème persiste, <link>prévenez-nous</link> pour que nous le corrigions.",
+      "retry": "Réessayer",
+      "home": "Aller à la page d'accueil",
+      "reference": "Code de référence",
+      "discord": "Demander sur Discord"
+    }
+  },
+  "admin": {
+    "heading": "<hidden>{brand} </hidden>Administration",
+    "tabTitle": "{page} | Administration {brand}",
+    "newTab": " (ouvre un nouvel onglet)",
+    "time": {
+      "when": "{at, date, admin} (heure de Chicago)",
+      "seconds": "{count, plural, one {# seconde} other {# secondes}}",
+      "minutes": "{count, plural, one {# minute} other {# minutes}}"
+    },
+    "shell": {
+      "nav": "Administration",
+      "pages": "Pages d'administration",
+      "viewSite": "Voir le site",
+      "signOut": "Se déconnecter",
+      "signingOut": "Déconnexion en cours"
+    },
+    "language": {
+      "group": "Langue",
+      "label": "Langue : {language}",
+      "failed": "La langue n'a pas changé. Réessayez."
+    },
+    "signIn": {
+      "title": "Connexion",
+      "text": "Connectez-vous pour mettre le site à jour.",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "busy": "Connexion en cours",
+      "wrong": {
+        "title": "Mot de passe incorrect",
+        "detail": "Vérifiez-le et réessayez."
+      },
+      "tooMany": {
+        "title": "Trop de tentatives",
+        "wait": "Réessayez dans {wait}.",
+        "later": "Réessayez dans quelques minutes."
+      },
+      "failed": {
+        "title": "Connexion impossible",
+        "status": "Le serveur a répondu {status}."
+      },
+      "unreachable": {
+        "title": "Serveur injoignable",
+        "detail": "Vérifiez la connexion et réessayez."
+      }
+    },
+    "updates": {
+      "title": "Mises à jour",
+      "intro": "Installe la dernière version de <link>{repo}</link>.",
+      "links": "En savoir plus sur les mises à jour",
+      "installed": "Version installée",
+      "latest": "Dernière version",
+      "published": "Publiée",
+      "installedAt": "Installée",
+      "commit": "Commit",
+      "byHand": "Envoyée à la main",
+      "noneYet": "Aucune publiée pour l'instant",
+      "onGitHub": "Version sur GitHub",
+      "cannotRead": "Impossible de lire GitHub",
+      "brings": "Ce qu'apporte {tag}",
+      "badge": {
+        "update": "Prête à installer",
+        "upToDate": "Installée",
+        "older": "Plus ancienne que la version installée",
+        "badTag": "Pas un tag de version",
+        "withdrawn": "Retirée"
+      },
+      "summary": {
+        "noReleases": "Aucune version publiée pour l'instant. Publiez-en une sur GitHub pour l'installer ici.",
+        "noReleasesFrom": "Aucune version publiée pour l'instant. Publiez-en une depuis <link>{label}</link> ou sur GitHub pour l'installer ici.",
+        "badTag": "La dernière version porte le tag {tag}, et non vMAJOR.MINOR.PATCH, elle ne peut donc pas être installée.",
+        "upToDate": "Le site utilise la dernière version.",
+        "older": "La version marquée comme la dernière, {tag}, est plus ancienne que la version installée, {installed}, il n'y a donc rien à installer.",
+        "withdrawn": "{tag} a été retirée parce qu'elle ne cessait de s'arrêter, elle n'est donc plus proposée. Publiez le correctif dans une version plus récente.",
+        "update": "{tag} est prête à être installée.",
+        "updateByHand": "{tag} est prête à être installée à la place du dossier envoyé à la main."
+      },
+      "off": {
+        "title": "Les mises à jour sont désactivées",
+        "fix": "{count, plural, one {Corrigez le réglage} other {Corrigez les réglages}} dans <code>.env</code> et redémarrez le serveur. Toutes les autres pages d'administration fonctionnent normalement."
+      },
+      "blocked": {
+        "upToDate": "À jour",
+        "nothing": "Rien à installer"
+      }
+    },
+    "panel": {
+      "heading": "Mettre à jour le site",
+      "explain": "Compile la version à côté du site en ligne et ne bascule qu'une fois qu'elle a démarré. Si quelque chose échoue, le site reste tel quel.",
+      "viewOnly": "Votre compte peut voir les mises à jour, mais pas les installer.",
+      "updating": "Mise à jour en cours",
+      "install": "Installer {tag}",
+      "notServed": {
+        "title": "Les mises à jour sont désactivées ici",
+        "body": "Le site n'a pas été lancé avec <code>npm run serve</code>, il ne peut donc pas se mettre à jour tout seul. Définissez la commande de démarrage du serveur sur <code>npm run serve</code> et redémarrez-le."
+      },
+      "waiting": "En attente que le programme de mise à jour prenne la demande en compte.",
+      "restarting": "Le site redémarre. En attente de sa réponse.",
+      "installing": "Installation de <mono>{tag}</mono>",
+      "commit": "Commit <mono>{sha}</mono>",
+      "outcome": {
+        "failed": "Échec",
+        "rolledBack": "Retour en arrière",
+        "done": "Terminée"
+      },
+      "signedOut": {
+        "title": "Déconnecté",
+        "watching": "Votre session a expiré. Reconnectez-vous pour voir comment la mise à jour s'est passée.",
+        "text": "Votre session a expiré. Reconnectez-vous."
+      },
+      "couldNotStart": {
+        "title": "Démarrage impossible",
+        "status": "La mise à jour n'a pas pu démarrer ({status})."
+      },
+      "alreadyRunning": {
+        "title": "Déjà en cours",
+        "text": "Une mise à jour est déjà en cours."
+      },
+      "noAnswer": {
+        "title": "Pas de réponse",
+        "text": "Impossible de joindre le serveur."
+      },
+      "stepsLabel": "Étapes de la mise à jour",
+      "steps": {
+        "download": {
+          "label": "Téléchargement",
+          "detail": "La version, depuis GitHub"
+        },
+        "install": {
+          "label": "Installation",
+          "detail": "npm ci, dans un nouveau dossier"
+        },
+        "build": {
+          "label": "Compilation",
+          "detail": "npm run build, en gardant les anciens fichiers"
+        },
+        "prune": {
+          "label": "Nettoyage",
+          "detail": "Tests, configurations et paquets de développement supprimés"
+        },
+        "migrate": {
+          "label": "Base de données",
+          "detail": "D'abord une sauvegarde, puis les changements de la base de données"
+        },
+        "check": {
+          "label": "Démarrage d'essai",
+          "detail": "Doit répondre avant que quoi que ce soit change"
+        },
+        "switch": {
+          "label": "Bascule",
+          "detail": "Redémarrage sur la nouvelle version compilée, ou retour en arrière"
+        }
+      },
+      "states": {
+        "pending": "En attente",
+        "running": "En cours",
+        "done": "Terminée",
+        "failed": "Échec",
+        "skipped": "Ignorée"
+      },
+      "log": {
+        "title": "Journal du programme de mise à jour",
+        "lines": "{count, plural, one {# ligne} other {# lignes}}",
+        "last": "Les {shown} dernières lignes sur {total}"
+      },
+      "updaterChanged": {
+        "title": "Le programme de mise à jour a lui-même changé",
+        "body": "Cette version modifie le programme de mise à jour, qui continue de s'exécuter depuis le dossier envoyé. Appuyez sur le bouton pour copier le nouveau depuis <code>.updater/releases/{tag}/scripts/</code>, puis redémarrez le serveur depuis le panneau.",
+        "copy": "Copier le nouveau programme",
+        "copying": "Copie en cours",
+        "copiedTitle": "Programme copié",
+        "copiedBody": "Redémarrez maintenant le serveur depuis le panneau pour terminer. Ce message disparaît après le redémarrage.",
+        "sessionRanOut": "Votre session a expiré. Reconnectez-vous.",
+        "failed": "La copie a échoué ({status}).",
+        "unreachable": "Impossible de joindre le serveur."
+      }
+    },
+    "notFound": {
+      "title": "Page introuvable",
+      "body": "Il n'y a rien à cette adresse.",
+      "goTo": "Aller à {host}"
+    },
+    "crash": {
+      "title": "Un problème est survenu",
+      "body": "Cette page a rencontré une erreur. Réessayez et, si cela persiste, la console du serveur contient les détails.",
+      "retry": "Réessayer",
+      "back": "Retour à l'administration",
+      "reference": "Référence : {reference}"
+    },
+    "errors": {
+      "signInAgain": "Reconnectez-vous.",
+      "mayNotUpdate": "Ce compte n'est pas autorisé à installer les mises à jour.",
+      "updatesOff": "Les mises à jour sont désactivées. {reasons}",
+      "tooMany": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "busy": "Occupé. Réessayez dans un instant.",
+      "wrongPassword": "Ce mot de passe n'est pas le bon.",
+      "tooManyCopies": "Cela fait beaucoup de copies en une heure. Réessayez plus tard.",
+      "notFromHere": "Cette requête ne vient pas de ce site.",
+      "sendJson": "Envoyez du JSON.",
+      "tooLarge": "C'est plus que ce que cette requête accepte.",
+      "badJson": "Ce n'est pas du JSON valide.",
+      "sendObject": "Envoyez un objet JSON.",
+      "unknownLanguage": "Ce n'est pas une des langues de l'administration.",
+      "languageNotSaved": "La langue n'a pas pu être enregistrée dans le compte.",
+      "languageKept": "Ce compte a sa propre langue, et l'administration ne peut pas la changer ici."
+    },
+    "problems": {
+      "tokenMissing": "GITHUB_TOKEN n'est pas défini. La page Mises à jour lit les versions avec lui : un jeton à portée limitée (fine-grained) avec « Contents: Read-only » sur le dépôt, ou « Read and write » si l'administration y enregistre aussi des données.",
+      "repoForm": "GITHUB_REPO n'est pas au format owner/name.",
+      "apiHttps": "GITHUB_API_URL n'est pas une adresse https.",
+      "apiPlain": "GITHUB_API_URL doit être une adresse simple, sans rien après l'hôte à part un chemin.",
+      "refused": "GitHub a refusé le jeton (401). Vérifiez GITHUB_TOKEN dans .env et qu'il n'a pas expiré.",
+      "rateLimit": "La limite de requêtes de GitHub est atteinte. Réessayez dans quelques minutes.",
+      "forbidden": "Le jeton n'a pas le droit de lire {repo} (403). Il lui faut « Contents: Read-only » sur ce dépôt, ou « Read and write » pour une administration qui y enregistre des données.",
+      "missingRepo": "GitHub n'a pas trouvé {repo} (404). Vérifiez GITHUB_REPO et que le jeton peut lire le dépôt.",
+      "answered": "GitHub a répondu {status}.",
+      "timeout": "GitHub n'a pas répondu en {seconds} secondes.",
+      "unreachable": "Impossible de joindre GitHub.",
+      "unreadable": "Impossible de lire GitHub.",
+      "notServe": "Les mises à jour ne fonctionnent que si le site est lancé avec npm run serve.",
+      "waiting": "Une mise à jour attend déjà de démarrer.",
+      "running": "Une mise à jour est déjà en cours.",
+      "copyingAlready": "Le programme de mise à jour est déjà en cours de copie. Réessayez dans un instant.",
+      "copyNotServe": "Cela ne fonctionne que si le site est lancé avec npm run serve.",
+      "copyBusy": "Une mise à jour est en cours. Réessayez quand elle sera terminée.",
+      "copyNoRelease": "Aucune version n'est installée, il n'y a donc pas de nouveau programme de mise à jour à copier.",
+      "copyNoBuild": "La version compilée de {tag} n'existe plus, il n'y a donc pas de programme de mise à jour à copier depuis elle.",
+      "copyFailed": "Impossible de copier le programme de mise à jour : {reason}"
+    }
+  }
+}

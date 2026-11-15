@@ -7,7 +7,7 @@ import {
   logoColors,
   type Swatch,
 } from '@/data/brand'
-import { copy } from '@/i18n/copy'
+import { listOf, words } from '@/i18n/words'
 
 const rgbText = (rgb: readonly number[]) => `RGB ${rgb.join(', ')}`
 
@@ -48,10 +48,10 @@ function GradientCard({
   use: string
   labels: CopyButtonLabels
 }) {
-  const t = copy().brand.colors
+  const t = words('brand.colors')
   const stops = [
-    { label: t.from, ...gradient.from },
-    { label: t.to, ...gradient.to },
+    { label: t('from'), ...gradient.from },
+    { label: t('to'), ...gradient.to },
   ]
   return (
     <li className="overflow-hidden rounded-xl border bg-card/30">
@@ -81,51 +81,51 @@ const swatchGrid = 'grid gap-4 sm:grid-cols-2 lg:grid-cols-4'
 
 /** Part 2: the logo's colors, the two gradients and the interface palette, as swatches with their hex ready to copy. */
 export function ColorSection() {
-  const t = copy().brand.colors
-  const labels: CopyButtonLabels = { copy: t.copy, copied: t.copied, copyFailed: t.copyFailed }
+  const t = words('brand.colors')
+  const labels: CopyButtonLabels = { copy: t('copy'), copied: t('copied'), copyFailed: t('copyFailed') }
 
   return (
-    <BrandSection id="colors" number="2" title={t.heading} intro={t.intro}>
-      <SubSection title={t.logoHeading}>
-        <Prose>{t.logoIntro}</Prose>
+    <BrandSection id="colors" number="2" title={t('heading')} intro={t('intro')}>
+      <SubSection title={t('logoHeading')}>
+        <Prose>{t('logoIntro')}</Prose>
         <ul className={swatchGrid}>
           {logoColors.map((swatch) => (
-            <SwatchCard key={swatch.id} swatch={swatch} use={t.uses[swatch.id]} labels={labels} />
+            <SwatchCard key={swatch.id} swatch={swatch} use={t(`uses.${swatch.id}`)} labels={labels} />
           ))}
         </ul>
       </SubSection>
 
-      <SubSection title={t.gradientsHeading}>
-        <Prose>{t.gradientsIntro}</Prose>
+      <SubSection title={t('gradientsHeading')}>
+        <Prose>{t('gradientsIntro')}</Prose>
         <ul className="grid gap-4 md:grid-cols-2">
           {gradients.map((gradient) => (
             <GradientCard
               key={gradient.id}
               gradient={gradient}
-              use={t.gradientUses[gradient.id]}
+              use={t(`gradientUses.${gradient.id}`)}
               labels={labels}
             />
           ))}
         </ul>
       </SubSection>
 
-      <SubSection title={t.interfaceHeading}>
-        <Prose>{t.interfaceIntro}</Prose>
+      <SubSection title={t('interfaceHeading')}>
+        <Prose>{t('interfaceIntro')}</Prose>
         <ul className={swatchGrid}>
           {interfaceColors.map((swatch) => (
             <SwatchCard
               key={swatch.id}
               swatch={swatch}
-              use={t.uses[swatch.id]}
+              use={t(`uses.${swatch.id}`)}
               labels={labels}
             />
           ))}
         </ul>
       </SubSection>
 
-      <SubSection title={t.rulesHeading}>
+      <SubSection title={t('rulesHeading')}>
         <ol className="max-w-2xl space-y-3">
-          {t.rules.map((rule, index) => (
+          {listOf('brand.colors.rules').map((rule, index) => (
             <li key={rule} className="flex gap-4 leading-relaxed text-muted-foreground">
               <span aria-hidden="true" className="w-4 shrink-0 font-serif text-xl leading-snug text-link italic">
                 {index + 1}

@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto'
 import fs from 'node:fs/promises'
 import { basename, dirname, join, relative } from 'node:path'
 import { parseVersion } from '../version.mjs'
+import { say, type Said } from './text'
 import { isBusy, updaterDir, updaterStatus } from './updater'
 
 /**
@@ -23,7 +24,10 @@ import { isBusy, updaterDir, updaterStatus } from './updater'
  * a test can make one of them fail.
  */
 
-export type AdoptResult = { ok: true; tag: string } | { ok: false; status: 409 | 500 | 503; error: string }
+/** `error` is in English, for the log; `said` says it in the admin's language. */
+export type AdoptResult = { ok: true; tag: string } | { ok: false; status: 409 | 500 | 503; error: string; said: Said }
+
+const refusal = (status: 409 | 500 | 503, said: Said): AdoptResult => ({ ok: false, status, error: say(said), said })
 
 /** The updater's files in a scripts folder, relative to it. A Dirent says what the entry itself is, so a link is never followed. */
 async function updaterFiles(scripts: string): Promise<string[]> {
@@ -69,7 +73,7 @@ const store = globalThis as typeof globalThis & { [copyingKey]?: boolean }
  * two copies at once could each back up the other's half-written files.
  */
 export async function adoptUpdater(dir = updaterDir()): Promise<AdoptResult> {
-  if (store[copyingKey]) return { ok: false, status: 409, error: 'The updater is being copied already. Try again in a moment.' }
+  if (store[copyingKey]) return refusal(409, { key: 'copyingAlready' })
   store[copyingKey] = true
   try {
     return await copyUpdater(dir)
@@ -82,20 +86,20 @@ async function copyUpdater(dir: string | null): Promise<AdoptResult> {
   // The supervisor always names <uploaded folder>/.updater. Anywhere else is
   // not a folder to go writing beside.
   if (!dir || basename(dir) !== '.updater') {
-    return { ok: false, status: 503, error: 'This only works when the site is started with npm run serve.' }
+    return refusal(503, { key: 'copyNotServe' })
   }
   const { pending, state } = await updaterStatus(dir)
   if (pending || isBusy(state)) {
-    return { ok: false, status: 409, error: 'An update is running. Try again when it is done.' }
+    return refusal(409, { key: 'copyBusy' })
   }
   // Checked as a version, because the tag becomes part of a path.
   const tag = state?.current?.tag
   if (!tag || !parseVersion(tag)) {
-    return { ok: false, status: 409, error: 'No release is installed, so there is no new updater to copy.' }
+    return refusal(409, { key: 'copyNoRelease' })
   }
   const live = join(dir, 'releases', tag)
   if (!(await built(live))) {
-    return { ok: false, status: 409, error: `The build of ${tag} is not there any more, so there is no updater to copy from it.` }
+    return refusal(409, { key: 'copyNoBuild', values: { tag } })
   }
 
   const from = join(live, 'scripts')
@@ -154,6 +158,6 @@ async function copyUpdater(dir: string | null): Promise<AdoptResult> {
     return { ok: true, tag }
   } catch (error) {
     await Promise.all(staged.map((temporary) => fs.rm(/* turbopackIgnore: true */ temporary, { force: true })))
-    return { ok: false, status: 500, error: `Could not copy the updater: ${error instanceof Error ? error.message : String(error)}` }
+    return refusal(500, { key: 'copyFailed', values: { reason: error instanceof Error ? error.message : String(error) } })
   }
 }

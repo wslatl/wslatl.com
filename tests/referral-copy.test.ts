@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { locales, type Locale } from '@/i18n/config'
-import { copyFor } from '@/i18n/copy'
+import { messagesFor, wordsFor } from '@/i18n/words'
 
 /**
  * The referral deal is: the person who signs up with a code gets a discount on
@@ -14,7 +14,7 @@ import { copyFor } from '@/i18n/copy'
 const root = join(__dirname, '..')
 
 /** Where page text lives. config/ and tests/ are left out: they explain the rule, so they quote it. */
-const textDirectories = ['app', 'components', 'content', 'data', 'i18n', 'lib']
+const textDirectories = ['app', 'components', 'content', 'data', 'i18n', 'lib', 'messages']
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -67,7 +67,7 @@ describe('the referral discount in the site text', () => {
 
   it('finds the page text it is meant to read', () => {
     expect(files.length).toBeGreaterThan(50)
-    expect(files.some((file) => file.endsWith('copy\\en.ts') || file.endsWith('copy/en.ts'))).toBe(true)
+    expect(files.some((file) => file.endsWith('messages\\en.json') || file.endsWith('messages/en.json'))).toBe(true)
   })
 
   it('never promises a discount on every invoice, or for as long as the partner stays in the program', () => {
@@ -139,32 +139,32 @@ describe('what the partner pages say about the deal', () => {
 
   it('limits the discount to the first invoice wherever it is offered, in every language', () => {
     for (const locale of locales) {
-      const t = copyFor(locale).partners
+      const t = wordsFor(locale, 'partners')
       const offers = {
-        'page description': t.metaDescription('10%'),
-        'page intro': t.intro('10%'),
-        'program discount': t.program.discount.body('10%'),
-        'profile description': t.profile.metaDescription('EXAMPLE10', '10%'),
-        'profile discount': t.profile.discount('10%'),
+        'page description': t('metaDescription', { percent: '10%' }),
+        'page intro': t('intro', { percent: '10%' }),
+        'program discount': t('program.discount.body', { percent: '10%' }),
+        'profile description': t('profile.metaDescription', { code: 'EXAMPLE10', percent: '10%' }),
+        'profile discount': t('profile.discount', { percent: '10%' }),
       }
       for (const [where, text] of Object.entries(offers)) {
         expect(text, `${locale} ${where}`).toMatch(first[locale])
       }
-      expect(t.program.discount.title('10%'), `${locale} program discount title`).toMatch(first[locale])
+      expect(t('program.discount.title', { percent: '10%' }), `${locale} program discount title`).toMatch(first[locale])
     }
   })
 
   it('says the discount applies once, on the places that explain the program', () => {
     for (const locale of locales) {
-      const t = copyFor(locale).partners
-      expect(t.program.discount.body('10%'), `${locale} program`).toMatch(appliesOnce[locale])
-      expect(t.profile.discount('10%'), `${locale} profile`).toMatch(appliesOnce[locale])
+      const t = wordsFor(locale, 'partners')
+      expect(t('program.discount.body', { percent: '10%' }), `${locale} program`).toMatch(appliesOnce[locale])
+      expect(t('profile.discount', { percent: '10%' }), `${locale} profile`).toMatch(appliesOnce[locale])
     }
   })
 
   it('pays the person who referred them one time, once the first invoice is paid, in every language', () => {
     for (const locale of locales) {
-      const credit = copyFor(locale).partners.program.credit.body
+      const credit = messagesFor(locale).partners.program.credit.body
       expect(credit, locale).toMatch(first[locale])
       expect(credit, locale).toMatch(once[locale])
     }
@@ -172,7 +172,7 @@ describe('what the partner pages say about the deal', () => {
 
   it('does not promise a number for the credit, which is set for each referrer in the billing panel', () => {
     for (const locale of locales) {
-      expect(copyFor(locale).partners.program.credit.body, locale).not.toMatch(/\d/)
+      expect(messagesFor(locale).partners.program.credit.body, locale).not.toMatch(/\d/)
     }
   })
 
@@ -185,7 +185,7 @@ describe('what the partner pages say about the deal', () => {
       pt: /se você quiser/i,
     }
     for (const locale of locales) {
-      expect(copyFor(locale).partners.program.profile.body, locale).toMatch(conditional[locale])
+      expect(messagesFor(locale).partners.program.profile.body, locale).toMatch(conditional[locale])
     }
   })
 })

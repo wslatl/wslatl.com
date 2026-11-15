@@ -15,7 +15,7 @@ import { Email } from '@/components/ui/email'
 import { hasTranslation, type LegalDocument } from '@/content/legal'
 import { defaultLocale, localePath, type Locale } from '@/i18n/config'
 import { getLocale } from '@/i18n/locale'
-import { copy } from '@/i18n/copy'
+import { words } from '@/i18n/words'
 import { localizedLegalPages } from '@/i18n/content'
 
 export function legalMetadata(page: LegalPage, locale?: Locale) {
@@ -135,7 +135,7 @@ interface LegalLayoutProps {
 
 export function LegalLayout({ page, content }: LegalLayoutProps) {
   const locale = getLocale()
-  const t = copy().legal
+  const t = words('legal')
   // A document is a plain function, so calling it once yields the element
   // tree that is both rendered below and read for the table of contents.
   const body = content()
@@ -150,12 +150,12 @@ export function LegalLayout({ page, content }: LegalLayoutProps) {
               just under the header instead of 6rem down the screen. */}
           <aside className="hidden pt-16 lg:block print:hidden">
             <div className="scroll-quiet scroll-fade sticky top-16 max-h-[calc(100dvh-4rem)] space-y-10 overflow-y-auto pt-8 pb-10">
-              <nav aria-label={t.onThisPage}>
-                <p className="mb-3 text-sm font-semibold text-foreground">{t.onThisPage}</p>
+              <nav aria-label={t('onThisPage')}>
+                <p className="mb-3 text-sm font-semibold text-foreground">{t('onThisPage')}</p>
                 <TocList entries={toc} />
               </nav>
-              <nav aria-label={t.documents}>
-                <p className="mb-3 text-sm font-semibold text-foreground">{t.documents}</p>
+              <nav aria-label={t('documents')}>
+                <p className="mb-3 text-sm font-semibold text-foreground">{t('documents')}</p>
                 <DocList current={page.href} />
               </nav>
             </div>
@@ -164,7 +164,7 @@ export function LegalLayout({ page, content }: LegalLayoutProps) {
           <div className="max-w-3xl">
             <PageHeader
               title={page.title}
-              breadcrumbs={[{ label: t.heading, href: '/legal' }]}
+              breadcrumbs={[{ label: t('heading'), href: '/legal' }]}
               crumbLabel={page.label}
               path={page.href}
             >
@@ -173,15 +173,15 @@ export function LegalLayout({ page, content }: LegalLayoutProps) {
 
             <dl className="-mt-4 mb-10 flex flex-wrap gap-x-8 gap-y-2 text-sm">
               <div className="flex gap-2">
-                <dt className="text-muted-foreground">{t.effective}</dt>
+                <dt className="text-muted-foreground">{t('effective')}</dt>
                 <dd className="font-medium text-foreground">{formatLegalDate(legalEffectiveDate(page.key))}</dd>
               </div>
               <div className="flex gap-2">
-                <dt className="text-muted-foreground">{t.jurisdiction}</dt>
+                <dt className="text-muted-foreground">{t('jurisdiction')}</dt>
                 <dd className="font-medium text-foreground">{siteConfig.jurisdiction}</dd>
               </div>
               <div className="flex gap-2">
-                <dt className="text-muted-foreground">{t.questions}</dt>
+                <dt className="text-muted-foreground">{t('questions')}</dt>
                 <dd>
                   <Email name="support" className="font-medium text-link hover:text-foreground" />
                 </dd>
@@ -189,13 +189,13 @@ export function LegalLayout({ page, content }: LegalLayoutProps) {
             </dl>
 
             <div className="mb-12 grid gap-3 sm:grid-cols-2 lg:hidden print:hidden">
-              <MobileDisclosure label={t.onThisPage}>
-                <nav aria-label={t.onThisPage}>
+              <MobileDisclosure label={t('onThisPage')}>
+                <nav aria-label={t('onThisPage')}>
                   <TocList entries={toc} />
                 </nav>
               </MobileDisclosure>
-              <MobileDisclosure label={t.documents}>
-                <nav aria-label={t.documents}>
+              <MobileDisclosure label={t('documents')}>
+                <nav aria-label={t('documents')}>
                   <DocList current={page.href} />
                 </nav>
               </MobileDisclosure>
@@ -207,9 +207,9 @@ export function LegalLayout({ page, content }: LegalLayoutProps) {
             {locale !== defaultLocale && (
               <div role="note" className="legal-callout mb-10" data-tone="note">
                 <p>
-                  {hasTranslation(locale, page.key) ? t.translationNotice : t.notTranslated}{' '}
+                  {hasTranslation(locale, page.key) ? t('translationNotice') : t('notTranslated')}{' '}
                   <Link href={localePath(defaultLocale, page.href)} hrefLang={defaultLocale} lang={defaultLocale}>
-                    {t.readInEnglish}
+                    {t('readInEnglish')}
                   </Link>
                   .
                 </p>
@@ -223,10 +223,10 @@ export function LegalLayout({ page, content }: LegalLayoutProps) {
               className="mt-20 rounded-2xl border bg-card/30 p-6 sm:p-8 print:hidden"
             >
               <h2 id="legal-questions-heading" className="text-lg font-semibold text-foreground">
-                {t.questionsHeading}
+                {t('questionsHeading')}
               </h2>
               <p className="mt-1.5 text-sm text-muted-foreground">
-                {t.questionsBody}
+                {t('questionsBody')}
               </p>
               <p className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium">
                 <Email name="support" className="text-link underline underline-offset-4 hover:text-foreground" />
@@ -236,8 +236,8 @@ export function LegalLayout({ page, content }: LegalLayoutProps) {
                   rel="noopener noreferrer"
                   className="text-link underline underline-offset-4 hover:text-foreground"
                 >
-                  {t.askOnDiscord}
-                  <span className="sr-only">{copy().header.newTab}</span>
+                  {t('askOnDiscord')}
+                  <span className="sr-only">{words()('header.newTab')}</span>
                 </a>
               </p>
             </aside>

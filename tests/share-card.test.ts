@@ -16,7 +16,7 @@ import { GET } from '@/app/og/route'
 import sitemap from '@/app/sitemap'
 import { partners } from '@/data/partners'
 import { defaultLocale, locales, stripLocale, type Locale } from '@/i18n/config'
-import { copyFor } from '@/i18n/copy'
+import { messagesFor } from '@/i18n/words'
 import { ogImage, shareCardUrl } from '@/lib/metadata'
 import { shareCardText } from '@/lib/share-card'
 import { imageSize } from './image-size'
@@ -104,7 +104,7 @@ describe('the words on a share card', () => {
     const english = shareCardText('/pricing', defaultLocale)?.title
     const wrong = locales.filter((locale) => {
       const title = shareCardText('/pricing', locale)?.title
-      return title !== copyFor(locale).pricing.metaTitle || (locale !== defaultLocale && title === english)
+      return title !== messagesFor(locale).pricing.metaTitle || (locale !== defaultLocale && title === english)
     })
     expect(wrong).toEqual([])
   })

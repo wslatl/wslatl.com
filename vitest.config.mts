@@ -12,5 +12,8 @@ export default defineConfig(({ mode }) => ({
     include: mode === 'http' ? ['tests/http/**/*.test.ts'] : ['tests/**/*.test.ts'],
     exclude: mode === 'http' ? configDefaults.exclude : [...configDefaults.exclude, 'tests/http/**'],
     environment: 'node',
+    // next-intl imports next/server without its extension, which Node only
+    // resolves once Vite bundles it for the tests.
+    server: { deps: { inline: ['next-intl'] } },
   },
 }))

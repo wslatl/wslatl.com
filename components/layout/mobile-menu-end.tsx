@@ -1,17 +1,13 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
-import { localeNames, localePath, locales, stripLocale, type Locale } from '@/i18n/config'
 import { Button } from '@/platform/components/button'
 
 interface MobileMenuEndProps {
-  locale: Locale
   registerHref: string
   /** The header's own words, already in this page's language. */
   labels: {
     getStarted: string
     newTab: string
-    chooseLanguage: string
     reviewNote: string
   }
 }
@@ -27,13 +23,10 @@ function closeMenu(event: React.MouseEvent<HTMLElement>) {
 
 /**
  * What the mobile menu has under its list of links (the kit's header puts
- * it there): the way to sign up, and the languages, which the narrowest
- * screens have no picker for. It runs in the browser, for the current path
- * the language links keep.
+ * it there): the way to sign up. The languages come after it, from the
+ * kit's own picker (SiteHeader's `languages`).
  */
-export function MobileMenuEnd({ locale, registerHref, labels }: MobileMenuEndProps) {
-  const pathname = usePathname()
-
+export function MobileMenuEnd({ registerHref, labels }: MobileMenuEndProps) {
   return (
     <>
       <Button asChild size="lg" className="mt-6 w-full">
@@ -43,28 +36,6 @@ export function MobileMenuEnd({ locale, registerHref, labels }: MobileMenuEndPro
         </a>
       </Button>
       <p className="mt-3 text-center text-sm text-muted-foreground">{labels.reviewNote}</p>
-
-      {/* The picker is hidden on the narrowest screens, so the languages
-          are here instead. Plain links: switching language is a fresh
-          page in another tree. */}
-      <div className="mt-6 border-t pt-4 sm:hidden">
-        <p className="text-sm font-semibold text-foreground">{labels.chooseLanguage}</p>
-        <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-sm">
-          {locales.map((other) => (
-            <li key={other}>
-              <a
-                href={localePath(other, stripLocale(pathname))}
-                lang={other}
-                hrefLang={other}
-                aria-current={other === locale ? 'true' : undefined}
-                className="text-muted-foreground aria-[current]:font-medium aria-[current]:text-foreground hover:text-foreground"
-              >
-                {localeNames[other]}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </div>
     </>
   )
 }

@@ -30,3 +30,11 @@
 # form post a browser makes without the script is refused (415).
 # tests/attack/admin-routes.test.ts and tests/http try each of these.
 10202	OUTOFSCOPE	http://localhost:3100/admin/login(\?.*)?$
+#
+# 10099, Source Code Disclosure - SQL, on the admin only. Its pages carry
+# the kit's admin words for its own client components (platform/admin),
+# and one English sentence there, "...so it cannot update itself. Set the
+# server's startup command to npm run serve...", reads to the pattern as an
+# SQL UPDATE ... SET. It is prose: the admin has no database and sends no
+# SQL. The rule stays on for every public page.
+10099	OUTOFSCOPE	http://localhost:3100/admin(/|\?|$)

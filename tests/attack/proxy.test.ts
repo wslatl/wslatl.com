@@ -45,19 +45,27 @@ const hostilePaths = [
 ]
 
 describe('the language rewrite', () => {
-  it('never sends a visitor anywhere, and never rewrites to another site', () => {
+  it('never sends a visitor to another site, and never rewrites anywhere but under a language on this one', () => {
+    const wrong: string[] = []
     for (const path of hostilePaths) {
       for (const method of ['GET', 'HEAD']) {
         const response = proxy(request(path, { method }))
-        expect(response.status, path).toBe(200)
-        expect(response.headers.get('location'), path).toBeNull()
+        const location = response.headers.get('location')
         const rewrite = response.headers.get('x-middleware-rewrite')
-        if (rewrite === null) continue
-        const target = new URL(rewrite)
-        expect(target.origin, path).toBe(origin)
-        expect(target.pathname.startsWith('/en/'), `${path} -> ${target.pathname}`).toBe(true)
+        if (location !== null) {
+          // The kit's own redirects (/en/x to /x): on this site, never one a browser reads as another.
+          const target = new URL(location, origin)
+          if (target.origin !== origin || !/^\/(?![\\/])/.test(target.href.slice(origin.length))) wrong.push(`${method} ${path} -> ${location}`)
+        } else if (![200, 404].includes(response.status)) {
+          // A 404 is the kit refusing an address that climbs out of its language.
+          wrong.push(`${method} ${path}: ${response.status}`)
+        } else if (rewrite !== null) {
+          const target = new URL(rewrite)
+          if (target.origin !== origin || !/^\/(?:en|es|fr|de|pt)(?:\/|$)/.test(target.pathname)) wrong.push(`${method} ${path} -> ${rewrite}`)
+        }
       }
     }
+    expect(wrong).toEqual([])
   })
 })
 

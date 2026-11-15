@@ -1,18 +1,30 @@
 import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
+import { NextRequest } from 'next/server'
 import { describe, expect, it } from 'vitest'
+import { proxy } from '@/proxy'
 import { isAdminPath as kitIsAdminPath } from '@/platform/admin/proxy'
 import {
   isAdminPath,
   isRootFile,
   partnerImageTypes,
-  rewriteTarget,
   rootDirectories,
   rootFiles,
   sharedDirectories,
 } from '@/i18n/routing'
 
 const root = join(__dirname, '..')
+
+/**
+ * Where the site's proxy sends a path: the page under a language it is
+ * rewritten to, or null when it goes on as it came. Next takes the slash off
+ * the end of an address before the proxy sees it (/brand/ to /brand), so
+ * none is asked for with one.
+ */
+function rewriteTarget(path: string): string | null {
+  const rewrite = proxy(new NextRequest(`https://wslatl.com${path}`)).headers.get('x-middleware-rewrite')
+  return rewrite === null ? null : new URL(rewrite).pathname
+}
 
 describe('the files served from the site root', () => {
   it('lists everything in public/, so a new file there is not rewritten into a 404', () => {
@@ -46,7 +58,6 @@ describe('the files served from the site root', () => {
     expect(isRootFile('/og')).toBe(true)
     expect(rewriteTarget('/og')).toBeNull()
     // Only that exact path: /og/ is a page that does not exist.
-    expect(rewriteTarget('/og/')).toBe('/en/og/')
   })
 })
 
@@ -55,7 +66,7 @@ describe('the picture folders at the root', () => {
     // /clients/pricing used to skip the language rewrite and render the
     // English pricing page with a canonical pointing at itself: a duplicate
     // anyone could get indexed by linking to it.
-    for (const path of ['/clients/pricing', '/owners/legal/privacy', '/owners/games/minecraft', '/clients/']) {
+    for (const path of ['/clients/pricing', '/owners/legal/privacy', '/owners/games/minecraft']) {
       expect(isRootFile(path), path).toBe(false)
       expect(rewriteTarget(path), path).toBe(`/en${path}`)
     }
@@ -74,7 +85,6 @@ describe('a directory shared with pages', () => {
     // /partners and /partners/<slug> are pages. Treated as files, the English
     // ones would skip app/[locale] and answer 404.
     expect(rewriteTarget('/partners')).toBe('/en/partners')
-    expect(rewriteTarget('/partners/')).toBe('/en/partners/')
     expect(rewriteTarget('/partners/someone')).toBe('/en/partners/someone')
     expect(rewriteTarget('/es/partners/someone')).toBeNull()
   })
@@ -133,13 +143,12 @@ describe('the brand kit page and the pictures beside it', () => {
     // a file: it would skip app/[locale] and answer 404.
     expect(isRootFile('/brand')).toBe(false)
     expect(rewriteTarget('/brand')).toBe('/en/brand')
-    expect(rewriteTarget('/brand/')).toBe('/en/brand/')
     expect(rewriteTarget('/es/brand')).toBeNull()
     expect(rewriteTarget('/pt/brand')).toBeNull()
   })
 
   it('treats anything else under /brand/ as a page, so a probe gets our 404, and never serves an SVG', () => {
-    for (const path of ['/brand/wp-login.php', '/brand/downloads/', '/brand/downloads/wslatl-logo.svg', '/brand/kit.WEBP']) {
+    for (const path of ['/brand/wp-login.php', '/brand/downloads/wslatl-logo.svg', '/brand/kit.WEBP']) {
       expect(isRootFile(path), path).toBe(false)
       expect(rewriteTarget(path), path).toBe(`/en${path}`)
     }
@@ -154,7 +163,7 @@ describe('where a request is sent', () => {
   })
 
   it('gives everything else the default language', () => {
-    expect(rewriteTarget('/')).toBe('/en/')
+    expect(rewriteTarget('/')).toBe('/en')
     expect(rewriteTarget('/pricing')).toBe('/en/pricing')
     expect(rewriteTarget('/games/minecraft')).toBe('/en/games/minecraft')
   })
@@ -171,10 +180,9 @@ describe('where a request is sent', () => {
 
 describe('the admin', () => {
   it('lives outside the languages, so its paths are never given one', () => {
-    for (const path of ['/admin', '/admin/', '/admin/login', '/admin/api/update']) {
-      expect(isAdminPath(path), path).toBe(true)
-      expect(rewriteTarget(path), path).toBeNull()
-    }
+    for (const path of ['/admin', '/admin/', '/admin/login', '/admin/api/update']) expect(isAdminPath(path), path).toBe(true)
+    // Asked without the slash at the end, as Next hands the proxy every address.
+    for (const path of ['/admin', '/admin/login', '/admin/api/update']) expect(rewriteTarget(path), path).toBeNull()
     for (const path of ['/administrator', '/admin.php', '/adminer', '/es/admin']) {
       expect(isAdminPath(path), path).toBe(false)
     }

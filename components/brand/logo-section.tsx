@@ -16,7 +16,7 @@ import {
   type PictureId,
 } from '@/data/brand'
 import { languageTag } from '@/i18n/dates'
-import { copy } from '@/i18n/copy'
+import { keep, listOf, words } from '@/i18n/words'
 import { getLocale } from '@/i18n/locale'
 import { cn } from '@/lib/utils'
 
@@ -58,12 +58,12 @@ function Specimen({
 
 /** A PNG to download: its size, and "PNG". The name it saves under is the kit's. */
 function DownloadLink({ file, width, height }: Download) {
-  const t = copy().brand.logo.downloads
+  const t = words('brand.logo.downloads')
   return (
     <Button asChild variant="outline" size="sm" className="tabular-nums">
       <a href={`${downloadsPath}/${file}`} download>
         <DownloadIcon aria-hidden="true" />
-        <span className="sr-only">{t.download} </span>
+        <span className="sr-only">{t('download')} </span>
         {width} × {height}
         <span className="text-xs font-normal text-muted-foreground">PNG</span>
       </a>
@@ -72,14 +72,14 @@ function DownloadLink({ file, width, height }: Download) {
 }
 
 function Downloads() {
-  const t = copy().brand.logo.downloads
+  const t = words('brand.logo.downloads')
   return (
-    <SubSection id="downloads" title={t.heading}>
-      <Prose>{t.intro}</Prose>
+    <SubSection id="downloads" title={t('heading')}>
+      <Prose>{t('intro')}</Prose>
       <div className="grid gap-5 pt-2 lg:grid-cols-2">
         <div className="rounded-2xl border bg-card/30 p-5 sm:p-6">
-          <h4 className="font-semibold text-foreground">{t.markHeading}</h4>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.markBody}</p>
+          <h4 className="font-semibold text-foreground">{t('markHeading')}</h4>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t('markBody')}</p>
           <ul className="mt-5 flex flex-wrap gap-2">
             {markDownloads.map((download) => (
               <li key={download.file}>
@@ -89,11 +89,11 @@ function Downloads() {
           </ul>
         </div>
         <div className="rounded-2xl border bg-card/30 p-5 sm:p-6">
-          <h4 className="font-semibold text-foreground">{t.lockupHeading}</h4>
+          <h4 className="font-semibold text-foreground">{t('lockupHeading')}</h4>
           <ul className="mt-2 divide-y">
             {lockupDownloads.map(({ use, ...download }) => (
               <li key={download.file} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 py-3">
-                <span className="text-sm text-muted-foreground">{t.uses[use]}</span>
+                <span className="text-sm text-muted-foreground">{t(`uses.${use}`)}</span>
                 <DownloadLink {...download} />
               </li>
             ))}
@@ -101,37 +101,37 @@ function Downloads() {
         </div>
       </div>
       <Prose className="text-sm">
-        {t.morePrefix}{' '}
+        {t('morePrefix')}{' '}
         <a href="#full-kit" className="text-link underline underline-offset-4 hover:text-foreground">
-          {t.moreLink}
+          {t('moreLink')}
         </a>
-        {t.moreSuffix}
+        {t('moreSuffix')}
       </Prose>
     </SubSection>
   )
 }
 
 function Specimens() {
-  const t = copy().brand.logo
+  const t = words('brand.logo')
   return (
-    <SubSection title={t.partsHeading}>
+    <SubSection title={t('partsHeading')}>
       <Prose>
-        <WithEnglish text={t.parts} english={[subline]} />
+        <WithEnglish text={t('parts', keep('0'))} english={[subline]} />
       </Prose>
       <div className="grid gap-5 pt-2 md:grid-cols-2">
-        <Specimen picture="mark" surface="white" alt={t.alt.markWhite} caption={t.specimens.markWhite} />
-        <Specimen picture="mark" surface="ink" alt={t.alt.markInk} caption={`${t.specimens.markInk} (${ink.hex})`} />
-        <Specimen picture="lockup" surface="white" alt={t.alt.lockupWhite} caption={t.specimens.lockupWhite} />
+        <Specimen picture="mark" surface="white" alt={t('alt.markWhite')} caption={t('specimens.markWhite')} />
+        <Specimen picture="mark" surface="ink" alt={t('alt.markInk')} caption={`${t('specimens.markInk')} (${ink.hex})`} />
+        <Specimen picture="lockup" surface="white" alt={t('alt.lockupWhite')} caption={t('specimens.lockupWhite')} />
         <Specimen
           picture="lockup"
           surface="ink"
-          alt={t.alt.lockupInk}
-          caption={`${t.specimens.lockupInk} (${ink.hex})`}
+          alt={t('alt.lockupInk')}
+          caption={`${t('specimens.lockupInk')} (${ink.hex})`}
         />
       </div>
-      <Prose>{t.surfaces}</Prose>
+      <Prose>{t('surfaces')}</Prose>
       <Prose>
-        <strong className="font-semibold text-foreground">{t.violetLead}</strong> {t.violet}
+        <strong className="font-semibold text-foreground">{t('violetLead')}</strong> {t('violet')}
       </Prose>
     </SubSection>
   )
@@ -150,48 +150,48 @@ function Diagram({ id, alt, caption }: { id: PictureId; alt: string; caption?: s
 }
 
 function ClearSpace() {
-  const t = copy().brand.logo
+  const t = words('brand.logo')
   return (
-    <SubSection title={t.clearSpace.heading}>
-      <Prose>{t.clearSpace.body}</Prose>
-      <Prose>{t.clearSpace.lockup}</Prose>
+    <SubSection title={t('clearSpace.heading')}>
+      <Prose>{t('clearSpace.body')}</Prose>
+      <Prose>{t('clearSpace.lockup')}</Prose>
       <div className="flex flex-wrap items-end gap-x-8 gap-y-6 pt-2">
-        <Diagram id="clearSpaceMark" alt={t.alt.clearSpaceMark} caption={t.clearSpace.markCaption} />
-        <Diagram id="clearSpaceLockup" alt={t.alt.clearSpaceLockup} caption={t.clearSpace.lockupCaption} />
+        <Diagram id="clearSpaceMark" alt={t('alt.clearSpaceMark')} caption={t('clearSpace.markCaption')} />
+        <Diagram id="clearSpaceLockup" alt={t('alt.clearSpaceLockup')} caption={t('clearSpace.lockupCaption')} />
       </div>
     </SubSection>
   )
 }
 
 function MinimumSizes() {
-  const t = copy().brand.logo
+  const t = words('brand.logo')
   const locale = getLocale()
   // 16, 32, 48 ... 512 and 1024, joined the way the reader's language joins a list.
   const sizes = new Intl.ListFormat(languageTag(locale), { style: 'long', type: 'conjunction' }).format(
     markSizes.map(String),
   )
   const rows = [
-    { name: t.minimum.mark, screen: t.minimum.markScreen, print: t.minimum.markPrint },
-    { name: t.minimum.lockup, screen: t.minimum.lockupScreen, print: t.minimum.lockupPrint },
+    { name: t('minimum.mark'), screen: t('minimum.markScreen'), print: t('minimum.markPrint') },
+    { name: t('minimum.lockup'), screen: t('minimum.lockupScreen'), print: t('minimum.lockupPrint') },
   ]
   return (
-    <SubSection title={t.minimum.heading}>
+    <SubSection title={t('minimum.heading')}>
       <Prose>
-        <WithEnglish text={t.minimum.body} english={[subline]} />
+        <WithEnglish text={t('minimum.body', keep('0'))} english={[subline]} />
       </Prose>
       <div className="max-w-2xl overflow-hidden rounded-xl border">
         <table className="w-full text-left text-sm">
-          <caption className="sr-only">{t.minimum.heading}</caption>
+          <caption className="sr-only">{t('minimum.heading')}</caption>
           <thead className="bg-card/60 text-foreground">
             <tr>
               <th scope="col" className="px-4 py-3 font-semibold">
-                {t.minimum.artwork}
+                {t('minimum.artwork')}
               </th>
               <th scope="col" className="px-4 py-3 font-semibold">
-                {t.minimum.columnScreen}
+                {t('minimum.columnScreen')}
               </th>
               <th scope="col" className="px-4 py-3 font-semibold">
-                {t.minimum.columnPrint}
+                {t('minimum.columnPrint')}
               </th>
             </tr>
           </thead>
@@ -208,20 +208,20 @@ function MinimumSizes() {
           </tbody>
         </table>
       </div>
-      <Prose>{t.minimum.shipped(sizes)}</Prose>
+      <Prose>{t('minimum.shipped', { sizes })}</Prose>
       <div className="pt-2">
-        <Diagram id="minimumSizes" alt={t.alt.minimumSizes} />
+        <Diagram id="minimumSizes" alt={t('alt.minimumSizes')} />
       </div>
     </SubSection>
   )
 }
 
 function WhichFile() {
-  const t = copy().brand.logo.which
+  const t = words('brand.logo.which')
   return (
-    <SubSection title={t.heading}>
+    <SubSection title={t('heading')}>
       <ul className="grid gap-5 pt-2 md:grid-cols-3">
-        {t.rows.map((row) => (
+        {listOf<{ space: string; examples: string; pick: string }>('brand.logo.which.rows').map((row) => (
           <li key={row.space} className="rounded-2xl border bg-card/30 p-5">
             <h4 className="font-semibold text-foreground">{row.space}</h4>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{row.examples}</p>
@@ -235,9 +235,9 @@ function WhichFile() {
 
 /** Part 1: the mark and the lockup on white and on Ink, clear space, minimum sizes, the downloads and which one to pick. */
 export function LogoSection() {
-  const t = copy().brand
+  const t = words('brand')
   return (
-    <BrandSection id="logo" number="1" title={t.logo.heading} intro={t.logo.intro}>
+    <BrandSection id="logo" number="1" title={t('logo.heading')} intro={t('logo.intro')}>
       <Specimens />
       <ClearSpace />
       <MinimumSizes />
