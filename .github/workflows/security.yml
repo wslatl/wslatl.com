@@ -24,8 +24,7 @@ on:
     - cron: '30 13 * * 1'
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: security-${{ github.event_name }}-${{ github.ref }}
@@ -37,10 +36,13 @@ jobs:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
       # The release binary, checked against the SHA-256 GitHub recorded for
       # it when it was published: gitleaks' own action needs a paid licence
       # for a repository that belongs to an organisation. Change both lines
@@ -64,34 +66,26 @@ jobs:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       # Made-up admin settings, as in ci.yml, so the admin's sign-in page is
-      # there to be scanned. Nothing can sign in with them: no password makes
-      # this hash.
-      - name: Made-up admin settings
-        run: |
-          {
-            echo "ADMIN_PASSWORD_HASH=scrypt:32768:8:1:Y2FuYXJ5LXNhbHQtY2FuYXJ5:Y2FuYXJ5LWtleS1jYW5hcnkta2V5LWNhbmFyeS1rZXk"
-            echo "ADMIN_SESSION_SECRET=zap-canary-session-secret-${GITHUB_RUN_ID}-0123456789"
-            echo "GITHUB_TOKEN=zap-canary-github-token-${GITHUB_RUN_ID}"
-          } > .env
+      # there to be scanned. Nobody can sign in with them.
+      - uses: ./.github/actions/made-up-admin
+        with:
+          job: zap
       - run: npm run build
-      - name: Start the built site
-        run: |
-          npm run start -- --port 3100 > "$RUNNER_TEMP/next.log" 2>&1 &
-          for _ in $(seq 1 60); do
-            curl -fsS http://localhost:3100/ > /dev/null && exit 0
-            sleep 1
-          done
-          echo "The site did not start" >&2
-          cat "$RUNNER_TEMP/next.log" >&2
-          exit 1
+      - uses: ./.github/actions/start-site
+        with:
+          port: '3100'
       # ZAP 2.17.0, pinned by digest, since a tag can be moved to other code.
       # To update: the digest of ghcr.io/zaproxy/zaproxy:<version>, and the
       # version here. The hooks file adds the pages nothing links to (the
@@ -120,7 +114,7 @@ jobs:
         run: node .github/zap/gate.mjs "$RUNNER_TEMP/zap/report.json" .github/zap/rules.tsv | tee -a "$GITHUB_STEP_SUMMARY"
       - name: Keep the report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: zap-report
           path: |
@@ -137,12 +131,15 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: read
-      issues: write
+      issues: write # its one tracking issue (.github/actions/tracking-issue)
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
       - name: Check the live site
         id: check
         run: |
