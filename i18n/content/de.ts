@@ -89,7 +89,7 @@ export const de: ContentTranslation = {
     'changes-later': {
       question: 'Kann ich später upgraden, downgraden oder etwas ändern?',
       answer:
-        'Ja. Bei einem Gameserver oder VPS kann der Kontoinhaber Tarif oder Abrechnungszyklus selbst auf der Serviceseite im Abrechnungsportal wechseln, entweder sofort mit anteiliger Verrechnung oder zur nächsten Verlängerung. Für mehr RAM, vCores oder Speicher gibt es auf derselben Seite „Request an upgrade“: Das öffnet ein Ticket, und berechnet wird erst etwas, wenn unser Team zustimmt. Dedicated Server, Webhosting und Migrationen übernimmt unser Team: Öffne ein Ticket oder schreib uns auf Discord.',
+        'Ja. Bei einem Gameserver, VPS oder Webhosting-Tarif kann der Kontoinhaber Tarif oder Abrechnungszyklus selbst auf der Serviceseite im Abrechnungsportal wechseln, entweder sofort mit anteiliger Verrechnung oder zur nächsten Verlängerung. Für mehr RAM, vCores oder Speicher bei einem Gameserver oder VPS gibt es auf derselben Seite „Request an upgrade“: Das öffnet ein Ticket, und berechnet wird erst etwas, wenn unser Team zustimmt. Dedicated Server und Migrationen übernimmt unser Team: Öffne ein Ticket oder schreib uns auf Discord.',
     },
     'vps-vs-shared': {
       question: 'Ist VPS-Hosting besser als Shared Hosting?',

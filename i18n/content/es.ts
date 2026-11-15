@@ -90,7 +90,7 @@ export const es: ContentTranslation = {
     'changes-later': {
       question: '¿Puedo subir, bajar o cambiar cosas más adelante?',
       answer:
-        'Sí. En un servidor de juego o un VPS, el titular de la cuenta puede cambiar de plan o de ciclo de facturación desde la página del servicio en el portal de facturación, ya sea al momento con prorrateo o en la próxima renovación. Para más RAM, vCores o disco, puede usar “Request an upgrade” en esa misma página, que abre un ticket y no cobra nada hasta que nuestro equipo lo aprueba. Los servidores dedicados, el hosting web y las migraciones los gestiona nuestro equipo: abre un ticket o escríbenos por Discord.',
+        'Sí. En un servidor de juego, un VPS o un plan de hosting web, el titular de la cuenta puede cambiar de plan o de ciclo de facturación desde la página del servicio en el portal de facturación, ya sea al momento con prorrateo o en la próxima renovación. Para más RAM, vCores o disco en un servidor de juego o un VPS, puede usar “Request an upgrade” en esa misma página, que abre un ticket y no cobra nada hasta que nuestro equipo lo aprueba. Los servidores dedicados y las migraciones los gestiona nuestro equipo: abre un ticket o escríbenos por Discord.',
     },
     'vps-vs-shared': {
       question: '¿Es mejor el hosting VPS que el compartido?',

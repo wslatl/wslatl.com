@@ -50,7 +50,7 @@ export const faqs: Faq[] = [
     id: 'changes-later',
     question: 'Can I upgrade, downgrade, or change things later?',
     answer:
-      'Yes. On a game server or VPS, the account holder can switch plan or billing cycle from the service page in the billing portal, either right away with proration or at the next renewal. For more RAM, vCores or disk, they can use Request an upgrade on the same page, which opens a ticket and charges nothing until our team approves it. Dedicated servers, web hosting and migrations are handled by our team: open a ticket or message us on Discord.',
+      'Yes. On a game server, VPS or web hosting plan, the account holder can switch plan or billing cycle from the service page in the billing portal, either right away with proration or at the next renewal. For more RAM, vCores or disk on a game server or VPS, they can use Request an upgrade on the same page, which opens a ticket and charges nothing until our team approves it. Dedicated servers and migrations are handled by our team: open a ticket or message us on Discord.',
   },
   {
     id: 'vps-vs-shared',
