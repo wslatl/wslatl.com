@@ -49,6 +49,7 @@ export const de: Copy = {
       guides: 'Anleitungen',
       dedicated: 'Dedicated Server',
       web: 'Webhosting',
+      hardware: 'Hardware und Standorte',
       about: 'Über uns',
       partners: 'Partner',
       brandKit: 'Marken-Kit',
@@ -235,6 +236,8 @@ export const de: Copy = {
       'Jeder Tarif wird monatlich in US-Dollar abgerechnet. Keine Preisfallen bei der Verlängerung: Das sind die regulären Monatspreise, und jede Erhöhung kommt mit mindestens 30 Tagen schriftlicher Ankündigung.',
     orderingPrefix: 'Eine Bestellung beginnt mit einer kurzen Bewerbung, und die meisten werden noch am selben Tag freigegeben.',
     orderingLink: 'So läuft eine Bestellung',
+    hardwarePrefix: 'Wo jeder Tarif läuft, und auf welcher Hardware:',
+    hardwareLink: 'Hardware und Standorte',
     lines: {
       vps: 'VPS-Hosting',
       game: 'Gameserver-Hosting',
@@ -265,6 +268,34 @@ export const de: Copy = {
       body:
         'Die gibt es als Angebot pro Aufbau statt von der Preisliste, weil die richtige Hardware oder Einrichtung davon abhängt, was du betreibst. Sag uns, was du brauchst, und wir melden uns mit einem Preis. Schon Kunde? Öffne im Abrechnungsportal „Browse plans“, wähl auf dem Tab „Dedicated servers“ einen Server und klick auf „Request this server“. Die Einrichtung eines Dedicated Servers dauert länger als bei Gameservern und VPS, meist ein paar Werktage.',
       cta: 'Angebot anfordern',
+    },
+  },
+  hardware: {
+    metaTitle: 'Hardware und Standorte',
+    metaDescription:
+      'Wo die Server von WSLATL laufen und auf welcher Hardware: jeder Standort mit CPU, Arbeitsspeicher und Laufwerken, ob gemietet oder eigen, mit Live-Status und Einstiegspreisen.',
+    heading: 'Hardware und Standorte',
+    intro:
+      'Wo unsere Server laufen, auf welcher Hardware und ab welchem Preis an jedem Standort. Bei jedem steht, ob die Hardware uns gehört oder gemietet ist.',
+    ownership: {
+      rented: 'Gemietet',
+      owned: 'Eigentum',
+    },
+    specs: {
+      cpu: 'CPU',
+      memory: 'Arbeitsspeicher',
+      storage: 'Speicher',
+    },
+    storageRaid: '{storage} im {raid}',
+    ddos: 'DDoS-Schutz von Haus aus',
+    filters: {
+      label: 'Standorte filtern',
+      product: 'Produkt',
+      tier: 'Stufe',
+      all: 'Alle',
+      showing: '{shown} von {total} Standorten',
+      none: 'Kein Standort passt zu diesen Filtern.',
+      reset: 'Alle Standorte zeigen',
     },
   },
   games: {

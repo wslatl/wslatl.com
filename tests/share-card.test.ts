@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { generateMetadata as brandMetadata } from '@/app/[locale]/brand/page'
 import { generateMetadata as gamesMetadata } from '@/app/[locale]/games/page'
 import { generateMetadata as gameMetadata } from '@/app/[locale]/games/[slug]/page'
+import { generateMetadata as hardwareMetadata } from '@/app/[locale]/hardware-and-locations/page'
 import { generateMetadata as legalIndexMetadata } from '@/app/[locale]/legal/page'
 import { generateMetadata as legalMetadata } from '@/app/[locale]/legal/[slug]/page'
 import { generateMetadata as homeMetadata } from '@/app/[locale]/page'
@@ -60,6 +61,7 @@ function metadataOf(path: string, locale: Locale): Promise<Metadata> {
   if (section === 'legal') return slug ? legalMetadata({ params }) : legalIndexMetadata({ params })
   if (section === 'partners') return slug ? partnerMetadata({ params }) : partnersMetadata({ params })
   if (section === 'brand') return brandMetadata({ params })
+  if (section === 'hardware-and-locations') return hardwareMetadata({ params })
   throw new Error(`The sitemap has ${path}, which this test does not know a page for`)
 }
 

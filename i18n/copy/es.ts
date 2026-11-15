@@ -49,6 +49,7 @@ export const es: Copy = {
       guides: 'Guías de configuración',
       dedicated: 'Servidores dedicados',
       web: 'Hosting web',
+      hardware: 'Hardware y ubicaciones',
       about: 'Sobre nosotros',
       partners: 'Socios',
       brandKit: 'Kit de marca',
@@ -235,6 +236,8 @@ export const es: Copy = {
       'Todos los planes se facturan cada mes en dólares estadounidenses. Sin trampas al renovar: estos son los precios mensuales de siempre, y cualquier subida llega con al menos 30 días de aviso por escrito.',
     orderingPrefix: 'El pedido empieza con una solicitud breve, y la mayoría se aprueban el mismo día.',
     orderingLink: 'Cómo funciona el pedido',
+    hardwarePrefix: 'Dónde funciona cada plan, y sobre qué:',
+    hardwareLink: 'hardware y ubicaciones',
     lines: {
       vps: 'Hosting VPS',
       game: 'Hosting de servidores de juego',
@@ -265,6 +268,34 @@ export const es: Copy = {
       body:
         'Estos se presupuestan por configuración en lugar de venderse desde una lista de precios, porque el hardware o el montaje adecuados dependen de lo que vayas a ejecutar. Cuéntanos qué necesitas y te damos un precio. ¿Ya eres cliente? En el portal de facturación, abre “Browse plans”, elige un servidor en la pestaña “Dedicated servers” y pulsa “Request this server”. Los servidores dedicados tardan más en configurarse que los servidores de juego y los VPS, normalmente unos días laborables.',
       cta: 'Pedir presupuesto',
+    },
+  },
+  hardware: {
+    metaTitle: 'Hardware y ubicaciones',
+    metaDescription:
+      'Dónde funcionan los servidores de WSLATL y sobre qué: cada ubicación con su CPU, su memoria y sus discos, si el hardware es alquilado o propio, su estado en directo y sus precios.',
+    heading: 'Hardware y ubicaciones',
+    intro:
+      'Dónde funcionan nuestros servidores, sobre qué hardware y desde cuánto empieza cada ubicación. Cada una indica si el hardware es nuestro o alquilado.',
+    ownership: {
+      rented: 'Alquilado',
+      owned: 'Propio',
+    },
+    specs: {
+      cpu: 'CPU',
+      memory: 'Memoria',
+      storage: 'Almacenamiento',
+    },
+    storageRaid: '{storage} en {raid}',
+    ddos: 'Protección DDoS integrada',
+    filters: {
+      label: 'Filtrar las ubicaciones',
+      product: 'Producto',
+      tier: 'Gama',
+      all: 'Todas',
+      showing: '{shown} de {total} ubicaciones',
+      none: 'Ninguna ubicación coincide con estos filtros.',
+      reset: 'Ver todas las ubicaciones',
     },
   },
   games: {

@@ -8,11 +8,12 @@ The public website for WSLATL LLC. Private hosting based in Missouri: VPS hostin
 
 1. Tells visitors what WSLATL sells, what it costs, and why we are different from the big hosting companies.
 2. Publishes plan pricing for VPS and game servers on `/pricing`, with a page per supported game under `/games`.
-3. Routes visitors to the right panel (billing, game panel, VPS panel, dedicated portal, cPanel) through the header Login menu and the footer.
-4. Hosts the full legal library (ten policies) under `/legal`.
-5. Shows our official referral partners on `/partners`, each with a profile page and, if they have one, their referral code.
-6. Gives partners and designers the brand kit on `/brand`: the logo to download, the colors to copy, the type, the voice and the rules for using them, with the full kit on Google Drive.
-7. Does all of that in English, Spanish, French, German and Portuguese.
+3. Lists every location on `/hardware-and-locations`: where it is, whether we rent or own the hardware, the hardware the plans state, what runs there and what it starts at, and its state right now.
+4. Routes visitors to the right panel (billing, game panel, VPS panel, dedicated portal, cPanel) through the header Login menu and the footer.
+5. Hosts the full legal library (ten policies) under `/legal`.
+6. Shows our official referral partners on `/partners`, each with a profile page and, if they have one, their referral code.
+7. Gives partners and designers the brand kit on `/brand`: the logo to download, the colors to copy, the type, the voice and the rules for using them, with the full kit on Google Drive.
+8. Does all of that in English, Spanish, French, German and Portuguese.
 
 Every public page is static. There is no CMS and no database: content lives in `data/*.ts` and `content/legal/*.tsx`, so copy is one PR away.
 
@@ -26,13 +27,14 @@ app/
   sitemap.ts, robots.ts    Every page in every language, from the same data the pages use.
   manifest.ts              /manifest.webmanifest: the name and icons for a home-screen shortcut.
   company.json/route.ts    /company.json: the company profile for the billing panel, written at build time.
-  live-status.json/route.ts  /live-status.json: each location's state on status.wslatl.com, for the home page's live panel (see Live status on the home page).
+  live-status.json/route.ts  /live-status.json: each location's state on status.wslatl.com, for the home page's live panel and /hardware-and-locations (see Live status on the home page).
   og/route.tsx             /og: the share card of every page but the home page, drawn on request by the kit (see Images).
   admin/                   The admin, the kit's: one-line files that hand each page and route to platform/admin/ (see Admin and updates).
   [locale]/                Every page, once, for all five languages (see Languages).
     layout.tsx             Root layout: language, the kit's fonts and skip link, default metadata, Organization JSON-LD.
     page.tsx               Home page composition.
     pricing/page.tsx       Pricing: line overviews, plan tables, what's included, how ordering works.
+    hardware-and-locations/page.tsx  Every location in data/locations.ts: where it is, rented or owned, its hardware, what runs there, its live state.
     games/page.tsx         Game directory with search.
     games/[slug]/page.tsx  One page per game, statically generated from data/games.ts.
     legal/page.tsx         Index of every legal document.
@@ -53,6 +55,7 @@ components/
   layout/                  The kit's header and footer with this site's links and words, the login menu, the language picker, the page header (the kit's page start with breadcrumb data), legal layout.
   sections/                Home page sections.
   pricing/                 Plan tables and the sticky section switcher.
+  locations/               The blocks of /hardware-and-locations, its filters, and the flags.
   games/                   Game directory (the only client-side search on the site).
   legal/                   The blocks every legal document is built from, and the SLA uptime table.
   partners/                Partner cards (on the kit's banner card), the profile's pictures, platform icons, the partner program section.
@@ -92,7 +95,7 @@ Some facts appear on many pages. Each one is defined exactly once, and everythin
 | Fact | Defined in | Used by |
 | --- | --- | --- |
 | Plan names, specs, prices | `data/pricing.ts` | Pricing page, home page, game pages, FAQ answer, meta descriptions |
-| Locations: the CPU there, and the group that lists their servers on the status page | `data/locations.ts` (the tests check it against the plan groups in `data/pricing.ts`) | The home page's live panel |
+| Locations: where each is, whether we rent or own the hardware there, its tier and hardware, what runs there, and the group that lists its servers on the status page | `data/locations.ts` (the tests check the hardware against the plan groups in `data/pricing.ts`) | The home page's live panel, `/hardware-and-locations` |
 | Price comparisons with competitors | `data/pricing.ts` (`comparisons`, dated when checked, and the competitor prices and disk sizes behind them in `comparedPrices`, which the tests check every claim against) | Pricing page plan groups, the Minecraft and FiveM pages |
 | Uptime targets | `data/sla.ts` | Terms of Service, SLA, Refund Policy, home page commitments, pricing page |
 | Legal document titles and dates | `data/legal.ts` and `config/site.ts` | Legal pages, `/legal`, footer, sitemap |
@@ -116,7 +119,8 @@ The panel beside the slogan shows each location in `data/locations.ts`, the hard
 - A location's state follows the status page's own rule for the servers in its group: Operational when every one answered its last check, Partial outage when some did not, Down when none did, Maintenance in a maintenance window (`lib/live-status/kuma.ts`).
 - Missing or late data is never shown as a state. A check older than five minutes counts as none. Without states, the panel keeps its locations and prices, says live status is not available right now, and links to the status page. The room every state can take is kept from the start, so nothing moves when they arrive.
 - Each location is found on the status page by its group's name, `statusGroup` in `data/locations.ts`. Rename a group there and rename it here too, or that location shows no state. The server's log says once when the status page cannot be used, and again when it can.
-- The panel keeps one size however many locations there are. With two, both are shown in full, as today. From a third on, the first two in `data/locations.ts` are shown in full, a "+N more locations" row counts the rest and leads to /pricing, and a line beside the heading sums up the state of every location, the ones not shown included ("All 8 operational", "1 of 8 has issues"). It never says all are operational unless every location is known to be. A new location needs its entry in `data/locations.ts` and its name under `home.hero.live.cities` in all five languages; `tests/locations.test.ts` checks both.
+- The panel keeps one size however many locations there are. With two, both are shown in full, as today. From a third on, the first two in `data/locations.ts` are shown in full, a "+N more locations" row counts the rest and leads to /hardware-and-locations, where every location is, and a line beside the heading sums up the state of every location, the ones not shown included ("All 8 operational", "1 of 8 has issues"). It never says all are operational unless every location is known to be. A new location needs its entry in `data/locations.ts` and its name under `home.hero.live.cities` in all five languages; `tests/locations.test.ts` checks both.
+- `/hardware-and-locations` gives every location a block of its own, with its state from the same route and under the same rules. It names only the hardware the plan descriptions in `data/pricing.ts` already state, which `tests/locations.test.ts` checks, and leaves out what they do not. With locations in more than one region it groups them under each region's name (from `Intl.DisplayNames`, in every language), and from `filtersFrom` locations on (`lib/locations-filter.ts`, six today) it offers filters by product and by tier. A country needs its flag drawn in `components/locations/flag.tsx`; the same test checks that too.
 
 ---
 

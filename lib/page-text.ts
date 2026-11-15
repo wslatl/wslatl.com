@@ -71,6 +71,11 @@ export function brandText(locale: Locale): PageText {
   return { title: t.metaTitle, description: t.metaDescription }
 }
 
+export function hardwareText(locale: Locale): PageText {
+  const t = copyFor(locale).hardware
+  return { title: t.metaTitle, description: t.metaDescription }
+}
+
 /** One legal document, from the document in the language of the page. */
 export function legalText(page: LegalPage): PageText {
   return { title: page.title, description: page.metaDescription }

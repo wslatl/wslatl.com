@@ -58,6 +58,7 @@ export const en = {
       guides: 'Setup guides',
       dedicated: 'Dedicated servers',
       web: 'Web hosting',
+      hardware: 'Hardware and locations',
       about: 'About us',
       partners: 'Partners',
       brandKit: 'Brand kit',
@@ -250,6 +251,8 @@ export const en = {
       'Every plan is billed monthly in US dollars. No renewal price traps: these are the regular monthly prices, and any increase comes with at least 30 days of written notice.',
     orderingPrefix: 'Ordering starts with a short application, and most are approved the same day.',
     orderingLink: 'How ordering works',
+    hardwarePrefix: 'Where each plan runs, and on what:',
+    hardwareLink: 'hardware and locations',
     lines: {
       vps: 'VPS hosting',
       game: 'Game server hosting',
@@ -280,6 +283,38 @@ export const en = {
       body:
         'These are quoted per build rather than sold off a price list, because the right hardware or setup depends on what you are running. Tell us what you need and we will come back with a price. Already a client? In the billing portal, open Browse plans, pick a server on the Dedicated servers tab and press Request this server. Dedicated servers take longer to set up than game servers and VPS, usually a few business days.',
       cta: 'Get a quote',
+    },
+  },
+  // /hardware-and-locations. The cities, tiers, products, states and the
+  // live status line are the home page's live panel's (home.hero.live).
+  hardware: {
+    metaTitle: 'Hardware and locations',
+    metaDescription:
+      'Where WSLATL servers run and on what: each location with its CPU, memory and drives, whether we rent or own the hardware, its live status and what its plans start at.',
+    heading: 'Hardware and locations',
+    intro:
+      'Where our servers run, what they run on, and what each location starts at. Each one says whether we own the hardware or rent it.',
+    ownership: {
+      rented: 'Rented',
+      owned: 'Owned',
+    },
+    specs: {
+      cpu: 'CPU',
+      memory: 'Memory',
+      storage: 'Storage',
+    },
+    // {storage} is NVMe or SATA SSD, {raid} is RAID 1.
+    storageRaid: '{storage} in {raid}',
+    ddos: 'DDoS protection built in',
+    filters: {
+      label: 'Filter the locations',
+      product: 'Product',
+      tier: 'Tier',
+      all: 'All',
+      // {shown} and {total} are numbers.
+      showing: '{shown} of {total} locations',
+      none: 'No location matches these filters.',
+      reset: 'Show every location',
     },
   },
   games: {

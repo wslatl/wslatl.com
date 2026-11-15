@@ -24,6 +24,7 @@ export function footerColumns(t: Copy, locale: Locale, legalPages: LegalPage[]):
         { label: t.footer.links.supportedGames, href: path('/games') },
         { label: t.footer.links.dedicated, href: path('/#services') },
         { label: t.footer.links.web, href: path('/#services') },
+        { label: t.footer.links.hardware, href: path('/hardware-and-locations') },
       ],
     },
     {
