@@ -8,6 +8,8 @@ import { Button, buttonVariants } from './button'
 import { Logo } from './logo'
 import { SiteLink, isExternal } from './site-link'
 import { cn } from '../lib/cn'
+import { stripLocale } from '../i18n/config'
+import { LanguagePicker, type LanguagePickerProps } from '../i18n/language-picker'
 
 export interface NavItem {
   label: string
@@ -58,6 +60,13 @@ export interface SiteHeaderProps {
   localePrefixes?: string[]
   /** The current path, when the app knows better than the router (a 404 rendered without the visitor's URL). */
   currentPath?: string
+  /**
+   * The language picker (../i18n/language-picker.tsx): in the bar from 40rem
+   * up, before `actions`, and at the end of the mobile menu below that, so
+   * every page has it in one of the two. Leave out for an app in one
+   * language.
+   */
+  languages?: Omit<LanguagePickerProps, 'variant' | 'className'>
 }
 
 // A component of its own so the close callback arrives as a prop: calling
@@ -99,6 +108,7 @@ export function SiteHeader({
   switcher,
   localePrefixes = [],
   currentPath,
+  languages,
 }: SiteHeaderProps) {
   const routerPath = usePathname()
   const pathname = currentPath ?? routerPath ?? '/'
@@ -108,6 +118,8 @@ export function SiteHeader({
   const menuRef = useRef<HTMLDivElement>(null)
   const closeMenu = useCallback(() => menuRef.current?.hidePopover(), [])
   const switcherRef = useRef<HTMLDetailsElement>(null)
+  // The picker wants the page without its language; currentPath may have one.
+  const languagePath = languages?.path ?? (currentPath === undefined ? undefined : stripLocale(currentPath))
 
   // Solid, not see-through: the brand kit puts the logo on a solid surface,
   // never over the page scrolling underneath.
@@ -198,6 +210,7 @@ export function SiteHeader({
               </ul>
             </details>
           )}
+          {languages && <LanguagePicker {...languages} path={languagePath} className="hidden sm:block" />}
           {actions}
           <Button
             type="button"
@@ -249,6 +262,7 @@ export function SiteHeader({
             ))}
           </ul>
           <MobileFooter footer={mobileFooter} close={closeMenu} />
+          {languages && <LanguagePicker {...languages} path={languagePath} variant="list" className="mt-6 border-t pt-4 sm:hidden" />}
           {switcher && (
             <div className="mt-6 border-t pt-4">
               <p className="text-sm font-semibold text-foreground">{switcher.label}</p>

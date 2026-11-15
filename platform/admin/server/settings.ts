@@ -1,7 +1,9 @@
 import 'server-only'
 import { repoPattern } from '../../config.mjs'
+import type { Locale } from '../../i18n/config'
 import { isPasswordHash } from './password'
 import type { SessionKeys } from './session'
+import { say, type Said } from './text'
 
 /**
  * The admin's settings, all from .env, read on every request and never at
@@ -21,20 +23,20 @@ const read = (env: Env, name: string) => env[name]?.trim() ?? ''
 
 // A stand-in for GitHub in tests runs locally. Anything else must be HTTPS,
 // so the token never travels in the clear, with nothing after the host but a
-// path. The same rule, and the same words, as apiAddressProblem in
-// scripts/updater/github.mjs, so the admin and the supervisor agree on when
-// updates are off; a test holds the two together.
-function apiUrlProblem(value: string): string {
+// path. The same rule, and in English the same words, as apiAddressProblem
+// in scripts/updater/github.mjs, so the admin and the supervisor agree on
+// when updates are off; a test holds the two together.
+function apiUrlProblem(value: string): Said | null {
   let url: URL
   try {
     url = new URL(value)
   } catch {
-    return 'GITHUB_API_URL is not an https address.'
+    return { key: 'apiHttps' }
   }
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)
-  if (!(url.protocol === 'https:' || (url.protocol === 'http:' && local))) return 'GITHUB_API_URL is not an https address.'
-  if (url.username || url.password || url.search || url.hash) return 'GITHUB_API_URL must be a plain address, with nothing after the host but a path.'
-  return ''
+  if (!(url.protocol === 'https:' || (url.protocol === 'http:' && local))) return { key: 'apiHttps' }
+  if (url.username || url.password || url.search || url.hash) return { key: 'apiPlain' }
+  return null
 }
 
 /**
@@ -43,20 +45,21 @@ function apiUrlProblem(value: string): string {
  * names another, as owner/name the way GitHub allows them, the same rule as
  * repo in platform.config.mjs: nothing that would walk the API address up a
  * level.
+ *
+ * The problems are in English, as the server log has them, unless another
+ * language is asked for, as the Updates page and its routes ask for the
+ * admin's.
  */
-export function githubSettings(env: Env, defaultRepo: string): { github: GitHubSettings | null; problems: string[] } {
+export function githubSettings(env: Env, defaultRepo: string, locale: Locale = 'en'): { github: GitHubSettings | null; problems: string[] } {
   const token = read(env, 'GITHUB_TOKEN')
   const repo = read(env, 'GITHUB_REPO') || defaultRepo
   const apiUrl = (read(env, 'GITHUB_API_URL') || defaultApiUrl).replace(/\/+$/, '')
-  const problems: string[] = []
-  if (!token) {
-    problems.push(
-      'GITHUB_TOKEN is not set. The Updates page reads the releases with it: a fine-grained token with Contents read-only on the repository, or read and write where the admin also saves to it.',
-    )
-  }
-  if (!repoPattern.test(repo)) problems.push('GITHUB_REPO is not in the form owner/name.')
+  const found: Said[] = []
+  if (!token) found.push({ key: 'tokenMissing' })
+  if (!repoPattern.test(repo)) found.push({ key: 'repoForm' })
   const apiProblem = apiUrlProblem(apiUrl)
-  if (apiProblem) problems.push(apiProblem)
+  if (apiProblem) found.push(apiProblem)
+  const problems = found.map((problem) => say(problem, locale))
   return problems.length ? { github: null, problems } : { github: { token, repo, apiUrl }, problems }
 }
 

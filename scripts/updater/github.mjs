@@ -191,15 +191,20 @@ export function gitHub({ token, repo, api, maxDownloadBytes = tarLimits.download
   }
 
   /**
-   * The commit a tag points at, right now. Asked for as tags/<tag>, so a
-   * branch that happens to share the tag's name can never be taken for it.
+   * The commit a tag points at, right now. Asked for by its full ref,
+   * refs/tags/<tag>, which names the tag itself. A shorter name is one
+   * GitHub looks up, and a branch can answer it: one called v1.1.0 for
+   * <tag>, one called tags/v1.1.0 for tags/<tag>. The full ref also gives
+   * the commit of an annotated tag, which GitHub answers tags/<tag> for
+   * with 422, as it answers a tag that is not there.
    * @param {string} tag
    */
   async function resolve(tag) {
-    const response = await get(`/commits/tags/${encodeURIComponent(tag)}`)
+    const response = await get(`/commits/refs/tags/${encodeURIComponent(tag)}`)
     if (!response.ok) {
       await response.body?.cancel()
-      throw new Error(response.status === 404 ? `GitHub could not find the commit of ${tag} (404).` : problem(response.status))
+      const missing = response.status === 404 || response.status === 422
+      throw new Error(missing ? `GitHub could not find the commit of ${tag} (${response.status}).` : problem(response.status))
     }
     return String((await response.json()).sha ?? '')
   }

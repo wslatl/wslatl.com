@@ -81,7 +81,7 @@ beforeEach(async () => {
     draft: false,
     prerelease: false,
   })
-  github.answer(`/repos/${repo}/commits/tags/v9.9.9`, { status: 200, body: { sha } })
+  github.answer(`/repos/${repo}/commits/refs/tags/v9.9.9`, { status: 200, body: { sha } })
 })
 
 afterEach(async () => {

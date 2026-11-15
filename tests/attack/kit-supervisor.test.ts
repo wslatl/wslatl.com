@@ -141,7 +141,7 @@ beforeAll(async () => {
     draft: false,
     prerelease: false,
   })
-  github.answer(`/repos/${repo}/commits/tags/v9.9.9`, { status: 200, body: { sha } })
+  github.answer(`/repos/${repo}/commits/refs/tags/v9.9.9`, { status: 200, body: { sha } })
   github.archive(sha, archiveOf(sha, releaseFiles))
 
   const settings: Record<string, string | null> = {
@@ -239,7 +239,7 @@ describe('the real supervisor, installing a release', () => {
   })
 
   it("asks GitHub for the tag's commit once, and downloads that commit", () => {
-    expect(asked('/commits/tags/')).toEqual([`/repos/${repo}/commits/tags/v9.9.9`])
+    expect(asked('/commits/refs/tags/')).toEqual([`/repos/${repo}/commits/refs/tags/v9.9.9`])
     // Its record and its files, of that one commit.
     expect(asked('/git/commits/')).toEqual([`/repos/${repo}/git/commits/${sha}`])
     expect(asked('/tarball/')).toEqual([`/repos/${repo}/tarball/${sha}`])

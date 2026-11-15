@@ -3,7 +3,9 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '../../lib/cn'
+import { useAdminText } from './admin-text'
 
+/** One of the admin's own pages, with its words in the admin's language. */
 export type AdminNavItem = { href: string; label: string }
 
 /**
@@ -13,8 +15,9 @@ export type AdminNavItem = { href: string; label: string }
  */
 export function AdminNav({ items }: { items: readonly AdminNavItem[] }) {
   const pathname = usePathname()
+  const { t } = useAdminText()
   return (
-    <nav aria-label="Admin pages" className="flex flex-wrap gap-1">
+    <nav aria-label={t('shell.pages')} className="flex flex-wrap gap-1">
       {items.map(({ href, label }) => {
         const active = href === '/admin' ? pathname === href : pathname === href || pathname.startsWith(`${href}/`)
         return (

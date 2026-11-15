@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from '../../components/button'
+import { useAdminText } from './admin-text'
 import { AdminCard } from './card'
 
 /**
@@ -17,29 +18,29 @@ export function errorReference(error: unknown): string | undefined {
 /**
  * When an admin page crashes: the same card as sign-in and the 404, since a
  * crash in the signed-in layout takes the header with it. It says so
- * plainly and offers another try. The error's own message can hold whatever
- * the page was working with, so it stays in the server's log, and the page
- * shows the reference that finds it there. retry asks the server for the
- * page again rather than drawing the same failed one.
+ * plainly and offers another try, in the admin's language. The error's own
+ * message can hold whatever the page was working with, so it stays in the
+ * server's log, and the page shows the reference that finds it there. retry
+ * asks the server for the page again rather than drawing the same failed
+ * one.
  */
 export function ErrorScreen({ error, retry }: { error: unknown; retry: () => void }) {
+  const { t } = useAdminText()
   const reference = errorReference(error)
   return (
     <AdminCard centered>
-      <title>Something went wrong</title>
-      <h1 className="text-2xl font-semibold tracking-tight">Something went wrong</h1>
-      <p className="mt-3 text-sm text-muted-foreground">
-        This page hit an error. Try again, and if it keeps happening, the server console has the details.
-      </p>
+      <title>{t('crash.title')}</title>
+      <h1 className="text-2xl font-semibold tracking-tight">{t('crash.title')}</h1>
+      <p className="mt-3 text-sm text-muted-foreground">{t('crash.body')}</p>
       <div className="mt-6 flex flex-wrap justify-center gap-3">
         <Button type="button" onClick={() => retry()}>
-          Try again
+          {t('crash.retry')}
         </Button>
         <Button asChild variant="outline">
-          <Link href="/admin">Back to the admin</Link>
+          <Link href="/admin">{t('crash.back')}</Link>
         </Button>
       </div>
-      {reference && <p className="mt-6 font-mono text-xs break-all text-muted-foreground">Reference: {reference}</p>}
+      {reference && <p className="mt-6 font-mono text-xs break-all text-muted-foreground">{t('crash.reference', { reference })}</p>}
     </AdminCard>
   )
 }

@@ -39,9 +39,70 @@ async function readJson(path) {
 }
 
 /**
+ * The admin's routes an app wires itself, each a one-line file, for a kit
+ * that has the route: without the file, what posts to it never works.
+ * `kit` is the kit's route module, as the manifest lists it.
+ */
+const wiredRoutes = Object.freeze([
+  {
+    kit: 'platform/admin/routes/language.ts',
+    route: 'admin/api/language',
+    line: "export { GET, POST } from '@/platform/admin/routes/language'",
+    what: "the admin's language menus post there, so without it they never change the language",
+    custom: "This app has its own sign-in, so not that one line: follow 'On the app's own accounts' in platform/admin/README.md, which gives the route file for it.",
+  },
+])
+
+/** The file names Next takes for a route handler. */
+const routeFiles = Object.freeze(['route.ts', 'route.tsx', 'route.js', 'route.jsx', 'route.mjs'])
+
+/**
+ * Whether the app's platform.config.mjs says its admin has its own sign-in
+ * (admin.auth "custom"). A config that is missing or will not load counts
+ * as the shared password, the kit's default.
+ * @param {string} appRoot
+ */
+async function hasCustomSignIn(appRoot) {
+  const file = join(appRoot, 'platform.config.mjs')
+  if ((await readIfPresent(file)) === null) return false
+  try {
+    const config = (await import(pathToFileURL(file).href)).default
+    return config?.admin?.auth === 'custom'
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Every admin route the kit has that the app has not wired, one plain
+ * sentence each. An app keeps its routes in app/ or, as the notification
+ * app does, in src/app/.
+ * @param {string} appRoot
+ * @param {Record<string, unknown>} kitFiles the manifest's files
+ * @returns {Promise<string[]>}
+ */
+async function missingRoutes(appRoot, kitFiles) {
+  /** @type {string[]} */
+  const problems = []
+  for (const { kit, route, line, what, custom } of wiredRoutes) {
+    if (!(kit in kitFiles)) continue
+    const found = await Promise.all(
+      ['app', 'src/app'].flatMap((base) =>
+        routeFiles.map((name) => readIfPresent(join(appRoot, ...base.split('/'), ...route.split('/'), name))),
+      ),
+    )
+    if (found.some((bytes) => bytes !== null)) continue
+    const how = (await hasCustomSignIn(appRoot)) ? custom : `Add it with this one line: ${line}`
+    problems.push(`app/${route}/route.ts is missing: ${what}. ${how}`)
+  }
+  return problems
+}
+
+/**
  * Whether an app's copy of the kit is exactly the version it says it is,
- * and whether its packages meet the kit's floors. Each problem comes back
- * as one plain sentence, so CI can print them as they are.
+ * whether it has wired the admin routes the kit's version has, and whether
+ * its packages meet the kit's floors. Each problem comes back as one plain
+ * sentence, so CI can print them as they are.
  * @param {string} appRoot
  * @returns {Promise<{ version: string | null, files: number, problems: string[] }>}
  */
@@ -69,6 +130,7 @@ export async function checkApp(appRoot) {
   if (recorded !== manifest.version) {
     problems.push(`${VERSION_FILE} says "${recorded ?? ''}" but the manifest is for ${manifest.version}. Sync again.`)
   }
+  problems.push(...(await missingRoutes(appRoot, manifest.files)))
   const floors = await readJson(join(appRoot, 'platform', 'versions.json'))
   const pkg = await readJson(join(appRoot, 'package.json'))
   if (floors && pkg) {

@@ -4,6 +4,7 @@ import { existsSync, statSync } from 'node:fs'
 import { link, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { Env } from './settings'
+import { say, type Said } from './text'
 
 /**
  * The admin's side of the updater. The update itself runs in the
@@ -119,17 +120,18 @@ export async function updaterStatus(dir = updaterDir()): Promise<UpdaterStatus> 
   return { available: true, pending: existsSync(join(dir, 'request.json')), state: await readState(dir) }
 }
 
-export type UpdateRequest = { ok: true } | { ok: false; status: 409 | 503; error: string }
+/** `error` is in English, for the log; `said` says it in the admin's language. */
+export type UpdateRequest = { ok: true } | { ok: false; status: 409 | 503; error: string; said: Said }
+
+const refusal = <Status extends number>(status: Status, said: Said) => ({ ok: false as const, status, error: say(said), said })
 
 /** Asks the supervisor for an update. `by` says who asked, for the record. */
 export async function requestUpdate(by: string, dir = updaterDir()): Promise<UpdateRequest> {
-  if (!dir) {
-    return { ok: false, status: 503, error: 'Updates only work when the site is started with npm run serve.' }
-  }
-  const waiting = { ok: false, status: 409, error: 'An update is already waiting to start.' } as const
+  if (!dir) return refusal(503, { key: 'notServe' })
+  const waiting = refusal(409, { key: 'waiting' })
   const { pending, state } = await updaterStatus(dir)
   if (pending) return waiting
-  if (isBusy(state)) return { ok: false, status: 409, error: 'An update is already running.' }
+  if (isBusy(state)) return refusal(409, { key: 'running' })
   // Written whole beside its place, then linked in under its real name. A
   // link is never made over a file that is already there, so of many
   // presses at the same moment exactly one asks, and the supervisor never

@@ -34,6 +34,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^1.73.0",
     "next": "^16.4.6",
+    "next-intl": "^4.14.9",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "tailwind-merge": "^3.7.0"
@@ -63,7 +64,9 @@
     },
     "@typescript-eslint/typescript-estree": {
       "minimatch": "^11.0.1"
-    }
+    },
+    "use-intl": "4.14.9",
+    "icu-minify": "4.14.9"
   },
   "allowScripts": {
     "sharp": true,

@@ -7,8 +7,11 @@ import { drawShareCard, type ShareCardInput } from './card'
 export type ShareCardText = Omit<ShareCardInput, 'address' | 'appName'>
 
 export interface ShareCardRouteOptions {
-  /** The app's name, for the logo's alt text. */
-  appName: string
+  /**
+   * The app's name, for the logo's alt text: one for every language, or one
+   * for each of `locales`, such as { en: 'Knowledge Base', es: 'Base de conocimiento', ... }.
+   */
+  appName: string | Readonly<Record<string, string>>
   /** The site's address as the card shows it, such as https://wslatl.com. */
   address: string
   /** The languages the app has. A one-language app passes just its own. */
@@ -60,6 +63,11 @@ const PATH = /^\/[^\u0000-\u001f\u007f]*$/
 export function createShareCardRoute(options: ShareCardRouteOptions): { GET: (request: Request) => Promise<Response> } {
   const { appName, address, locales, defaultLocale, textFor } = options
   const maxCached = options.maxCached ?? 500
+  if (typeof appName !== 'string') {
+    const missing = locales.filter((locale) => typeof appName[locale] !== 'string' || appName[locale].trim() === '')
+    if (missing.length > 0) throw new Error(`createShareCardRoute: appName has no name for ${missing.join(', ')}. Give one string, or one for each language.`)
+  }
+  const nameIn = (locale: string) => (typeof appName === 'string' ? appName : appName[locale])
 
   /**
    * The cards drawn so far in this process, by language and page. A page's
@@ -89,7 +97,7 @@ export function createShareCardRoute(options: ShareCardRouteOptions): { GET: (re
       drawn.delete(key)
       drawn.set(key, png)
     } else {
-      png = drawShareCard({ ...card, address, appName }).arrayBuffer()
+      png = drawShareCard({ ...card, address, appName: nameIn(locale) }).arrayBuffer()
       drawn.set(key, png)
       // A card that failed to draw is drawn again on the next request.
       png.catch(() => drawn.delete(key))

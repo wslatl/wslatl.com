@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { Button } from '../../components/button'
+import { useAdminText } from './admin-text'
 
 /**
  * Posts to the sign-out route, then goes to the sign-in page. Both
@@ -12,6 +13,7 @@ import { Button } from '../../components/button'
  */
 export function SignOut({ action = '/admin/api/logout', then = '/admin/login' }: { action?: string; then?: string }) {
   const router = useRouter()
+  const { t } = useAdminText()
   const [busy, setBusy] = useState(false)
 
   async function signOut() {
@@ -24,7 +26,7 @@ export function SignOut({ action = '/admin/api/logout', then = '/admin/login' }:
   return (
     <Button variant="ghost" size="sm" onClick={signOut} disabled={busy}>
       <LogOut aria-hidden="true" />
-      {busy ? 'Signing out' : 'Sign out'}
+      {busy ? t('shell.signingOut') : t('shell.signOut')}
     </Button>
   )
 }

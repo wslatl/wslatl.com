@@ -21,7 +21,9 @@ export const { GET } = createShareCardRoute({
 
 A page then shares `/og?path=/games/minecraft&locale=es`. The card is addressed by page and never by its words, so it can only say what the site already says, anything that is not a page is a 404, and there is a fixed number of cards to keep.
 
-`textFor` returns `{ title, description?, kicker? }`. The `kicker` is the small line above the title (the game, on a game's page).
+`textFor` returns `{ title, description?, kicker? }`. The `kicker` is the small line above the title (the game, on a game's page). It can be async, as `getTranslations({ locale, namespace })` is: a route handler always passes its language, since root params do not reach it.
+
+`appName`, which the logo's alt text names, is one string, or one for each of `locales`: `{ en: 'Knowledge Base', es: 'Base de conocimiento', ... }`. Given by language, every one of `locales` needs one, or the route throws as it is made.
 
 ## Drawing one directly
 

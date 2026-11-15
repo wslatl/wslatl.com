@@ -1,9 +1,13 @@
 import 'server-only'
 import type { PlatformConfig } from '../../config.mjs'
+import { isLocale, textIn, type LocalizedText, type Locale } from '../../i18n/config'
 import type { AdminNavItem } from '../components/admin-nav'
 import { adminRequest, type AdminAuth, type AdminUser } from './auth'
 import { adminLog } from './request'
 import { githubSettings, type GitHubSettings } from './settings'
+
+/** One of the app's own admin pages, as platform.config.mjs names it: its words one string, or one for each language. */
+export type AdminLink = { href: string; label: LocalizedText }
 
 /** The app's settings as the admin uses them, from its platform.config.mjs. */
 export type AdminApp = {
@@ -18,11 +22,12 @@ export type AdminApp = {
   repo: string
   /** Which check platform.config.mjs asks for. */
   auth: 'password' | 'custom'
-  nav: readonly AdminNavItem[]
+  nav: readonly AdminLink[]
   wide: boolean
-  signInText: string
+  /** The app's own line for the sign-in card, or null for the kit's "Sign in to update the site." in each language. */
+  signInText: LocalizedText | null
   /** The app's own admin pages shown on the Updates page. */
-  updateLinks: readonly AdminNavItem[]
+  updateLinks: readonly AdminLink[]
 }
 
 export function adminApp(config: PlatformConfig): AdminApp {
@@ -35,9 +40,14 @@ export function adminApp(config: PlatformConfig): AdminApp {
     auth: config.admin.auth,
     nav: Object.freeze([...(config.admin.nav ?? [])]),
     wide: config.admin.wide === true,
-    signInText: config.admin.signInText ?? 'Sign in to update the site.',
+    signInText: config.admin.signInText ?? null,
     updateLinks: Object.freeze(config.admin.updateLinks?.map((link) => Object.freeze({ ...link })) ?? []),
   })
+}
+
+/** The app's own admin pages with their words in one language, as the header and the Updates page show them. */
+export function linksIn(links: readonly AdminLink[], locale: Locale): AdminNavItem[] {
+  return links.map(({ href, label }) => ({ href, label: textIn(label, locale) }))
 }
 
 /**
@@ -48,8 +58,8 @@ export function adminApp(config: PlatformConfig): AdminApp {
  */
 export type AdminSettings = { github: GitHubSettings | null; updatesOff: readonly string[] }
 
-/** Someone signed in, as the kit's pages and routes see them. */
-export type SignedIn = { name: string; mayUpdate: boolean }
+/** Someone signed in, as the kit's pages and routes see them: locale is the account's own language, or null when it keeps none. */
+export type SignedIn = { name: string; mayUpdate: boolean; locale: Locale | null }
 
 export type AdminCore = {
   app: AdminApp
@@ -66,6 +76,8 @@ export type AdminCore = {
    * missing or broken leaves the admin on with updates off, also logged once.
    */
   settings(): Promise<AdminSettings | null>
+  /** Why updates are off, one sentence for each setting, in a language: what settings() says in English for the log. */
+  updatesOffIn(locale: Locale): string[]
   /** Who sent a request, from its headers, or null when nobody is signed in. */
   user(headers: Headers): Promise<SignedIn | null>
 }
@@ -136,12 +148,15 @@ export function adminCore(config: PlatformConfig, auth: AdminAuth | null): Admin
       report(`${id} updates`, updatesOff.length > 0 && !trial ? `updates are off, and the rest of the admin works. ${updatesOff.join(' ')}` : null)
       return { github, updatesOff: Object.freeze([...updatesOff]) }
     },
+    updatesOffIn: (locale) => githubSettings(process.env, app.repo, locale).problems,
     async user(headers) {
       if (!auth) return null
       try {
         const found: AdminUser | null = await auth.user(adminRequest(headers), process.env)
         const name = typeof found?.name === 'string' ? printable(found.name) : ''
-        return found && name ? { name, mayUpdate: found.mayUpdate !== false } : null
+        // A language that is not one of the five counts as none, and the cookie decides.
+        const locale = found && isLocale(found.locale) ? found.locale : null
+        return found && name ? { name, mayUpdate: found.mayUpdate !== false, locale } : null
       } catch (error) {
         // Nobody counts as signed in when the check cannot say who is.
         adminLog(`the sign-in check failed, so the request counts as signed out: ${failure(error)}`)

@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { Button } from '../../components/button'
+import { englishText, type AdminText } from '../text'
+import { useAdminText } from './admin-text'
 import { formatWait } from './format'
 import { Notice } from './notice'
 
@@ -11,17 +13,18 @@ export type LoginProblem = { title: string; detail: string }
 
 /**
  * What a refused sign-in says, from what /admin/api/login answered: its
- * status, its Retry-After header and its own message. After too many
- * attempts it says how long is left.
+ * status, its Retry-After header and its own message, in the admin's
+ * language (English unless its words are given). After too many attempts
+ * it says how long is left.
  */
-export function loginProblem(status: number, retryAfter: string | null, said: string): LoginProblem {
-  if (status === 401) return { title: 'Wrong password', detail: 'Check it and try again.' }
+export function loginProblem(status: number, retryAfter: string | null, said: string, t: AdminText = englishText): LoginProblem {
+  if (status === 401) return { title: t('signIn.wrong.title'), detail: t('signIn.wrong.detail') }
   if (status === 429) {
     // Too many attempts, from this address or from everyone: Retry-After says for how long.
-    const wait = formatWait(retryAfter)
-    return { title: 'Too many attempts', detail: wait ? `Try again in ${wait}.` : said || 'Try again in a few minutes.' }
+    const wait = formatWait(retryAfter, t)
+    return { title: t('signIn.tooMany.title'), detail: wait ? t('signIn.tooMany.wait', { wait }) : said || t('signIn.tooMany.later') }
   }
-  return { title: 'Could not sign in', detail: said || `The server answered ${status}.` }
+  return { title: t('signIn.failed.title'), detail: said || t('signIn.failed.status', { status: String(status) }) }
 }
 
 /**
@@ -32,6 +35,7 @@ export function loginProblem(status: number, retryAfter: string | null, said: st
  */
 export function LoginForm() {
   const router = useRouter()
+  const { t } = useAdminText()
   const field = useRef<HTMLInputElement>(null)
   const [problem, setProblem] = useState<LoginProblem | null>(null)
   const [busy, setBusy] = useState(false)
@@ -57,7 +61,7 @@ export function LoginForm() {
         body: JSON.stringify({ password }),
       })
     } catch {
-      fail({ title: 'Could not reach the server', detail: 'Check the connection and try again.' })
+      fail({ title: t('signIn.unreachable.title'), detail: t('signIn.unreachable.detail') })
       return
     }
     if (response.ok) {
@@ -65,14 +69,14 @@ export function LoginForm() {
       return
     }
     const body = await response.json().catch(() => ({}))
-    fail(loginProblem(response.status, response.headers.get('retry-after'), typeof body.error === 'string' ? body.error : ''))
+    fail(loginProblem(response.status, response.headers.get('retry-after'), typeof body.error === 'string' ? body.error : '', t))
   }
 
   return (
     <form action="/admin/api/login" method="post" onSubmit={submit} className="mt-6 space-y-4">
       <div>
         <label htmlFor="admin-password" className="text-sm font-medium">
-          Password
+          {t('signIn.password')}
         </label>
         <input
           ref={field}
@@ -96,7 +100,7 @@ export function LoginForm() {
       </div>
       <Button type="submit" disabled={busy} className="h-11 w-full">
         {busy && <LoaderCircle aria-hidden="true" className="animate-spin" />}
-        {busy ? 'Signing in' : 'Sign in'}
+        {busy ? t('signIn.busy') : t('signIn.submit')}
       </Button>
     </form>
   )

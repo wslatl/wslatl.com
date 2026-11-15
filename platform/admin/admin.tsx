@@ -3,22 +3,31 @@ import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import { connection } from 'next/server'
+import { cache } from 'react'
 import type { PlatformConfig } from '../config.mjs'
+import { textIn, type Locale, type LocalizedText } from '../i18n/config'
+import { adminMessages } from '../i18n/messages'
 import { AdminShell } from './components/admin-shell'
+import { AdminTextProvider } from './components/admin-text'
 import { AdminCard } from './components/card'
+import { LanguageMenu } from './components/language-menu'
 import { LoginForm } from './components/login-form'
 import { Logo } from '../components/logo'
+import { hidden } from './components/tags'
 import { Updates } from './components/updates'
 import type { AdminAuth } from './server/auth'
-import { adminCore, type AdminCore, type AdminSettings, type SignedIn } from './server/core'
-import { bare, checkPost, checkRead, json } from './server/request'
+import { adminCore, linksIn, type AdminCore, type AdminSettings, type SignedIn } from './server/core'
+import { chooseAdminLocale, cookieLocale, requestLocale } from './server/locale'
+import { bare, checkPost, checkRead, signInAgain } from './server/request'
 import { adminRoutes, type AdminRoutes } from './server/routes'
+import { adminText } from './server/text'
 
 /**
  * One app's admin: its settings and check, its JSON routes, and the pages
- * that need someone signed in. The ready-made files under pages/ and
- * routes/ are this, made from the app's platform.config.mjs and the shared
- * password (app.ts). An app whose check is its own makes its own once:
+ * that need someone signed in, in the admin's language. The ready-made
+ * files under pages/ and routes/ are this, made from the app's
+ * platform.config.mjs and the shared password (app.ts). An app whose check
+ * is its own makes its own once:
  *
  *   export const admin = createAdmin({ config, auth: staffCheck })
  *
@@ -27,19 +36,25 @@ import { adminRoutes, type AdminRoutes } from './server/routes'
 export type Admin = AdminCore & {
   routes: AdminRoutes
   /**
+   * The admin's language for the request being rendered: the signed-in
+   * account's own, for an app whose check keeps one, then the admin's
+   * language cookie, then English (server/locale.ts).
+   */
+  locale(): Promise<Locale>
+  /**
    * For any page that needs someone signed in, first thing: a 404 while the
    * admin is off, the sign-in page when nobody is signed in, and otherwise
-   * who it is. Each page calls it, since moving between pages does not run
-   * their layout again.
+   * who it is and the admin's language. Each page calls it, since moving
+   * between pages does not run their layout again.
    */
-  signedInPage(): Promise<{ user: SignedIn; settings: AdminSettings }>
+  signedInPage(): Promise<{ user: SignedIn; settings: AdminSettings; locale: Locale }>
   /**
    * The same for one of the app's own JSON routes that reads (a GET): who
    * it is, or the answer to send instead, in this order: a 404 while the
    * admin is off, whatever is sent; a 403 for a read another site asked for;
    * a 401 when nobody is signed in.
    */
-  signedInRoute(request: Request): Promise<{ user: SignedIn; settings: AdminSettings } | { response: Response }>
+  signedInRoute(request: Request): Promise<{ user: SignedIn; settings: AdminSettings; locale: Locale } | { response: Response }>
   /**
    * The same for one of the app's own JSON routes that takes a POST, in one
    * call and in this order: a 404 while the admin is off, whatever is sent,
@@ -53,16 +68,17 @@ export type Admin = AdminCore & {
   signedInPost(
     request: Request,
     options?: { maxBytes?: number },
-  ): Promise<{ user: SignedIn; settings: AdminSettings; body: Record<string, unknown> } | { response: Response }>
+  ): Promise<{ user: SignedIn; settings: AdminSettings; locale: Locale; body: Record<string, unknown> } | { response: Response }>
   /** The header and main area, for a layout around signed-in pages. It checks who is signed in first. */
   SignedInLayout(props: { children: React.ReactNode }): Promise<React.JSX.Element>
   /**
    * The tab title for one of the app's own admin pages, as the kit's pages
-   * title theirs: `export const generateMetadata = admin.titled('Guides')`.
+   * title theirs: `export const generateMetadata = admin.titled('Guides')`,
+   * or with the words in each language, `admin.titled({ en: 'Guides', es: 'Guías', ... })`.
    * While the admin is off it is a 404, so a page never gives away what it
    * would have been called.
    */
-  titled(title: string): () => Promise<Metadata>
+  titled(title: LocalizedText): () => Promise<Metadata>
   /** The Updates page, and its tab title. */
   Updates(): Promise<React.JSX.Element>
   updatesMetadata(): Promise<Metadata>
@@ -71,33 +87,52 @@ export type Admin = AdminCore & {
   signInMetadata(): Promise<Metadata>
 }
 
-/** A tab title that only exists while the admin is on, so a 404 never says what the page would have been. */
-const titled = (title: string, ready: () => Promise<boolean>) => async (): Promise<Metadata> => {
-  await connection()
-  if (!(await ready())) notFound()
-  return { title }
-}
-
 export function createAdmin({ config, auth }: { config: PlatformConfig; auth: AdminAuth | null }): Admin {
   const core = adminCore(config, auth)
   const { app } = core
+
+  /**
+   * Only an app's own check can keep a language per account, and only once
+   * the admin is on: its user() is never asked before then. The shared
+   * password keeps none, so its admin goes straight to the cookie.
+   */
+  async function localeFor(requestHeaders: Headers): Promise<Locale> {
+    if (auth?.kind !== 'custom') return requestLocale(requestHeaders)
+    const user = (await core.settings()) ? await core.user(requestHeaders) : null
+    return chooseAdminLocale(user?.locale, cookieLocale(requestHeaders))
+  }
+
+  // Once per request, however many of the layouts, pages and titles ask.
+  const locale = cache(async () => localeFor(await headers()))
 
   async function signedInPage() {
     // Rendered per request, always: .env is read now, never at build time.
     await connection()
     const settings = await core.settings()
     if (!settings) notFound()
-    const user = await core.user(await headers())
+    const requestHeaders = await headers()
+    const user = await core.user(requestHeaders)
     if (!user) redirect(core.signInPath)
-    return { user, settings }
+    return { user, settings, locale: chooseAdminLocale(user.locale, cookieLocale(requestHeaders)) }
   }
 
   const isOn = async () => (await core.settings()) !== null
   const sharedPasswordOn = async () => core.auth?.kind === 'password' && (await isOn())
 
+  /** A tab title that only exists while the admin is on, so a 404 never says what the page would have been. */
+  const titled = (title: LocalizedText | ((t: ReturnType<typeof adminText>) => string), ready: () => Promise<boolean>) => async (): Promise<Metadata> => {
+    await connection()
+    if (!(await ready())) notFound()
+    const language = await locale()
+    const t = adminText(language)
+    const page = typeof title === 'function' ? title(t) : textIn(title, language)
+    return { title: { absolute: t('tabTitle', { page, brand: app.brand }) } }
+  }
+
   return {
     ...core,
     routes: adminRoutes(core),
+    locale,
     signedInPage,
     titled: (title) => titled(title, isOn),
 
@@ -107,8 +142,8 @@ export function createAdmin({ config, auth }: { config: PlatformConfig; auth: Ad
       const foreign = checkRead(request)
       if (foreign) return { response: foreign }
       const user = await core.user(request.headers)
-      if (!user) return { response: json({ error: 'Sign in again.' }, { status: 401 }) }
-      return { user, settings }
+      if (!user) return { response: signInAgain(request) }
+      return { user, settings, locale: chooseAdminLocale(user.locale, cookieLocale(request.headers)) }
     },
 
     async signedInPost(request, options = {}) {
@@ -117,29 +152,52 @@ export function createAdmin({ config, auth }: { config: PlatformConfig; auth: Ad
       const check = await checkPost(request, options)
       if (!check.ok) return { response: check.response }
       const user = await core.user(request.headers)
-      if (!user) return { response: json({ error: 'Sign in again.' }, { status: 401 }) }
-      return { user, settings, body: check.body }
+      if (!user) return { response: signInAgain(request) }
+      return { user, settings, locale: chooseAdminLocale(user.locale, cookieLocale(request.headers)), body: check.body }
     },
 
     async SignedInLayout({ children }) {
-      await signedInPage()
+      const { locale: language } = await signedInPage()
+      // Its own words for its client components, in the language just
+      // chosen, whatever the root layout around it chose.
       return (
-        <AdminShell brand={app.brand} nav={app.nav} wide={app.wide} signOutPath={core.signOutPath} signInPath={core.signInPath}>
-          {children}
-        </AdminShell>
+        <AdminTextProvider locale={language} messages={adminMessages(language)}>
+          <AdminShell
+            brand={app.brand}
+            nav={linksIn(app.nav, language)}
+            wide={app.wide}
+            signOutPath={core.signOutPath}
+            signInPath={core.signInPath}
+            locale={language}
+          >
+            {children}
+          </AdminShell>
+        </AdminTextProvider>
       )
     },
 
     async Updates() {
-      const { user, settings } = await signedInPage()
-      return <Updates github={settings.github} updatesOff={settings.updatesOff} mayUpdate={user.mayUpdate} links={app.updateLinks} />
+      const { user, settings, locale: language } = await signedInPage()
+      // The reasons in the admin's language; the log has them in English.
+      const updatesOff = settings.github ? [] : core.updatesOffIn(language)
+      return (
+        <Updates
+          github={settings.github}
+          updatesOff={updatesOff}
+          mayUpdate={user.mayUpdate}
+          links={linksIn(app.updateLinks, language)}
+          locale={language}
+        />
+      )
     },
-    updatesMetadata: titled('Updates', isOn),
+    updatesMetadata: titled((t) => t('updates.title'), isOn),
 
     async SignIn() {
       await connection()
       if (!(await sharedPasswordOn())) notFound()
       if (await core.user(await headers())) redirect('/admin')
+      const language = await locale()
+      const t = adminText(language)
       // The mark once, on the card's solid surface, with the gradient only
       // as the bar along the card's top edge.
       return (
@@ -147,14 +205,15 @@ export function createAdmin({ config, auth }: { config: PlatformConfig; auth: Ad
           <div className="flex items-center gap-3">
             <Logo />
             <h1 className="text-xl font-semibold tracking-tight">
-              <span className="sr-only">{`${app.brand} `}</span>Admin
+              {t.rich('heading', { brand: app.brand, hidden })}
             </h1>
           </div>
-          <p className="mt-3 text-sm text-muted-foreground">{app.signInText}</p>
+          <p className="mt-3 text-sm text-muted-foreground">{app.signInText === null ? t('signIn.text') : textIn(app.signInText, language)}</p>
           <LoginForm />
+          <LanguageMenu variant="row" className="mt-6 border-t pt-4" />
         </AdminCard>
       )
     },
-    signInMetadata: titled('Sign in', sharedPasswordOn),
+    signInMetadata: titled((t) => t('signIn.title'), sharedPasswordOn),
   }
 }

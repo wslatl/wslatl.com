@@ -43,6 +43,7 @@ export const adminPostRoutes: readonly string[] = Object.freeze([
   '/admin/api/logout',
   '/admin/api/update',
   '/admin/api/adopt-updater',
+  '/admin/api/language',
 ])
 
 /** The admin's own addresses. /administrator and the like are not it. */
@@ -51,7 +52,7 @@ export function isAdminPath(pathname: string): boolean {
 }
 
 export type RefuseOptions = {
-  /** Every exact path that takes a POST. The kit's own four unless the app names more. */
+  /** Every exact path that takes a POST. The kit's own five unless the app names more. */
   postRoutes?: readonly string[]
   /**
    * For an app that uses Server Actions on purpose, as the status site does:
@@ -145,6 +146,14 @@ function newNonce(): string {
 }
 
 /**
+ * Request headers an admin page or route never gets from the visitor: the
+ * two Next takes a nonce from, and next-intl's language, which the proxy's
+ * language step alone sets, and never for the admin, whose language comes
+ * from the account or its cookie (../i18n/admin-locale.ts).
+ */
+const adminDropped = [...policyHeaders, 'x-next-intl-locale']
+
+/**
  * An admin page or route, rendered for this request alone, with a nonce of
  * its own: Next reads it from the request's Content-Security-Policy header
  * and puts it on every script it writes into the page, and the browser runs
@@ -152,7 +161,8 @@ function newNonce(): string {
  */
 function withNonce(request: Request, development: boolean): NextResponse {
   const policy = adminPolicy({ nonce: newNonce(), development })
-  const headers = withoutPolicies(request.headers)
+  const headers = new Headers(request.headers)
+  for (const name of adminDropped) headers.delete(name)
   headers.set('content-security-policy', policy)
   const response = NextResponse.next({ request: { headers } })
   response.headers.set('Content-Security-Policy', policy)

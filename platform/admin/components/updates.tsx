@@ -1,28 +1,32 @@
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
+import type { Locale } from '../../i18n/config'
 import { deployedCommit, installedRelease } from '../server/build-info'
-import { releaseOverview, type Overview, type Release } from '../server/github'
+import { GitHubError, releaseOverview, type Overview, type Release } from '../server/github'
 import type { GitHubSettings } from '../server/settings'
+import { adminText, say } from '../server/text'
 import { updaterStatus } from '../server/updater'
-import type { AdminNavItem } from '../../config.mjs'
+import type { AdminText } from '../text'
 import { cn } from '../../lib/cn'
+import type { AdminNavItem } from './admin-nav'
 import { formatWhen, shortSha } from './format'
 import { Badge, Notice, type Tone } from './notice'
 import { ReleaseNotes, safeHref } from './release-notes'
 import { UpdatePanel } from './update-panel'
+import { code } from './tags'
 
 /** What the latest release is to this site, shown beside it. */
-const latestBadge: Record<Overview['status'], { tone: Tone | 'neutral'; label: string } | null> = {
-  update: { tone: 'info', label: 'Ready to install' },
-  'up-to-date': { tone: 'success', label: 'Installed' },
-  older: { tone: 'neutral', label: 'Older than installed' },
-  'bad-tag': { tone: 'warning', label: 'Not a version tag' },
-  withdrawn: { tone: 'warning', label: 'Withdrawn' },
+const latestBadge: Record<Overview['status'], { tone: Tone | 'neutral'; key: 'update' | 'upToDate' | 'older' | 'badTag' | 'withdrawn' } | null> = {
+  update: { tone: 'info', key: 'update' },
+  'up-to-date': { tone: 'success', key: 'upToDate' },
+  older: { tone: 'neutral', key: 'older' },
+  'bad-tag': { tone: 'warning', key: 'badTag' },
+  withdrawn: { tone: 'warning', key: 'withdrawn' },
   'no-releases': null,
 }
 
 /** A link off the site: in a new tab, so a running update stays in view, and without the referrer or window.opener. */
-function OutLink({ href, className, children }: { href: string; className?: string; children: React.ReactNode }) {
+function OutLink({ href, newTab, className, children }: { href: string; newTab: string; className?: string; children: React.ReactNode }) {
   return (
     <a
       href={href}
@@ -35,7 +39,7 @@ function OutLink({ href, className, children }: { href: string; className?: stri
     >
       {children}
       <ArrowUpRight aria-hidden="true" className="size-3.5 shrink-0" />
-      <span className="sr-only"> (opens in a new tab)</span>
+      <span className="sr-only">{newTab}</span>
     </a>
   )
 }
@@ -57,6 +61,7 @@ function ReleaseCard({
   badge,
   details,
   empty,
+  t,
 }: {
   id: string
   heading: string
@@ -64,8 +69,9 @@ function ReleaseCard({
   badge?: { tone: Tone | 'neutral'; label: string } | null
   details?: React.ReactNode
   empty: React.ReactNode
+  t: AdminText
 }) {
-  const published = release ? formatWhen(release.publishedAt) : ''
+  const published = release ? formatWhen(release.publishedAt, t) : ''
   // The address comes from GitHub, so it is linked only when it is an ordinary web address.
   const href = release ? safeHref(release.url) : null
   return (
@@ -81,12 +87,12 @@ function ReleaseCard({
           <p className="mt-3 font-mono text-2xl font-semibold tracking-tight break-all">{release.tag}</p>
           {release.name !== release.tag && <p className="mt-1 text-sm break-words">{release.name}</p>}
           <dl className="mt-3 space-y-1 text-sm">
-            {published && <Detail label="Published">{published}</Detail>}
+            {published && <Detail label={t('updates.published')}>{published}</Detail>}
             {details}
           </dl>
           {href && (
-            <OutLink href={href} className="mt-auto self-start pt-4 text-sm">
-              Release on GitHub
+            <OutLink href={href} newTab={t('newTab')} className="mt-auto self-start pt-4 text-sm">
+              {t('updates.onGitHub')}
             </OutLink>
           )}
         </>
@@ -97,13 +103,23 @@ function ReleaseCard({
   )
 }
 
+/** A rich text <link> to an address off the site, made outside the component that uses it. */
+const outTo = (href: string, newTab: string) =>
+  function outLink(chunks: React.ReactNode) {
+    return (
+      <OutLink href={href} newTab={newTab}>
+        {chunks}
+      </OutLink>
+    )
+  }
+
 const linkClass = 'text-link underline decoration-link/50 underline-offset-2 hover:text-foreground hover:decoration-current'
 
 /** The app's own admin pages that belong next to updates (admin.updateLinks), as a row of links. */
-function UpdateLinks({ links }: { links: readonly AdminNavItem[] }) {
+function UpdateLinks({ links, t }: { links: readonly AdminNavItem[]; t: AdminText }) {
   if (links.length === 0) return null
   return (
-    <nav aria-label="More about updates" className="mt-3">
+    <nav aria-label={t('updates.links')} className="mt-3">
       <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
         {links.map((link) => (
           <li key={link.href}>
@@ -117,38 +133,34 @@ function UpdateLinks({ links }: { links: readonly AdminNavItem[] }) {
   )
 }
 
-const noReleases = 'No releases published yet. Publish one on GitHub to install it here.'
-
 /**
  * Where the site stands against GitHub's latest release, in one sentence.
  * With no release yet, links is the app's own pages for updates: the first
  * is named as a place to publish one, beside GitHub.
  */
-export function summary({ status, latest }: Overview, installed: string | null, links: readonly AdminNavItem[] = []): React.ReactNode {
+export function summary({ status, latest }: Overview, installed: string | null, links: readonly AdminNavItem[] = [], t: AdminText = adminText('en')): React.ReactNode {
+  const tag = latest?.tag ?? ''
   switch (status) {
     case 'no-releases':
-      if (links.length === 0) return noReleases
-      return (
-        <>
-          No releases published yet. Publish one from{' '}
+      if (links.length === 0) return t('updates.summary.noReleases')
+      return t.rich('updates.summary.noReleasesFrom', {
+        label: links[0].label,
+        link: (chunks) => (
           <Link href={links[0].href} className={linkClass}>
-            {links[0].label}
-          </Link>{' '}
-          or on GitHub to install it here.
-        </>
-      )
+            {chunks}
+          </Link>
+        ),
+      })
     case 'bad-tag':
-      return `The latest release is tagged ${latest?.tag}, not vMAJOR.MINOR.PATCH, so it cannot be installed.`
+      return t('updates.summary.badTag', { tag })
     case 'up-to-date':
-      return 'The site runs the latest release.'
+      return t('updates.summary.upToDate')
     case 'older':
-      return `The release marked latest, ${latest?.tag}, is older than the installed ${installed}, so there is nothing to install.`
+      return t('updates.summary.older', { tag, installed: installed ?? '' })
     case 'withdrawn':
-      return `${latest?.tag} was taken back out after it kept stopping, so it is not offered again. Publish the fix as a newer release.`
+      return t('updates.summary.withdrawn', { tag })
     default:
-      return installed
-        ? `${latest?.tag} is ready to install.`
-        : `${latest?.tag} is ready to install in place of the folder uploaded by hand.`
+      return installed ? t('updates.summary.update', { tag }) : t('updates.summary.updateByHand', { tag })
   }
 }
 
@@ -162,41 +174,43 @@ function UpdatesOff({
   installedTag,
   commit,
   links,
+  t,
 }: {
   reasons: readonly string[]
   installedTag: string | null
   commit: string | null
   links: readonly AdminNavItem[]
+  t: AdminText
 }) {
   return (
     <>
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Updates</h1>
-        <UpdateLinks links={links} />
+        <h1 className="text-2xl font-semibold tracking-tight">{t('updates.title')}</h1>
+        <UpdateLinks links={links} t={t} />
       </div>
-      <Notice tone="warning" title="Updates are off">
+      <Notice tone="warning" title={t('updates.off.title')}>
         {reasons.map((reason) => (
           <span key={reason} className="block">
             {reason}
           </span>
         ))}
         <span className="mt-2 block text-muted-foreground">
-          Put {reasons.length === 1 ? 'it' : 'them'} right in <code className="font-mono">.env</code> and restart the server. Every
-          other admin page works as usual.
+          {t.rich('updates.off.fix', { count: reasons.length, code })}
         </span>
       </Notice>
       <ReleaseCard
         id="installed"
-        heading="Installed"
+        heading={t('updates.installed')}
         release={installedTag ? { tag: installedTag, name: installedTag, publishedAt: '', url: '', notes: '' } : null}
         details={
           commit && (
-            <Detail label="Commit">
+            <Detail label={t('updates.commit')}>
               <span className="font-mono">{shortSha(commit)}</span>
             </Detail>
           )
         }
-        empty={<p className="mt-3 text-lg font-semibold">Uploaded by hand</p>}
+        empty={<p className="mt-3 text-lg font-semibold">{t('updates.byHand')}</p>}
+        t={t}
       />
     </>
   )
@@ -204,34 +218,38 @@ function UpdatesOff({
 
 /**
  * The Updates page's content: what is installed, GitHub's latest release,
- * the panel that installs it, and what it brings. The caller has already
- * checked who is signed in. github is null while updates are off, and
- * updatesOff says why.
+ * the panel that installs it, and what it brings, in the admin's language.
+ * The caller has already checked who is signed in. github is null while
+ * updates are off, and updatesOff says why.
  */
 export async function Updates({
   github: settings,
   updatesOff = [],
   mayUpdate = true,
   links = [],
+  locale = 'en',
   fetchImpl = fetch,
 }: {
   github: GitHubSettings | null
   updatesOff?: readonly string[]
   mayUpdate?: boolean
-  /** The app's own pages for updates (admin.updateLinks). */
+  /** The app's own pages for updates (admin.updateLinks), with their words in the admin's language. */
   links?: readonly AdminNavItem[]
+  /** The admin's language. */
+  locale?: Locale
   fetchImpl?: typeof fetch
 }) {
+  const t = adminText(locale)
   const installedTag = installedRelease()
   const commit = deployedCommit()
-  if (!settings) return <UpdatesOff reasons={updatesOff} installedTag={installedTag} commit={commit} links={links} />
+  if (!settings) return <UpdatesOff reasons={updatesOff} installedTag={installedTag} commit={commit} links={links} t={t} />
   const { repo } = settings
   const updater = await updaterStatus()
   // A release a crash took back out is never offered again.
   const withdrawn = updater.state?.withdrawn ?? []
   const github = await releaseOverview(settings, installedTag, fetchImpl, 10_000, withdrawn).then(
     (overview) => ({ ok: true as const, overview }),
-    (error: unknown) => ({ ok: false as const, error: error instanceof Error ? error.message : 'Could not read GitHub.' }),
+    (error: unknown) => ({ ok: false as const, error: error instanceof GitHubError ? say(error.said, locale) : t('problems.unreadable') }),
   )
   const current = updater.state?.current?.tag === installedTag ? updater.state?.current : null
   // The installed release as GitHub has it, or as the build names it when
@@ -246,12 +264,13 @@ export async function Updates({
       }
     : null
   const offer = github.ok && github.overview.status === 'update' ? (github.overview.latest?.tag ?? null) : null
-  const blocked = github.ok && github.overview.status === 'up-to-date' ? 'Up to date' : 'Nothing to install'
+  const blocked = github.ok && github.overview.status === 'up-to-date' ? t('updates.blocked.upToDate') : t('updates.blocked.nothing')
   const latest = github.ok ? github.overview.latest : null
   const notes = github.ok && github.overview.status === 'update' && latest?.notes ? latest : null
-  const deployedAt = current?.deployedAt ? formatWhen(current.deployedAt) : ''
+  const deployedAt = current?.deployedAt ? formatWhen(current.deployedAt, t) : ''
+  const badge = github.ok ? latestBadge[github.overview.status] : null
   const commitDetail = commit && (
-    <Detail label="Commit">
+    <Detail label={t('updates.commit')}>
       <span className="font-mono">{shortSha(commit)}</span>
     </Detail>
   )
@@ -259,45 +278,47 @@ export async function Updates({
   return (
     <>
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Updates</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">{t('updates.title')}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Installs the latest release of <OutLink href={`https://github.com/${repo}/releases`}>{repo}</OutLink>.
+          {t.rich('updates.intro', { repo, link: outTo(`https://github.com/${repo}/releases`, t('newTab')) })}
         </p>
-        <UpdateLinks links={links} />
+        <UpdateLinks links={links} t={t} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <ReleaseCard
           id="installed"
-          heading="Installed"
+          heading={t('updates.installed')}
           release={installed}
           details={
             <>
-              {deployedAt && <Detail label="Installed">{deployedAt}</Detail>}
+              {deployedAt && <Detail label={t('updates.installedAt')}>{deployedAt}</Detail>}
               {commitDetail}
             </>
           }
           empty={
             <>
-              <p className="mt-3 text-lg font-semibold">Uploaded by hand</p>
+              <p className="mt-3 text-lg font-semibold">{t('updates.byHand')}</p>
               {commitDetail && <dl className="mt-2 space-y-1 text-sm">{commitDetail}</dl>}
             </>
           }
+          t={t}
         />
         <ReleaseCard
           id="latest"
-          heading="Latest release"
+          heading={t('updates.latest')}
           release={latest}
-          badge={github.ok ? latestBadge[github.overview.status] : null}
+          badge={badge && { tone: badge.tone, label: t(`updates.badge.${badge.key}`) }}
           empty={
             github.ok ? (
-              <p className="mt-3 text-lg font-semibold">None published yet</p>
+              <p className="mt-3 text-lg font-semibold">{t('updates.noneYet')}</p>
             ) : (
-              <Notice tone="danger" title="Could not read GitHub" className="mt-3">
+              <Notice tone="danger" title={t('updates.cannotRead')} className="mt-3">
                 {github.error}
               </Notice>
             )
           }
+          t={t}
         />
       </div>
 
@@ -305,14 +326,14 @@ export async function Updates({
         initial={updater}
         offer={offer}
         blocked={blocked}
-        summary={github.ok ? summary(github.overview, installedTag, links) : null}
+        summary={github.ok ? summary(github.overview, installedTag, links, t) : null}
         mayUpdate={mayUpdate}
       />
 
       {notes && (
         <section aria-labelledby="notes-heading" className="rounded-xl border bg-card p-5 sm:p-6">
           <h2 id="notes-heading" className="text-base font-semibold">
-            What {notes.tag} brings
+            {t('updates.brings', { tag: notes.tag })}
           </h2>
           {/* At most about 70 characters a line, as the brand kit sets body text. */}
           <ReleaseNotes markdown={notes.notes} repo={repo} headingLevel={3} className="mt-4 max-w-prose" />
