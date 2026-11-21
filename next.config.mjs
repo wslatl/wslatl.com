@@ -54,6 +54,18 @@ const nextConfig = {
     // README), so there is nothing left for a runtime optimizer to do.
     unoptimized: true,
   },
+  experimental: {
+    // What Next renders while the site runs stays in memory (50 MB at most,
+    // the oldest dropped first) and never goes to the disk. A game, a legal
+    // document or a partner has its address made up by whoever asks
+    // (/games/anything, in every language), and Next kept each 404 it drew
+    // there as files under .next/server, about 126 KB each and for good, so
+    // a flood of made-up addresses filled the server's disk, and a server
+    // over its disk limit is stopped by Pterodactyl. The pages the build
+    // made are read from the build as before; tests/http checks that a run
+    // of made-up addresses writes nothing.
+    isrFlushToDisk: false,
+  },
   async headers() {
     return [
       {

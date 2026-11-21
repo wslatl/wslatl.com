@@ -1,11 +1,11 @@
 import { randomBytes } from 'node:crypto'
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import shortLinks from '../../config/links.json' with { type: 'json' }
 import { cookieProblems, headerProblems } from '../../scripts/check-security.mjs'
 import { fakeGitHub, type FakeGitHub } from '../attack/fake-github'
-import { raw, type Site, startSite } from './server'
+import { raw, root, type Site, startSite } from './server'
 
 /**
  * The attack tests again, against the real thing: the site as `npm run
@@ -303,6 +303,38 @@ describe('a flood of guesses from many addresses', () => {
     expect((await guess({ 'cf-connecting-ip': '198.18.1.3', cookie: 'admin_device=made.up' }, site.password)).status).toBe(429)
     // The owner's own browser still gets in.
     expect((await guess({ 'cf-connecting-ip': '198.18.1.4', cookie: device }, site.password)).status).toBe(200)
+  }, 120_000)
+})
+
+/** Every file under a folder, as paths relative to it. */
+function filesUnder(dir: string, prefix = ''): string[] {
+  if (!existsSync(join(dir, prefix))) return []
+  return readdirSync(join(dir, prefix), { withFileTypes: true }).flatMap((entry) => {
+    const path = prefix ? `${prefix}/${entry.name}` : entry.name
+    return entry.isDirectory() ? filesUnder(dir, path) : [path]
+  })
+}
+
+describe('a made-up game, document or partner', () => {
+  it('is our 404 page, and writes nothing to the disk however many are asked for', async () => {
+    // Each page under these has its address made up by whoever asks, and
+    // Next kept every one it answered as a file under .next/server, about
+    // 126 KB each, for good: a flood of made-up addresses filled the disk,
+    // and a server over its disk limit is stopped by Pterodactyl.
+    const server = join(root, '.next', 'server')
+    const before = new Set(filesUnder(server))
+    for (const list of ['/games', '/es/games', '/legal', '/fr/legal', '/partners', '/de/partners']) {
+      for (let i = 0; i < 3; i++) {
+        const path = `${list}/no-such-${randomBytes(6).toString('hex')}`
+        const response = await ask(path)
+        expect(response.status, path).toBe(404)
+        expect(await response.text(), path).toContain('<title>Page not found | WSLATL</title>')
+      }
+    }
+    // A real one is still served, from what the build made.
+    expect((await ask('/games/minecraft')).status).toBe(200)
+    expect((await ask('/es/legal/privacy')).status).toBe(200)
+    expect(filesUnder(server).filter((file) => !before.has(file))).toEqual([])
   }, 120_000)
 })
 
