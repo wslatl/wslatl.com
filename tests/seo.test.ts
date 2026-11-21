@@ -1,13 +1,19 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import type { Metadata } from 'next'
 import { describe, expect, it, vi } from 'vitest'
 import { generateMetadata as homeMetadata } from '@/app/[locale]/page'
 import { generateMetadata as gameMetadata } from '@/app/[locale]/games/[slug]/page'
+import { generateMetadata as partnerMetadata } from '@/app/[locale]/partners/[slug]/page'
 import manifest from '@/app/manifest'
 import robots from '@/app/robots'
 import sitemap from '@/app/sitemap'
 import { siteConfig } from '@/config/site'
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { OrganizationJsonLd } from '@/components/seo/organization-json-ld'
 import { games } from '@/data/games'
+import { partners } from '@/data/partners'
 import { locales } from '@/i18n/config'
 import { pageUrl } from '@/lib/metadata'
 import { imageSize } from './image-size'
@@ -77,6 +83,10 @@ describe('the icons search results and browsers show', () => {
   })
 })
 
+/** The Open Graph pictures a page lists, with the tags each carries. */
+const shareImages = (metadata: Metadata) =>
+  (metadata.openGraph?.images ?? []) as { url: string; alt: string; width: number; height: number; type: string }[]
+
 describe('what Google reads for the site and its pages', () => {
   it('names the brand first in the home page title, in every language', async () => {
     for (const locale of locales) {
@@ -93,6 +103,70 @@ describe('what Google reads for the site and its pages', () => {
       )
       expect(new Set(titles).size).toBe(games.length)
     }
+  })
+
+  it('gives every home page a card and picture text in its own language, the English one keeping the static picture', async () => {
+    const english = await homeMetadata({ params: Promise.resolve({ locale: 'en' }) })
+    const [englishImage] = shareImages(english)
+    expect(englishImage.url).toMatch(/^\/og-image\.png\?v=/)
+    for (const locale of locales.filter((other) => other !== 'en')) {
+      const metadata = await homeMetadata({ params: Promise.resolve({ locale }) })
+      const [image] = shareImages(metadata)
+      expect(image.url, locale).toBe(`/og?path=%2F&locale=${locale}`)
+      expect(image.alt, locale).not.toBe(englishImage.alt)
+      expect(image, locale).toMatchObject({ width: 1200, height: 630, type: 'image/png' })
+    }
+  })
+
+  it('gives Twitter the same picture and alt text as Open Graph, in the page language, and no handle it does not own', async () => {
+    for (const locale of locales) {
+      const metadata = await homeMetadata({ params: Promise.resolve({ locale }) })
+      const [og] = shareImages(metadata)
+      expect(metadata.twitter?.images, locale).toEqual([{ url: og.url, alt: og.alt }])
+      expect(metadata.twitter, locale).not.toHaveProperty('site')
+      expect(metadata.twitter, locale).not.toHaveProperty('creator')
+    }
+  })
+
+  it('shares every partner profile with its own 1200x630 PNG card, never the 3:1 WebP banner', async () => {
+    for (const locale of locales) {
+      for (const partner of partners) {
+        const metadata = await partnerMetadata({ params: Promise.resolve({ locale, slug: partner.slug }) })
+        const [image] = shareImages(metadata)
+        expect(image.url, `${locale} ${partner.slug}`).toBe(`/og?path=%2Fpartners%2F${partner.slug}&locale=${locale}`)
+        expect(image, `${locale} ${partner.slug}`).toMatchObject({ width: 1200, height: 630, type: 'image/png' })
+        expect(metadata.description?.length, `${locale} ${partner.slug}`).toBeGreaterThanOrEqual(70)
+      }
+    }
+  })
+
+  it('keeps every game title inside the width of a result, with the brand on the end', async () => {
+    for (const locale of locales) {
+      for (const game of games) {
+        const metadata = await gameMetadata({ params: Promise.resolve({ locale, slug: game.slug }) })
+        const title = `${metadata.title} | ${siteConfig.brand}`
+        expect(title.length, `${locale} ${game.slug}: ${title}`).toBeLessThanOrEqual(65)
+      }
+    }
+  })
+
+  it('writes the company in the language of the page, in full, with a way to contact it', () => {
+    const descriptions = new Set<string>()
+    for (const locale of locales) {
+      const html = renderToStaticMarkup(createElement(OrganizationJsonLd, { locale }))
+      const org = JSON.parse(html.replace(/^[^>]*>/, '').replace(/<\/script>$/, '').replaceAll('\\u003c', '<'))
+      descriptions.add(org.description)
+      expect(org).toMatchObject({
+        '@id': `${siteConfig.siteUrl}/#organization`,
+        name: siteConfig.brand,
+        legalName: siteConfig.legal.companyName,
+        logo: { '@type': 'ImageObject', width: 512, height: 512 },
+        contactPoint: [{ '@type': 'ContactPoint', contactType: 'customer support' }],
+      })
+      expect(org.contactPoint[0].availableLanguage).toEqual([...locales])
+    }
+    // Five languages, five descriptions.
+    expect(descriptions.size).toBe(locales.length)
   })
 
   it('leaves lastmod out of the sitemap rather than stamping every page with the build date', () => {

@@ -241,7 +241,7 @@
     "fromPrice": "ab {price}/Monat",
     "toStart": "{ram} für den Anfang",
     "detail": {
-      "metaTitle": "{game} Server mieten ab {price}/Monat",
+      "metaTitle": "{game} Server mieten",
       "metaDescription": "Miete deinen eigenen {game} Server bei WSLATL ab {price} im Monat. {tagline}",
       "metaDescriptionNoPrice": "Miete deinen eigenen {game} Server bei WSLATL. Frag uns nach einem passenden Tarif. {tagline}",
       "heading": "{game} Server-Hosting",
@@ -274,8 +274,8 @@
     }
   },
   "legal": {
-    "metaTitle": "Rechtliches",
-    "metaDescription": "Alle Richtlinien von WSLATL LLC an einem Ort: Datenschutz, Nutzungsbedingungen, zulässige Nutzung, Erstattungen, SLA, DMCA, Missbrauch, Guthaben, Unterauftragsverarbeiter und Backups.",
+    "metaTitle": "Rechtliches: Richtlinien und Bedingungen",
+    "metaDescription": "Alle Richtlinien von WSLATL LLC an einem Ort: Datenschutz, Bedingungen, zulässige Nutzung, Erstattungen, SLA, DMCA, Missbrauch, Backups und mehr.",
     "heading": "Rechtliches",
     "intro": "Unsere Richtlinien, geschrieben zum Lesen. Jede zeigt das Datum, ab dem sie gilt, und jede kann sich einzeln ändern. Schau also auf das Datum des Dokuments, auf das du dich verlässt.",
     "effective": "Gültig ab",
@@ -675,6 +675,9 @@
       "gamesMore": "{count} Spiele werden unterstützt, und wenn es einen Dedicated Server dafür gibt, können wir es fast immer betreiben.",
       "pricingIntro": "Veröffentlichte Monatspreise in US-Dollar. Keine Preisfallen bei der Verlängerung."
     }
+  },
+  "organization": {
+    "description": "WSLATL ist ein kleiner Hoster aus Missouri, Aufnahme nur auf Bewerbung, mit Gameservern, VPS, Dedicated Servern und Webhosting."
   },
   "notFound": {
     "metaTitle": "Seite nicht gefunden",

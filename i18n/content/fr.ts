@@ -730,7 +730,7 @@ export const fr: ContentTranslation = {
       label: "Politique DMCA",
       title: "Politique DMCA",
       metaDescription:
-        "Comment déposer une notification de retrait pour atteinte au droit d'auteur, ou une contre-notification, auprès de WSLATL LLC, et notre politique envers les contrevenants récidivistes au titre du 17 U.S.C. 512.",
+        "Comment déposer auprès de WSLATL LLC une notification de retrait pour atteinte au droit d'auteur ou une contre-notification, et notre politique envers les récidivistes (17 U.S.C. 512).",
       intro:
         "Comment signaler une atteinte au droit d'auteur sur l'infrastructure WSLATL, comment un client conteste un retrait, et ce qui arrive aux comptes qui contreviennent de façon répétée.",
     },

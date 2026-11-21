@@ -47,9 +47,9 @@ export interface Partner {
   avatar?: string
   /**
    * Wide picture about 3:1 (1500x500 is ideal), at /partners/<slug>/<file>.
-   * It is also the picture shown when someone shares the profile. Optional:
-   * without one they get a plain branded banner, and a shared link shows a
-   * card made for their profile (/og, see lib/share-card.ts).
+   * Optional: without one they get a plain branded banner. It is not the
+   * picture a shared link shows: that is always a 1200x630 card made for the
+   * profile (/og, see lib/share-card.ts).
    */
   banner?: string
   /**
@@ -104,7 +104,13 @@ export const partners: Partner[] = [
   {
     slug: 'vulnradar',
     name: 'VulnRadar',
-    tagline: 'Paste a URL, get a website security report in under 3 seconds.',
+    tagline: {
+      en: 'Paste a URL, get a website security report in under 3 seconds.',
+      es: 'Pega una URL y recibe un informe de seguridad web en menos de 3 segundos.',
+      fr: 'Collez une URL, obtenez un rapport de sécurité web en moins de 3 secondes.',
+      de: 'URL einfügen, Sicherheitsbericht für die Website in unter 3 Sekunden erhalten.',
+      pt: 'Cole uma URL e receba um relatório de segurança do site em menos de 3 segundos.',
+    },
     description:
       'VulnRadar scans any website for security issues: 905+ checks across headers, TLS, cookies, DNS and exposed secrets, with no agent to install.\n\nEvery finding comes with the evidence behind it and a config fix you can paste into Nginx, Caddy, Express or Next.js. The whole engine is open source under GPL-3.0.',
     avatar: '/partners/vulnradar/avatar.webp',
