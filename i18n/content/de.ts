@@ -723,8 +723,8 @@ export const de: ContentTranslation = {
         'Wir halten unsere Erstattungsrichtlinie einfach. 48 Stunden ohne Angabe von Gründen. 14 Tage bei echten Problemen. Weiter unten steht genau, was erstattungsfähig ist und was nicht.',
     },
     sla: {
-      label: 'Service Level Agreement',
-      title: 'Service Level Agreement',
+      label: 'Service-Level-Vereinbarung (SLA)',
+      title: 'Service-Level-Vereinbarung (SLA)',
       metaDescription:
         'Uptime-Ziele von WSLATL LLC nach Servicetyp, Ankündigung geplanter Wartungen und wie du eine Servicegutschrift geltend machst.',
       intro:

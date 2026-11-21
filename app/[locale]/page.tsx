@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { SiteHeader } from '@/components/layout/site-header'
 import { Footer } from '@/components/layout/footer'
 import { JsonLd } from '@/components/seo/json-ld'
+import { OrganizationJsonLd, organizationId } from '@/components/seo/organization-json-ld'
 import { Hero } from '@/components/sections/hero'
 import { Clients } from '@/components/sections/clients'
 import { Services } from '@/components/sections/services'
@@ -44,12 +45,14 @@ export default async function Home({ params }: PageProps) {
     name: siteConfig.brand,
     alternateName: [siteConfig.name, 'wslatl.com'],
     url: siteConfig.siteUrl,
-    publisher: { '@id': `${siteConfig.siteUrl}/#organization` },
+    publisher: { '@id': organizationId },
   }
 
   return (
     <>
       <SiteHeader />
+      {/* The company in full, here and nowhere else: the other pages refer to it by its id. */}
+      <OrganizationJsonLd locale={locale} />
       {locale === defaultLocale && <JsonLd data={websiteJsonLd} />}
       <Main>
         <Hero />

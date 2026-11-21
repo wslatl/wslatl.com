@@ -241,7 +241,7 @@
     "fromPrice": "à partir de {price}/mois",
     "toStart": "{ram} pour démarrer",
     "detail": {
-      "metaTitle": "Hébergement {game} dès {price}/mois",
+      "metaTitle": "Hébergement serveur {game}",
       "metaDescription": "Louez votre propre serveur {game} chez WSLATL dès {price} par mois. {tagline}",
       "metaDescriptionNoPrice": "Louez votre propre serveur {game} chez WSLATL. Demandez-nous une offre à sa mesure. {tagline}",
       "heading": "Hébergement de serveur {game}",
@@ -274,8 +274,8 @@
     }
   },
   "legal": {
-    "metaTitle": "Mentions légales",
-    "metaDescription": "Toutes les politiques de WSLATL LLC au même endroit : confidentialité, conditions de service, usage acceptable, remboursements, SLA, DMCA, abus, avoir de compte, sous-traitants et sauvegardes.",
+    "metaTitle": "Mentions légales et conditions",
+    "metaDescription": "Toutes les politiques de WSLATL LLC au même endroit : confidentialité, conditions, usage acceptable, remboursements, SLA, DMCA, abus et sauvegardes.",
     "heading": "Mentions légales",
     "intro": "Nos politiques, écrites pour être lues. Chacune indique sa date d'entrée en vigueur, et chacune peut évoluer de son côté : vérifiez donc la date du document sur lequel vous vous appuyez.",
     "effective": "Date d'effet",
@@ -675,6 +675,9 @@
       "gamesMore": "{count} jeux pris en charge, et s'il existe un serveur dédié, nous pouvons presque toujours le faire tourner.",
       "pricingIntro": "Tarifs mensuels publiés en dollars américains. Aucun piège de prix au renouvellement."
     }
+  },
+  "organization": {
+    "description": "WSLATL est un petit hébergeur du Missouri, sur candidature uniquement, qui propose des serveurs de jeu, des VPS, des serveurs dédiés et de l'hébergement web."
   },
   "notFound": {
     "metaTitle": "Page introuvable",

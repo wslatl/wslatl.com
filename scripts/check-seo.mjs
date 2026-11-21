@@ -10,26 +10,38 @@
 //   - a title and description of its own, in range, and not shared
 //   - the canonical address (English at plain paths) and hreflang alternates
 //     for all five languages plus x-default, agreeing with the sitemap
-//   - Open Graph and Twitter tags, with pictures that load
+//   - hreflang that is reciprocal page to page, and the same in the sitemap
+//   - Open Graph and Twitter tags (size, type, alt text and language), with
+//     pictures that are 1200x630 PNG or JPEG files and load
+//   - a translated page that does not repeat the English words
 //   - one h1, alt text on every image, structured data that parses and says
 //     what the page says
 //   - links to other pages of the site that do not 404 or point at an old
 //     address
-// And for the site: robots.txt, the sitemap, noindex on the admin and on the
-// 404 page, fonts that do not hide text, and large pictures that load first.
+// And for the site: robots.txt, the sitemap, noindex on the admin, the 404
+// page in each language (its title, og:locale and one noindex), the company
+// profiles in sameAs (GitHub has to answer 200), fonts that do not hide text,
+// and large pictures that load first.
 //
 // Run against a local build, the addresses in the sitemap and the tags still
 // name https://wslatl.com; each is fetched from the site being checked.
 import { eachLimited, makeGet } from './lib/site-http.mjs'
 import {
   checkDuplicates,
+  checkLanguages,
+  checkNotFound,
   checkPage,
+  checkPicture,
+  checkReciprocity,
   checkRobots,
   checkSitemap,
+  checkSitemapAgreement,
   internalLinks,
   linkProblem,
+  locales,
   readPage,
   readSitemap,
+  sameAsOf,
 } from './lib/seo-rules.mjs'
 
 const base = new URL(process.argv[2] ?? 'https://wslatl.com')
@@ -81,10 +93,17 @@ async function checkPages(entries) {
   const wrong = pages.flatMap(({ url, page }) => checkPage(page, { url, origin }).map((problem) => `${onSite(url)}: ${problem}`))
   report('Titles, descriptions, canonicals, hreflang, cards, headings, images and structured data', wrong, `${pages.length} pages`)
   report('No two pages in one language share a title or description', checkDuplicates(pages), `${pages.length} pages`)
+  report('A translated page does not repeat the English title, description, picture text or company description', checkLanguages(pages), `${pages.length} pages`)
+  report('hreflang links are returned page to page', checkReciprocity(pages), `${pages.length} pages`)
+  report('The sitemap and each page list the same alternates', checkSitemapAgreement(entries, pages), `${pages.length} pages`)
   return pages
 }
 
-/** Every card picture the pages name has to load as an image, from the site being checked. */
+/**
+ * Every card picture the pages name has to load as an image, from the site
+ * being checked, and be a 1200x630 PNG or JPEG under 5 MB: its own bytes
+ * are read, not only what the page says about it.
+ */
 async function checkPictures(pages) {
   const pictures = [...new Set(pages.flatMap(({ page }) => [page.ogImage, page.twitterImage]).filter(Boolean))]
   const wrong = []
@@ -92,10 +111,12 @@ async function checkPictures(pages) {
     const url = new URL(picture.replaceAll('&amp;', '&'), origin)
     const res = await get(url.pathname + url.search)
     const type = res.headers.get('content-type') ?? ''
-    await res.body?.cancel()
-    if (res.status !== 200 || !type.startsWith('image/')) wrong.push(`${url.pathname}${url.search} (${res.status} ${type})`)
+    const bytes = Buffer.from(await res.arrayBuffer())
+    const name = `${url.pathname}${url.search}`
+    if (res.status !== 200 || !type.startsWith('image/')) wrong.push(`${name} (${res.status} ${type})`)
+    else for (const problem of checkPicture(bytes)) wrong.push(`${name} ${problem}`)
   }, (picture, error) => wrong.push(`${picture} (${error.message})`), 4)
-  report('Open Graph and Twitter pictures load', wrong, `${pictures.length} pictures`)
+  report('Open Graph and Twitter pictures load and are 1200x630 PNG or JPEG', wrong, `${pictures.length} pictures`)
 }
 
 async function checkLinks(pages) {
@@ -120,13 +141,42 @@ async function checkNoindex() {
     if (!/noindex/i.test(header)) problems.push(`${path} sends no X-Robots-Tag noindex`)
     if (res.status === 200 && !/<meta[^>]+name="robots"[^>]+noindex/i.test(body)) problems.push(`${path} has no robots noindex tag`)
   }
-  for (const path of [`/no-such-page-${Date.now()}`, `/es/no-such-page-${Date.now()}`]) {
+  let english
+  for (const locale of locales) {
+    const path = `${locale === 'en' ? '' : `/${locale}`}/no-such-page-${Date.now()}`
     const res = await get(path)
     const body = await res.text()
     if (res.status !== 404) problems.push(`${path} is not a 404 (${res.status})`)
     else if (!/noindex/i.test(body)) problems.push(`${path} answers 404 without a noindex`)
+    else {
+      const page = readPage(body)
+      if (locale === 'en') english = page
+      for (const problem of checkNotFound(page, { locale, english })) problems.push(`${path}: ${problem}`)
+    }
   }
-  report('The admin and the 404 page are noindex', problems, 'admin and 404 pages say noindex')
+  report('The admin and the 404 page, in each language, are noindex and in that language', problems, 'admin and 404 pages say noindex; the 404 has its own title and og:locale in all five languages')
+}
+
+/**
+ * The company profiles the Organization lists have to be the ones we own, and
+ * GitHub has to answer. Discord invites and Trustpilot turn away automated
+ * requests, so those are not fetched: they are checked against the fixed list
+ * in scripts/lib/seo-rules.mjs, and by hand after a change.
+ */
+async function checkProfiles(pages) {
+  const github = sameAsOf(pages).filter((profile) => new URL(profile).hostname === 'github.com')
+  const problems = []
+  if (!github.length) problems.push('the Organization lists no GitHub profile')
+  for (const profile of github) {
+    try {
+      const res = await fetch(profile, { redirect: 'manual', headers: { 'user-agent': 'wslatl-seo-check' } })
+      await res.body?.cancel()
+      if (res.status !== 200) problems.push(`${profile} answers ${res.status}`)
+    } catch (error) {
+      problems.push(`${profile} (${error.message})`)
+    }
+  }
+  report('The GitHub profile in sameAs answers 200', problems, github.join(', '))
 }
 
 /** Text has to show while a font loads, and the biggest pictures have to be fetched first. */
@@ -168,6 +218,7 @@ for (const [name, run] of [
     const entries = await loadSitemap()
     const pages = await checkPages(entries)
     await checkPictures(pages)
+    await checkProfiles(pages)
     await checkLinks(pages)
     await checkPerformance(pages)
   }],

@@ -5,15 +5,37 @@ import { SiteHeader } from '@/components/layout/site-header'
 import { Footer } from '@/components/layout/footer'
 import { TabTitle } from '@/components/layout/tab-title'
 import { siteConfig } from '@/config/site'
-import { defaultLocale, localePath } from '@/i18n/config'
+import { defaultLocale, isLocale, localePath, locales, openGraphLocales } from '@/i18n/config'
 import { getLocale, setLocale } from '@/i18n/locale'
-import { words } from '@/i18n/words'
+import { words, wordsFor } from '@/i18n/words'
 import { Button } from '@/platform/components/button'
 import { ErrorPage } from '@/platform/components/error-page'
 
-export const metadata: Metadata = {
-  title: 'Page not found',
-  robots: { index: false },
+/**
+ * The title, description and Open Graph language in the language of the
+ * address, read from the same root parameter as the page below. Robots is set
+ * here so the layout's "index, follow" is not left on a 404 beside the
+ * framework's own noindex (two noindex tags say the same thing; one saying
+ * index would not). scripts/check-seo.mjs checks each language's 404 for its
+ * title, og:locale and that no robots tag allows indexing.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const requested = await requestedLocale()
+  const locale = isLocale(requested) ? requested : defaultLocale
+  const t = wordsFor(locale, 'notFound')
+  const title = `${t('metaTitle')} | ${siteConfig.brand}`
+  return {
+    title: t('metaTitle'),
+    description: t('body'),
+    robots: { index: false },
+    openGraph: {
+      locale: openGraphLocales[locale],
+      alternateLocale: locales.filter((other) => other !== locale).map((other) => openGraphLocales[other]),
+      title,
+      description: t('body'),
+    },
+    twitter: { title, description: t('body') },
+  }
 }
 
 export default async function NotFound() {

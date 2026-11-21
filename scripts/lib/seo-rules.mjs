@@ -12,6 +12,23 @@ export const alternateKeys = [...locales, 'x-default']
 /** Open Graph language codes, per language (mirrors openGraphLocales in i18n/config.ts). */
 export const openGraphLocales = { en: 'en_US', es: 'es_ES', fr: 'fr_FR', de: 'de_DE', pt: 'pt_BR' }
 
+/** The name the site goes by: og:site_name, application-name, WebSite and Organization name (siteConfig.brand). */
+export const brand = 'WSLATL'
+
+/**
+ * The profiles the Organization may list in sameAs. Anything else (an old
+ * domain, a personal page, a wrong GitHub) fails. tests/seo-rules.test.ts
+ * checks this is the same set as config/links.json.
+ */
+export const sameAsAllowed = [
+  'https://discord.gg/3eKawhSbAF',
+  'https://www.trustpilot.com/review/wslatl.com',
+  'https://github.com/wslatl',
+]
+
+/** The share picture every card has to be: 1200x630, a PNG or a JPEG, under 5 MB. */
+export const shareImage = { width: 1200, height: 630, types: ['image/png', 'image/jpeg'], maxBytes: 5 * 1024 * 1024 }
+
 const entities = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", '#x27': "'", '#39': "'" }
 export const decode = (text) => text.replace(/&(amp|lt|gt|quot|apos|#x27|#39);/g, (_, name) => entities[name])
 
@@ -57,12 +74,24 @@ export function readPage(html) {
     canonical: links.find((l) => l.rel === 'canonical')?.href,
     alternates,
     ogImage: meta('og:image'),
+    ogImageAlt: meta('og:image:alt'),
+    ogImageWidth: meta('og:image:width'),
+    ogImageHeight: meta('og:image:height'),
+    ogImageType: meta('og:image:type'),
+    ogSiteName: meta('og:site_name'),
+    ogType: meta('og:type'),
+    ogLocaleAlternates: metas.filter((m) => m.property === 'og:locale:alternate').map((m) => m.content),
+    // Every tag that tells a crawler what to do with the page: robots, and the googlebot one.
+    robotsAll: metas.filter((m) => m.name === 'robots' || m.name === 'googlebot').map((m) => m.content ?? ''),
     ogTitle: meta('og:title'),
     ogDescription: meta('og:description'),
     ogUrl: meta('og:url'),
     ogLocale: meta('og:locale'),
     twitterCard: meta('twitter:card'),
     twitterImage: meta('twitter:image'),
+    twitterImageAlt: meta('twitter:image:alt'),
+    twitterTitle: meta('twitter:title'),
+    twitterDescription: meta('twitter:description'),
     h1s,
     images,
     faqItems: [...body.matchAll(/<details\b[^>]*class="[^"]*\bfaq-item\b/gi)].length,
@@ -96,8 +125,9 @@ export function expectedUrl(origin, locale, path) {
 }
 
 // Search results cut a title near 60 characters and a description near 160.
-// These are the points past which the cut is certain, not the ideal lengths.
-export const limits = { title: 75, descriptionMin: 30, descriptionMax: 220 }
+// These are close to those widths: a title past 65 or a description past 200
+// is cut or rewritten, and one under 70 says too little to be a snippet.
+export const limits = { title: 65, descriptionMin: 70, descriptionMax: 200 }
 
 /**
  * Problems with one page's head and body. `url` is the page's address as the
@@ -134,9 +164,7 @@ export function checkPage(page, { url, origin }) {
   if (!page.ogTitle) problems.push('no og:title')
   if (!page.ogDescription) problems.push('no og:description')
   if (page.ogLocale !== openGraphLocales[locale]) problems.push(`og:locale is ${page.ogLocale ?? 'missing'}, expected ${openGraphLocales[locale]}`)
-  if (!page.ogImage) problems.push('no og:image')
-  if (page.twitterCard !== 'summary_large_image') problems.push('twitter:card is not summary_large_image')
-  if (!page.twitterImage) problems.push('no twitter:image')
+  problems.push(...checkCards(page, { locale }))
 
   if (page.h1s.length !== 1) problems.push(`${page.h1s.length} h1 headings, expected 1`)
   else if (!page.h1s[0]) problems.push('the h1 is empty')
@@ -184,12 +212,14 @@ export function checkStructuredData(page, { url, origin, path, locale }) {
   }
   const ofType = (type) => nodes.filter((node) => typesOf(node).includes(type))
 
+  // The company is written in full on the home page of each language, and
+  // the other pages refer to it by its id.
   const organizations = ofType('Organization')
-  if (organizations.length !== 1) problems.push(`${organizations.length} Organization blocks, expected 1`)
-  for (const org of organizations) {
-    if (!org.name) problems.push('Organization has no name')
-    if (org.url !== origin) problems.push(`Organization url is ${org.url}, expected ${origin}`)
-    if (!org.logo) problems.push('Organization has no logo')
+  if (path === '/') {
+    if (organizations.length !== 1) problems.push(`${organizations.length} Organization blocks on the home page, expected 1`)
+    for (const org of organizations) problems.push(...checkOrganization(org, { origin }))
+  } else if (organizations.length) {
+    problems.push(`${organizations.length} Organization block(s) on an inner page: write it on the home page and refer to ${origin}/#organization`)
   }
 
   const sites = ofType('WebSite')
@@ -245,6 +275,7 @@ export function checkStructuredData(page, { url, origin, path, locale }) {
   }
 
   for (const offer of nodes.filter((node) => typesOf(node).includes('Offer'))) {
+    if (!/^https:\/\/schema\.org\/[A-Za-z]+$/.test(String(offer.availability ?? ''))) problems.push('Offer without an availability (a schema.org address)')
     if (!(Number(offer.price) >= 0) || !offer.priceCurrency) problems.push('Offer without a price and currency')
     else if (!pageText.includes(Number(offer.price).toFixed(2)) && !pageText.includes(String(Number(offer.price))))
       problems.push(`Offer price ${offer.price} is not shown on the page`)
@@ -252,9 +283,212 @@ export function checkStructuredData(page, { url, origin, path, locale }) {
   if (path === '/pricing' && !nodes.some((node) => typesOf(node).includes('Offer'))) problems.push('the pricing page has plans but no Offer data')
   for (const product of ofType('Product')) {
     if (!product.name) problems.push('Product has no name')
+    if (!product.sku) problems.push(`Product ${product.name ?? ''} has no sku`)
     if (!product.offers) problems.push(`Product ${product.name ?? ''} has no offers`)
   }
   return problems
+}
+
+/**
+ * The share and Twitter cards of one page: Facebook, LinkedIn, X and Discord
+ * read these. The picture has to say its size and type (the file itself is
+ * checked by checkPicture), have a description in the page's language, and
+ * the Twitter card has to say what the Open Graph one does.
+ */
+export function checkCards(page, { locale }) {
+  const problems = []
+  if (!page.ogImage) problems.push('no og:image')
+  else if (!page.ogImage.startsWith('https://')) problems.push(`og:image is not an absolute https address: ${page.ogImage}`)
+  else if (locale !== defaultLocale && !page.ogImage.includes(`locale=${locale}`)) problems.push(`og:image is not the card for ${locale}: ${page.ogImage}`)
+  if (String(page.ogImageWidth) !== String(shareImage.width)) problems.push(`og:image:width is ${page.ogImageWidth ?? 'missing'}, expected ${shareImage.width}`)
+  if (String(page.ogImageHeight) !== String(shareImage.height)) problems.push(`og:image:height is ${page.ogImageHeight ?? 'missing'}, expected ${shareImage.height}`)
+  if (!shareImage.types.includes(page.ogImageType)) problems.push(`og:image:type is ${page.ogImageType ?? 'missing'}, expected a PNG or a JPEG`)
+  if (!page.ogImageAlt) problems.push('no og:image:alt')
+  if (page.ogSiteName !== brand) problems.push(`og:site_name is ${page.ogSiteName ?? 'missing'}, expected ${brand}`)
+  if (!page.ogType) problems.push('no og:type')
+  if (!page.ogTitle) problems.push('no og:title')
+  else if (page.ogTitle !== page.title) problems.push('og:title is not the page title')
+  if (!page.ogDescription) problems.push('no og:description')
+  else if (page.ogDescription !== page.description) problems.push('og:description is not the meta description')
+
+  const alternates = locales.filter((other) => other !== locale).map((other) => openGraphLocales[other])
+  if ([...page.ogLocaleAlternates].toSorted().join() !== alternates.toSorted().join())
+    problems.push(`og:locale:alternate is ${page.ogLocaleAlternates.join(', ') || 'missing'}, expected ${alternates.join(', ')}`)
+
+  if (page.twitterCard !== 'summary_large_image') problems.push('twitter:card is not summary_large_image')
+  if (!page.twitterImage) problems.push('no twitter:image')
+  else if (page.twitterImage !== page.ogImage) problems.push('twitter:image is not the og:image')
+  if (!page.twitterImageAlt) problems.push('no twitter:image:alt')
+  else if (page.twitterImageAlt !== page.ogImageAlt) problems.push('twitter:image:alt is not the og:image:alt')
+  if (page.twitterTitle !== page.ogTitle) problems.push('twitter:title is not the og:title')
+  if (page.twitterDescription !== page.ogDescription) problems.push('twitter:description is not the og:description')
+  return problems
+}
+
+/** The company's own data, as Google's Organization guidance asks for it. */
+export function checkOrganization(org, { origin }) {
+  const problems = []
+  if (org.name !== brand) problems.push(`Organization name is ${org.name ?? 'missing'}, expected ${brand}`)
+  if (!org.legalName) problems.push('Organization has no legalName')
+  if (org.url !== origin) problems.push(`Organization url is ${org.url}, expected ${origin}`)
+  if (!org.description) problems.push('Organization has no description')
+
+  const logo = typeof org.logo === 'object' ? org.logo : undefined
+  if (!org.logo) problems.push('Organization has no logo')
+  else if (!logo || typesOf(logo).join() !== 'ImageObject' || !logo.url) problems.push('Organization logo is not an ImageObject with a url')
+  else if (!(Number(logo.width) >= 112 && Number(logo.height) >= 112)) problems.push('Organization logo is under 112x112 or has no size')
+
+  const contacts = asList(org.contactPoint)
+  if (!contacts.length) problems.push('Organization has no contactPoint')
+  for (const contact of contacts) {
+    if (typesOf(contact).join() !== 'ContactPoint' || !contact.contactType) problems.push('contactPoint is not a ContactPoint with a contactType')
+    else if (!contact.email && !contact.url) problems.push('contactPoint has neither an email nor a url')
+    if (!asList(contact.availableLanguage).length) problems.push('contactPoint has no availableLanguage')
+  }
+
+  const profiles = asList(org.sameAs)
+  if (!profiles.length) problems.push('Organization has no sameAs')
+  for (const profile of profiles) {
+    if (!sameAsAllowed.includes(profile)) problems.push(`sameAs lists ${profile}, which is not one of the company's profiles`)
+  }
+  return problems
+}
+
+/** The company's description, as the home page of one language writes it. */
+const organizationDescription = (page) => nodesOf(page).find((node) => typesOf(node).includes('Organization'))?.description
+
+/**
+ * The same page in two languages must not say the same words: a translated
+ * page that kept the English title, description, picture text or company
+ * description was missed in translation. `allowed` names the few that may
+ * match, as "locale path" (for example "de /brand").
+ */
+export function checkLanguages(pages, allowed = []) {
+  const problems = []
+  const byUrl = new Map(pages.map((entry) => [entry.url, entry.page]))
+  for (const { url, page } of pages) {
+    const pathname = new URL(url).pathname
+    const locale = localeOfPath(pathname)
+    if (locale === defaultLocale) continue
+    const path = pathWithoutLocale(pathname)
+    if (allowed.includes(`${locale} ${path}`)) continue
+    const english = byUrl.get(expectedUrl(new URL(url).origin, defaultLocale, path))
+    if (!english) continue
+    const same = (label, a, b) => a && b && a === b && problems.push(`${pathname}: ${label} is the English one`)
+    same('the title', page.title, english.title)
+    same('the description', page.description, english.description)
+    same('og:image:alt', page.ogImageAlt, english.ogImageAlt)
+    same('twitter:image:alt', page.twitterImageAlt, english.twitterImageAlt)
+    same('the Organization description', organizationDescription(page), organizationDescription(english))
+  }
+  return problems
+}
+
+/**
+ * hreflang has to be reciprocal: when A lists B as its version in a language,
+ * B has to list A as its version in A's language, or Google ignores the pair.
+ * Checked page to page over every page fetched, not only against the set a
+ * page is expected to list.
+ */
+export function checkReciprocity(pages) {
+  const problems = []
+  const byUrl = new Map(pages.map((entry) => [entry.url, entry.page]))
+  for (const { url, page } of pages) {
+    const own = localeOfPath(new URL(url).pathname)
+    for (const [key, href] of Object.entries(page.alternates)) {
+      const target = byUrl.get(href)
+      if (!target) {
+        problems.push(`${url} lists ${key} ${href}, which was not fetched`)
+        continue
+      }
+      if (key !== 'x-default' && target.alternates[own] !== url) problems.push(`${href} does not list ${url} back as ${own}`)
+    }
+  }
+  return problems
+}
+
+/** The sitemap and each page's own hreflang tags have to list the same addresses. */
+export function checkSitemapAgreement(entries, pages) {
+  const problems = []
+  const byUrl = new Map(pages.map((entry) => [entry.url, entry.page]))
+  for (const { loc, alternates } of entries) {
+    const page = byUrl.get(loc)
+    if (!page) continue
+    const sitemap = JSON.stringify(Object.entries(alternates).toSorted())
+    const onPage = JSON.stringify(Object.entries(page.alternates).toSorted())
+    if (sitemap !== onPage) problems.push(`${loc}: the sitemap and the page list different alternates`)
+  }
+  return problems
+}
+
+/**
+ * A 404 page in one language: it is not a page Google keeps, but it is what
+ * a reader and a link preview see, so its title, description and og:locale
+ * have to be in the address's language, and every robots tag has to say
+ * noindex (the framework adds its own, so there may be two, but none may
+ * say "index"). The framework renders it outside the layout that holds
+ * <html lang>, so the markup may carry no lang at all; a wrong one fails.
+ * `english` is the 404 page at a plain path.
+ */
+export function checkNotFound(page, { locale, english }) {
+  const problems = []
+  if (page.lang !== undefined && page.lang !== locale) problems.push(`html lang is "${page.lang}", expected "${locale}"`)
+  if (!page.title) problems.push('no title')
+  else if (!page.title.endsWith(` | ${brand}`)) problems.push(`title is "${page.title}", expected it to end in " | ${brand}"`)
+  if (locale !== defaultLocale && english && page.title === english.title) problems.push('title is the English one')
+  if (locale !== defaultLocale && english && page.description && page.description === english.description) problems.push('description is the English one')
+  if (page.ogLocale !== openGraphLocales[locale]) problems.push(`og:locale is ${page.ogLocale ?? 'missing'}, expected ${openGraphLocales[locale]}`)
+  if (page.ogTitle !== page.title) problems.push('og:title is not the title')
+  if (!page.robotsAll.length) problems.push('no robots noindex')
+  for (const content of page.robotsAll) {
+    if (!/\bnoindex\b/i.test(content)) problems.push(`a robots tag says "${content}" on a 404 page`)
+  }
+  if (page.canonical) problems.push('a 404 page has a canonical address')
+  return problems
+}
+
+/**
+ * What the picture file itself is, from its first bytes: a PNG or a JPEG
+ * with its size, or WebP and anything else by its signature alone.
+ */
+export function imageInfo(bytes) {
+  const b = Buffer.from(bytes)
+  if (b.length > 24 && b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])))
+    return { type: 'image/png', width: b.readUInt32BE(16), height: b.readUInt32BE(20) }
+  if (b.length > 4 && b[0] === 0xff && b[1] === 0xd8) {
+    let i = 2
+    while (i + 9 < b.length) {
+      if (b[i] !== 0xff) break
+      const marker = b[i + 1]
+      const length = b.readUInt16BE(i + 2)
+      // The start-of-frame markers carry the size; 0xc4, 0xc8 and 0xcc do not.
+      if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker))
+        return { type: 'image/jpeg', height: b.readUInt16BE(i + 5), width: b.readUInt16BE(i + 7) }
+      i += 2 + length
+    }
+    return { type: 'image/jpeg' }
+  }
+  if (b.length > 12 && b.toString('ascii', 0, 4) === 'RIFF' && b.toString('ascii', 8, 12) === 'WEBP') return { type: 'image/webp' }
+  return { type: 'unknown' }
+}
+
+/** Problems with one share picture file: its real type, size and weight. */
+export function checkPicture(bytes) {
+  const problems = []
+  const { type, width, height } = imageInfo(bytes)
+  if (!shareImage.types.includes(type)) problems.push(`is a ${type.replace('image/', '').toUpperCase()}, not a PNG or a JPEG`)
+  else if (width !== shareImage.width || height !== shareImage.height) problems.push(`is ${width}x${height}, expected ${shareImage.width}x${shareImage.height}`)
+  if (bytes.length > shareImage.maxBytes) problems.push('is over 5 MB')
+  return problems
+}
+
+/** The company profiles the home pages list in sameAs, each once. */
+export function sameAsOf(pages) {
+  return [
+    ...new Set(
+      pages.flatMap(({ page }) => nodesOf(page).filter((node) => typesOf(node).includes('Organization')).flatMap((org) => asList(org.sameAs))),
+    ),
+  ]
 }
 
 /** Entries of the sitemap: each url, with the alternates it lists. */

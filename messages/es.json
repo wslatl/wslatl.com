@@ -222,7 +222,7 @@
     }
   },
   "games": {
-    "metaTitle": "Hosting de servidores de juego: Minecraft, Rust, ARK y {more}+ más",
+    "metaTitle": "Servidores de juego: Minecraft, Rust, ARK y {more}+ más",
     "metaDescription": "Servidores de juego desde {price}/mes, con precio por RAM y no por juego. Minecraft, Rust, ARK, CS2, FiveM, Valheim, Palworld y más en un panel Pterodactyl.",
     "heading": "Hosting de servidores de juego",
     "crumb": "Juegos",
@@ -241,7 +241,7 @@
     "fromPrice": "desde {price}/mes",
     "toStart": "{ram} para empezar",
     "detail": {
-      "metaTitle": "Servidor de {game} desde {price}/mes",
+      "metaTitle": "Hosting de servidor de {game}",
       "metaDescription": "Alquila tu propio servidor de {game} con WSLATL desde {price} al mes. {tagline}",
       "metaDescriptionNoPrice": "Alquila tu propio servidor de {game} con WSLATL. Pídenos un plan a su medida. {tagline}",
       "heading": "Hosting de servidores de {game}",
@@ -274,8 +274,8 @@
     }
   },
   "legal": {
-    "metaTitle": "Legal",
-    "metaDescription": "Todas las políticas de WSLATL LLC en un mismo sitio: privacidad, condiciones del servicio, uso aceptable, reembolsos, SLA, DMCA, abuso, crédito de cuenta, subencargados y copias de seguridad.",
+    "metaTitle": "Políticas y documentos legales",
+    "metaDescription": "Todas las políticas de WSLATL LLC en un sitio: privacidad, condiciones, uso aceptable, reembolsos, SLA, DMCA, abuso, crédito, subencargados y copias.",
     "heading": "Legal",
     "intro": "Nuestras políticas, escritas para que se lean. Cada una indica la fecha en que entró en vigor, y cada una puede cambiar por su cuenta, así que comprueba la fecha del documento en el que te apoyes.",
     "effective": "En vigor desde",
@@ -675,6 +675,9 @@
       "gamesMore": "{count} juegos compatibles, y si tiene servidor dedicado casi siempre podemos ejecutarlo.",
       "pricingIntro": "Precios mensuales publicados en dólares estadounidenses. Sin trampas de precio en la renovación."
     }
+  },
+  "organization": {
+    "description": "WSLATL es una pequeña empresa de hosting de Missouri que acepta clientes por solicitud, con servidores de juego, VPS, servidores dedicados y hosting web."
   },
   "notFound": {
     "metaTitle": "Página no encontrada",

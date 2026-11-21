@@ -47,14 +47,15 @@ export function gamesText(locale: Locale): PageText {
 
 /** One game's page, from the game in the language of the page. */
 export function gameText(game: GameEntry, locale: Locale): PageText {
-  // The same "from" price the page shows. When no plan covers even the
-  // smallest setup, the page shows no price, so the search result does not
-  // either.
+  // The title leaves the price out, so the long game names stay inside the
+  // width of a result. The description has the same "from" price the page
+  // shows. When no plan covers even the smallest setup, the page shows no
+  // price, so the search result does not either.
   const entry = gameEntryPlan(game)
   const price = entry ? formatPrice(entry.plan.price) : null
   const t = wordsFor(locale, 'games.detail')
   return {
-    title: price ? t('metaTitle', { game: game.name, price }) : t('heading', { game: game.name }),
+    title: t('metaTitle', { game: game.name }),
     description: price
       ? t('metaDescription', { game: game.name, price, tagline: game.tagline })
       : t('metaDescriptionNoPrice', { game: game.name, tagline: game.tagline }),

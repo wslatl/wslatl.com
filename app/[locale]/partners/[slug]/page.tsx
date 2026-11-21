@@ -6,7 +6,6 @@ import { Main } from '@/platform/components/main'
 import { PartnerProfile } from '@/components/partners/partner-profile'
 import { partners } from '@/data/partners'
 import type { Locale } from '@/i18n/config'
-import { wordsFor } from '@/i18n/words'
 import { setLocale } from '@/i18n/locale'
 import { pageMetadata } from '@/lib/metadata'
 import { partnerProfileText } from '@/lib/page-text'
@@ -32,11 +31,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return pageMetadata({
     ...partnerProfileText(partner, locale),
     path: `/partners/${partner.slug}`,
+    // No image: a shared link shows the page's own 1200x630 card, never the 3:1 WebP banner.
     locale,
-    // Their banner is the picture a shared link shows; with none, the page's own card.
-    image: partner.banner
-      ? { url: partner.banner, alt: wordsFor(locale)('partners.profile.bannerAlt', { name: partner.name }) }
-      : undefined,
   })
 }
 

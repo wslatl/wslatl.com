@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { notFound } from 'next/navigation'
-import { JsonLd } from '@/components/seo/json-ld'
 import { siteConfig } from '@/config/site'
-import { shortLinks } from '@/config/links'
 import { isLocale, locales, openGraphLocales } from '@/i18n/config'
 import { getLocale, setLocale } from '@/i18n/locale'
 import { words } from '@/i18n/words'
@@ -57,7 +55,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title,
     description,
-    images: [ogImage.url],
+    images: [{ url: ogImage.url, alt: ogImage.alt }],
   },
   robots: {
     index: true,
@@ -99,28 +97,6 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-const organizationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  '@id': `${siteConfig.siteUrl}/#organization`,
-  name: siteConfig.name,
-  // The names people search for us by. "WSLATL" also names the site itself
-  // (the WebSite data on the home page), so the two read as one brand.
-  alternateName: [siteConfig.brand, `${siteConfig.brand} Hosting`],
-  url: siteConfig.siteUrl,
-  // 512px square, a white mark on near-black: legible on a white results page.
-  logo: `${siteConfig.siteUrl}/logo.png`,
-  slogan: siteConfig.slogan,
-  description: siteConfig.description,
-  address: {
-    '@type': 'PostalAddress',
-    addressRegion: 'MO',
-    addressCountry: 'US',
-  },
-  // Profiles by their real addresses: search engines match these, not redirects.
-  sameAs: [shortLinks.discord.url, shortLinks.trustpilot.url, shortLinks.github.url],
-}
-
 export default async function RootLayout({
   children,
   params,
@@ -145,7 +121,6 @@ export default async function RootLayout({
     // the names its stylesheet reads.
     <html lang={locale} className={fontClassNames}>
       <body className="relative isolate min-h-dvh font-sans antialiased">
-        <JsonLd data={organizationJsonLd} />
         <SkipLink>{t('header.skipToContent')}</SkipLink>
         {/* The blue wash at the top of every page. Static, so it costs nothing to scroll. */}
         <div

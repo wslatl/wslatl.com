@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { Metadata } from 'next'
 import { siteConfig } from '@/config/site'
-import { locales, type Locale } from '@/i18n/config'
+import { defaultLocale, locales, type Locale } from '@/i18n/config'
 import { getLocale } from '@/i18n/locale'
 import { createSeo } from '@/platform/i18n/seo'
 
@@ -73,11 +73,6 @@ interface PageMetadataInput {
   absoluteTitle?: boolean
   /** Defaults to the language of the page being rendered. */
   locale?: Locale
-  /**
-   * A share picture for the page to use in place of its card (a partner's
-   * banner). A path under public/ is fine: the layout sets metadataBase.
-   */
-  image?: { url: string; alt: string; width?: number; height?: number }
 }
 
 /**
@@ -85,20 +80,25 @@ interface PageMetadataInput {
  * nested `openGraph` object from the layout, so every page builds its full
  * Open Graph and Twitter set here instead of losing the share image.
  *
- * The share image is the page's own card (shareCardUrl), with the page's
- * title as its alt text. The home page keeps the site's picture instead, and
- * a page given an `image` keeps that. A page needs its words in
- * lib/share-card.ts to have a card; tests/share-card.test.ts checks every
- * page in the sitemap has them.
+ * The share image is the page's own card (shareCardUrl), a 1200x630 PNG with
+ * its size and type tags, and the page's title as its alt text. Only the
+ * English home page keeps the site's static picture (public/og-image.png,
+ * which is in English); the other four home pages have a card in their own
+ * language. No page takes a picture of its own: a partner's 3:1 WebP banner
+ * is not a share image on Facebook, LinkedIn or X. The same picture and alt
+ * go in twitter:image and twitter:image:alt. The brand has no X account, so
+ * there is no twitter:site and no twitter:creator, and none is guessed. A
+ * page needs its words in lib/share-card.ts to have a card;
+ * tests/share-card.test.ts checks every page in the sitemap has them.
  *
  * Every page also points at itself in the other languages, so a search engine
  * can offer a reader the version in their own language (hreflang), with the
  * English one as the fallback for everyone else (x-default).
  */
-export function pageMetadata({ title, description, path, absoluteTitle = false, locale, image }: PageMetadataInput): Metadata {
+export function pageMetadata({ title, description, path, absoluteTitle = false, locale }: PageMetadataInput): Metadata {
   const language = locale ?? getLocale()
-  // The home page keeps the site's picture; every other page gets its own card.
-  const shareImage = image ?? (path === '/' ? ogImage : { ...ogImage, url: shareCardUrl(path, language), alt: title })
+  // The English home page keeps the site's picture; every other page gets its own card.
+  const shareImage = path === '/' && language === defaultLocale ? ogImage : { ...ogImage, url: shareCardUrl(path, language), alt: title }
   const url = pageUrl(language, path)
   const fullTitle = absoluteTitle ? title : `${title} | ${siteConfig.brand}`
 
@@ -119,7 +119,7 @@ export function pageMetadata({ title, description, path, absoluteTitle = false, 
       card: 'summary_large_image',
       title: fullTitle,
       description,
-      images: [shareImage.url],
+      images: [{ url: shareImage.url, alt: shareImage.alt }],
     },
   }
 }

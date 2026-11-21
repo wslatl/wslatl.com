@@ -241,7 +241,7 @@
     "fromPrice": "from {price}/mo",
     "toStart": "{ram} to start",
     "detail": {
-      "metaTitle": "{game} Server Hosting from {price}/mo",
+      "metaTitle": "{game} Server Hosting",
       "metaDescription": "Run your own {game} server with WSLATL from {price} a month. {tagline}",
       "metaDescriptionNoPrice": "Run your own {game} server with WSLATL. Ask us for a plan sized to it. {tagline}",
       "heading": "{game} server hosting",
@@ -274,7 +274,7 @@
     }
   },
   "legal": {
-    "metaTitle": "Legal",
+    "metaTitle": "Legal Policies and Terms",
     "metaDescription": "Every WSLATL LLC policy in one place: privacy, terms of service, acceptable use, refunds, SLA, DMCA, abuse, account credit, subprocessors, and backups.",
     "heading": "Legal",
     "intro": "Our policies, written to be read. Each one shows the date it took effect, and each one can change on its own, so check the date on the document you are relying on.",
@@ -675,6 +675,9 @@
       "gamesMore": "{count} games supported, and if it has a dedicated server we can almost always run it.",
       "pricingIntro": "Published monthly prices in US dollars. No renewal price traps."
     }
+  },
+  "organization": {
+    "description": "WSLATL is a small, application-only hosting company in Missouri offering game servers, VPS, dedicated servers and web hosting."
   },
   "notFound": {
     "metaTitle": "Page not found",

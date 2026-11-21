@@ -2,19 +2,32 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { PricingJsonLd } from '@/components/seo/pricing-json-ld'
+import { shortLinks } from '@/config/links'
 import { productLines } from '@/data/pricing'
 import { defaultLocale, locales, openGraphLocales } from '@/i18n/config'
 import {
   alternateKeys,
+  brand,
+  checkCards,
   checkDuplicates,
+  checkLanguages,
+  checkNotFound,
+  checkOrganization,
   checkPage,
+  checkPicture,
+  checkReciprocity,
   checkRobots,
   checkSitemap,
+  checkSitemapAgreement,
   expectedUrl,
+  imageInfo,
   internalLinks,
+  limits,
   linkProblem,
   readPage,
   readSitemap,
+  sameAsAllowed,
+  sameAsOf,
   locales as ruleLocales,
   defaultLocale as ruleDefaultLocale,
   openGraphLocales as ruleOpenGraphLocales,
@@ -33,10 +46,31 @@ interface PageOptions {
   jsonLd?: unknown[]
 }
 
+/** The company as the home page writes it: everything the rules ask for. */
+const fullOrganization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${origin}/#organization`,
+  name: 'WSLATL',
+  legalName: 'WSLATL LLC',
+  url: origin,
+  description: 'A small hosting company in Missouri.',
+  logo: { '@type': 'ImageObject', url: `${origin}/logo.png`, width: 512, height: 512 },
+  contactPoint: [
+    { '@type': 'ContactPoint', contactType: 'customer support', url: `${origin}/#contact`, availableLanguage: ['en', 'es', 'fr', 'de', 'pt'] },
+  ],
+  sameAs: [...sameAsAllowed],
+}
+
+/** What a page says in each language that a translated page must not copy from the English one. */
+const wordsIn = (locale: string) => (locale === 'en' ? 'Games' : `Games in ${locale}`)
+
 /** A page that passes every rule, to break one thing at a time. */
 function page({ locale = 'en', path = '/games', omit = [], extraHead = '', body, jsonLd }: PageOptions = {}) {
   const url = expectedUrl(origin, locale, path)
   const has = (tag: string) => !omit.includes(tag)
+  const title = `${wordsIn(locale)} | WSLATL`
+  const description = `Plans for game servers and VPS, in ${locale}, with prices that are on the page and every spec listed.`
   const crumbs = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -45,18 +79,25 @@ function page({ locale = 'en', path = '/games', omit = [], extraHead = '', body,
       { '@type': 'ListItem', position: 2, name: 'Games', item: url },
     ],
   }
-  const organization = { '@context': 'https://schema.org', '@type': 'Organization', name: 'WSLATL LLC', url: origin, logo: `${origin}/logo.png` }
-  const blocks = jsonLd ?? [organization, crumbs]
+  // The company is written in full on the home pages and nowhere else.
+  const site = { '@context': 'https://schema.org', '@type': 'WebSite', name: 'WSLATL', url: origin }
+  const home = [{ ...fullOrganization, description: `${fullOrganization.description} (${locale})` }, crumbs, ...(locale === defaultLocale ? [site] : [])]
+  const blocks = jsonLd ?? (path === '/' ? home : [crumbs])
   const alternates = alternateKeys
     .map((key) => `<link rel="alternate" hreflang="${key}" href="${expectedUrl(origin, key === 'x-default' ? 'en' : key, path)}"/>`)
     .join('')
+  const others = locales
+    .filter((other) => other !== locale)
+    .map((other) => `<meta property="og:locale:alternate" content="${openGraphLocales[other as keyof typeof openGraphLocales]}"/>`)
+    .join('')
+  const card = `${origin}/og?path=${path}&amp;locale=${locale}`
   const html = `<!DOCTYPE html><html lang="${locale}"><head>
-    ${has('title') ? '<title>Games | WSLATL</title>' : ''}
-    ${has('description') ? '<meta name="description" content="Plans for game servers and VPS, with prices that are on the page."/>' : ''}
+    ${has('title') ? `<title>${title}</title>` : ''}
+    ${has('description') ? `<meta name="description" content="${description}"/>` : ''}
     ${has('canonical') ? `<link rel="canonical" href="${url}"/>` : ''}
     ${has('hreflang') ? alternates : ''}
-    ${has('og') ? `<meta property="og:title" content="Pricing"/><meta property="og:description" content="Plans"/><meta property="og:url" content="${url}"/><meta property="og:locale" content="${openGraphLocales[locale as keyof typeof openGraphLocales]}"/><meta property="og:image" content="/og?path=${path}"/>` : ''}
-    ${has('twitter') ? '<meta name="twitter:card" content="summary_large_image"/><meta name="twitter:image" content="/og"/>' : ''}
+    ${has('og') ? `<meta property="og:title" content="${title}"/><meta property="og:description" content="${description}"/><meta property="og:url" content="${url}"/><meta property="og:locale" content="${openGraphLocales[locale as keyof typeof openGraphLocales]}"/>${others}<meta property="og:site_name" content="WSLATL"/><meta property="og:type" content="website"/><meta property="og:image" content="${card}"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image:type" content="image/png"/><meta property="og:image:alt" content="${wordsIn(locale)} card"/>` : ''}
+    ${has('twitter') ? `<meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="${title}"/><meta name="twitter:description" content="${description}"/><meta name="twitter:image" content="${card}"/><meta name="twitter:image:alt" content="${wordsIn(locale)} card"/>` : ''}
     ${extraHead}
     ${blocks.map((block) => `<script type="application/ld+json">${JSON.stringify(block)}</script>`).join('')}
     </head><body>${body ?? '<main><h1>Games</h1><img src="/a.webp" alt="A picture"/></main>'}</body></html>`
@@ -74,24 +115,37 @@ describe('what the SEO check knows about the site', () => {
     expect(ruleDefaultLocale).toBe(defaultLocale)
     expect(ruleOpenGraphLocales).toEqual(openGraphLocales)
   })
+
+  it('allows exactly the company profiles the site links to', () => {
+    expect(new Set(sameAsAllowed)).toEqual(new Set([shortLinks.discord.url, shortLinks.trustpilot.url, shortLinks.github.url]))
+  })
 })
 
 describe('the page rules', () => {
   it('pass a complete page in every language', () => {
     for (const locale of locales) expect(problemsOf({ locale }), locale).toEqual([])
+    for (const locale of locales) expect(problemsOf({ locale, path: '/' }), `${locale} home`).toEqual([])
   })
 
   it('want a title, and one that is not cut off in results', () => {
     expect(problemsOf({ omit: ['title'] })).toContain('no title')
     const { url, parsed } = page()
-    expect(checkPage({ ...parsed, title: 'x'.repeat(90) }, { url, origin })).toEqual([expect.stringContaining('title is 90 characters')])
+    expect(limits.title).toBe(65)
+    expect(checkPage({ ...parsed, title: 'x'.repeat(70), ogTitle: 'x'.repeat(70), twitterTitle: 'x'.repeat(70) }, { url, origin })).toEqual([
+      expect.stringContaining('title is 70 characters (over 65)'),
+    ])
+    expect(checkPage({ ...parsed, title: 'x'.repeat(65), ogTitle: 'x'.repeat(65), twitterTitle: 'x'.repeat(65) }, { url, origin })).toEqual([])
   })
 
   it('want a description of a sensible length', () => {
     expect(problemsOf({ omit: ['description'] })).toContain('no meta description')
     const { url, parsed } = page()
-    expect(checkPage({ ...parsed, description: 'Short.' }, { url, origin })).toEqual([expect.stringContaining('only 6 characters')])
-    expect(checkPage({ ...parsed, description: 'x'.repeat(300) }, { url, origin })).toEqual([expect.stringContaining('300 characters')])
+    const withDescription = (description: string) => ({ ...parsed, description, ogDescription: description, twitterDescription: description })
+    expect(checkPage(withDescription('Short.'), { url, origin })).toEqual([expect.stringContaining('only 6 characters')])
+    // Past 70 characters a description says something; this one is the old floor of 30.
+    expect(checkPage(withDescription('x'.repeat(40)), { url, origin })).toEqual([expect.stringContaining('only 40 characters')])
+    expect(checkPage(withDescription('x'.repeat(70)), { url, origin })).toEqual([])
+    expect(checkPage(withDescription('x'.repeat(300)), { url, origin })).toEqual([expect.stringContaining('300 characters')])
   })
 
   it('want the canonical to be the page itself, English at the plain path', () => {
@@ -126,9 +180,11 @@ describe('the page rules', () => {
 
   it('want Open Graph and Twitter cards, with the right locale', () => {
     expect(problemsOf({ omit: ['og'] })).toEqual(
-      expect.arrayContaining(['no og:image', 'no og:title', 'no og:description']),
+      expect.arrayContaining(['no og:image', 'no og:title', 'no og:description', 'no og:image:alt']),
     )
-    expect(problemsOf({ omit: ['twitter'] })).toEqual(['twitter:card is not summary_large_image', 'no twitter:image'])
+    expect(problemsOf({ omit: ['twitter'] })).toEqual(
+      expect.arrayContaining(['twitter:card is not summary_large_image', 'no twitter:image', 'no twitter:image:alt']),
+    )
     const { url, parsed } = page({ locale: 'pt' })
     expect(checkPage({ ...parsed, ogLocale: 'en_US' }, { url, origin })).toEqual(['og:locale is en_US, expected pt_BR'])
   })
@@ -149,6 +205,93 @@ describe('the page rules', () => {
   })
 })
 
+describe('the card rules', () => {
+  const cards = (locale = 'en', change: Record<string, unknown> = {}) => {
+    const { parsed } = page({ locale })
+    return checkCards({ ...parsed, ...change }, { locale })
+  }
+
+  it('pass the cards of a page in every language', () => {
+    for (const locale of locales) expect(cards(locale), locale).toEqual([])
+  })
+
+  it('want the size and the type of the picture in tags, not only in the file', () => {
+    expect(cards('en', { ogImageWidth: undefined })).toEqual(['og:image:width is missing, expected 1200'])
+    expect(cards('en', { ogImageHeight: '500' })).toEqual(['og:image:height is 500, expected 630'])
+    expect(cards('en', { ogImageType: undefined })).toEqual(['og:image:type is missing, expected a PNG or a JPEG'])
+    expect(cards('en', { ogImageType: 'image/webp' })).toEqual(['og:image:type is image/webp, expected a PNG or a JPEG'])
+    expect(cards('en', { ogImageType: 'image/jpeg' })).toEqual([])
+  })
+
+  it('want the picture to be an absolute address, and each language its own card', () => {
+    expect(cards('en', { ogImage: '/og?path=/', twitterImage: '/og?path=/' })).toEqual([expect.stringContaining('not an absolute https address')])
+    const english = `${origin}/og-image.png?v=1`
+    expect(cards('es', { ogImage: english, twitterImage: english })).toEqual([`og:image is not the card for es: ${english}`])
+  })
+
+  it('want alt text for both pictures, and the same on both', () => {
+    expect(cards('en', { ogImageAlt: undefined })).toEqual(expect.arrayContaining(['no og:image:alt']))
+    expect(cards('en', { twitterImageAlt: undefined })).toEqual(['no twitter:image:alt'])
+    expect(cards('en', { twitterImageAlt: 'Another' })).toEqual(['twitter:image:alt is not the og:image:alt'])
+  })
+
+  it('want the Twitter card to say what the Open Graph one says', () => {
+    expect(cards('en', { twitterTitle: 'Other' })).toEqual(['twitter:title is not the og:title'])
+    expect(cards('en', { twitterDescription: 'Other' })).toEqual(['twitter:description is not the og:description'])
+    expect(cards('en', { twitterImage: `${origin}/og?path=/x&locale=en` })).toEqual(['twitter:image is not the og:image'])
+    expect(cards('en', { ogTitle: 'Other', twitterTitle: 'Other' })).toEqual(['og:title is not the page title'])
+    expect(cards('en', { ogDescription: 'Other', twitterDescription: 'Other' })).toEqual(['og:description is not the meta description'])
+  })
+
+  it('want the site name, a type and the other four languages as alternates', () => {
+    expect(cards('en', { ogSiteName: 'WSLATL LLC' })).toEqual([`og:site_name is WSLATL LLC, expected ${brand}`])
+    expect(cards('en', { ogType: undefined })).toEqual(['no og:type'])
+    expect(cards('fr', { ogLocaleAlternates: ['en_US', 'es_ES', 'de_DE'] })).toEqual([expect.stringContaining('og:locale:alternate is en_US, es_ES, de_DE')])
+    // A language is never its own alternate.
+    expect(cards('fr', { ogLocaleAlternates: ['fr_FR', 'en_US', 'es_ES', 'de_DE', 'pt_BR'] })).toHaveLength(1)
+  })
+
+  it('refuse a partner banner as the share picture: a 3:1 WebP with no size tags', () => {
+    const banner = `${origin}/partners/vulnradar/banner.webp`
+    const problems = cards('en', { ogImage: banner, twitterImage: banner, ogImageWidth: undefined, ogImageHeight: undefined, ogImageType: undefined })
+    expect(problems).toEqual(
+      expect.arrayContaining(['og:image:width is missing, expected 1200', 'og:image:height is missing, expected 630']),
+    )
+  })
+})
+
+describe('the picture file rules', () => {
+  const png = (width: number, height: number) => {
+    const bytes = Buffer.alloc(33)
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(bytes)
+    bytes.writeUInt32BE(width, 16)
+    bytes.writeUInt32BE(height, 20)
+    return bytes
+  }
+  const jpeg = (width: number, height: number) => {
+    // SOI, then a start-of-frame segment: length, precision, height, width.
+    const bytes = Buffer.from([0xff, 0xd8, 0xff, 0xc0, 0x00, 0x11, 0x08, 0, 0, 0, 0, 0x03, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    bytes.writeUInt16BE(height, 7)
+    bytes.writeUInt16BE(width, 9)
+    return bytes
+  }
+  const webp = Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4), Buffer.from('WEBPVP8 '), Buffer.alloc(20)])
+
+  it('reads the type and the size from the file', () => {
+    expect(imageInfo(png(1200, 630))).toEqual({ type: 'image/png', width: 1200, height: 630 })
+    expect(imageInfo(jpeg(1200, 630))).toEqual({ type: 'image/jpeg', width: 1200, height: 630 })
+    expect(imageInfo(webp)).toEqual({ type: 'image/webp' })
+    expect(imageInfo(Buffer.from('<html>'))).toEqual({ type: 'unknown' })
+  })
+
+  it('want a 1200x630 PNG or JPEG', () => {
+    expect(checkPicture(png(1200, 630))).toEqual([])
+    expect(checkPicture(jpeg(1200, 630))).toEqual([])
+    expect(checkPicture(png(1500, 500))).toEqual(['is 1500x500, expected 1200x630'])
+    expect(checkPicture(webp)).toEqual(['is a WEBP, not a PNG or a JPEG'])
+  })
+})
+
 const crumbs = (items: unknown[]) => ({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items })
 const item = (position: number, name: string, href: string) => ({ '@type': 'ListItem', position, name, item: href })
 const faqBlock = (name: string, text: string) => ({
@@ -156,36 +299,202 @@ const faqBlock = (name: string, text: string) => ({
   '@type': 'FAQPage',
   mainEntity: [{ '@type': 'Question', name, acceptedAnswer: { '@type': 'Answer', text } }],
 })
-const offer = (price: string) => ({ '@type': 'Product', name: 'P-VPS-2', offers: { '@type': 'Offer', price, priceCurrency: 'USD' } })
+const offer = (price: string, extra: Record<string, unknown> = { availability: 'https://schema.org/InStock' }) => ({
+  '@type': 'Product',
+  name: 'Premium VPS P-VPS-2',
+  sku: 'P-VPS-2',
+  offers: { '@type': 'Offer', price, priceCurrency: 'USD', ...extra },
+})
+
+describe('the Organization rules', () => {
+  const organization = fullOrganization
+  const trail = crumbs([item(1, 'Home', origin), item(2, 'Games', `${origin}/games`)])
+  const problems = (change: Record<string, unknown>) => checkOrganization({ ...organization, ...change }, { origin })
+
+  it('pass the company as the home pages write it', () => {
+    expect(checkOrganization(organization, { origin })).toEqual([])
+  })
+
+  it('wants the full company on each home page, and none on the inner pages', () => {
+    expect(problemsOf({ path: '/', jsonLd: [] })).toEqual(['0 Organization blocks on the home page, expected 1', '0 WebSite blocks on the home page, expected 1'])
+    expect(problemsOf({ path: '/', locale: 'es', jsonLd: [organization, organization] })).toEqual(['2 Organization blocks on the home page, expected 1'])
+    expect(problemsOf({ jsonLd: [organization, trail] })).toEqual([
+      expect.stringContaining('1 Organization block(s) on an inner page'),
+    ])
+    // An id reference is not a second copy of the company.
+    expect(problemsOf({ jsonLd: [trail, { '@context': 'https://schema.org', '@type': 'Product', name: 'A', sku: 'A', brand: { '@id': `${origin}/#organization` } }] })).toEqual([
+      'Product A has no offers',
+    ])
+  })
+
+  it('wants one display name, the legal name, the site address and a description', () => {
+    expect(problems({ name: 'WSLATL LLC' })).toEqual([`Organization name is WSLATL LLC, expected ${brand}`])
+    expect(problems({ legalName: undefined })).toEqual(['Organization has no legalName'])
+    expect(problems({ url: 'https://example.com' })).toEqual([`Organization url is https://example.com, expected ${origin}`])
+    expect(problems({ description: undefined })).toEqual(['Organization has no description'])
+  })
+
+  it('wants a logo that is an image of a size Google accepts', () => {
+    expect(problems({ logo: undefined })).toEqual(['Organization has no logo'])
+    expect(problems({ logo: `${origin}/logo.png` })).toEqual(['Organization logo is not an ImageObject with a url'])
+    expect(problems({ logo: { '@type': 'ImageObject', url: `${origin}/logo.png`, width: 64, height: 64 } })).toEqual([
+      'Organization logo is under 112x112 or has no size',
+    ])
+  })
+
+  it('wants a contact point with a type, a way to reach it and its languages', () => {
+    expect(problems({ contactPoint: undefined })).toEqual(['Organization has no contactPoint'])
+    expect(problems({ contactPoint: [{ '@type': 'ContactPoint', url: `${origin}/#contact`, availableLanguage: ['en'] }] })).toEqual([
+      'contactPoint is not a ContactPoint with a contactType',
+    ])
+    expect(problems({ contactPoint: [{ '@type': 'ContactPoint', contactType: 'customer support', availableLanguage: ['en'] }] })).toEqual([
+      'contactPoint has neither an email nor a url',
+    ])
+    expect(problems({ contactPoint: [{ '@type': 'ContactPoint', contactType: 'customer support', email: 'a@b.c' }] })).toEqual([
+      'contactPoint has no availableLanguage',
+    ])
+  })
+
+  it('wants sameAs to hold the company profiles and nothing else', () => {
+    expect(problems({ sameAs: undefined })).toEqual(['Organization has no sameAs'])
+    expect(problems({ sameAs: [...sameAsAllowed, 'https://github.com/someone-else'] })).toEqual([
+      "sameAs lists https://github.com/someone-else, which is not one of the company's profiles",
+    ])
+    expect(problems({ sameAs: ['https://github.com/wslatl', 'https://old-domain.example'] })).toHaveLength(1)
+  })
+
+  it('reads the profiles the pages list', () => {
+    const { parsed } = page({ path: '/', jsonLd: [organization] })
+    expect(sameAsOf([{ url: origin, page: parsed }])).toEqual(sameAsAllowed)
+  })
+})
+
+describe('the language rules', () => {
+  const pageIn = (locale: string, change: Record<string, unknown> = {}, path = '/games') => ({
+    url: expectedUrl(origin, locale, path),
+    page: { ...page({ locale, path }).parsed, ...change },
+  })
+
+  it('pass a translated page that has its own words', () => {
+    expect(checkLanguages([pageIn('en'), pageIn('es'), pageIn('de')])).toEqual([])
+  })
+
+  it('catch a translated title, description or picture text left in English', () => {
+    const english = pageIn('en')
+    const copy = (field: string) => checkLanguages([english, pageIn('es', { [field]: english.page[field as keyof typeof english.page] })])
+    expect(copy('title')).toEqual(['/es/games: the title is the English one'])
+    expect(copy('description')).toEqual(['/es/games: the description is the English one'])
+    expect(copy('ogImageAlt')).toEqual(['/es/games: og:image:alt is the English one'])
+    expect(copy('twitterImageAlt')).toEqual(['/es/games: twitter:image:alt is the English one'])
+  })
+
+  it('catch a company description left in English on a translated home page', () => {
+    const english = pageIn('en', {}, '/')
+    const spanish = { url: expectedUrl(origin, 'es', '/'), page: page({ locale: 'es', path: '/', jsonLd: [fullOrganization] }).parsed }
+    const englishWithOrg = { ...english, page: page({ path: '/', jsonLd: [fullOrganization] }).parsed }
+    expect(checkLanguages([englishWithOrg, spanish]).filter((problem) => problem.includes('Organization'))).toEqual([
+      '/es: the Organization description is the English one',
+    ])
+  })
+
+  it('lets a named page keep a brand word', () => {
+    const english = pageIn('en')
+    const same = pageIn('es', { title: english.page.title })
+    expect(checkLanguages([english, same], ['es /games'])).toEqual([])
+  })
+})
+
+describe('the hreflang return-link rules', () => {
+  const set = (path = '/games') =>
+    locales.map((locale) => ({ url: expectedUrl(origin, locale, path), page: page({ locale, path }).parsed }))
+
+  it('pass pages that list each other', () => {
+    expect(checkReciprocity(set())).toEqual([])
+  })
+
+  it('catch a page that does not list the page that lists it', () => {
+    const pages = set()
+    // The Spanish page stops listing the German one.
+    const es = pages.find((entry) => entry.url.endsWith('/es/games'))!
+    es.page = { ...es.page, alternates: { ...es.page.alternates, de: es.url } }
+    expect(checkReciprocity(pages)).toEqual([`${origin}/es/games does not list ${origin}/de/games back as de`])
+  })
+
+  it('catch an alternate that was never fetched', () => {
+    const pages = set().slice(0, 4)
+    expect(checkReciprocity(pages)).toEqual(expect.arrayContaining([expect.stringContaining('which was not fetched')]))
+  })
+})
+
+describe('the sitemap against the pages', () => {
+  it('pass when the sitemap and the page list the same alternates', () => {
+    const pages = [{ url: origin, page: page({ path: '/' }).parsed }]
+    expect(checkSitemapAgreement([sitemapEntry('/')], pages)).toEqual([])
+  })
+
+  it('catch a sitemap and a page that drifted apart', () => {
+    const { parsed } = page({ path: '/' })
+    const drifted = { ...parsed, alternates: { ...parsed.alternates, fr: `${origin}/fr/old` } }
+    expect(checkSitemapAgreement([sitemapEntry('/')], [{ url: origin, page: drifted }])).toEqual([
+      `${origin}: the sitemap and the page list different alternates`,
+    ])
+  })
+})
+
+describe('the 404 page rules', () => {
+  const notFound = (locale: string, extra = '', lang: string | undefined = undefined) => {
+    const en = locale === 'en'
+    const title = en ? 'Page not found | WSLATL' : `Not found in ${locale} | WSLATL`
+    const html = `<html${lang ? ` lang="${lang}"` : ''}><head><meta name="robots" content="noindex"/><title>${title}</title><meta name="description" content="${en ? 'Body' : `Body ${locale}`}"/><meta property="og:title" content="${title}"/><meta property="og:locale" content="${openGraphLocales[locale as keyof typeof openGraphLocales]}"/>${extra}</head><body></body></html>`
+    return readPage(html)
+  }
+  const english = notFound('en')
+
+  it('pass a 404 in each language with its own title and og:locale', () => {
+    for (const locale of locales) expect(checkNotFound(notFound(locale), { locale, english }), locale).toEqual([])
+  })
+
+  it('catch an English title or og:locale under a translated address', () => {
+    const wrong = { ...notFound('es'), title: english.title, ogTitle: english.title, ogLocale: 'en_US' }
+    expect(checkNotFound(wrong, { locale: 'es', english })).toEqual(['title is the English one', 'og:locale is en_US, expected es_ES'])
+  })
+
+  it('catch a wrong language and a title with no brand', () => {
+    expect(checkNotFound(notFound('fr', '', 'en'), { locale: 'fr', english })).toEqual(['html lang is "en", expected "fr"'])
+    expect(checkNotFound({ ...notFound('fr'), title: 'Introuvable', ogTitle: 'Introuvable' }, { locale: 'fr', english })).toEqual([
+      'title is "Introuvable", expected it to end in " | WSLATL"',
+    ])
+  })
+
+  it('allow two noindex tags but never one that allows indexing', () => {
+    expect(checkNotFound(notFound('de', '<meta name="robots" content="noindex"/>'), { locale: 'de', english })).toEqual([])
+    expect(checkNotFound(notFound('de', '<meta name="robots" content="index, follow"/>'), { locale: 'de', english })).toEqual([
+      'a robots tag says "index, follow" on a 404 page',
+    ])
+    const noRobots = { ...notFound('de'), robotsAll: [] }
+    expect(checkNotFound(noRobots, { locale: 'de', english })).toEqual(['no robots noindex'])
+  })
+})
 
 describe('the structured data rules', () => {
-  const organization = { '@context': 'https://schema.org', '@type': 'Organization', name: 'WSLATL LLC', url: origin, logo: `${origin}/logo.png` }
+  const organization = fullOrganization
 
   it('rejects JSON that does not parse', () => {
     const { url, parsed } = page()
     const broken = readPage(page().html.replace('</head>', '<script type="application/ld+json">{oops</script></head>'))
     expect(checkPage(broken, { url, origin })).toEqual([expect.stringContaining('not valid JSON')])
-    expect(parsed.jsonLd).toHaveLength(2)
-  })
-
-  it('wants one Organization with a name, the site address and a logo', () => {
-    expect(problemsOf({ jsonLd: [crumbs([item(1, 'Home', origin), item(2, 'Games', `${origin}/games`)])] })).toEqual([
-      '0 Organization blocks, expected 1',
-    ])
-    expect(problemsOf({ jsonLd: [{ ...organization, url: 'https://example.com' }, crumbs([item(1, 'Home', origin), item(2, 'Games', `${origin}/games`)])] })).toEqual([
-      `Organization url is https://example.com, expected ${origin}`,
-    ])
+    expect(parsed.jsonLd).toHaveLength(1)
   })
 
   it('wants the schema.org address itself as the context, not one that merely contains it', () => {
     const trail = crumbs([item(1, 'Home', origin), item(2, 'Games', `${origin}/games`)])
-    expect(problemsOf({ jsonLd: [{ ...organization, '@context': 'https://schema.org.example.com' }, trail] })).toEqual([
+    expect(problemsOf({ jsonLd: [{ ...trail, '@context': 'https://schema.org.example.com' }] })).toEqual([
       'structured data @context is not schema.org',
     ])
-    expect(problemsOf({ jsonLd: [{ ...organization, '@context': 'https://example.com/schema.org' }, trail] })).toEqual([
+    expect(problemsOf({ jsonLd: [{ ...trail, '@context': 'https://example.com/schema.org' }] })).toEqual([
       'structured data @context is not schema.org',
     ])
-    expect(problemsOf({ jsonLd: [{ ...organization, '@context': 'http://schema.org/' }, trail] })).toEqual([])
+    expect(problemsOf({ jsonLd: [{ ...trail, '@context': 'http://schema.org/' }] })).toEqual([])
   })
 
   it('wants WebSite data on the English home page only', () => {
@@ -196,20 +505,20 @@ describe('the structured data rules', () => {
   })
 
   it('wants a breadcrumb trail that starts at home and ends on the page', () => {
-    expect(problemsOf({ jsonLd: [organization] })).toEqual(['0 BreadcrumbList blocks, expected 1'])
-    expect(problemsOf({ jsonLd: [organization, crumbs([item(1, 'Home', origin), item(2, 'Games', `${origin}/legal`)])] })).toEqual([
+    expect(problemsOf({ jsonLd: [] })).toEqual(['0 BreadcrumbList blocks, expected 1'])
+    expect(problemsOf({ jsonLd: [crumbs([item(1, 'Home', origin), item(2, 'Games', `${origin}/legal`)])] })).toEqual([
       `BreadcrumbList ends on ${origin}/legal, expected ${origin}/games`,
     ])
-    expect(problemsOf({ jsonLd: [organization, crumbs([item(1, 'Home', origin), item(3, 'Games', `${origin}/games`)])] })).toEqual([
+    expect(problemsOf({ jsonLd: [crumbs([item(1, 'Home', origin), item(3, 'Games', `${origin}/games`)])] })).toEqual([
       'BreadcrumbList item 2 has position 3',
     ])
-    expect(problemsOf({ locale: 'de', jsonLd: [organization, crumbs([item(1, 'Start', origin), item(2, 'Spiele', `${origin}/de/games`)])] })).toEqual([
+    expect(problemsOf({ locale: 'de', jsonLd: [crumbs([item(1, 'Start', origin), item(2, 'Spiele', `${origin}/de/games`)])] })).toEqual([
       `BreadcrumbList starts on ${origin}, expected the home page`,
     ])
   })
 
   const faqBody = '<main><h1>Games</h1><details class="faq-item"><summary>How do I pay?</summary><p>By card.</p></details></main>'
-  const base = [organization, crumbs([item(1, 'Home', origin), item(2, 'Games', `${origin}/games`)])]
+  const base = [crumbs([item(1, 'Home', origin), item(2, 'Games', `${origin}/games`)])]
 
   it('wants FAQPage data to match the questions and answers the page shows', () => {
     expect(problemsOf({ body: faqBody, jsonLd: [...base, faqBlock('How do I pay?', 'By card.')] })).toEqual([])
@@ -227,25 +536,36 @@ describe('the structured data rules', () => {
 
   it('wants the pricing page to carry offers, and each price to be one the page shows', () => {
     const body = '<main><h1>Pricing</h1><p>P-VPS-2 $6.50 a month</p></main>'
-    const onPricing = [organization, crumbs([item(1, 'Home', origin), item(2, 'Pricing', `${origin}/pricing`)])]
+    const onPricing = [crumbs([item(1, 'Home', origin), item(2, 'Pricing', `${origin}/pricing`)])]
     const check = (jsonLd: unknown[]) => problemsOf({ path: '/pricing', body, jsonLd })
     expect(check(onPricing)).toEqual(['the pricing page has plans but no Offer data'])
     expect(check([...onPricing, offer('6.50')])).toEqual([])
     expect(check([...onPricing, offer('9.99')])).toEqual(['Offer price 9.99 is not shown on the page'])
-    expect(check([...onPricing, { '@type': 'Product', name: 'P-VPS-2' }])).toEqual([
+    expect(check([...onPricing, { '@type': 'Product', name: 'P-VPS-2', sku: 'P-VPS-2' }])).toEqual([
       'the pricing page has plans but no Offer data',
       'Product P-VPS-2 has no offers',
     ])
   })
 
+  it('wants every offer to say it is available, and every product to have a sku', () => {
+    const body = '<main><h1>Pricing</h1><p>P-VPS-2 $6.50 a month</p></main>'
+    const onPricing = [crumbs([item(1, 'Home', origin), item(2, 'Pricing', `${origin}/pricing`)])]
+    const check = (jsonLd: unknown[]) => problemsOf({ path: '/pricing', body, jsonLd })
+    expect(check([...onPricing, offer('6.50', {})])).toEqual(['Offer without an availability (a schema.org address)'])
+    expect(check([...onPricing, { ...offer('6.50'), sku: undefined }])).toEqual(['Product Premium VPS P-VPS-2 has no sku'])
+  })
+
   it('is satisfied by the pricing page data the site really sends', () => {
     const plans = productLines.flatMap((line) => line.groups.flatMap((group) => group.plans))
     const html = renderToStaticMarkup(createElement(PricingJsonLd, { lines: productLines, locale: 'en' }))
-    const data = readPage(html).jsonLd[0].data as { itemListElement: { item: { name: string; offers: { price: string; priceCurrency: string } } }[] }
-    expect(data.itemListElement.map((entry) => [entry.item.name, entry.item.offers.price])).toEqual(
+    type Entry = { item: { name: string; sku: string; offers: { price: string; priceCurrency: string; availability: string } } }
+    const data = readPage(html).jsonLd[0].data as { itemListElement: Entry[] }
+    expect(data.itemListElement.map((entry) => [entry.item.sku, entry.item.offers.price])).toEqual(
       plans.map((plan) => [plan.name, plan.price.toFixed(2)]),
     )
     expect(new Set(data.itemListElement.map((entry) => entry.item.offers.priceCurrency))).toEqual(new Set(['USD']))
+    expect(new Set(data.itemListElement.map((entry) => entry.item.offers.availability))).toEqual(new Set(['https://schema.org/InStock']))
+    for (const entry of data.itemListElement) expect(entry.item.name).toContain(entry.item.sku)
   })
 })
 

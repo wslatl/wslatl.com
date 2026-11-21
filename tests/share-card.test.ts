@@ -14,7 +14,6 @@ import { generateMetadata as partnerMetadata } from '@/app/[locale]/partners/[sl
 import { generateMetadata as pricingMetadata } from '@/app/[locale]/pricing/page'
 import { GET } from '@/app/og/route'
 import sitemap from '@/app/sitemap'
-import { partners } from '@/data/partners'
 import { defaultLocale, locales, stripLocale, type Locale } from '@/i18n/config'
 import { messagesFor } from '@/i18n/words'
 import { ogImage, shareCardUrl } from '@/lib/metadata'
@@ -133,14 +132,13 @@ describe('the address of a share card', () => {
     expect(ogImage.url).toBe(`/og-image.png?v=${fingerprint}`)
   })
 
-  it('is what every page shares itself with: its own card, apart from the home page and a partner with a banner', async () => {
+  it('is what every page shares itself with: its own card, apart from the English home page', async () => {
     const wrong: string[] = []
     for (const { path, locale } of pages) {
       const head = await metadataOf(path, locale)
       const card = shareCardText(path, locale)
-      const banner = partners.find((partner) => `/partners/${partner.slug}` === path)?.banner
       const own = `/og?path=${encodeURIComponent(path)}&locale=${locale}`
-      const want = path === '/' ? ogImage.url : (banner ?? own)
+      const want = path === '/' && locale === defaultLocale ? ogImage.url : own
 
       const images = shareImages(head)
       if (images.length !== 1 || images[0].url !== want) {
@@ -148,7 +146,11 @@ describe('the address of a share card', () => {
       }
       // The card's alt text is the title it carries.
       if (want === own && images[0]?.alt !== card?.title) wrong.push(`${locale} ${path}: alt text ${images[0]?.alt}`)
-      if (JSON.stringify(head.twitter?.images) !== JSON.stringify([want])) wrong.push(`${locale} ${path}: Twitter image`)
+      // Twitter gets the same picture and the same alt text.
+      if (JSON.stringify(head.twitter?.images) !== JSON.stringify([{ url: want, alt: images[0]?.alt }])) wrong.push(`${locale} ${path}: Twitter image`)
+      if (!images[0]?.alt) wrong.push(`${locale} ${path}: no alt text`)
+      // A picture that is not the English home page's says its size and type.
+      if (want === own && JSON.stringify(head.openGraph?.images).match(/"width":1200,"height":630/) === null) wrong.push(`${locale} ${path}: no size`)
     }
     expect(wrong).toEqual([])
   })
