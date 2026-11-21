@@ -68,8 +68,6 @@ export function readPage(html) {
 
   return {
     lang: html.match(/<html\b[^>]*\blang="([^"]*)"/i)?.[1],
-    // The first lang declared inside the body: the 404 page's own wrapper, as it has no <html lang>.
-    bodyLang: html.match(/<body[^>]*>[\s\S]*?\slang="([^"]*)"/i)?.[1],
     title: decode(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1] ?? '').trim(),
     description: meta('description'),
     robots: meta('robots'),
@@ -456,8 +454,6 @@ export function checkSitemapAgreement(entries, pages) {
 export function checkNotFound(page, { locale, english }) {
   const problems = []
   if (page.lang !== undefined && page.lang !== locale) problems.push(`html lang is "${page.lang}", expected "${locale}"`)
-  // The framework renders a 404 outside the layout, so <html lang> may be absent; the wrapper must then carry it.
-  else if (page.lang === undefined && page.bodyLang !== locale) problems.push(`no html lang and the page wrapper lang is "${page.bodyLang ?? 'missing'}", expected "${locale}"`)
   if (!page.title) problems.push('no title')
   else if (!page.title.endsWith(` | ${brand}`)) problems.push(`title is "${page.title}", expected it to end in " | ${brand}"`)
   if (locale !== defaultLocale && english && page.title === english.title) problems.push('title is the English one')

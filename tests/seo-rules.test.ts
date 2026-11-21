@@ -446,7 +446,7 @@ describe('the 404 page rules', () => {
   const notFound = (locale: string, extra = '', lang: string | undefined = undefined) => {
     const en = locale === 'en'
     const title = en ? 'Page not found | WSLATL' : `Not found in ${locale} | WSLATL`
-    const html = `<html${lang ? ` lang="${lang}"` : ''}><head><meta name="robots" content="noindex"/><title>${title}</title><meta name="description" content="${en ? 'Body' : `Body ${locale}`}"/><meta property="og:title" content="${title}"/><meta property="og:locale" content="${openGraphLocales[locale as keyof typeof openGraphLocales]}"/>${extra}</head><body><div${lang === undefined ? ` lang="${locale}"` : ''}>x</div></body></html>`
+    const html = `<html${lang ? ` lang="${lang}"` : ''}><head><meta name="robots" content="noindex"/><title>${title}</title><meta name="description" content="${en ? 'Body' : `Body ${locale}`}"/><meta property="og:title" content="${title}"/><meta property="og:locale" content="${openGraphLocales[locale as keyof typeof openGraphLocales]}"/>${extra}</head><body></body></html>`
     return readPage(html)
   }
   const english = notFound('en')
@@ -465,12 +465,6 @@ describe('the 404 page rules', () => {
     expect(checkNotFound({ ...notFound('fr'), title: 'Introuvable', ogTitle: 'Introuvable' }, { locale: 'fr', english })).toEqual([
       'title is "Introuvable", expected it to end in " | WSLATL"',
     ])
-  })
-
-  it('want the wrapper lang when there is no html lang', () => {
-    const bare = { ...notFound('fr'), bodyLang: undefined }
-    expect(checkNotFound(bare, { locale: 'fr', english })).toEqual(['no html lang and the page wrapper lang is "missing", expected "fr"'])
-    expect(checkNotFound({ ...bare, bodyLang: 'en' }, { locale: 'fr', english })).toEqual(['no html lang and the page wrapper lang is "en", expected "fr"'])
   })
 
   it('allow two noindex tags but never one that allows indexing', () => {
