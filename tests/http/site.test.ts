@@ -338,6 +338,19 @@ describe('a made-up game, document or partner', () => {
   }, 120_000)
 })
 
+describe('an address the framework hands to a page with no language', () => {
+  it('is a 404, never a 500 with a stack trace in the log', async () => {
+    // The proxy reads /es.rsc as /es and /og.rsc as the share card, and
+    // gives neither a language; the framework then renders the home page
+    // with "es.rsc" for its language, whose words do not exist.
+    for (const path of ['/_next', '/es.rsc', '/fr.rsc', '/og.rsc', '/api.rsc', '/admin.rsc', '/robots.txt.rsc', '/company.json.rsc', '/icon-192.png.rsc']) {
+      expect((await ask(path)).status, path).toBe(404)
+    }
+    expect(site.log()).not.toMatch(/MISSING_MESSAGE/)
+  })
+
+})
+
 describe('the secrets', () => {
   it('reach GitHub only as the token, in the header, at the address in the settings', () => {
     expect(github.seen.length).toBeGreaterThan(0)

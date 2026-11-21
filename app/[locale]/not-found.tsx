@@ -5,7 +5,7 @@ import { SiteHeader } from '@/components/layout/site-header'
 import { Footer } from '@/components/layout/footer'
 import { TabTitle } from '@/components/layout/tab-title'
 import { siteConfig } from '@/config/site'
-import { defaultLocale, localePath } from '@/i18n/config'
+import { defaultLocale, isLocale, localePath } from '@/i18n/config'
 import { getLocale, setLocale } from '@/i18n/locale'
 import { words } from '@/i18n/words'
 import { Button } from '@/platform/components/button'
@@ -21,7 +21,10 @@ export default async function NotFound() {
   // stands in for, so the language comes from the address instead. Reading a
   // header here would answer every 404 correctly and cost the whole site its
   // static pages, because a header is only knowable per request.
-  setLocale((await requestedLocale()) ?? defaultLocale)
+  // A language that is not ours is drawn in English, never refused again:
+  // this page is what a refusal shows.
+  const requested = await requestedLocale()
+  setLocale(isLocale(requested) ? requested : defaultLocale)
   const locale = getLocale()
   const t = words()
   const path = (href: string) => localePath(locale, href)
