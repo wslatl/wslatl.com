@@ -154,3 +154,30 @@ describe('the admin\'s Content Security Policy', () => {
     expect(policyOf(response)).toMatch(/default-src 'self'.*script-src 'self'(;|$)/)
   })
 })
+
+describe('an address that cannot be decoded', () => {
+  it('goes to our 404 page in its own language on this site, never on to a bare 500 with no headers', () => {
+    for (const [path, target] of [
+      ['/%ff', '/broken-address'],
+      ['/%C0%AF', '/broken-address'],
+      ['/en/%E0%A4%A', '/broken-address'],
+      ['/es/%E0%A4%A', '/es/broken-address'],
+      ['/de/games/%ff', '/de/broken-address'],
+      ['/zz/%ff', '/broken-address'],
+      ['/admin/%ff', '/admin/broken-address'],
+      ['/admin/api/login%ff', '/admin/broken-address'],
+    ] as const) {
+      const response = proxy(request(path, { headers: { host: 'evil.example' } }))
+      expect(response.status, path).toBe(307)
+      expect(response.headers.get('location'), path).toBe(`${origin}${target}`)
+    }
+  })
+
+  it('still gets the HTTPS and method rules first', () => {
+    const upgraded = proxy(request('/es/%ff', { headers: { 'cf-visitor': '{"scheme":"http"}' } }))
+    expect(upgraded.status).toBe(308)
+    expect(upgraded.headers.get('location')).toBe(`${origin}/es/%ff`)
+    expect(proxy(request('/es/%ff', { method: 'POST', body: 'x' })).status).toBe(405)
+    expect(proxy(request('/admin/api/login%ff', { method: 'POST', body: '{}' })).status).toBe(405)
+  })
+})

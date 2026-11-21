@@ -1,6 +1,6 @@
 import platform from './platform.config.mjs'
 import { createProxy } from '@/platform/i18n/proxy'
-import { isRootFile } from '@/i18n/routing'
+import { brokenAddress, isRootFile } from '@/i18n/routing'
 
 /**
  * Every request comes through here, the admin's included, and the kit
@@ -25,9 +25,12 @@ import { isRootFile } from '@/i18n/routing'
  *    decoded is a 404.
  *
  * A Content-Security-Policy the visitor sent, which Next would take a page's
- * nonce from, and a language named in a header, never reach a page.
+ * nonce from, and a language named in a header, never reach a page. An
+ * address that cannot be decoded (/%ff) gets the HTTPS and method rules,
+ * then a 307 to our 404 page in its language (brokenAddress), where the
+ * framework would answer a bare 500 with none of the headers.
  */
-export const proxy = createProxy({ url: platform.url, isFile: isRootFile })
+export const proxy = createProxy({ url: platform.url, isFile: isRootFile, brokenAddress })
 
 export const config = {
   // Only Next's own assets skip the proxy. The matcher has to be a constant,

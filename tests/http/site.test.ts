@@ -349,6 +349,30 @@ describe('an address the framework hands to a page with no language', () => {
     expect(site.log()).not.toMatch(/MISSING_MESSAGE/)
   })
 
+  it('cannot be decoded, and is sent to our 404 page in its own language, with every header, never to a bare error', async () => {
+    // (/en/%ff goes to /%ff first: next.config.mjs's own redirect from /en/
+    // answers before the proxy, and then this.)
+    for (const [path, target] of [
+      ['/%ff', '/broken-address'],
+      ['/%C0%AF', '/broken-address'],
+      ['/es/%E0%A4%A', '/es/broken-address'],
+      ['/de/games/%ff', '/de/broken-address'],
+      ['/admin/%ff', '/admin/broken-address'],
+    ] as const) {
+      const response = await raw(site.base, 'GET', path)
+      expect(response.status, path).toBe(307)
+      expect(response.headers.location, path).toBe(`https://wslatl.com${target}`)
+    }
+    for (const [path, admin] of [
+      ['/broken-address', false],
+      ['/es/broken-address', false],
+      ['/admin/broken-address', true],
+    ] as const) {
+      const response = await ask(path)
+      expect(response.status, path).toBe(404)
+      expect(headerProblems(response.headers, { admin, page: true }), path).toEqual([])
+    }
+  })
 })
 
 describe('the secrets', () => {

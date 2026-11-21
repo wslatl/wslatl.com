@@ -1,3 +1,5 @@
+import { defaultLocale, isLocale } from '@/i18n/config'
+
 /**
  * The paths served from the site root that are files or endpoints rather
  * than pages. They have no language, so the kit's proxy leaves them alone
@@ -80,4 +82,19 @@ export function isRootFile(pathname: string): boolean {
     rootFiles.includes(pathname) ||
     [...rootDirectories, ...sharedDirectories].some((dir) => pathname.startsWith(dir) && sharedFile.test(pathname))
   )
+}
+
+/**
+ * Where an address that cannot be decoded goes (/%ff, /es/%E0%A4%A): our
+ * 404 page, in the language its first segment names, and the admin's own
+ * 404 for an admin address. The kit's proxy sends it there with a 307 on the
+ * site's own address (brokenAddress in proxy.ts). Without it the framework
+ * answered such an address with a bare 500 that carried none of the
+ * security headers, its Content Security Policy included. No page is called
+ * broken-address, so each lands on the 404 page of its language.
+ */
+export function brokenAddress(pathname: string): string {
+  const first = pathname.split('/')[1]
+  if (first === 'admin') return '/admin/broken-address'
+  return isLocale(first) && first !== defaultLocale ? `/${first}/broken-address` : '/broken-address'
 }
