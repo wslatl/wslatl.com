@@ -32,7 +32,7 @@ const nextConfig = {
   // i18n/routing.ts: tests/error-pages.test.ts checks they agree.
   async rewrites() {
     return {
-      afterFiles: ['/clients/', '/owners/', '/brand/', '/partners/'].map((folder) => ({
+      afterFiles: ['/clients/', '/owners/', '/email/', '/brand/', '/partners/'].map((folder) => ({
         source: `${folder}:path*`,
         destination: `/en${folder}:path*`,
       })),
@@ -67,6 +67,13 @@ const nextConfig = {
       {
         source: outsideAdmin,
         headers: [{ key: 'Content-Security-Policy', value: publicPolicy({ dev: isDev }) }],
+      },
+      // The pictures every app's emails load (the kit appends ?v= and bumps it
+      // when a file changes), so mail clients and proxies may keep them for a
+      // year without asking again.
+      {
+        source: '/email/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       // The admin is for the owner only: never indexed, wherever a link to
       // it turns up. robots.txt leaves it out on purpose: a disallowed page
