@@ -68,6 +68,8 @@ export function readPage(html) {
 
   return {
     lang: html.match(/<html\b[^>]*\blang="([^"]*)"/i)?.[1],
+    // The first lang declared inside the body: the 404 page's own wrapper, as it has no <html lang>.
+    bodyLang: html.match(/<body[^>]*>[\s\S]*?\slang="([^"]*)"/i)?.[1],
     title: decode(html.match(/<title>([\s\S]*?)<\/title>/i)?.[1] ?? '').trim(),
     description: meta('description'),
     robots: meta('robots'),
@@ -385,6 +387,27 @@ export function checkLanguages(pages, allowed = []) {
 }
 
 /**
+ * A partner's profile in a translated language must not open with the
+ * partner's untranslated English tagline: the English page's description
+ * starts with it, so a translated one that starts the same way is a page
+ * in two languages. A tagline the partner did translate starts differently.
+ */
+export function checkPartnerLanguages(pages) {
+  const problems = []
+  const byUrl = new Map(pages.map((entry) => [entry.url, entry.page]))
+  for (const { url, page } of pages) {
+    const pathname = new URL(url).pathname
+    const locale = localeOfPath(pathname)
+    const path = pathWithoutLocale(pathname)
+    if (locale === defaultLocale || !/^\/partners\/[^/]+$/.test(path)) continue
+    const english = byUrl.get(expectedUrl(new URL(url).origin, defaultLocale, path))
+    const lead = english?.description?.slice(0, 30)
+    if (lead && lead.length === 30 && page.description?.startsWith(lead)) problems.push(`${pathname}: the description opens with the English tagline`)
+  }
+  return problems
+}
+
+/**
  * hreflang has to be reciprocal: when A lists B as its version in a language,
  * B has to list A as its version in A's language, or Google ignores the pair.
  * Checked page to page over every page fetched, not only against the set a
@@ -433,6 +456,8 @@ export function checkSitemapAgreement(entries, pages) {
 export function checkNotFound(page, { locale, english }) {
   const problems = []
   if (page.lang !== undefined && page.lang !== locale) problems.push(`html lang is "${page.lang}", expected "${locale}"`)
+  // The framework renders a 404 outside the layout, so <html lang> may be absent; the wrapper must then carry it.
+  else if (page.lang === undefined && page.bodyLang !== locale) problems.push(`no html lang and the page wrapper lang is "${page.bodyLang ?? 'missing'}", expected "${locale}"`)
   if (!page.title) problems.push('no title')
   else if (!page.title.endsWith(` | ${brand}`)) problems.push(`title is "${page.title}", expected it to end in " | ${brand}"`)
   if (locale !== defaultLocale && english && page.title === english.title) problems.push('title is the English one')

@@ -20,7 +20,7 @@
 //     address
 // And for the site: robots.txt, the sitemap, noindex on the admin, the 404
 // page in each language (its title, og:locale and one noindex), the company
-// profiles in sameAs (GitHub has to answer 200), fonts that do not hide text,
+// profiles in sameAs (GitHub has to answer 200 and its org has to link back to the site), fonts that do not hide text,
 // and large pictures that load first.
 //
 // Run against a local build, the addresses in the sitemap and the tags still
@@ -29,6 +29,7 @@ import { eachLimited, makeGet } from './lib/site-http.mjs'
 import {
   checkDuplicates,
   checkLanguages,
+  checkPartnerLanguages,
   checkNotFound,
   checkPage,
   checkPicture,
@@ -94,6 +95,7 @@ async function checkPages(entries) {
   report('Titles, descriptions, canonicals, hreflang, cards, headings, images and structured data', wrong, `${pages.length} pages`)
   report('No two pages in one language share a title or description', checkDuplicates(pages), `${pages.length} pages`)
   report('A translated page does not repeat the English title, description, picture text or company description', checkLanguages(pages), `${pages.length} pages`)
+  report('A translated partner page does not open with the untranslated English tagline', checkPartnerLanguages(pages), `${pages.length} pages`)
   report('hreflang links are returned page to page', checkReciprocity(pages), `${pages.length} pages`)
   report('The sitemap and each page list the same alternates', checkSitemapAgreement(entries, pages), `${pages.length} pages`)
   return pages
@@ -177,6 +179,26 @@ async function checkProfiles(pages) {
     }
   }
   report('The GitHub profile in sameAs answers 200', problems, github.join(', '))
+
+  // Google reconciles the company with its GitHub org through the org's own website link.
+  const orgProblems = []
+  for (const profile of github) {
+    const login = new URL(profile).pathname.split('/').filter(Boolean)[0]
+    if (!login) continue
+    try {
+      const res = await fetch(`https://api.github.com/orgs/${login}`, { headers: { 'user-agent': 'wslatl-seo-check', accept: 'application/vnd.github+json' } })
+      if (res.status !== 200) {
+        await res.body?.cancel()
+        orgProblems.push(`${login}: the GitHub API answers ${res.status}`)
+        continue
+      }
+      const { blog } = await res.json()
+      if (!blog || blog.replace(/\/+$/, '') !== origin) orgProblems.push(`the GitHub org ${login} has website "${blog ?? ''}", expected ${origin}`)
+    } catch (error) {
+      orgProblems.push(`${login} (${error.message})`)
+    }
+  }
+  report('The GitHub org in sameAs links back to the site', orgProblems, github.join(', '))
 }
 
 /** Text has to show while a font loads, and the biggest pictures have to be fetched first. */

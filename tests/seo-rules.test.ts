@@ -11,6 +11,7 @@ import {
   checkCards,
   checkDuplicates,
   checkLanguages,
+  checkPartnerLanguages,
   checkNotFound,
   checkOrganization,
   checkPage,
@@ -445,7 +446,7 @@ describe('the 404 page rules', () => {
   const notFound = (locale: string, extra = '', lang: string | undefined = undefined) => {
     const en = locale === 'en'
     const title = en ? 'Page not found | WSLATL' : `Not found in ${locale} | WSLATL`
-    const html = `<html${lang ? ` lang="${lang}"` : ''}><head><meta name="robots" content="noindex"/><title>${title}</title><meta name="description" content="${en ? 'Body' : `Body ${locale}`}"/><meta property="og:title" content="${title}"/><meta property="og:locale" content="${openGraphLocales[locale as keyof typeof openGraphLocales]}"/>${extra}</head><body></body></html>`
+    const html = `<html${lang ? ` lang="${lang}"` : ''}><head><meta name="robots" content="noindex"/><title>${title}</title><meta name="description" content="${en ? 'Body' : `Body ${locale}`}"/><meta property="og:title" content="${title}"/><meta property="og:locale" content="${openGraphLocales[locale as keyof typeof openGraphLocales]}"/>${extra}</head><body><div${lang === undefined ? ` lang="${locale}"` : ''}>x</div></body></html>`
     return readPage(html)
   }
   const english = notFound('en')
@@ -464,6 +465,12 @@ describe('the 404 page rules', () => {
     expect(checkNotFound({ ...notFound('fr'), title: 'Introuvable', ogTitle: 'Introuvable' }, { locale: 'fr', english })).toEqual([
       'title is "Introuvable", expected it to end in " | WSLATL"',
     ])
+  })
+
+  it('want the wrapper lang when there is no html lang', () => {
+    const bare = { ...notFound('fr'), bodyLang: undefined }
+    expect(checkNotFound(bare, { locale: 'fr', english })).toEqual(['no html lang and the page wrapper lang is "missing", expected "fr"'])
+    expect(checkNotFound({ ...bare, bodyLang: 'en' }, { locale: 'fr', english })).toEqual(['no html lang and the page wrapper lang is "en", expected "fr"'])
   })
 
   it('allow two noindex tags but never one that allows indexing', () => {
@@ -691,5 +698,23 @@ describe('the link rules', () => {
     expect(linkProblem(500)).toBe('answers 500')
     expect(linkProblem(308)).toContain('moved for good')
     expect(linkProblem(301)).toContain('moved for good')
+  })
+})
+
+describe('the partner language rule', () => {
+  const entry = (path: string, description: string) => ({
+    url: `${origin}${path}`,
+    page: readPage(`<html><head><meta name="description" content="${description}"/></head><body></body></html>`),
+  })
+  const tagline = 'Making mods and playing games while serving my community.'
+
+  it('passes a translated description with its own words', () => {
+    expect(checkPartnerLanguages([entry('/partners/a', `${tagline} Sign up.`), entry('/es/partners/a', 'Regístrate con el código A.')])).toEqual([])
+  })
+
+  it('catches one that opens with the English tagline', () => {
+    expect(checkPartnerLanguages([entry('/partners/a', `${tagline} Sign up.`), entry('/es/partners/a', `${tagline} Regístrate.`)])).toEqual([
+      '/es/partners/a: the description opens with the English tagline',
+    ])
   })
 })
