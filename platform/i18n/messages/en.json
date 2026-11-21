@@ -62,7 +62,11 @@
       "pages": "Admin pages",
       "viewSite": "View site",
       "signOut": "Sign out",
-      "signingOut": "Signing out"
+      "signingOut": "Signing out",
+      "menu": "Menu",
+      "closeMenu": "Close menu",
+      "badge": "{count, plural, one {# item needs attention} other {# items need attention}}",
+      "account": "Site and account"
     },
     "language": {
       "group": "Language",

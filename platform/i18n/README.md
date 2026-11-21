@@ -117,6 +117,8 @@ The visitor's `Content-Security-Policy` headers, which Next would take a page's 
 
 A `proxy.ts` with work of its own calls the steps apart: `secureRequest(request, { url }) ?? createLocaleRouting({ url, isFile })(request)`.
 
+**Behind Cloudflare.** Every request reaches the app with Host set to its own address and `X-Forwarded-Proto: https`, and Next on plain HTTP builds the address it hands the proxy from them. Each language's rewrite is built on that same address, which Next keeps inside the app; the test app's smoke checks and `tests/i18n/proxy.test.ts` ask exactly that. Start the app with `next start` alone, as the updater does. Bound with `--hostname 127.0.0.1`, Next hands the proxy an address on `localhost` while the request names `127.0.0.1`, then takes every rewrite for another host and proxies it out: English pages loop, or answer 500 with EPROTO behind Cloudflare. That comes from Next, not the kit, and an app's own rewrites do the same.
+
 ## The admin's language
 
 The admin's addresses never change. Its language comes from, in this order:

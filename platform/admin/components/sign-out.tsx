@@ -11,7 +11,7 @@ import { useAdminText } from './admin-text'
  * addresses come from the app's check: the kit's own routes for the shared
  * password, the app's for its own accounts.
  */
-export function SignOut({ action = '/admin/api/logout', then = '/admin/login' }: { action?: string; then?: string }) {
+export function SignOut({ action = '/admin/api/logout', then = '/admin/login', className }: { action?: string; then?: string; className?: string }) {
   const router = useRouter()
   const { t } = useAdminText()
   const [busy, setBusy] = useState(false)
@@ -24,7 +24,7 @@ export function SignOut({ action = '/admin/api/logout', then = '/admin/login' }:
   }
 
   return (
-    <Button variant="ghost" size="sm" onClick={signOut} disabled={busy}>
+    <Button variant="ghost" size="sm" onClick={signOut} disabled={busy} className={className}>
       <LogOut aria-hidden="true" />
       {busy ? t('shell.signingOut') : t('shell.signOut')}
     </Button>

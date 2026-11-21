@@ -1,27 +1,30 @@
 {
-  "version": "v0.2.1",
-  "commit": "6481c8ef54bcea8cb271c2727963c2ddf4b035d1",
+  "version": "v0.3.0",
+  "commit": "15dae3b600f7b30dc59a85886501cc799553bf42",
   "files": {
     "platform/README.md": {
       "sha256": "73f80f77d4f3bef0e85fdd934669caa56ea4c6a66cf74cc921c527660fe166a4"
     },
     "platform/admin/README.md": {
-      "sha256": "fb7a0958933e29627dd9ac6e2e22a322091b0bd26776a75f9d561df47ad272e3"
+      "sha256": "7bed1681cfa56a75f68f64cc9d26beb757fc7db603392c2e626379b66d39da89"
     },
     "platform/admin/admin.css": {
       "sha256": "90cfb97cf237a67335f9fb81e244d255263117c5ebcf2754407ceb5dab1bde41"
     },
     "platform/admin/admin.tsx": {
-      "sha256": "a3733d7b800c8d3bf9b7464f282a7a21f6b892201720819c6259bcdcffab8299"
+      "sha256": "bc3bd48181d77559109bc6da42c201359b7fbefe9c422f2e15658aeeec538516"
     },
     "platform/admin/app.ts": {
       "sha256": "05c7fbcd7324e9fb0c30db2e7db0e8c7f65f66ac1e1f25f2ebf81b756128e3f3"
     },
     "platform/admin/components/admin-nav.tsx": {
-      "sha256": "134a3771a895633c148d94ed46af9aece07ca9f9d0db86e32cfafda56133b8b4"
+      "sha256": "622bce68b0ffc6343c239456e3cc225c2a34f5ff9de6e4695379e2801518e859"
     },
     "platform/admin/components/admin-shell.tsx": {
-      "sha256": "e37c0f32408d05352349c03f3dcf1125600555429b86b22360999771df8f8cc3"
+      "sha256": "4f7c71f41ad2da0d7bf932642a59de149ce90571e4b6d6b11e9add1f03207b3b"
+    },
+    "platform/admin/components/admin-sidebar.tsx": {
+      "sha256": "6bee2ab76a6e796d932fb39c130a35837b5a0a0fb5a918acf26159736991cc7d"
     },
     "platform/admin/components/admin-text.tsx": {
       "sha256": "9edbeab50a5216ac51f8779fb6f1fdbcf11e17688d3f060a43829b8f4ef56f3e"
@@ -39,10 +42,16 @@
       "sha256": "d2576859e6528e55b3f9c375c29506e158dc5786bf5d3b80021e82eea86113bf"
     },
     "platform/admin/components/language-menu.tsx": {
-      "sha256": "8ce7affd30185200ec5ead252814054c73ace666abf38127f3772422125875d7"
+      "sha256": "201a61a66614808c95853ee8e123ba4deee09994114e4c8178cf997dfd1838b3"
     },
     "platform/admin/components/login-form.tsx": {
       "sha256": "d1886f69e756fdd4673c6f412471c5a9cf59ae2e783df1f5058fb98076041c04"
+    },
+    "platform/admin/components/menu-id.ts": {
+      "sha256": "5412be6c2b0542eb4cac40abf1de42c7ae46e810d135230f0c6012036b7a938e"
+    },
+    "platform/admin/components/mobile-menu.tsx": {
+      "sha256": "b35b77cbfac02295adae50eeb32314ca53a893e3fe44f17ea25320f8d4afb0ba"
     },
     "platform/admin/components/notice.tsx": {
       "sha256": "caa9eeef6c3ed2c8de9ef3babba2f5e38610f93f0412f9c74740c2ee4800bfb5"
@@ -54,7 +63,7 @@
       "sha256": "ee16dd6c3f9a5bef933ca1f5babf0adee81ef4cc5cf1ace4927f3df8681a6726"
     },
     "platform/admin/components/sign-out.tsx": {
-      "sha256": "cc508fb048b2a458361529bf02bfa1838b528b3280016288d990bfeadb2b24b4"
+      "sha256": "524ac52f5d69891d09dc28cf5b663d8480412c614be72387a8d49ae6b2d5b37f"
     },
     "platform/admin/components/tab-title.tsx": {
       "sha256": "9fd48a9adb8e9e0bcd25526a224a082f260286946e56d2d2d252f58f51e3891c"
@@ -71,8 +80,14 @@
     "platform/admin/hash-password.mjs": {
       "sha256": "fbac94bea374cdc556e4c8f1ffdd35b325739b4bc6c5da38324fbb487f4614fa"
     },
+    "platform/admin/icons.ts": {
+      "sha256": "5fcdcd8620310f997a20f74bf58465b6d217d1087ee6d0873b18903b2450237c"
+    },
     "platform/admin/instrumentation.ts": {
       "sha256": "c40e0b6c023c9918a9c81ab0a801ef39f1e71fd87e221cbc41d2003177e1da54"
+    },
+    "platform/admin/nav.ts": {
+      "sha256": "dd18ac5d0fcecf13633e26e8e28a2f4c2e7e015f0a8ead8a8434eb68fe56a9f7"
     },
     "platform/admin/next.mjs": {
       "sha256": "d9594e6db6ccb95b17b27c3682d261ad5585ab22cc1bed07b60021d1f48faa2b"
@@ -132,7 +147,7 @@
       "sha256": "1b29848ddafdb6419cd11ae9f423ab59c8a53344d226eea0cbceb1e7b794c7e7"
     },
     "platform/admin/server/core.ts": {
-      "sha256": "76d96af29b9172d0d3e030000bb558458ce9d0d3bb40c5b6a1224a221ede0825"
+      "sha256": "904447dea40d4e6c9fcafeedaebb45eccb82226451b574e21c830b0ae63bc74d"
     },
     "platform/admin/server/device.ts": {
       "sha256": "c10b74572db8af3f04faf6992516325f49c1e0ad670bf1cd3287930c05581447"
@@ -246,7 +261,7 @@
       "sha256": "9d84739626a26926451c2240f92e0b8c03d54190d12dedd838eb8db8bf541126"
     },
     "platform/config.mjs": {
-      "sha256": "14edb203d28a1d9ed2429da1d80cd663e4cf1ca50b35521caec21a8a7e3ca6e5"
+      "sha256": "22c402fe8c802e95888d20d3d4fd46c88cf569753d706da8311042493fee5577"
     },
     "platform/email/README.md": {
       "sha256": "985076c939204c523215f093d2b82392c04cc306ee7a3ea1e1cdad67439650d8"
@@ -267,7 +282,7 @@
       "sha256": "b8c2b525457738f8f17a0338562273a9f49acf6d41413cb59152471b3935afb3"
     },
     "platform/i18n/README.md": {
-      "sha256": "b4be8eb94bc705d803cc6fd32bacca451ea7425e36989f29151a421a58dcb585"
+      "sha256": "cb852c96ae61e0fab5ad08b62c27ffbccc327d5b0c505b8f02d76a29e735c8c8"
     },
     "platform/i18n/admin-locale.ts": {
       "sha256": "7a6ce3e629e50d998c203a4c59e27d38ba2927e71c01e6f2a48957d6f218c5ff"
@@ -285,19 +300,19 @@
       "sha256": "80d2b40d01ea5d9e1c54beb3ea7bb05ede54fa2378f560988e2aadb4460a3bd0"
     },
     "platform/i18n/messages/de.json": {
-      "sha256": "5c1a9ed20c4ebc2bdb1a8b4ab264c942c0f3d81c1c268b59332b000c559dcf10"
+      "sha256": "a1ebcdd81f2d84b64e8a93ab2cb09daaf1878c98cd3ae069bb6930ac3a49f222"
     },
     "platform/i18n/messages/en.json": {
-      "sha256": "13e059a1792b1a91854be7c3a24098bbab14163a84987343eb7685005c12279e"
+      "sha256": "54dbe02fda5fead2bb71035c1f94a238d368464b11823afd39846be10aefcd22"
     },
     "platform/i18n/messages/es.json": {
-      "sha256": "ec18b7fb953a50204cce35aeb5d626c0da15a90b656e3dc04a40d930d2aa8214"
+      "sha256": "4d1ec2e3ee9a8f9dce46973f9981c8ed42f35a0a7fe485993950deae4df792cd"
     },
     "platform/i18n/messages/fr.json": {
-      "sha256": "20246614d6425cd0653ec22b6539772a17424872656615138037169da7cf2103"
+      "sha256": "ba61f8cb045ff1cb27ed7630dfc5e50b7e3a129e6c3b9868fd5a9b09e3b4e0ea"
     },
     "platform/i18n/messages/pt.json": {
-      "sha256": "0eed83cce1246d1ccf07fac73badb7143be9a0c0467f2a27b373b822d7cd522d"
+      "sha256": "2a091a2d47b277d618648b89a75b87d682891b589b2bf566a821d42bdc6f2f36"
     },
     "platform/i18n/navigation.ts": {
       "sha256": "6487af060b59fb4235ae7882b01373faac14a039b4c6ed27c7532667b670400b"

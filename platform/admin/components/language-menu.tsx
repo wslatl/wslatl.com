@@ -14,9 +14,12 @@ import { useAdminText } from './admin-text'
  * /admin/api/language, which sets the admin's language cookie (and keeps it
  * for the account, for an app whose accounts keep one), and the page is
  * drawn again in the new language. `menu` is the button and list in the
- * admin's header; `row` is the five in a row, for the sign-in card.
+ * admin's header; `row` is the five in a row, for the sign-in card;
+ * `inline` is the same button with the list opening in the page's flow
+ * under it, for the sidebar, where a list floating off the edge would have
+ * nowhere to go.
  */
-export function LanguageMenu({ variant = 'menu', className }: { variant?: 'menu' | 'row'; className?: string }) {
+export function LanguageMenu({ variant = 'menu', className }: { variant?: 'menu' | 'row' | 'inline'; className?: string }) {
   const { locale, t } = useAdminText()
   const router = useRouter()
   const menuRef = useRef<HTMLDetailsElement>(null)
@@ -68,7 +71,7 @@ export function LanguageMenu({ variant = 'menu', className }: { variant?: 'menu'
           className={itemClassName}
         >
           {localeNames[code]}
-          {variant === 'menu' && code === locale && <Check aria-hidden="true" className="size-4 shrink-0 text-link" />}
+          {variant !== 'row' && code === locale && <Check aria-hidden="true" className="size-4 shrink-0 text-link" />}
         </button>
       </li>
     ))
@@ -79,6 +82,8 @@ export function LanguageMenu({ variant = 'menu', className }: { variant?: 'menu'
       {failure}
     </p>
   )
+
+  const inline = variant === 'inline'
 
   if (variant === 'row') {
     return (
@@ -111,14 +116,18 @@ export function LanguageMenu({ variant = 'menu', className }: { variant?: 'menu'
     >
       <summary
         aria-label={t('language.label', { language: localeNames[locale] })}
-        className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }), 'cursor-pointer list-none [&::-webkit-details-marker]:hidden')}
+        className={cn(
+          buttonVariants({ variant: 'ghost', size: 'sm' }),
+          'cursor-pointer list-none [&::-webkit-details-marker]:hidden',
+          inline && 'h-auto w-full justify-start px-3 py-2.5 text-sm font-medium lg:py-2',
+        )}
       >
         <Languages aria-hidden="true" />
-        <span aria-hidden="true" className="hidden sm:inline">
+        <span aria-hidden="true" className={cn(!inline && 'hidden sm:inline')}>
           {localeNames[locale]}
         </span>
       </summary>
-      <div className="absolute top-full right-0 z-50 mt-2 w-48 rounded-xl border bg-popover p-1.5 text-popover-foreground shadow-xl">
+      <div className={cn(inline ? 'mt-1 border-l pl-2' : 'absolute top-full right-0 z-50 mt-2 w-48 rounded-xl border bg-popover p-1.5 text-popover-foreground shadow-xl')}>
         <ul>
           {choices(
             'flex w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-left text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50 aria-[current]:text-foreground',

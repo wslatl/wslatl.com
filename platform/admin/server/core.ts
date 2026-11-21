@@ -2,6 +2,7 @@ import 'server-only'
 import type { PlatformConfig } from '../../config.mjs'
 import { isLocale, textIn, type LocalizedText, type Locale } from '../../i18n/config'
 import type { AdminNavItem } from '../components/admin-nav'
+import type { NavEntry } from '../nav'
 import { adminRequest, type AdminAuth, type AdminUser } from './auth'
 import { adminLog } from './request'
 import { githubSettings, type GitHubSettings } from './settings'
@@ -22,7 +23,8 @@ export type AdminApp = {
   repo: string
   /** Which check platform.config.mjs asks for. */
   auth: 'password' | 'custom'
-  nav: readonly AdminLink[]
+  /** admin.nav as the config has it, pages and groups, for the request's own nav to fall back to. */
+  nav: readonly NavEntry[]
   wide: boolean
   /** The app's own line for the sign-in card, or null for the kit's "Sign in to update the site." in each language. */
   signInText: LocalizedText | null

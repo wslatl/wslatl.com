@@ -155,12 +155,50 @@ A value that is not one of the five codes, exactly as written, counts as none, a
 
 The admin's colours are set under `--admin-*` names (`--admin-muted`, `--admin-border` and so on) on the admin's `<html>`, never under `--muted`, `--accent`, `--border`, `--link`, `--input`, `--ring` or any other plain name. The kit's colour utilities (`bg-card`, `text-link`, `border-border`) read the `--admin-*` name first and the plain one after it, so the admin looks as it always did and an app's own variables with those names are left as the app set them. An app's own admin pages that use these classes get the admin's colours; its own CSS that reads `var(--muted)` gets its own.
 
+## The sidebar
+
+Every signed-in page sits beside a sidebar on a desktop; on a phone it folds behind a Menu button (a native popover, closed by Escape, a tap outside or a link). At the top are the app's mark and name. Under the pages, kept apart from them: Updates (unless the app lists it), View site, the language menu, Sign out and the app's version.
+
+`admin.nav` takes pages and groups, in order. A flat list of `{ href, label }` still works, each page ungrouped.
+
+```js
+nav: [
+  { href: '/admin', label: 'Overview', icon: 'layout-dashboard', exact: true },
+  { group: { en: 'Monitoring', es: 'Supervisión', fr: 'Supervision', de: 'Überwachung', pt: 'Monitoramento' },
+    items: [{ href: '/admin/monitors', label: 'Monitors', icon: 'activity' }, { href: '/admin/docker', label: 'Docker', icon: 'container' }] },
+  { group: 'System', items: [{ href: '/admin/settings', label: 'Settings', icon: 'settings' }] },
+]
+```
+
+- A group's `group` heading is optional. Pages may sit above, between or after groups.
+- Labels and headings are a string, or all five languages.
+- `icon` is a lucide name from the kit's list: layout-dashboard, file-text, sparkles, download, rocket, life-buoy, activity, server, triangle-alert, container, mail, users, settings, scroll-text, key-round, at-sign, tags, filter, list, user-search, shield. An unknown name stops the config from loading and is named.
+- The most specific page lights (`aria-current="page"`): `/admin/updates/publish` lights Publish, not Updates; `/admin/guides/edit` lights Guides. `exact: true` lights a page on its own address only; `/admin` is exact unless it says `exact: false`.
+
+### Per request: `navFor`
+
+```ts
+export const admin = createAdmin({
+  config,
+  auth,
+  version: 'v1.4.2', // or () => string | null | Promise<string | null>
+  navFor: async ({ user, env }) => [ /* same shapes as admin.nav */
+    { group: 'Monitoring', items: [
+      { href: '/admin/incidents', label: 'Incidents', badge: await openIncidents() },
+      ...(env.DOCKER_SOCKET ? [{ href: '/admin/docker', label: 'Docker' }] : []),
+    ] },
+  ],
+})
+```
+
+`navFor({ user, env })` returns the nav for this request and defaults to `admin.nav`. A page left out is hidden. `badge` (a whole number; 0 shows nothing, over 99 shows 99+) is read aloud as "N items need attention" in the admin's language. It runs on every page, so keep it quick. If it throws or returns something invalid, the admin logs why and shows `admin.nav`. `version` is the small text at the foot of the sidebar.
+
 ## `admin` in platform.config.mjs
 
 | Setting | What it does |
 | --- | --- |
 | `auth` | `"password"` or `"custom"`, as above. |
-| `nav` | The admin's own pages, as `[{ href: '/admin/guides', label: 'Guides' }]`. Left out, the header lists none, as on the main website. |
+| `nav` | The admin's own pages in the sidebar, flat or in groups (below). Left out, the sidebar lists none, as on the main website. |
 | `wide` | `true` for pages 72rem wide instead of 56rem, for an admin with tables. |
 | `signInText` | The line on the sign-in card. "Sign in to update the site.", in the admin's language, unless set. |
 | `updateLinks` | The app's own admin pages that belong next to updates, as `[{ href: '/admin/updates/publish', label: 'Publish a release' }]`. Shown as a row of links under the Updates heading, also while updates are off. At most 5; each `href` an address in the admin (`/admin` or a path under it, no query), each `label` plain text of 40 characters at most, no angle brackets or control characters, and no address twice. While no release is published, the page says "Publish one from" the first link "or on GitHub" instead of pointing to GitHub alone. A setting that breaks these rules stops `platform.config.mjs` from loading, with the reason. |

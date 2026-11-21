@@ -62,7 +62,11 @@
       "pages": "Páginas da administração",
       "viewSite": "Ver o site",
       "signOut": "Sair",
-      "signingOut": "Saindo"
+      "signingOut": "Saindo",
+      "menu": "Menu",
+      "closeMenu": "Fechar o menu",
+      "badge": "{count, plural, one {# item precisa de atenção} other {# itens precisam de atenção}}",
+      "account": "Site e conta"
     },
     "language": {
       "group": "Idioma",
