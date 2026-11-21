@@ -62,7 +62,11 @@
       "pages": "Verwaltungsseiten",
       "viewSite": "Website ansehen",
       "signOut": "Abmelden",
-      "signingOut": "Abmeldung läuft"
+      "signingOut": "Abmeldung läuft",
+      "menu": "Menü",
+      "closeMenu": "Menü schließen",
+      "badge": "{count, plural, one {# Eintrag braucht Aufmerksamkeit} other {# Einträge brauchen Aufmerksamkeit}}",
+      "account": "Website und Konto"
     },
     "language": {
       "group": "Sprache",

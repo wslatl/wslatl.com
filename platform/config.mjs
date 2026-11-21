@@ -16,14 +16,28 @@
  *
  * @typedef {object} AdminConfig
  * @property {'password' | 'custom'} auth "password" is the kit's one shared password. "custom" means the app plugs in its own check, such as staff accounts. platform/admin/README.md has both.
- * @property {AdminNavItem[]} [nav] The admin's own pages, in the order its header lists them, when it has more than Updates. Left out, the header lists none, as on the main website.
+ * @property {AdminNavEntry[]} [nav] The admin's own pages, in the order its sidebar lists them, when it has more than Updates: pages (each { href, label, icon?, exact? }) and groups of pages ({ group?, items }). A flat list of pages works as ever, each page ungrouped. Left out, the sidebar lists none, as on the main website. platform/admin/README.md has the shapes.
  * @property {boolean} [wide] Pages 72rem wide instead of 56rem, for an admin with tables.
  * @property {LocalizedText} [signInText] The line on the sign-in card under "Admin". "Sign in to update the site.", in the admin's language, unless set.
- * @property {AdminNavItem[]} [updateLinks] The app's own admin pages that belong next to updates, such as { href: "/admin/updates/publish", label: "Publish a release" }. Shown on the Updates page, at most 5, each href an address in the admin and each label plain text of 40 characters at most. While no release is published, the page points to the first one as well as to GitHub.
+ * @property {AdminLink[]} [updateLinks] The app's own admin pages that belong next to updates, such as { href: "/admin/updates/publish", label: "Publish a release" }. Shown on the Updates page, at most 5, each href an address in the admin and each label plain text of 40 characters at most. While no release is published, the page points to the first one as well as to GitHub.
+ *
+ * @typedef {object} AdminLink
+ * @property {string} href An address in the admin, such as "/admin/guides".
+ * @property {LocalizedText} label What the admin calls it, such as "Guides".
  *
  * @typedef {object} AdminNavItem
- * @property {string} href An address in the admin, such as "/admin/guides".
- * @property {LocalizedText} label What the header calls it, such as "Guides".
+ * @property {string} href An address in the admin, such as "/admin/guides". The page is lit for it and for every address under it, and the most specific page wins.
+ * @property {LocalizedText} label What the sidebar calls it, such as "Guides".
+ * @property {AdminIcon} [icon] A lucide icon from the kit's list (adminIcons below).
+ * @property {boolean} [exact] Lit on its own address only. "/admin" is always exact unless this says false.
+ *
+ * @typedef {object} AdminNavGroup
+ * @property {LocalizedText} [group] The heading over the pages. Left out, the pages sit together under no heading.
+ * @property {AdminNavItem[]} items The group's pages, in order.
+ *
+ * @typedef {AdminNavItem | AdminNavGroup} AdminNavEntry
+ *
+ * @typedef {'layout-dashboard' | 'file-text' | 'sparkles' | 'download' | 'rocket' | 'life-buoy' | 'activity' | 'server' | 'triangle-alert' | 'container' | 'mail' | 'users' | 'settings' | 'scroll-text' | 'key-round' | 'at-sign' | 'tags' | 'filter' | 'list' | 'user-search' | 'shield'} AdminIcon
  *
  * @typedef {string | Readonly<Record<'en' | 'es' | 'fr' | 'de' | 'pt', string>>} LocalizedText
  *   Words the admin shows: one string for every language, or one for each
@@ -97,8 +111,71 @@ function eachText(text, test) {
   return keys.length === textLocales.length && textLocales.every((locale) => keys.includes(locale) && test(/** @type {Record<string, unknown>} */ (text)[locale]))
 }
 
+/**
+ * The lucide icons an admin page may name in admin.nav, as lucide calls
+ * them. The kit bundles exactly these (admin/icons.ts, held to this list by
+ * a test), so an app never ships the rest.
+ */
+export const adminIcons = Object.freeze(
+  /** @type {const} */ ([
+    'layout-dashboard', 'file-text', 'sparkles', 'download', 'rocket', 'life-buoy', 'activity', 'server', 'triangle-alert', 'container', 'mail',
+    'users', 'settings', 'scroll-text', 'key-round', 'at-sign', 'tags', 'filter', 'list', 'user-search', 'shield',
+  ]),
+)
+
 /** @param {unknown} words */
 const someWords = (words) => typeof words === 'string' && words.trim() !== ''
+
+/**
+ * What is wrong with an admin nav, one sentence each: the list in admin.nav,
+ * or one an app's navFor hook hands back for a request (where: "navFor",
+ * badge: true, since only the hook knows a count).
+ * @param {unknown} nav
+ * @param {{ where?: string, badge?: boolean }} [options]
+ * @returns {string[]}
+ */
+export function navProblems(nav, { where = 'admin.nav', badge = false } = {}) {
+  /** @type {string[]} */
+  const problems = []
+  /** @type {string[]} */
+  const hrefs = []
+  /** @type {string[]} */
+  const icons = []
+  let good = Array.isArray(nav)
+  /** @param {any} item */
+  const itemOk = (item) => {
+    if (typeof item !== 'object' || item === null || Array.isArray(item)) return false
+    if (typeof item.href !== 'string' || !adminHref.test(item.href) || !eachText(item.label, someWords)) return false
+    if (item.exact !== undefined && typeof item.exact !== 'boolean') return false
+    if (item.badge !== undefined && !(badge && Number.isInteger(item.badge) && item.badge >= 0 && item.badge <= 1_000_000_000)) return false
+    if (item.icon !== undefined) {
+      if (typeof item.icon !== 'string' || !adminIcons.includes(/** @type {never} */ (item.icon))) {
+        icons.push(String(item.icon))
+        return true
+      }
+    }
+    hrefs.push(item.href)
+    return true
+  }
+  if (Array.isArray(nav)) {
+    for (const entry of nav) {
+      if (typeof entry === 'object' && entry !== null && 'items' in entry) {
+        const keys = Object.keys(entry)
+        if (!keys.every((key) => key === 'group' || key === 'items')) good = false
+        else if (entry.group !== undefined && !eachText(entry.group, someWords)) good = false
+        else if (!Array.isArray(entry.items) || !entry.items.every(itemOk)) good = false
+      } else if (!itemOk(entry)) good = false
+    }
+  }
+  if (!good) {
+    problems.push(
+      `${where} must be a list of pages { href, label, icon?, exact? } and groups { group?, items }, each href an address in the admin such as "/admin/guides", and each label and group heading its words, or its words in each of en, es, fr, de and pt.${badge ? ' A badge is a whole number, 0 or more.' : ' A badge comes from the navFor hook, never from the config.'}`,
+    )
+  }
+  for (const icon of new Set(icons)) problems.push(`${where} uses the icon "${icon}", which the kit does not have. The icons are: ${adminIcons.join(', ')}.`)
+  if (good && new Set(hrefs).size !== hrefs.length) problems.push(`${where} lists the same address twice.`)
+  return problems
+}
 
 /**
  * What is wrong with the admin's optional settings, one sentence each.
@@ -109,20 +186,7 @@ function adminProblems(admin) {
   /** @type {string[]} */
   const problems = []
   const { nav, wide, signInText, updateLinks } = admin
-  if (nav !== undefined) {
-    const good =
-      Array.isArray(nav) &&
-      nav.every(
-        (item) =>
-          typeof item?.href === 'string' && adminHref.test(item.href) && eachText(item?.label, someWords),
-      )
-    if (!good) {
-      problems.push(
-        'admin.nav must be a list of { href, label }, each href an address in the admin such as "/admin/guides", and each label its words, or its words in each of en, es, fr, de and pt.',
-      )
-    }
-    else if (new Set(nav.map((item) => item.href)).size !== nav.length) problems.push('admin.nav lists the same address twice.')
-  }
+  if (nav !== undefined) problems.push(...navProblems(nav))
   if (wide !== undefined && typeof wide !== 'boolean') problems.push('admin.wide must be true or false.')
   if (signInText !== undefined && !eachText(signInText, someWords)) {
     problems.push('admin.signInText must be a sentence, such as "Sign in to update the site.", or one in each of en, es, fr, de and pt.')

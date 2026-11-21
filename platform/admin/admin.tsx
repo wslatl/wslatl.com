@@ -4,7 +4,7 @@ import { headers } from 'next/headers'
 import { notFound, redirect } from 'next/navigation'
 import { connection } from 'next/server'
 import { cache } from 'react'
-import type { PlatformConfig } from '../config.mjs'
+import { navProblems, type PlatformConfig } from '../config.mjs'
 import { textIn, type Locale, type LocalizedText } from '../i18n/config'
 import { adminMessages } from '../i18n/messages'
 import { AdminShell } from './components/admin-shell'
@@ -16,10 +16,12 @@ import { Logo } from '../components/logo'
 import { hidden } from './components/tags'
 import { Updates } from './components/updates'
 import type { AdminAuth } from './server/auth'
+import { navIn, type NavEntry } from './nav'
 import { adminCore, linksIn, type AdminCore, type AdminSettings, type SignedIn } from './server/core'
 import { chooseAdminLocale, cookieLocale, requestLocale } from './server/locale'
-import { bare, checkPost, checkRead, signInAgain } from './server/request'
+import { adminLog, bare, checkPost, checkRead, signInAgain } from './server/request'
 import { adminRoutes, type AdminRoutes } from './server/routes'
+import type { Env } from './server/settings'
 import { adminText } from './server/text'
 
 /**
@@ -87,7 +89,30 @@ export type Admin = AdminCore & {
   signInMetadata(): Promise<Metadata>
 }
 
-export function createAdmin({ config, auth }: { config: PlatformConfig; auth: AdminAuth | null }): Admin {
+/**
+ * What an app's navFor hook is asked: who is signed in, and the server's
+ * settings (process.env), so a page can be left out because of either.
+ */
+export type NavContext = { user: SignedIn; env: Env }
+
+export type CreateAdminOptions = {
+  config: PlatformConfig
+  auth: AdminAuth | null
+  /**
+   * The sidebar's pages for one request, when they depend on it: a page
+   * left out (Docker, when there is no Docker socket), a count beside one
+   * (open incidents). Return the same shapes as admin.nav, with the
+   * addition of `badge` on a page. Left out, every request gets
+   * admin.nav. It runs on every page, so keep it quick: a count from one
+   * indexed query, not a scan. Should it throw, or hand back something that
+   * is not a nav, the admin logs why and shows admin.nav instead.
+   */
+  navFor?: (context: NavContext) => readonly NavEntry[] | Promise<readonly NavEntry[]>
+  /** The app's version, at the foot of the sidebar, such as "v1.4.2": text, or a function that gives it. */
+  version?: string | (() => string | null | Promise<string | null>)
+}
+
+export function createAdmin({ config, auth, navFor, version }: CreateAdminOptions): Admin {
   const core = adminCore(config, auth)
   const { app } = core
 
@@ -114,6 +139,20 @@ export function createAdmin({ config, auth }: { config: PlatformConfig; auth: Ad
     const user = await core.user(requestHeaders)
     if (!user) redirect(core.signInPath)
     return { user, settings, locale: chooseAdminLocale(user.locale, cookieLocale(requestHeaders)) }
+  }
+
+  /** The pages for this request: the app's navFor, or admin.nav, which is also what stands in for a navFor that fails. */
+  async function navForRequest(user: SignedIn): Promise<readonly NavEntry[]> {
+    if (!navFor) return app.nav
+    try {
+      const nav = await navFor({ user, env: process.env })
+      const problems = navProblems(nav, { where: 'navFor', badge: true })
+      if (problems.length === 0) return nav
+      adminLog(`navFor gave a nav the admin cannot show, so admin.nav is shown instead. ${problems.join(' ')}`)
+    } catch (error) {
+      adminLog(`navFor failed (${error instanceof Error ? error.message : 'no reason given'}), so admin.nav is shown instead.`)
+    }
+    return app.nav
   }
 
   const isOn = async () => (await core.settings()) !== null
@@ -157,14 +196,18 @@ export function createAdmin({ config, auth }: { config: PlatformConfig; auth: Ad
     },
 
     async SignedInLayout({ children }) {
-      const { locale: language } = await signedInPage()
+      const { user, locale: language } = await signedInPage()
+      const pages = navIn(await navForRequest(user), language)
+      const shown = typeof version === 'function' ? await version() : version
       // Its own words for its client components, in the language just
       // chosen, whatever the root layout around it chose.
       return (
         <AdminTextProvider locale={language} messages={adminMessages(language)}>
           <AdminShell
             brand={app.brand}
-            nav={linksIn(app.nav, language)}
+            name={app.name}
+            nav={pages}
+            version={shown}
             wide={app.wide}
             signOutPath={core.signOutPath}
             signInPath={core.signInPath}
