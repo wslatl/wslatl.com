@@ -55,15 +55,18 @@ const nextConfig = {
     unoptimized: true,
   },
   experimental: {
-    // What Next renders while the site runs stays in memory (50 MB at most,
-    // the oldest dropped first) and never goes to the disk. A game, a legal
-    // document or a partner has its address made up by whoever asks
-    // (/games/anything, in every language), and Next kept each 404 it drew
-    // there as files under .next/server, about 126 KB each and for good, so
-    // a flood of made-up addresses filled the server's disk, and a server
-    // over its disk limit is stopped by Pterodactyl. The pages the build
-    // made are read from the build as before; tests/http checks that a run
-    // of made-up addresses writes nothing.
+    // What Next renders while the site runs is kept in memory, never on the
+    // disk. A game, a legal document or a partner has its address made up by
+    // whoever asks (/games/anything, in every language), and Next kept each
+    // 404 it drew there as files under .next/server, about 126 KB each and
+    // for good, so a flood of made-up addresses filled the server's disk,
+    // and a server over its disk limit is stopped by Pterodactyl. Memory is
+    // no limit on such a flood either: beside its cache, Next keeps a note
+    // of every such page it draws, the whole address in it, until the server
+    // stops. So no made-up slug reaches those pages at all: proxy.ts sends
+    // it to the catch-all 404 page, which keeps nothing. The pages the build
+    // made are read from the build as before; tests/http checks that made-up
+    // addresses write nothing and are kept nowhere.
     isrFlushToDisk: false,
   },
   async headers() {

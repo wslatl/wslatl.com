@@ -1,8 +1,9 @@
 import { randomBytes } from 'node:crypto'
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import shortLinks from '../../config/links.json' with { type: 'json' }
+import { partners } from '../../data/partners'
 import { cookieProblems, headerProblems } from '../../scripts/check-security.mjs'
 import { fakeGitHub, type FakeGitHub } from '../attack/fake-github'
 import { raw, root, type Site, startSite } from './server'
@@ -87,6 +88,7 @@ describe('the security headers', () => {
       ['a legal document', '/legal/privacy', {}, {}],
       ['a page that does not exist', '/no-such-page', {}, {}],
       ['an unknown game in German', '/de/games/no-such-game', {}, {}],
+      ['an address under /_next/ that is none of its files', '/_next/games/no-such-game', {}, {}],
       ['a missing file', '/no-such-file.js', {}, {}],
       ['a script', asset ?? '/', {}, {}],
       ['a share card', '/og?path=/pricing&locale=en', {}, {}],
@@ -306,6 +308,9 @@ describe('a flood of guesses from many addresses', () => {
   }, 120_000)
 })
 
+/** A slug no list has, new every time. */
+const madeUp = () => `no-such-${randomBytes(6).toString('hex')}`
+
 /** Every file under a folder, as paths relative to it. */
 function filesUnder(dir: string, prefix = ''): string[] {
   if (!existsSync(join(dir, prefix))) return []
@@ -335,6 +340,54 @@ describe('a made-up game, document or partner', () => {
     expect((await ask('/games/minecraft')).status).toBe(200)
     expect((await ask('/es/legal/privacy')).status).toBe(200)
     expect(filesUnder(server).filter((file) => !before.has(file))).toEqual([])
+  }, 120_000)
+
+  it('is kept nowhere, in any form Next reads as that page, so it leaves nothing in memory either', async () => {
+    // Next drew each of these as the list's own page and kept a note of it
+    // in memory that nothing clears, the whole address in it: up to 16 KB
+    // for every new address. Such a page went out with s-maxage and
+    // x-nextjs-cache: MISS. The catch-all page, which keeps nothing, goes
+    // out with no-store, and so does the plain 404 under /_next/.
+    const build = readFileSync(join(root, '.next', 'BUILD_ID'), 'utf8').trim()
+    const forms: [string, string, Record<string, string>?][] = [
+      ['GET', `/games/${madeUp()}`],
+      ['GET', `/es/games/${madeUp()}`],
+      ['GET', `/fr/legal/${madeUp()}`],
+      ['GET', `/de/partners/${madeUp()}`],
+      ['HEAD', `/pt/games/${madeUp()}`],
+      ['GET', `/legal/${madeUp()}${'x'.repeat(4000)}`],
+      ['GET', `/games/${madeUp()}.rsc`],
+      ['GET', `/es/legal/${madeUp()}.prefetch.rsc`],
+      ['GET', `/games/${madeUp()}%25`],
+      ['GET', `/es/games/${madeUp()}%25`],
+      ['GET', `/partners/${madeUp()}.png`],
+      ['GET', `/es/partners/${madeUp()}.webp`],
+      ['GET', `/_next/games/${madeUp()}`],
+      ['GET', `/_next/legal/${madeUp()}`],
+      ['GET', `/_next/partners/${madeUp()}`],
+      // Next hands the proxy a data address of this build as the page itself.
+      ['GET', `/_next/data/${build}/games/${madeUp()}.json`],
+      ['GET', `/_next/data/${build}/es/legal/${madeUp()}.json`],
+      ['GET', `/games/${madeUp()}`, { rsc: '1' }],
+      ['GET', `/de/games/${madeUp()}`, { rsc: '1', 'next-router-prefetch': '1' }],
+      ['GET', `/partners/${madeUp()}`, { rsc: '1', 'next-router-prefetch': '1', 'next-router-segment-prefetch': '/_tree' }],
+    ]
+    for (const [method, path, headers = {}] of forms) {
+      const label = `${method} ${path.slice(0, 60)} ${JSON.stringify(headers)}`
+      let response = await raw(site.base, method, path, headers)
+      // An RSC request is asked again with the hash of its headers (?_rsc=), as Next tells the client router to.
+      if (response.status === 307 && headers.rsc) response = await raw(site.base, method, String(response.headers.location), headers)
+      // The 404 page's RSC form goes out as a 200, as it does for any address the site has no page for.
+      expect(response.status, label).toBe(headers.rsc || path.endsWith('.rsc') ? 200 : 404)
+      expect(String(response.headers['cache-control']), label).toMatch(/no-store/)
+      expect(response.headers['x-nextjs-cache'], label).toBeUndefined()
+    }
+    // A real one is still the page the build made, read from the build.
+    for (const path of ['/games/minecraft', '/es/legal/privacy', `/de/partners/${partners[0].slug}`, '/games/minecraft.rsc']) {
+      const response = await raw(site.base, 'GET', path)
+      expect(response.status, path).toBe(200)
+      expect(response.headers['x-nextjs-cache'], path).toBe('HIT')
+    }
   }, 120_000)
 })
 

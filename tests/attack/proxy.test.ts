@@ -139,12 +139,27 @@ describe('the admin\'s Content Security Policy', () => {
 
   it('is decided here alone: a policy the visitor sends with the request never reaches a page', () => {
     const chosen = "script-src 'nonce-chosenbythevisitor'"
-    for (const path of ['/admin', '/admin/login', '/pricing', '/no-such-page', '/es/no-such-page']) {
+    for (const path of [
+      '/admin',
+      '/admin/login',
+      '/pricing',
+      '/no-such-page',
+      '/es/no-such-page',
+      // Sent on to the catch-all by the site, with the request headers the kit chose.
+      '/games/no-such-game',
+      '/es/legal/no-such-document',
+      '/partners/no-such-partner.png',
+    ]) {
       const response = proxy(request(path, { headers: { 'content-security-policy': chosen } }))
       const forwarded = response.headers.get('x-middleware-request-content-security-policy')
       expect(forwarded ?? '', path).not.toContain('chosenbythevisitor')
       // The admin's pages get the proxy's own policy instead; the rest get none.
       expect(forwarded, path).toBe(path.startsWith('/admin') ? policyOf(response) : null)
+      // Next drops every request header this list leaves out: the visitor's
+      // policy is left out everywhere but the admin, which gets its own.
+      const kept = (response.headers.get('x-middleware-override-headers') ?? '').split(',')
+      expect(kept, path).not.toEqual([''])
+      expect(kept.includes('content-security-policy'), path).toBe(path.startsWith('/admin'))
     }
   })
 

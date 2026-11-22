@@ -1,4 +1,7 @@
 import { defaultLocale, isLocale } from '@/i18n/config'
+import { games } from '@/data/games'
+import { legalPages, legalSlug } from '@/data/legal'
+import { partners } from '@/data/partners'
 
 /**
  * The paths served from the site root that are files or endpoints rather
@@ -77,11 +80,68 @@ export function isAdminPath(pathname: string): boolean {
   return pathname === '/admin' || pathname.startsWith('/admin/')
 }
 
+/**
+ * The lists with a page of their own for each entry, at /<list>/<slug> in
+ * every language, and the slugs the build makes those pages for: the same
+ * lists each app/[locale]/<list>/[slug]/page.tsx builds from
+ * (generateStaticParams), which tests/routing.test.ts holds together.
+ */
+export const listPages: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+  ['games', new Set(games.map((game) => game.slug))],
+  ['legal', new Set(legalPages.map(legalSlug))],
+  ['partners', new Set(partners.map((partner) => partner.slug))],
+])
+
+/**
+ * For /<list>/<segment>, the address of one of a list's pages whether the
+ * build made it or not: the list's slugs and that segment. Null for any
+ * other path.
+ */
+function listPageAt(path: string): { slugs: ReadonlySet<string>; segment: string } | null {
+  const [, list, segment, ...deeper] = path.split('/')
+  const slugs = listPages.get(list)
+  return slugs !== undefined && segment && deeper.length === 0 ? { slugs, segment } : null
+}
+
 export function isRootFile(pathname: string): boolean {
-  return (
-    rootFiles.includes(pathname) ||
-    [...rootDirectories, ...sharedDirectories].some((dir) => pathname.startsWith(dir) && sharedFile.test(pathname))
-  )
+  if (rootFiles.includes(pathname)) return true
+  // A partner's pictures sit in a folder of their own (lib/partners.ts
+  // checks that they do), so one straight under /partners/ is the address
+  // of a partner's page instead, and goes the way of any slug of a list.
+  if (listPageAt(pathname) !== null) return false
+  return [...rootDirectories, ...sharedDirectories].some((dir) => pathname.startsWith(dir) && sharedFile.test(pathname))
+}
+
+/**
+ * Where a page address goes instead when it would reach one of those pages
+ * with a slug the build made none for (/games/anything, /es/legal/anything,
+ * /partners/anything.png): the same address one segment deeper, which no
+ * page answers but app/[locale]/[...rest], with the same 404 page. Null for
+ * every other address, every page the build made included.
+ *
+ * Next draws such a page the first time it is asked for, and keeps a note
+ * of it beside its cache that nothing ever clears, with the whole address
+ * in it: up to 16 KB of memory for every new address, which anyone can make
+ * up, for as long as the server runs. The catch-all is drawn for each
+ * request and keeps nothing.
+ *
+ * `pathname` is the address as Next will route it, under its language
+ * (proxy.ts). Next reads /games/<slug>.rsc as an RSC request for the page
+ * at /games/<slug>, and decodes a slug before it looks it up
+ * (/games/minecraf%74 is the Minecraft page), so a slug is compared the
+ * same way.
+ */
+export function unlistedPage(pathname: string): string | null {
+  const locale = pathname.split('/')[1]
+  const page = isLocale(locale) ? listPageAt(pathname.slice(locale.length + 1)) : null
+  if (page === null) return null
+  let slug = page.segment.replace(/\.rsc$/, '')
+  try {
+    slug = decodeURIComponent(slug)
+  } catch {
+    // Not one of ours either: no slug has a percent sign in it.
+  }
+  return page.slugs.has(slug) ? null : `${pathname}/-`
 }
 
 /**
