@@ -34,11 +34,12 @@ export const rootFiles: readonly string[] = [
 
 /**
  * Directories under public/ that hold only pictures (client logos, team
- * photos). Only a picture there is a file; any other path under them is a
- * page and gets a language, so a made-up address like /clients/pricing is a
- * 404 rather than a second copy of /pricing that a search engine could index.
+ * photos, and the images every app's emails load, which sit at /email/). Only
+ * a picture there is a file; any other path under them is a page and gets a
+ * language, so a made-up address like /clients/pricing is a 404 rather than a
+ * second copy of /pricing that a search engine could index.
  */
-export const rootDirectories: readonly string[] = ['/clients/', '/owners/']
+export const rootDirectories: readonly string[] = ['/clients/', '/owners/', '/email/']
 
 /**
  * Directories under public/ that share their name with pages. /partners and
