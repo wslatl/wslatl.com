@@ -279,14 +279,27 @@ describe('methods', () => {
     }
   })
 
-  it('never echo a request back (TRACE), cookies and headers included', async () => {
+  it('never echo a request back (TRACE, or a request for *), cookies and headers included', async () => {
     const canary = `trace-canary-${randomBytes(8).toString('hex')}`
-    for (const path of ['/', '/admin/login', '/admin/api/update']) {
-      const response = await raw(site.base, 'TRACE', path, { cookie: `__Host-wslatl_admin=${canary}`, 'x-canary': canary })
-      expect(response.status, path).toBeGreaterThanOrEqual(400)
-      expect(response.body, path).not.toContain(canary)
-      expect(JSON.stringify(response.headers), path).not.toContain(canary)
+    for (const [method, path] of [
+      ['TRACE', '/'],
+      ['TRACE', '/admin/login'],
+      ['TRACE', '/admin/api/update'],
+      ['OPTIONS', '*'],
+      ['GET', '*'],
+      ['HEAD', '*'],
+    ]) {
+      const response = await raw(site.base, method, path, { cookie: `__Host-wslatl_admin=${canary}`, 'x-canary': canary })
+      expect(response.status, `${method} ${path}`).toBeGreaterThanOrEqual(400)
+      expect(response.body, `${method} ${path}`).not.toContain(canary)
+      expect(JSON.stringify(response.headers), `${method} ${path}`).not.toContain(canary)
     }
+    // Next answers both before proxy.ts runs, with none of the headers: a
+    // risk taken on purpose, which SECURITY.md names, so the owner knows
+    // what closes it (only Cloudflare reaching the server).
+    const security = readFileSync(join(root, 'SECURITY.md'), 'utf8')
+    const risks = security.slice(security.indexOf('### Risks taken on purpose'), security.indexOf('## Encryption'))
+    expect(risks).toMatch(/`TRACE` requests, and requests for `\*`/)
   })
 })
 
