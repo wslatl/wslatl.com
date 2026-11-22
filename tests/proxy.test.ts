@@ -176,6 +176,33 @@ describe('what the proxy runs on', () => {
     }
   })
 
+  it("answers every other address under /_next/ with a plain 404 that keeps nothing, since none is one of Next's files", () => {
+    // Skipping the proxy, /_next/games/<anything> reached a game's page with
+    // "_next" for its language, and Next kept a note of every one it drew.
+    // (Next hands the proxy /_next/data/<build>/<page>.json as the page
+    // itself, so that one goes the way of the page: tests/http asks for it.)
+    for (const path of [
+      '/_next',
+      '/_next/games/no-such-game',
+      '/_next/legal/no-such-document',
+      '/_next/partners/no-such-partner',
+      '/_next/image',
+      '/_next/stati%63/chunks/main.js',
+    ]) {
+      expect(matcher.test(path), path).toBe(true)
+      for (const method of ['GET', 'HEAD']) {
+        const response = proxy(new NextRequest(`https://wslatl.com${path}`, { method }))
+        expect(response.status, `${method} ${path}`).toBe(404)
+        expect(response.headers.get('cache-control'), `${method} ${path}`).toBe('no-store')
+        expect(response.headers.get('x-middleware-next'), `${method} ${path}`).toBeNull()
+        expect(response.headers.get('x-middleware-rewrite'), `${method} ${path}`).toBeNull()
+      }
+    }
+    // The kit's own rules still come first.
+    expect(proxy(new NextRequest('https://wslatl.com/_next/games/x', { method: 'POST', body: 'x' })).status).toBe(405)
+    expect(proxy(new NextRequest('https://wslatl.com/_next/games/x', { headers: { 'cf-visitor': '{"scheme":"http"}' } })).status).toBe(308)
+  })
+
   it('gives a path that looks like a dev endpoint a language in production, so it gets our 404', () => {
     for (const path of ['/__nextjsX/pricing', '/__nextjs_original-stack-frames']) {
       const response = proxy(new NextRequest(`https://wslatl.com${path}`))

@@ -4,6 +4,7 @@ import { NextRequest } from 'next/server'
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import sitemap from '@/app/sitemap'
 import { defaultLocale, locales, stripLocale } from '@/i18n/config'
+import { decodable } from '@/platform/i18n/proxy'
 import { proxy } from '@/proxy'
 import { type Admin, logsOf, makeAdmin, origin, paths, restart, send, setUp, signInFully, tearDown, wholeResponse } from './site'
 
@@ -315,9 +316,13 @@ describe('fuzzing the public routes', () => {
     }
   })
 
-  it('the proxy: any address and method, never a crash, a redirect or a rewrite off the site', () => {
+  it('the proxy: any address and method, never a crash, a redirect but to our own 404 page, or a rewrite off the site', () => {
     rng = generator(seed + 3)
     const { pick, chance, text } = rng
+    // The one redirect the proxy makes: an address that cannot be decoded,
+    // after the HTTPS and method rules, to our 404 page in its language on
+    // this site (brokenAddress in proxy.ts), a path of the site's own.
+    const brokenTarget = new RegExp(`^${origin}/(?:(?:${[...locales.filter((locale) => locale !== defaultLocale), 'admin'].join('|')})/)?broken-address$`)
     for (let i = 0; i < 2000; i++) {
       const path = `/${text(30)}`.replace(/[#?]/g, '')
       const method = pick(methods)
@@ -330,8 +335,10 @@ describe('fuzzing the public routes', () => {
       }
       const response = proxy(request)
       const label = `seed=${seed} case ${i}: ${method} ${JSON.stringify(path).slice(0, 100)}`
-      expect([200, 405], label).toContain(response.status)
-      expect(response.headers.get('location'), label).toBeNull()
+      const location = response.headers.get('location')
+      const toOur404 = response.status === 307 && !decodable(request.nextUrl.pathname) && brokenTarget.test(location ?? '')
+      expect([200, 405].includes(response.status) || toOur404, label).toBe(true)
+      expect(location === null || toOur404, label).toBe(true)
       const rewrite = response.headers.get('x-middleware-rewrite')
       expect(rewrite === null || new URL(rewrite).origin === origin, label).toBe(true)
       expect(!headers['next-action'] || response.status === 405, label).toBe(true)

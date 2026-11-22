@@ -78,6 +78,10 @@ export const metadata: Metadata = {
  * unknown game, a mistyped document) before the page can run, answering with
  * its own bare 404 page and logging an error for every bot that probes one.
  * True lets the page run and call notFound(), which is what renders ours.
+ * A made-up game, document or partner never gets that far: Next keeps a
+ * note of every such page it draws, for as long as the server runs, so
+ * proxy.ts sends each one to app/[locale]/[...rest] instead (unlistedPage
+ * in i18n/routing.ts), which keeps nothing.
  *
  * Nothing renders under a made-up language: proxy.ts gives every request a
  * real one before it reaches a route (i18n/routing.ts), and the layout below

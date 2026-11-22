@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation'
 import { cache } from 'react'
 import { defaultLocale, isLocale, type Locale } from '@/i18n/config'
 
@@ -12,13 +13,22 @@ import { defaultLocale, isLocale, type Locale } from '@/i18n/config'
 const holder = cache(() => ({ locale: defaultLocale }))
 
 /**
- * Called by each route before it renders anything. The layout answers 404 for
- * an unknown language before any page runs, so the fallback to English is
- * only for the 404 page, which reads the language from the address on its
- * own and must still render whatever that address holds.
+ * Called by each route, and by each page's metadata, before it renders
+ * anything: the page's [locale], or a 404 for one that is not ours. The
+ * layout answers 404 for such a language too, but a page's metadata runs
+ * beside the layout rather than after it, so it must not read its words
+ * first: the framework hands /es.rsc, /og.rsc and /_next, which the proxy
+ * gives no language, to the home page with "es.rsc", "og" or "_next" for
+ * its language, and the missing words were a 500 with a stack trace in the
+ * log on every request.
+ *
+ * The 404 page reads the language from the address on its own and must
+ * still render whatever that address holds, so it checks its own and calls
+ * this with one of ours.
  */
-export function setLocale(locale: string) {
-  holder().locale = isLocale(locale) ? locale : defaultLocale
+export function setLocale(locale: string): void {
+  if (!isLocale(locale)) notFound()
+  holder().locale = locale
 }
 
 export function getLocale(): Locale {

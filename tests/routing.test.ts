@@ -1,17 +1,25 @@
 import { existsSync, readdirSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { NextRequest } from 'next/server'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { generateStaticParams as gamePages } from '@/app/[locale]/games/[slug]/page'
+import { generateStaticParams as legalPages } from '@/app/[locale]/legal/[slug]/page'
+import { generateStaticParams as partnerPages } from '@/app/[locale]/partners/[slug]/page'
 import { proxy } from '@/proxy'
 import { isAdminPath as kitIsAdminPath } from '@/platform/admin/proxy'
+import { defaultLocale, locales } from '@/i18n/config'
 import {
   isAdminPath,
   isRootFile,
+  listPages,
   partnerImageTypes,
   rootDirectories,
   rootFiles,
   sharedDirectories,
 } from '@/i18n/routing'
+
+// The pages are imported for their lists alone; config/emails.ts, which they reach, is server-only.
+vi.mock('server-only', () => ({}))
 
 const root = join(__dirname, '..')
 
@@ -24,6 +32,19 @@ const root = join(__dirname, '..')
 function rewriteTarget(path: string): string | null {
   const rewrite = proxy(new NextRequest(`https://wslatl.com${path}`)).headers.get('x-middleware-rewrite')
   return rewrite === null ? null : new URL(rewrite).pathname
+}
+
+/**
+ * The path Next routes once the proxy is done: where it rewrote the
+ * address, or the address itself, when it goes on as it came (one with a
+ * language prefix already, or a percent sign). Null when the proxy
+ * answered the request itself.
+ */
+function landing(path: string, headers: Record<string, string> = {}): string | null {
+  const response = proxy(new NextRequest(`https://wslatl.com${path}`, { headers }))
+  const rewrite = response.headers.get('x-middleware-rewrite')
+  if (rewrite !== null) return new URL(rewrite).pathname
+  return response.headers.get('x-middleware-next') === null ? null : new URL(`https://wslatl.com${path}`).pathname
 }
 
 describe('the files served from the site root', () => {
@@ -84,9 +105,10 @@ describe('a directory shared with pages', () => {
   it('still gives the partner pages a language', () => {
     // /partners and /partners/<slug> are pages. Treated as files, the English
     // ones would skip app/[locale] and answer 404.
+    const [partner] = listPages.get('partners') ?? []
     expect(rewriteTarget('/partners')).toBe('/en/partners')
-    expect(rewriteTarget('/partners/someone')).toBe('/en/partners/someone')
-    expect(rewriteTarget('/es/partners/someone')).toBeNull()
+    expect(rewriteTarget(`/partners/${partner}`)).toBe(`/en/partners/${partner}`)
+    expect(rewriteTarget(`/es/partners/${partner}`)).toBeNull()
   })
 
   it('treats anything there that is not a picture as a page, so a probe gets our 404', () => {
@@ -122,6 +144,78 @@ describe('a directory shared with pages', () => {
     const pages = readdirSync(join(root, 'app', '[locale]'))
     expect(rootDirectories.filter((dir) => pages.includes(dir.replaceAll('/', '')))).toEqual([])
     expect(sharedDirectories.every((dir) => pages.includes(dir.replaceAll('/', '')))).toBe(true)
+  })
+
+  it("takes a picture straight under /partners/ for a partner's page, since each partner's pictures have a folder of their own", () => {
+    // Served as a file, /partners/<anything>.png went on with no language,
+    // missed in public/, and next.config.mjs's rewrite then handed it to the
+    // partner page as English, which Next keeps a note of for every slug.
+    for (const type of partnerImageTypes) {
+      const path = `/partners/no-such-partner.${type}`
+      expect(isRootFile(path), path).toBe(false)
+      expect(landing(path), path).toBe(`/en${path}/-`)
+    }
+    const partnersDir = join(root, 'public', 'partners')
+    expect(readdirSync(partnersDir).filter((name) => !statSync(join(partnersDir, name)).isDirectory())).toEqual([])
+  })
+})
+
+describe('a game, document or partner the build did not make', () => {
+  const unknown = ['no-such-thing', 'no-such-thing.rsc', 'no-such-thing.prefetch.rsc', 'no-such%25', 'Minecraft', 'privacy%2Fx', '%F0%9F%98%80', 'x'.repeat(4000)]
+
+  it('lands on the catch-all page, one segment deeper, in every language and every form Next reads as that page', () => {
+    // Next draws each [slug] page it was not built with when it is first
+    // asked for, and keeps a note of it that nothing clears, the whole
+    // address in it: up to 16 KB of memory for every new made-up address.
+    // app/[locale]/[...rest] is drawn for each request and keeps nothing.
+    for (const [list] of listPages) {
+      for (const locale of locales) {
+        const prefix = locale === defaultLocale ? '' : `/${locale}`
+        for (const slug of unknown) {
+          const path = `${prefix}/${list}/${slug}`
+          expect(landing(path), path).toBe(`/${locale}/${list}/${slug}/-`)
+        }
+      }
+    }
+  })
+
+  it('lands there however the request asks for it: a page, an RSC request or a prefetch', () => {
+    const asked: Record<string, string>[] = [{}, { rsc: '1' }, { rsc: '1', 'next-router-prefetch': '1' }, { rsc: '1', 'next-router-segment-prefetch': '/_tree' }]
+    for (const headers of asked) {
+      expect(landing('/games/no-such-game?_rsc=abc', headers), JSON.stringify(headers)).toBe('/en/games/no-such-game/-')
+      expect(landing('/de/legal/no-such-document', headers), JSON.stringify(headers)).toBe('/de/legal/no-such-document/-')
+    }
+  })
+
+  it('leaves every page the build made where it is, in every language, its RSC form and its slug in percent signs included', () => {
+    for (const [list, slugs] of listPages) {
+      for (const slug of slugs) {
+        for (const locale of locales) {
+          const prefix = locale === defaultLocale ? '' : `/${locale}`
+          expect(landing(`${prefix}/${list}/${slug}`), `${prefix}/${list}/${slug}`).toBe(`/${locale}/${list}/${slug}`)
+          expect(landing(`${prefix}/${list}/${slug}.rsc`), `${prefix}/${list}/${slug}.rsc`).toBe(`/${locale}/${list}/${slug}.rsc`)
+        }
+      }
+    }
+    // Next decodes a slug before it looks the page up, and next-intl an
+    // address before it rewrites it: each is the page itself.
+    expect(landing('/games/minecraf%74')).toBe('/en/games/minecraft')
+    expect(landing('/es/legal/%70rivacy')).toBe('/es/legal/privacy')
+  })
+
+  it('leaves every other address as it was', () => {
+    for (const path of ['/games', '/es/legal', '/partners', '/games/no-such-game/deeper', '/pricing/no-such-page', '/es/brand/no-such.png']) {
+      expect(landing(path) ?? '', path).not.toMatch(/\/-$/)
+    }
+  })
+
+  it('knows each list the pages are built from, and every list with a page for each entry', () => {
+    const lists = readdirSync(join(root, 'app', '[locale]')).filter((name) => existsSync(join(root, 'app', '[locale]', name, '[slug]', 'page.tsx')))
+    expect([...listPages.keys()].toSorted()).toEqual(lists.toSorted())
+    const built: Record<string, () => { slug: string }[]> = { games: gamePages, legal: legalPages, partners: partnerPages }
+    for (const [list, slugs] of listPages) {
+      expect([...slugs].toSorted(), list).toEqual(built[list]().map(({ slug }) => slug).toSorted())
+    }
   })
 })
 

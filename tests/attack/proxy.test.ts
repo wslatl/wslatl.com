@@ -139,12 +139,27 @@ describe('the admin\'s Content Security Policy', () => {
 
   it('is decided here alone: a policy the visitor sends with the request never reaches a page', () => {
     const chosen = "script-src 'nonce-chosenbythevisitor'"
-    for (const path of ['/admin', '/admin/login', '/pricing', '/no-such-page', '/es/no-such-page']) {
+    for (const path of [
+      '/admin',
+      '/admin/login',
+      '/pricing',
+      '/no-such-page',
+      '/es/no-such-page',
+      // Sent on to the catch-all by the site, with the request headers the kit chose.
+      '/games/no-such-game',
+      '/es/legal/no-such-document',
+      '/partners/no-such-partner.png',
+    ]) {
       const response = proxy(request(path, { headers: { 'content-security-policy': chosen } }))
       const forwarded = response.headers.get('x-middleware-request-content-security-policy')
       expect(forwarded ?? '', path).not.toContain('chosenbythevisitor')
       // The admin's pages get the proxy's own policy instead; the rest get none.
       expect(forwarded, path).toBe(path.startsWith('/admin') ? policyOf(response) : null)
+      // Next drops every request header this list leaves out: the visitor's
+      // policy is left out everywhere but the admin, which gets its own.
+      const kept = (response.headers.get('x-middleware-override-headers') ?? '').split(',')
+      expect(kept, path).not.toEqual([''])
+      expect(kept.includes('content-security-policy'), path).toBe(path.startsWith('/admin'))
     }
   })
 
@@ -152,5 +167,32 @@ describe('the admin\'s Content Security Policy', () => {
     const response = proxy(request('/admin/api/update', { method: 'DELETE' }))
     expect(response.status).toBe(405)
     expect(policyOf(response)).toMatch(/default-src 'self'.*script-src 'self'(;|$)/)
+  })
+})
+
+describe('an address that cannot be decoded', () => {
+  it('goes to our 404 page in its own language on this site, never on to a bare 500 with no headers', () => {
+    for (const [path, target] of [
+      ['/%ff', '/broken-address'],
+      ['/%C0%AF', '/broken-address'],
+      ['/en/%E0%A4%A', '/broken-address'],
+      ['/es/%E0%A4%A', '/es/broken-address'],
+      ['/de/games/%ff', '/de/broken-address'],
+      ['/zz/%ff', '/broken-address'],
+      ['/admin/%ff', '/admin/broken-address'],
+      ['/admin/api/login%ff', '/admin/broken-address'],
+    ] as const) {
+      const response = proxy(request(path, { headers: { host: 'evil.example' } }))
+      expect(response.status, path).toBe(307)
+      expect(response.headers.get('location'), path).toBe(`${origin}${target}`)
+    }
+  })
+
+  it('still gets the HTTPS and method rules first', () => {
+    const upgraded = proxy(request('/es/%ff', { headers: { 'cf-visitor': '{"scheme":"http"}' } }))
+    expect(upgraded.status).toBe(308)
+    expect(upgraded.headers.get('location')).toBe(`${origin}/es/%ff`)
+    expect(proxy(request('/es/%ff', { method: 'POST', body: 'x' })).status).toBe(405)
+    expect(proxy(request('/admin/api/login%ff', { method: 'POST', body: '{}' })).status).toBe(405)
   })
 })

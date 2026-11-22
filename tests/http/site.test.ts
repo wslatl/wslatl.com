@@ -1,11 +1,12 @@
 import { randomBytes } from 'node:crypto'
-import { existsSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import shortLinks from '../../config/links.json' with { type: 'json' }
+import { partners } from '../../data/partners'
 import { cookieProblems, headerProblems } from '../../scripts/check-security.mjs'
 import { fakeGitHub, type FakeGitHub } from '../attack/fake-github'
-import { raw, type Site, startSite } from './server'
+import { raw, root, type Site, startSite } from './server'
 
 /**
  * The attack tests again, against the real thing: the site as `npm run
@@ -87,6 +88,7 @@ describe('the security headers', () => {
       ['a legal document', '/legal/privacy', {}, {}],
       ['a page that does not exist', '/no-such-page', {}, {}],
       ['an unknown game in German', '/de/games/no-such-game', {}, {}],
+      ['an address under /_next/ that is none of its files', '/_next/games/no-such-game', {}, {}],
       ['a missing file', '/no-such-file.js', {}, {}],
       ['a script', asset ?? '/', {}, {}],
       ['a share card', '/og?path=/pricing&locale=en', {}, {}],
@@ -277,14 +279,27 @@ describe('methods', () => {
     }
   })
 
-  it('never echo a request back (TRACE), cookies and headers included', async () => {
+  it('never echo a request back (TRACE, or a request for *), cookies and headers included', async () => {
     const canary = `trace-canary-${randomBytes(8).toString('hex')}`
-    for (const path of ['/', '/admin/login', '/admin/api/update']) {
-      const response = await raw(site.base, 'TRACE', path, { cookie: `__Host-wslatl_admin=${canary}`, 'x-canary': canary })
-      expect(response.status, path).toBeGreaterThanOrEqual(400)
-      expect(response.body, path).not.toContain(canary)
-      expect(JSON.stringify(response.headers), path).not.toContain(canary)
+    for (const [method, path] of [
+      ['TRACE', '/'],
+      ['TRACE', '/admin/login'],
+      ['TRACE', '/admin/api/update'],
+      ['OPTIONS', '*'],
+      ['GET', '*'],
+      ['HEAD', '*'],
+    ]) {
+      const response = await raw(site.base, method, path, { cookie: `__Host-wslatl_admin=${canary}`, 'x-canary': canary })
+      expect(response.status, `${method} ${path}`).toBeGreaterThanOrEqual(400)
+      expect(response.body, `${method} ${path}`).not.toContain(canary)
+      expect(JSON.stringify(response.headers), `${method} ${path}`).not.toContain(canary)
     }
+    // Next answers both before proxy.ts runs, with none of the headers: a
+    // risk taken on purpose, which SECURITY.md names, so the owner knows
+    // what closes it (only Cloudflare reaching the server).
+    const security = readFileSync(join(root, 'SECURITY.md'), 'utf8')
+    const risks = security.slice(security.indexOf('### Risks taken on purpose'), security.indexOf('## Encryption'))
+    expect(risks).toMatch(/`TRACE` requests, and requests for `\*`/)
   })
 })
 
@@ -304,6 +319,126 @@ describe('a flood of guesses from many addresses', () => {
     // The owner's own browser still gets in.
     expect((await guess({ 'cf-connecting-ip': '198.18.1.4', cookie: device }, site.password)).status).toBe(200)
   }, 120_000)
+})
+
+/** A slug no list has, new every time. */
+const madeUp = () => `no-such-${randomBytes(6).toString('hex')}`
+
+/** Every file under a folder, as paths relative to it. */
+function filesUnder(dir: string, prefix = ''): string[] {
+  if (!existsSync(join(dir, prefix))) return []
+  return readdirSync(join(dir, prefix), { withFileTypes: true }).flatMap((entry) => {
+    const path = prefix ? `${prefix}/${entry.name}` : entry.name
+    return entry.isDirectory() ? filesUnder(dir, path) : [path]
+  })
+}
+
+describe('a made-up game, document or partner', () => {
+  it('is our 404 page, and writes nothing to the disk however many are asked for', async () => {
+    // Each page under these has its address made up by whoever asks, and
+    // Next kept every one it answered as a file under .next/server, about
+    // 126 KB each, for good: a flood of made-up addresses filled the disk,
+    // and a server over its disk limit is stopped by Pterodactyl.
+    const server = join(root, '.next', 'server')
+    const before = new Set(filesUnder(server))
+    for (const list of ['/games', '/es/games', '/legal', '/fr/legal', '/partners', '/de/partners']) {
+      for (let i = 0; i < 3; i++) {
+        const path = `${list}/no-such-${randomBytes(6).toString('hex')}`
+        const response = await ask(path)
+        expect(response.status, path).toBe(404)
+        expect(await response.text(), path).toContain('<title>Page not found | WSLATL</title>')
+      }
+    }
+    // A real one is still served, from what the build made.
+    expect((await ask('/games/minecraft')).status).toBe(200)
+    expect((await ask('/es/legal/privacy')).status).toBe(200)
+    expect(filesUnder(server).filter((file) => !before.has(file))).toEqual([])
+  }, 120_000)
+
+  it('is kept nowhere, in any form Next reads as that page, so it leaves nothing in memory either', async () => {
+    // Next drew each of these as the list's own page and kept a note of it
+    // in memory that nothing clears, the whole address in it: up to 16 KB
+    // for every new address. Such a page went out with s-maxage and
+    // x-nextjs-cache: MISS. The catch-all page, which keeps nothing, goes
+    // out with no-store, and so does the plain 404 under /_next/.
+    const build = readFileSync(join(root, '.next', 'BUILD_ID'), 'utf8').trim()
+    const forms: [string, string, Record<string, string>?][] = [
+      ['GET', `/games/${madeUp()}`],
+      ['GET', `/es/games/${madeUp()}`],
+      ['GET', `/fr/legal/${madeUp()}`],
+      ['GET', `/de/partners/${madeUp()}`],
+      ['HEAD', `/pt/games/${madeUp()}`],
+      ['GET', `/legal/${madeUp()}${'x'.repeat(4000)}`],
+      ['GET', `/games/${madeUp()}.rsc`],
+      ['GET', `/es/legal/${madeUp()}.prefetch.rsc`],
+      ['GET', `/games/${madeUp()}%25`],
+      ['GET', `/es/games/${madeUp()}%25`],
+      ['GET', `/partners/${madeUp()}.png`],
+      ['GET', `/es/partners/${madeUp()}.webp`],
+      ['GET', `/_next/games/${madeUp()}`],
+      ['GET', `/_next/legal/${madeUp()}`],
+      ['GET', `/_next/partners/${madeUp()}`],
+      // Next hands the proxy a data address of this build as the page itself.
+      ['GET', `/_next/data/${build}/games/${madeUp()}.json`],
+      ['GET', `/_next/data/${build}/es/legal/${madeUp()}.json`],
+      ['GET', `/games/${madeUp()}`, { rsc: '1' }],
+      ['GET', `/de/games/${madeUp()}`, { rsc: '1', 'next-router-prefetch': '1' }],
+      ['GET', `/partners/${madeUp()}`, { rsc: '1', 'next-router-prefetch': '1', 'next-router-segment-prefetch': '/_tree' }],
+    ]
+    for (const [method, path, headers = {}] of forms) {
+      const label = `${method} ${path.slice(0, 60)} ${JSON.stringify(headers)}`
+      let response = await raw(site.base, method, path, headers)
+      // An RSC request is asked again with the hash of its headers (?_rsc=), as Next tells the client router to.
+      if (response.status === 307 && headers.rsc) response = await raw(site.base, method, String(response.headers.location), headers)
+      // The 404 page's RSC form goes out as a 200, as it does for any address the site has no page for.
+      expect(response.status, label).toBe(headers.rsc || path.endsWith('.rsc') ? 200 : 404)
+      expect(String(response.headers['cache-control']), label).toMatch(/no-store/)
+      expect(response.headers['x-nextjs-cache'], label).toBeUndefined()
+    }
+    // A real one is still the page the build made, read from the build.
+    for (const path of ['/games/minecraft', '/es/legal/privacy', `/de/partners/${partners[0].slug}`, '/games/minecraft.rsc']) {
+      const response = await raw(site.base, 'GET', path)
+      expect(response.status, path).toBe(200)
+      expect(response.headers['x-nextjs-cache'], path).toBe('HIT')
+    }
+  }, 120_000)
+})
+
+describe('an address the framework hands to a page with no language', () => {
+  it('is a 404, never a 500 with a stack trace in the log', async () => {
+    // The proxy reads /es.rsc as /es and /og.rsc as the share card, and
+    // gives neither a language; the framework then renders the home page
+    // with "es.rsc" for its language, whose words do not exist.
+    for (const path of ['/_next', '/es.rsc', '/fr.rsc', '/og.rsc', '/api.rsc', '/admin.rsc', '/robots.txt.rsc', '/company.json.rsc', '/icon-192.png.rsc']) {
+      expect((await ask(path)).status, path).toBe(404)
+    }
+    expect(site.log()).not.toMatch(/MISSING_MESSAGE/)
+  })
+
+  it('cannot be decoded, and is sent to our 404 page in its own language, with every header, never to a bare error', async () => {
+    // (/en/%ff goes to /%ff first: next.config.mjs's own redirect from /en/
+    // answers before the proxy, and then this.)
+    for (const [path, target] of [
+      ['/%ff', '/broken-address'],
+      ['/%C0%AF', '/broken-address'],
+      ['/es/%E0%A4%A', '/es/broken-address'],
+      ['/de/games/%ff', '/de/broken-address'],
+      ['/admin/%ff', '/admin/broken-address'],
+    ] as const) {
+      const response = await raw(site.base, 'GET', path)
+      expect(response.status, path).toBe(307)
+      expect(response.headers.location, path).toBe(`https://wslatl.com${target}`)
+    }
+    for (const [path, admin] of [
+      ['/broken-address', false],
+      ['/es/broken-address', false],
+      ['/admin/broken-address', true],
+    ] as const) {
+      const response = await ask(path)
+      expect(response.status, path).toBe(404)
+      expect(headerProblems(response.headers, { admin, page: true }), path).toEqual([])
+    }
+  })
 })
 
 describe('the secrets', () => {
