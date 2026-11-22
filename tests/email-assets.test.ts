@@ -41,9 +41,19 @@ describe('the shared email images', () => {
     expect(isRootFile('/email/wslatl-mark.svg')).toBe(false)
   })
 
-  it('is cached for a year, publicly and immutably', async () => {
+  it('caches the pictures for a year, publicly and immutably, and nothing else under /email/', async () => {
     const rules = await nextConfig.headers!()
-    const rule = rules.find((r) => r.source === '/email/:path*')
-    expect(rule?.headers).toContainEqual({ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' })
+    const emailRules = rules.filter((r) => r.source.startsWith('/email/'))
+    expect(emailRules).toHaveLength(1)
+    const [rule] = emailRules
+    expect(rule.headers).toContainEqual({ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' })
+    // The source as Next reads it: /email/:file(one alternative per picture).
+    const alternatives = /^\/email\/:file\((.+)\)$/.exec(rule.source)?.[1]
+    expect(alternatives).toBeDefined()
+    const cached = (path: string) => new RegExp(`^/email/(?:${alternatives})$`).test(path)
+    for (const { path } of files) expect(cached(path), path).toBe(true)
+    for (const path of ['/email/missing.png', '/email/wslatl-mark.png.bak', '/email/xwslatl-mark.png', '/email/wslatl-markXpng', '/email/a/wslatl-mark.png', '/email/pricing']) {
+      expect(cached(path), path).toBe(false)
+    }
   })
 })

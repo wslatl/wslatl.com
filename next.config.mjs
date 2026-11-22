@@ -21,6 +21,9 @@ const legalSlugs = [
 // (config/security-headers.mjs, where the headers themselves are).
 const isDev = process.env.NODE_ENV === 'development'
 
+/** The pictures under public/email/, which every app's emails load from here. */
+const emailPictures = ['wslatl-wide-dark.png', 'wslatl-mark.png']
+
 /** @satisfies {import('next').NextConfig} */
 const nextConfig = {
   poweredByHeader: false,
@@ -70,9 +73,10 @@ const nextConfig = {
       },
       // The pictures every app's emails load (the kit appends ?v= and bumps it
       // when a file changes), so mail clients and proxies may keep them for a
-      // year without asking again.
+      // year without asking again. Only these files: a missing one, or anything
+      // else under /email/, answers our 404, which no cache may keep.
       {
-        source: '/email/:path*',
+        source: `/email/:file(${emailPictures.map((name) => name.replaceAll('.', '\\.')).join('|')})`,
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       // The admin is for the owner only: never indexed, wherever a link to

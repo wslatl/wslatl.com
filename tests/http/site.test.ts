@@ -150,6 +150,22 @@ describe('the security headers', () => {
   })
 })
 
+describe('the shared email pictures', () => {
+  it('are kept for a year, and a missing one or anything else under /email/ is never kept', async () => {
+    for (const path of ['/email/wslatl-wide-dark.png', '/email/wslatl-mark.png']) {
+      const response = await ask(`${path}?v=20261121`)
+      expect(response.status, path).toBe(200)
+      expect(response.headers.get('cache-control'), path).toBe('public, max-age=31536000, immutable')
+    }
+    const missing = await ask('/email/missing.png')
+    expect(missing.status).toBe(404)
+    for (const path of ['/email/missing.png', '/email/wslatl-mark.png.bak', '/email/pricing']) {
+      const response = path === '/email/missing.png' ? missing : await ask(path)
+      expect(response.headers.get('cache-control') ?? '', path).not.toMatch(/immutable|max-age=31536000/)
+    }
+  })
+})
+
 describe('the session, through the real server', () => {
   it('is a __Host- cookie with every flag, beside a device cookie with every flag, and only the real one opens the dashboard', async () => {
     const { cookie, setCookies } = await signIn()
